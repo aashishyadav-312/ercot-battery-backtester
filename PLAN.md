@@ -154,7 +154,7 @@ Lead with the headline finding as a hero sentence above the KPIs.
 No third-party brand names or logos. Screenshot before/after at desktop and
 phone widths. Commit and push.
 ```
-(If you've installed the REA agents skill by then, add: "Also use the rea-agents skill to study the reference dashboard at gridstatus.io/live/ercot for layout patterns only.")
+(Design patterns to borrow are in docs/DESIGN_REFERENCE.md. GridStatus blocks cloud browsers with Cloudflare, so REA can only study it from your laptop.)
 
 ### Phase 7 — Deploy  ·  Sonnet · low
 ```
@@ -197,4 +197,4 @@ contacts, in drafts/. Plain, human tone, no hype words.
 1. Make a free ERCOT API account at apiexplorer.ercot.com and get a subscription key.
 2. Add the keys to the cloud environment's variables and to the GitHub repo's Actions secrets.
 3. After Phase 7: Settings → Pages → Source = GitHub Actions.
-4. Before Phase 6, optionally: run `npx rea-agents setup` on your laptop, after checking what the package does, and enable it as a skill.
+4. Optional: run `npx rea-agents setup` on your laptop if you want REA to study the live reference site (it is blocked from the cloud).
