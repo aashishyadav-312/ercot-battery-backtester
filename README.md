@@ -2,7 +2,7 @@
 
 How much could a battery have earned at a given ERCOT location, and what drove that number?
 
-Status: Phase 3 done (year runs and metrics). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 4 done for hubs (batch run, benchmark check, findings). Resource nodes pending ERCOT API credentials. See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 

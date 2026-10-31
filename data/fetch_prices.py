@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -65,12 +66,22 @@ def _normalize(raw: pd.DataFrame, market: str) -> pd.DataFrame:
     return df.sort_values(key).reset_index(drop=True)
 
 
-def _download_archive(year: int, market: str) -> pd.DataFrame:
+def _download_archive(year: int, market: str, retries: int = 4) -> pd.DataFrame:
+    """Download one annual archive, backing off when ERCOT rate-limits (HTTP 403)."""
+    import requests
     from gridstatus import Ercot
 
     ercot = Ercot()
-    raw = ercot.get_rtm_spp(year) if market == "RT15" else ercot.get_dam_spp(year)
-    return _normalize(raw, market)
+    for attempt in range(retries + 1):
+        try:
+            raw = ercot.get_rtm_spp(year) if market == "RT15" else ercot.get_dam_spp(year)
+            return _normalize(raw, market)
+        except requests.HTTPError as err:
+            if err.response is None or err.response.status_code != 403 or attempt == retries:
+                raise
+            wait = 30 * 2**attempt
+            log.warning("ERCOT returned 403 (rate limit); retrying in %ds", wait)
+            time.sleep(wait)
 
 
 def _download_api(location: str, year: int, market: str) -> pd.DataFrame:
