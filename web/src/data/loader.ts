@@ -1,0 +1,32 @@
+import type { IndexRun, NodeSelection, Run, Selection } from './types';
+
+const BASE = `${import.meta.env.BASE_URL}data/`;
+const cache = new Map<string, Promise<unknown>>();
+
+function getJson<T>(file: string): Promise<T> {
+  let p = cache.get(file);
+  if (!p) {
+    p = fetch(BASE + file).then((r) => {
+      if (!r.ok) throw new Error(`${file}: HTTP ${r.status}`);
+      return r.json();
+    });
+    p.catch(() => cache.delete(file)); // allow retry after a failure
+    cache.set(file, p);
+  }
+  return p as Promise<T>;
+}
+
+export const loadIndex = () => getJson<{ runs: IndexRun[] }>('index.json').then((d) => d.runs);
+export const loadNodeSelection = () => getJson<NodeSelection>('node_selection.json');
+export const loadRun = (file: string) => getJson<Run>(file);
+
+export function findRun(index: IndexRun[], s: Selection, location = s.location, year = s.year, duration = s.duration) {
+  return index.find(
+    (r) => r.location === location && r.year === year && r.duration_h === duration && r.deg_cost_per_mwh === s.deg,
+  );
+}
+
+export const HUBS = ['HB_HOUSTON', 'HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_PAN'];
+export const DURATIONS = [1, 2, 4];
+export const YEARS = [2024, 2025, 2026];
+export const DEGS = [0, 10];

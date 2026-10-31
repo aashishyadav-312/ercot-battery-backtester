@@ -1,0 +1,5 @@
+body { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+code { font-size: .9em; padding: 1px 5px; border-radius: 4px; background: var(--mantine-color-default-hover); }
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
