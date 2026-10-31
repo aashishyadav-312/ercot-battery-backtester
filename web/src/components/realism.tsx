@@ -283,13 +283,13 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
             <div style={{ overflowX: 'auto' }}>
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
                 <Table.Thead><Table.Tr><Table.Th>{run.days} matched days</Table.Th><Table.Th ta="right">Before</Table.Th><Table.Th ta="right">After</Table.Th></Table.Tr></Table.Thead>
-                <Table.Tbody style={{ ...tnum, whiteSpace: 'nowrap' }}>
+                <Table.Tbody style={tnum}>
                   <Table.Tr><Table.Td>Perfect foresight, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.pf_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.pf_revenue_per_kw)}<Change v={run.change.pf_revenue} /></Table.Td></Table.Tr>
                   <Table.Tr><Table.Td>DA-scheduled, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.da_rt_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.da_rt_revenue_per_kw)}<Change v={run.change.da_rt_revenue} /></Table.Td></Table.Tr>
                   <Table.Tr><Table.Td>Capture rate</Table.Td><Table.Td ta="right">{pct(run.before.capture_rate)}</Table.Td><Table.Td ta="right">{pct(run.after.capture_rate)}<Change v={run.change.capture_rate_pts} kind="pts" /></Table.Td></Table.Tr>
                   {PRICE_ROWS.map((p) => (
                     <Table.Tr key={p.key}>
-                      <Table.Td style={{ whiteSpace: "normal" }}>{p.label}, $/MWh{p.hint && <Text c="dimmed" fz="xs" lh={1.35}>{p.hint}</Text>}</Table.Td>
+                      <Table.Td>{p.label}, $/MWh{p.hint && <Text c="dimmed" fz="xs" lh={1.35}>{p.hint}</Text>}</Table.Td>
                       <Table.Td ta="right">{usdS(loc.prices.before[p.key])}</Table.Td>
                       <Table.Td ta="right">{usdS(loc.prices.after[p.key])}{p.key !== 'rt_minus_da_mean' && <Change v={loc.prices.after[p.key] / loc.prices.before[p.key] - 1} />}</Table.Td>
                     </Table.Tr>
