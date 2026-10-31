@@ -45,7 +45,7 @@ def test_fill_gaps_handles_dst_days():
     # Spring-forward day has 92 fifteen-minute intervals, fall-back day has 100.
     for day, expected in [("2025-03-09", 92), ("2025-11-02", 100)]:
         start = pd.Timestamp(day, tz="US/Central")
-        end = pd.Timestamp(day, tz="US/Central") + pd.Timedelta(hours=30)
+        end = start + pd.Timedelta("30h")
         utc = pd.date_range(start.tz_convert("UTC"), end.tz_convert("UTC"), freq="15min")
         raw = pd.DataFrame({"Interval Start": utc.tz_convert("US/Central"), "Location": "HB_HOUSTON", "SPP": 1.0})
         out = _fill_gaps(_normalize(raw, "RT15"), "RT15", 2025)
