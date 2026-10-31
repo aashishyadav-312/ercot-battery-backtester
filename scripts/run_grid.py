@@ -17,7 +17,7 @@ import logging
 from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 
-from data.fetch_prices import fetch
+from data.fetch_prices import ErcotBlockedError, fetch
 from model.metrics import summarize
 from model.run_year import RESULTS_DIR, run_year, save
 
@@ -77,6 +77,8 @@ def main() -> None:
             for year in args.years:
                 fetch(loc, year)
             locations.append(loc)
+        except ErcotBlockedError:
+            raise  # a blocked runner won't recover; fail the whole run with the clear message
         except Exception as err:  # noqa: BLE001 - report and keep going
             log.error("Skipping %s: %s", loc, err)
 

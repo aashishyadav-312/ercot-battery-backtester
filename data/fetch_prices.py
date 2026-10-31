@@ -69,6 +69,23 @@ def _normalize(raw: pd.DataFrame, market: str) -> pd.DataFrame:
     return df.sort_values(key).reset_index(drop=True)
 
 
+def _fail_fast() -> bool:
+    """CI sets ERCOT_FAIL_FAST=1 so a blocked runner stops instead of backing off."""
+    return os.environ.get("ERCOT_FAIL_FAST") == "1"
+
+
+class ErcotBlockedError(RuntimeError):
+    """ERCOT refused with HTTP 403 and ERCOT_FAIL_FAST is set; callers should abort."""
+
+
+def _blocked_error(where: str) -> ErcotBlockedError:
+    return ErcotBlockedError(
+        f"ERCOT answered HTTP 403 on {where}. ERCOT's bot protection often blocks cloud and "
+        "GitHub-hosted runner IP ranges, so retrying will not help. Run the refresh from a "
+        "machine that can reach ERCOT (python -m scripts.run_grid ...) and commit the results."
+    )
+
+
 def _download_archive(year: int, market: str, retries: int = 4) -> pd.DataFrame:
     """Download one annual archive, backing off when ERCOT rate-limits (HTTP 403)."""
     import requests
@@ -80,7 +97,11 @@ def _download_archive(year: int, market: str, retries: int = 4) -> pd.DataFrame:
             raw = ercot.get_rtm_spp(year) if market == "RT15" else ercot.get_dam_spp(year)
             return _normalize(raw, market)
         except requests.HTTPError as err:
-            if err.response is None or err.response.status_code != 403 or attempt == retries:
+            if err.response is None or err.response.status_code != 403:
+                raise
+            if _fail_fast():
+                raise _blocked_error("the public archive download") from err
+            if attempt == retries:
                 raise
             wait = 30 * 2**attempt
             log.warning("ERCOT returned 403 (rate limit); retrying in %ds", wait)
@@ -137,6 +158,11 @@ def _throttle() -> None:
     _last_api_call = time.monotonic()
 
 
+def _is_403(err: Exception) -> bool:
+    response = getattr(err, "response", None)
+    return response is not None and response.status_code == 403
+
+
 def _retryable(err: Exception) -> bool:
     """403 (bot protection), 429 (rate limit), or gridstatus giving up on 429s/timeouts."""
     import requests
@@ -162,6 +188,8 @@ def _hit_api(api, market: str, start: str, end: str, retries: int = 5, **filters
         except Exception as err:  # noqa: BLE001 - filtered by _retryable
             if not _retryable(err) or attempt == retries:
                 raise
+            if _fail_fast() and _is_403(err):
+                raise _blocked_error("the ERCOT public API") from err
             wait = 10 * 2**attempt
             log.warning("ERCOT API refused (%s); retrying in %ds", str(err)[:60], wait)
             time.sleep(wait)
