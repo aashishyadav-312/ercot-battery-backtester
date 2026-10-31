@@ -2,7 +2,11 @@
 
 How much could a battery have earned at a given ERCOT location, and what drove that number?
 
-Status: Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+**Live site:** https://aashishyadav-312.github.io/ercot-battery-backtester/
+
+[![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
+
+Status: Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -39,3 +43,13 @@ python -m data.fetch_prices --location HB_HOUSTON --year 2025 --market RT15   # 
 - **Load zones** (`LZ_*`) are excluded for now. The archives carry two price series per zone (load-weighted and energy-weighted) under the same label, and they disagree.
 - Timestamps are stored in UTC, with a US/Central copy. Single missing intervals are forward-filled; longer gaps stay empty.
 - ERCOT's website rate-limits bursts of requests (HTTP 403 from its bot protection). If that happens, wait a few minutes and rerun. Cached files are never downloaded again.
+
+## Workflows
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| [`deploy.yml`](.github/workflows/deploy.yml) | push to `main`, manual | Copies `results/*.json` into `web/public/data`, builds `web/` (Vite base `/ercot-battery-backtester/`, hash routing) and publishes `web/dist` to GitHub Pages. |
+| [`ci.yml`](.github/workflows/ci.yml) | pull requests | Runs `pytest` (Python 3.11, `pip install -e ".[dev]"`) and the web build. |
+| [`refresh.yml`](.github/workflows/refresh.yml) | monthly (06:17 UTC on the 3rd), manual | Refetches the current year for all hubs and the nodes in `results/node_selection.json` (uses the `ERCOT_API_*` secrets), reruns `scripts.run_grid` for that year and opens a PR with the updated results. Merging it redeploys the site. Timeout 60 minutes. |
+
+ERCOT's bot protection can block GitHub's runner IPs. The refresh job sets `ERCOT_FAIL_FAST=1`, so an HTTP 403 stops the run with an explanatory error instead of backing off. If that happens, run the refresh locally (`python -m scripts.run_grid --years <year> --nodes ...`) and commit the results.

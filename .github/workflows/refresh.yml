@@ -1,0 +1,54 @@
+name: Refresh current-year results
+
+on:
+  schedule:
+    - cron: "17 6 3 * *" # 06:17 UTC on the 3rd of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ERCOT_API_USERNAME: ${{ secrets.ERCOT_API_USERNAME }}
+      ERCOT_API_PASSWORD: ${{ secrets.ERCOT_API_PASSWORD }}
+      ERCOT_API_SUBSCRIPTION_KEY: ${{ secrets.ERCOT_API_SUBSCRIPTION_KEY }}
+      # Stop with a clear message on HTTP 403 instead of backing off (see data/fetch_prices.py).
+      ERCOT_FAIL_FAST: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: pip install -e .
+      - name: Rerun the grid for the current year
+        run: |
+          YEAR=$(date -u +%Y)
+          NODES=$(python -c "import json; print(' '.join(n['location'] for n in json.load(open('results/node_selection.json'))['nodes']))")
+          echo "Refreshing $YEAR: hubs + nodes: $NODES"
+          # run_grid fetches the year first (hub archives, then nodes at ~2 s per
+          # request), skips anything ERCOT refuses, and merges into results/index.json.
+          python -m scripts.run_grid --years "$YEAR" --nodes $NODES
+      - name: Open a pull request with the updated results
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/refresh-results
+          add-paths: results/
+          commit-message: "Refresh ERCOT results through the latest complete day"
+          title: "Refresh ERCOT results"
+          body: |
+            Automated monthly refresh: refetched the current year for all hubs and the
+            nodes in `results/node_selection.json`, then reran `scripts.run_grid` for that year.
+
+            Merging to `main` redeploys the site.
+          delete-branch: true
