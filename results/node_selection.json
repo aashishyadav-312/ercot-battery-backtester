@@ -1,0 +1,85 @@
+{
+ "sample_month": "2025-08",
+ "method": "rank by RT 15-min price std; skip nodes with >0.95 price correlation to an earlier pick",
+ "n_nodes_ranked": 735,
+ "median_std": 23.64,
+ "hub_std": {
+  "HB_HOUSTON": 21.25,
+  "HB_NORTH": 22.35,
+  "HB_SOUTH": 21.69,
+  "HB_WEST": 23.58,
+  "HB_PAN": 23.77
+ },
+ "nodes": [
+  {
+   "location": "RUSSEKST_RN",
+   "std": 215.198,
+   "mean": 135.685,
+   "min": -34.27,
+   "max": 2153.17,
+   "group": "high",
+   "load_zone": "LZ_WEST",
+   "substation": "RUSSEKST",
+   "best_corr_hub": "HB_WEST",
+   "best_hub_corr": 0.156,
+   "nearest_hub": "HB_WEST",
+   "rank": 1
+  },
+  {
+   "location": "CAMWIND_RN",
+   "std": 144.875,
+   "mean": 38.294,
+   "min": -11.45,
+   "max": 2580.73,
+   "group": "high",
+   "load_zone": "LZ_SOUTH",
+   "substation": "PAREDES",
+   "best_corr_hub": "HB_SOUTH",
+   "best_hub_corr": 0.112,
+   "nearest_hub": "HB_SOUTH",
+   "rank": 2
+  },
+  {
+   "location": "RHESS2_ESS1",
+   "std": 119.731,
+   "mean": 58.772,
+   "min": 8.26,
+   "max": 2812.96,
+   "group": "high",
+   "load_zone": "LZ_SOUTH",
+   "substation": "GEORSO",
+   "best_corr_hub": "HB_SOUTH",
+   "best_hub_corr": 0.308,
+   "nearest_hub": "HB_SOUTH",
+   "rank": 4
+  },
+  {
+   "location": "ANSON1_ALL",
+   "std": 23.637,
+   "mean": 33.87,
+   "min": -3.74,
+   "max": 326.36,
+   "group": "typical",
+   "load_zone": "LZ_WEST",
+   "substation": "PHNTMHL",
+   "best_corr_hub": "HB_NORTH",
+   "best_hub_corr": 0.985,
+   "nearest_hub": "HB_WEST",
+   "rank": 368
+  },
+  {
+   "location": "WIPOPA_3_4",
+   "std": 23.667,
+   "mean": 38.35,
+   "min": 7.41,
+   "max": 326.36,
+   "group": "typical",
+   "load_zone": "LZ_SOUTH",
+   "substation": "PINECR",
+   "best_corr_hub": "HB_SOUTH",
+   "best_hub_corr": 0.992,
+   "nearest_hub": "HB_SOUTH",
+   "rank": 367
+  }
+ ]
+}
