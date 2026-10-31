@@ -168,18 +168,25 @@ def _download_api(location: str, year: int, market: str, api=None) -> pd.DataFra
 
 
 def fetch_node_sample(year: int, month: int, refresh: bool = False, api=None) -> pd.DataFrame:
-    """RT 15-min prices for every resource node (type RN) for one month.
+    """RT 15-min prices for every resource node (settlement point type RN) for one month.
 
-    Used to rank nodes by volatility. About 700 nodes x 3k intervals, so it is
-    paged (100k rows a page) and cached as data/raw/RT15_RN_{year}-{month}.parquet.
+    Used to rank nodes by volatility. One day of all resource nodes is ~67k rows,
+    a single API page, so the month is requested a day at a time: month-long
+    all-node queries need ~20 pages and ERCOT tends to time out and then refuse
+    (HTTP 403) partway through. Cached as data/raw/RT15_RN_{year}-{month}.parquet.
     """
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     path = RAW_DIR / f"RT15_RN_{year}-{month:02d}.parquet"
     if path.exists() and not refresh:
         return pd.read_parquet(path)
+    api = api or _api_client()
     first = pd.Timestamp(year=year, month=month, day=1)
-    last = first + pd.offsets.MonthEnd(0)
-    df = _hit_api(api or _api_client(), "RT15", f"{first:%Y-%m-%d}", f"{last:%Y-%m-%d}", settlementPointType="RN")
+    parts = []
+    for day in pd.date_range(first, first + pd.offsets.MonthEnd(0), freq="D"):
+        d = f"{day:%Y-%m-%d}"
+        log.info("All resource nodes, %s", d)
+        parts.append(_hit_api(api, "RT15", d, d, settlementPointType="RN"))
+    df = pd.concat(parts, ignore_index=True)
     df.to_parquet(path, index=False)
     return df
 

@@ -186,9 +186,13 @@ def test_missing_credentials_raise_clear_error(monkeypatch):
 def test_node_sample_filters_resource_nodes_and_caches(monkeypatch, tmp_path):
     monkeypatch.setattr(fp, "RAW_DIR", tmp_path)
     api = MagicMock()
-    api.hit_ercot_api.return_value = pd.concat([_api_rows("2025-08-01", "N1"), _api_rows("2025-08-01", "N2")])
+    api.hit_ercot_api.side_effect = lambda ep, deliveryDateFrom, deliveryDateTo, **kw: pd.concat(
+        [_api_rows(deliveryDateFrom, "N1"), _api_rows(deliveryDateFrom, "N2")]
+    )
     df = fp.fetch_node_sample(2025, 8, api=api)
-    kw = api.hit_ercot_api.call_args.kwargs
-    assert kw == {"deliveryDateFrom": "2025-08-01", "deliveryDateTo": "2025-08-31", "settlementPointType": "RN"}
-    assert sorted(df["location"].unique()) == ["N1", "N2"]
+    calls = [c.kwargs for c in api.hit_ercot_api.call_args_list]
+    assert len(calls) == 31  # one single-page request per day
+    assert calls[0] == {"deliveryDateFrom": "2025-08-01", "deliveryDateTo": "2025-08-01", "settlementPointType": "RN"}
+    assert calls[-1]["deliveryDateTo"] == "2025-08-31"
+    assert sorted(df["location"].unique()) == ["N1", "N2"] and len(df) == 31 * 96 * 2
     assert (tmp_path / "RT15_RN_2025-08.parquet").exists()
