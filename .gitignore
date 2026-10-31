@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Raw price downloads (regenerate with data/fetch_prices.py)
+data/raw/
+
+# Frontend
+node_modules/
+dist/
+
+# Local secrets
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

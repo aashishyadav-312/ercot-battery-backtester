@@ -1,0 +1,243 @@
+{
+  "target": "https://www.gridstatus.io/live/ercot",
+  "method": "Installed REA 6.8.0 CLI with existing bundled Node.js v24.22.1; passive local Chrome CDP observation; supplementary direct browser DOM and visual inspection.",
+  "page_evidence_id": "ev_e551a555fe61800567d664d6f8196dd765cf44810ee5e135bf68e9293b69bfee",
+  "screenshot_evidence_id": "ev_d16f41fbdf86f15055be9029b030272632b9c4e9b9f5563a09d6d2c8edb588ea",
+  "captured_at": "2026-10-31T06:37:41.762Z",
+  "script_count": 253,
+  "sources": [
+    {
+      "name": "ECharts",
+      "url": "https://www.gridstatus.io/assets/EChartsWrapper-Bv2E0CtY.js",
+      "sha256": "1c378c06421dfbf8c9f19b2544945a44388a1e3a4fc28c1e5302fb3d0dce9156",
+      "bytes": 759082,
+      "signals": [
+        "echarts",
+        "zrender"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./jsx-runtime-DykzC2zs.js",
+        "./Box-DG8e35v4.js",
+        "./theme-CkLy2yUt.js",
+        "./themeTokens-DLW-btp-.js",
+        "./index-B2v0U7eZ.js"
+      ]
+    },
+    {
+      "name": "Mapbox GL",
+      "url": "https://www.gridstatus.io/assets/mapbox-gl-B_wxVkTK.js",
+      "sha256": "65192d63bed9c814e85101a32afc73c1a6659164e357d8cfa1814e4161c9f981",
+      "bytes": 1798394,
+      "signals": [
+        "Mapbox GL JS",
+        "mapbox-gl-js",
+        "mapboxgl"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./preload-helper-C3h0jJHI.js",
+        "},",
+        ":{"
+      ]
+    },
+    {
+      "name": "React",
+      "url": "https://www.gridstatus.io/assets/jsx-runtime-DykzC2zs.js",
+      "sha256": "e5b48881a0e03ba498890f4fca88cd6436a579949df6b4cdfe60bda39be499da",
+      "bytes": 4428,
+      "signals": [
+        "react.transitional.element",
+        "React"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js"
+      ]
+    },
+    {
+      "name": "AG Grid",
+      "url": "https://www.gridstatus.io/assets/GSDataTable-D67YSq1R.js",
+      "sha256": "1490576bacf619ef5fbaa95c8c8b247c397236903fc8c0506feff44d8c716ed1",
+      "bytes": 658427,
+      "signals": [
+        "AG Grid",
+        "ag-grid"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./jsx-runtime-DykzC2zs.js",
+        "./Box-DG8e35v4.js",
+        "./index-B2v0U7eZ.js",
+        "ag-grid-community"
+      ]
+    },
+    {
+      "name": "AG Grid",
+      "url": "https://www.gridstatus.io/assets/GSDataTable-DhSzdnqu.js",
+      "sha256": "5a4d6503085118d96bbfb2ed65d24ddf92115b29a040c0a8ff702d19c21d1e7e",
+      "bytes": 3317,
+      "signals": [],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./jsx-runtime-DykzC2zs.js",
+        "./preload-helper-C3h0jJHI.js",
+        "./index-B2v0U7eZ.js"
+      ]
+    },
+    {
+      "name": "Node map layer",
+      "url": "https://www.gridstatus.io/assets/nodeLayer-n-606zSG.js",
+      "sha256": "1f79c0c82df5b8fb75a1cfd0549f7900efb53d57ce1dca5d4749f475357bf131",
+      "bytes": 2446,
+      "signals": [
+        "circle-color",
+        "circle-radius"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./jsx-runtime-DykzC2zs.js",
+        "./ISOBadge-BRRaZWBs.js",
+        "./mapUtils-Bxg5t5tp.js",
+        "./SearchResultRow-DryOceWo.js",
+        "./bindLayerFeatureIndexer-Clu-cE2P.js",
+        "./bindLayerOnClick-BRcL4XDj.js",
+        "./bindLayerPopup-J8xybJUF.js"
+      ]
+    },
+    {
+      "name": "Chart wrapper",
+      "url": "https://www.gridstatus.io/assets/EChartsGraph-BpaORhYw.js",
+      "sha256": "da4185d2883dd7284acbeab20ef485a774350c4c9be1d1353f05f3c5b5cc30b2",
+      "bytes": 24506,
+      "signals": [
+        "setOption",
+        "tooltip",
+        "animation"
+      ],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./jsx-runtime-DykzC2zs.js",
+        "./Box-DG8e35v4.js",
+        "./Button-BUr7B8nT.js",
+        "./use-media-query-D3Ny0zcF.js",
+        "./use-resize-observer-CWVo1aBj.js",
+        "./Flex-DEkpvo9A.js",
+        "./Anchor-CwQJuS_5.js",
+        "./utils-Nf0EdCFs.js",
+        "./luxon-BgXR_Ufk.js",
+        "./index-B2v0U7eZ.js",
+        "./EChartsWrapper-Bv2E0CtY.js",
+        "./timeComparison-1uLHXS3t.js",
+        "./echartsAxisTooltipPlacement-wXDHVYLt.js"
+      ]
+    },
+    {
+      "name": "Refresh context",
+      "url": "https://www.gridstatus.io/assets/RefreshContext-DXSvp1Jp.js",
+      "sha256": "9d98653834db78b2954a92fe3979e4b1ac3261cea33b385d35796b94ba5d244d",
+      "bytes": 1339,
+      "signals": [],
+      "imports": [
+        "./rolldown-runtime-BDcqL3qD.js",
+        "./tabler-icons-q8mnXEc1.js",
+        "./dist-EWYJwrHn.js",
+        "./CONSTANTS-DNv1hVK5.js",
+        "./makeAuthenticatedRequest-C9_tHJU8.js"
+      ]
+    }
+  ],
+  "completeness": {
+    "status": "policy_filtered",
+    "conditions": [
+      "attach_limited",
+      "policy_filtered"
+    ],
+    "policy_filtered_sections": [
+      "console_text",
+      "metadata",
+      "resources",
+      "scripts",
+      "storage_keys",
+      "websocket_shapes",
+      "workers"
+    ],
+    "attach_limited_sections": [
+      "console_events",
+      "metadata",
+      "network_requests",
+      "websocket_connections",
+      "websocket_frames",
+      "workers"
+    ],
+    "truncated_sections": [],
+    "unavailable_sections": [],
+    "excluded": [
+      {
+        "section": "console_text",
+        "reason": "not_approved",
+        "count": null
+      },
+      {
+        "section": "metadata",
+        "reason": "disallowed_origin",
+        "count": 19
+      },
+      {
+        "section": "resources",
+        "reason": "disallowed_origin",
+        "count": 19
+      },
+      {
+        "section": "resources",
+        "reason": "unsupported_url",
+        "count": 3
+      },
+      {
+        "section": "scripts",
+        "reason": "disallowed_origin",
+        "count": 11
+      },
+      {
+        "section": "storage_keys",
+        "reason": "not_approved",
+        "count": null
+      },
+      {
+        "section": "websocket_shapes",
+        "reason": "not_approved",
+        "count": null
+      },
+      {
+        "section": "workers",
+        "reason": "unattributed_origin",
+        "count": 5
+      }
+    ],
+    "dropped_events": {
+      "scripts": 0,
+      "network_requests": 0,
+      "console_events": 0,
+      "websocket_connections": 0,
+      "websocket_frames": 0,
+      "webmcp_tools": 0,
+      "timeline_events": 0,
+      "total": 0
+    }
+  },
+  "limitations": [
+    "Artifact identity is unavailable for this observation.",
+    "Observation starts when REA attaches; prior network and console activity is unavailable.",
+    "Worker targets are a final inventory snapshot, not worker-session observation. Their attached flag describes any debugging client; this page-session collector does not observe worker network, console, or script events, and short-lived workers may be absent from the snapshot.",
+    "Raw network headers, bodies, cookies, storage values, console objects, and WebSocket payloads are never retained; explicitly requested primitive console text is retained verbatim, while payload captures retain value-free shapes.",
+    "Source maps are reported only as declarative URLs and are not fetched.",
+    "URL-less scripts and console events without an allowed source URL are excluded because their origin cannot be proven.",
+    "CDP discovery omitted the target attachment state; attached is reported as unknown.",
+    "Browser host platform and architecture were not observed."
+  ]
+}
