@@ -125,24 +125,45 @@ def _api_to_raw(df: pd.DataFrame) -> pd.DataFrame:
     return doc.rename(columns={"SettlementPoint": "Location", "SettlementPointPrice": "SPP"})
 
 
-def _hit_api(api, market: str, start: str, end: str, retries: int = 4, **filters) -> pd.DataFrame:
-    """One filtered API query over delivery dates [start, end] (inclusive), normalized.
+API_MIN_INTERVAL_S = 2.1  # ERCOT's public API allows 30 requests a minute
+_last_api_call = 0.0
 
-    ERCOT's bot protection answers some requests (e.g. a full-year range) with
-    HTTP 403, and the API rate limit is HTTP 429; both are retried with backoff.
-    """
+
+def _throttle() -> None:
+    global _last_api_call
+    wait = _last_api_call + API_MIN_INTERVAL_S - time.monotonic()
+    if wait > 0:
+        time.sleep(wait)
+    _last_api_call = time.monotonic()
+
+
+def _retryable(err: Exception) -> bool:
+    """403 (bot protection), 429 (rate limit), or gridstatus giving up on 429s/timeouts."""
     import requests
 
+    if isinstance(err, requests.HTTPError):
+        return err.response is not None and err.response.status_code in (403, 429)
+    return isinstance(err, RuntimeError) and "Failed after" in str(err)
+
+
+def _hit_api(api, market: str, start: str, end: str, retries: int = 5, **filters) -> pd.DataFrame:
+    """One filtered API query over delivery dates [start, end] (inclusive), normalized.
+
+    Requests are spaced to stay under the API rate limit. ERCOT's bot
+    protection still answers some requests (e.g. a full-year range) with HTTP
+    403, and gridstatus raises RuntimeError once its own quick 429 retries run
+    out; both are retried here with a longer backoff.
+    """
     for attempt in range(retries + 1):
+        _throttle()
         try:
             raw = api.hit_ercot_api(API_ENDPOINTS[market], deliveryDateFrom=start, deliveryDateTo=end, **filters)
             break
-        except requests.HTTPError as err:
-            code = err.response.status_code if err.response is not None else None
-            if code not in (403, 429) or attempt == retries:
+        except Exception as err:  # noqa: BLE001 - filtered by _retryable
+            if not _retryable(err) or attempt == retries:
                 raise
             wait = 10 * 2**attempt
-            log.warning("ERCOT API returned %s; retrying in %ds", code, wait)
+            log.warning("ERCOT API refused (%s); retrying in %ds", str(err)[:60], wait)
             time.sleep(wait)
     if raw.empty:
         return pd.DataFrame(columns=["interval_start_utc", "location", "market", "price"])
@@ -153,14 +174,15 @@ def _download_api(location: str, year: int, market: str, api=None) -> pd.DataFra
     """One settlement point's prices for a year (or year to date) from the ERCOT API.
 
     Requested one month at a time: a single full-year range is refused (HTTP 403).
+    The current year stops at yesterday, the last complete operating day.
     """
     api = api or _api_client()
-    today = pd.Timestamp.now(tz=TZ).tz_localize(None).normalize()
+    yesterday = pd.Timestamp.now(tz=TZ).tz_localize(None).normalize() - pd.Timedelta(days=1)
     parts = []
     for first in pd.date_range(f"{year}-01-01", f"{year}-12-01", freq="MS"):
-        if first > today:
+        if first > yesterday:
             break
-        last = min(first + pd.offsets.MonthEnd(0), today)
+        last = min(first + pd.offsets.MonthEnd(0), yesterday)
         parts.append(_hit_api(api, market, f"{first:%Y-%m-%d}", f"{last:%Y-%m-%d}", settlementPoint=location))
     df = pd.concat(parts, ignore_index=True)
     df = df[df["location"] == location].drop_duplicates(["location", "interval_start_utc"])

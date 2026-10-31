@@ -63,6 +63,11 @@ import requests  # noqa: E402
 from data import fetch_prices as fp  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def _no_throttle(monkeypatch):
+    monkeypatch.setattr(fp, "API_MIN_INTERVAL_S", 0.0)
+
+
 def _api_rows(day, point="NODE_A", n_hours=24, dst_repeat=False):
     """Rows shaped like ErcotAPI.hit_ercot_api output for np6-905-cd."""
     rows = []
@@ -114,6 +119,23 @@ def test_api_retries_on_bot_protection_403(monkeypatch):
     assert len(df) == 96 and api.hit_ercot_api.call_count == 3
 
 
+def test_api_retries_when_gridstatus_gives_up_on_rate_limit(monkeypatch):
+    monkeypatch.setattr(fp.time, "sleep", lambda s: None)
+    api = MagicMock()
+    api.hit_ercot_api.side_effect = [RuntimeError("Error: Failed after 3 retries for url"), _api_rows("2025-06-01")]
+    assert len(fp._hit_api(api, "RT15", "2025-06-01", "2025-06-01")) == 96
+
+
+def test_api_throttles_requests(monkeypatch):
+    sleeps = []
+    monkeypatch.setattr(fp, "API_MIN_INTERVAL_S", 2.1)
+    monkeypatch.setattr(fp.time, "sleep", sleeps.append)
+    monkeypatch.setattr(fp, "_last_api_call", fp.time.monotonic())
+    api = MagicMock(hit_ercot_api=MagicMock(return_value=_api_rows("2025-06-01")))
+    fp._hit_api(api, "RT15", "2025-06-01", "2025-06-01")
+    assert sleeps and 0 < sleeps[0] <= fp.API_MIN_INTERVAL_S
+
+
 def test_api_does_not_retry_other_errors(monkeypatch):
     monkeypatch.setattr(fp.time, "sleep", lambda s: None)
     api = MagicMock()
@@ -135,7 +157,7 @@ def test_download_api_requests_one_month_at_a_time(monkeypatch):
     assert len(df) == 12 * 96 and df["interval_start_utc"].is_monotonic_increasing
 
 
-def test_download_api_stops_at_today_for_current_year(monkeypatch):
+def test_download_api_stops_at_yesterday_for_current_year(monkeypatch):
     api = MagicMock()
     api.hit_ercot_api.side_effect = lambda ep, deliveryDateFrom, deliveryDateTo, **kw: _api_rows(deliveryDateFrom)
     real_now = pd.Timestamp.now
@@ -145,7 +167,7 @@ def test_download_api_stops_at_today_for_current_year(monkeypatch):
     finally:
         monkeypatch.setattr(pd.Timestamp, "now", real_now)
     calls = [c.kwargs for c in api.hit_ercot_api.call_args_list]
-    assert len(calls) == 3 and calls[-1]["deliveryDateTo"] == "2026-03-15"
+    assert len(calls) == 3 and calls[-1]["deliveryDateTo"] == "2026-03-14"
 
 
 def test_api_day_ahead_hourly_rows():
