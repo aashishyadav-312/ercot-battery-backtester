@@ -2,7 +2,7 @@
 
 How much could a battery have earned at a given ERCOT location, and what drove that number?
 
-Status: Phase 1 done (price data). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 2 done (daily dispatch optimizer). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
