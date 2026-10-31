@@ -627,7 +627,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3778,
    "cycles_per_year": 1171.8,
-   "avg_spread_captured": 43.99
+   "avg_spread_captured": 43.99,
+   "da_rt_revenue_per_kw_year": 25.59,
+   "value_of_perfect_foresight_per_kw_year": 22.4,
+   "capture_rate": 0.5332
   },
   {
    "location": "HB_HOUSTON",
@@ -644,7 +647,10 @@
    "days_covered": 366,
    "top10_day_share": 0.441,
    "cycles_per_year": 544.7,
-   "avg_spread_captured": 87.4
+   "avg_spread_captured": 87.4,
+   "da_rt_revenue_per_kw_year": 20.79,
+   "value_of_perfect_foresight_per_kw_year": 19.74,
+   "capture_rate": 0.5129
   },
   {
    "location": "HB_HOUSTON",
@@ -661,7 +667,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3569,
    "cycles_per_year": 811.5,
-   "avg_spread_captured": 43.17
+   "avg_spread_captured": 43.17,
+   "da_rt_revenue_per_kw_year": 46.34,
+   "value_of_perfect_foresight_per_kw_year": 19.4,
+   "capture_rate": 0.7049
   },
   {
    "location": "HB_HOUSTON",
@@ -678,7 +687,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4248,
    "cycles_per_year": 434.2,
-   "avg_spread_captured": 75.05
+   "avg_spread_captured": 75.05,
+   "da_rt_revenue_per_kw_year": 37.2,
+   "value_of_perfect_foresight_per_kw_year": 17.22,
+   "capture_rate": 0.6836
   },
   {
    "location": "HB_HOUSTON",
@@ -695,7 +707,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3284,
    "cycles_per_year": 555.4,
-   "avg_spread_captured": 38.87
+   "avg_spread_captured": 38.87,
+   "da_rt_revenue_per_kw_year": 65.76,
+   "value_of_perfect_foresight_per_kw_year": 15.12,
+   "capture_rate": 0.813
   },
   {
    "location": "HB_HOUSTON",
@@ -712,7 +727,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4059,
    "cycles_per_year": 326.2,
-   "avg_spread_captured": 61.3
+   "avg_spread_captured": 61.3,
+   "da_rt_revenue_per_kw_year": 48.72,
+   "value_of_perfect_foresight_per_kw_year": 15.44,
+   "capture_rate": 0.7593
   },
   {
    "location": "HB_HOUSTON",
@@ -729,7 +747,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1951,
    "cycles_per_year": 1051.8,
-   "avg_spread_captured": 36.5
+   "avg_spread_captured": 36.5,
+   "da_rt_revenue_per_kw_year": 18.39,
+   "value_of_perfect_foresight_per_kw_year": 15.75,
+   "capture_rate": 0.5386
   },
   {
    "location": "HB_HOUSTON",
@@ -746,7 +767,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2389,
    "cycles_per_year": 568.3,
-   "avg_spread_captured": 60.74
+   "avg_spread_captured": 60.74,
+   "da_rt_revenue_per_kw_year": 13.46,
+   "value_of_perfect_foresight_per_kw_year": 13.23,
+   "capture_rate": 0.5041
   },
   {
    "location": "HB_HOUSTON",
@@ -763,7 +787,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1705,
    "cycles_per_year": 772.8,
-   "avg_spread_captured": 36.96
+   "avg_spread_captured": 36.96,
+   "da_rt_revenue_per_kw_year": 33.44,
+   "value_of_perfect_foresight_per_kw_year": 17.9,
+   "capture_rate": 0.6513
   },
   {
    "location": "HB_HOUSTON",
@@ -780,7 +807,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2106,
    "cycles_per_year": 463.1,
-   "avg_spread_captured": 56.22
+   "avg_spread_captured": 56.22,
+   "da_rt_revenue_per_kw_year": 24.24,
+   "value_of_perfect_foresight_per_kw_year": 15.44,
+   "capture_rate": 0.6108
   },
   {
    "location": "HB_HOUSTON",
@@ -797,7 +827,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1535,
    "cycles_per_year": 547.7,
-   "avg_spread_captured": 35.84
+   "avg_spread_captured": 35.84,
+   "da_rt_revenue_per_kw_year": 53.25,
+   "value_of_perfect_foresight_per_kw_year": 17.42,
+   "capture_rate": 0.7535
   },
   {
    "location": "HB_HOUSTON",
@@ -814,7 +847,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1935,
    "cycles_per_year": 361.7,
-   "avg_spread_captured": 49.9
+   "avg_spread_captured": 49.9,
+   "da_rt_revenue_per_kw_year": 37.27,
+   "value_of_perfect_foresight_per_kw_year": 15.8,
+   "capture_rate": 0.7023
   },
   {
    "location": "HB_HOUSTON",
@@ -831,7 +867,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2374,
    "cycles_per_year": 1057.8,
-   "avg_spread_captured": 30.7
+   "avg_spread_captured": 30.7,
+   "da_rt_revenue_per_kw_year": 11.27,
+   "value_of_perfect_foresight_per_kw_year": 16.79,
+   "capture_rate": 0.4018
   },
   {
    "location": "HB_HOUSTON",
@@ -848,7 +887,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2977,
    "cycles_per_year": 489.2,
-   "avg_spread_captured": 57.31
+   "avg_spread_captured": 57.31,
+   "da_rt_revenue_per_kw_year": 7.19,
+   "value_of_perfect_foresight_per_kw_year": 13.95,
+   "capture_rate": 0.3402
   },
   {
    "location": "HB_HOUSTON",
@@ -865,7 +907,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2277,
    "cycles_per_year": 767.1,
-   "avg_spread_captured": 32.42
+   "avg_spread_captured": 32.42,
+   "da_rt_revenue_per_kw_year": 22.99,
+   "value_of_perfect_foresight_per_kw_year": 20.67,
+   "capture_rate": 0.5266
   },
   {
    "location": "HB_HOUSTON",
@@ -882,7 +927,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2866,
    "cycles_per_year": 409.2,
-   "avg_spread_captured": 53.7
+   "avg_spread_captured": 53.7,
+   "da_rt_revenue_per_kw_year": 15.13,
+   "value_of_perfect_foresight_per_kw_year": 17.65,
+   "capture_rate": 0.4615
   },
   {
    "location": "HB_HOUSTON",
@@ -899,7 +947,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2112,
    "cycles_per_year": 538.9,
-   "avg_spread_captured": 32.72
+   "avg_spread_captured": 32.72,
+   "da_rt_revenue_per_kw_year": 43.62,
+   "value_of_perfect_foresight_per_kw_year": 18.82,
+   "capture_rate": 0.6985
   },
   {
    "location": "HB_HOUSTON",
@@ -916,7 +967,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2717,
    "cycles_per_year": 334.9,
-   "avg_spread_captured": 47.5
+   "avg_spread_captured": 47.5,
+   "da_rt_revenue_per_kw_year": 29.04,
+   "value_of_perfect_foresight_per_kw_year": 16.69,
+   "capture_rate": 0.6351
   },
   {
    "location": "HB_NORTH",
@@ -933,7 +987,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3755,
    "cycles_per_year": 1222.6,
-   "avg_spread_captured": 42.88
+   "avg_spread_captured": 42.88,
+   "da_rt_revenue_per_kw_year": 27.17,
+   "value_of_perfect_foresight_per_kw_year": 21.96,
+   "capture_rate": 0.5531
   },
   {
    "location": "HB_NORTH",
@@ -950,7 +1007,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4381,
    "cycles_per_year": 548.4,
-   "avg_spread_captured": 88.54
+   "avg_spread_captured": 88.54,
+   "da_rt_revenue_per_kw_year": 22.07,
+   "value_of_perfect_foresight_per_kw_year": 19.5,
+   "capture_rate": 0.5309
   },
   {
    "location": "HB_NORTH",
@@ -967,7 +1027,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3547,
    "cycles_per_year": 849.4,
-   "avg_spread_captured": 42.34
+   "avg_spread_captured": 42.34,
+   "da_rt_revenue_per_kw_year": 48.99,
+   "value_of_perfect_foresight_per_kw_year": 18.89,
+   "capture_rate": 0.7217
   },
   {
    "location": "HB_NORTH",
@@ -984,7 +1047,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4226,
    "cycles_per_year": 445.3,
-   "avg_spread_captured": 75.25
+   "avg_spread_captured": 75.25,
+   "da_rt_revenue_per_kw_year": 39.28,
+   "value_of_perfect_foresight_per_kw_year": 16.92,
+   "capture_rate": 0.6989
   },
   {
    "location": "HB_NORTH",
@@ -1001,7 +1067,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3272,
    "cycles_per_year": 578.9,
-   "avg_spread_captured": 38.3
+   "avg_spread_captured": 38.3,
+   "da_rt_revenue_per_kw_year": 68.92,
+   "value_of_perfect_foresight_per_kw_year": 14.63,
+   "capture_rate": 0.8249
   },
   {
    "location": "HB_NORTH",
@@ -1018,7 +1087,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4043,
    "cycles_per_year": 336.2,
-   "avg_spread_captured": 61.27
+   "avg_spread_captured": 61.27,
+   "da_rt_revenue_per_kw_year": 52.15,
+   "value_of_perfect_foresight_per_kw_year": 14.19,
+   "capture_rate": 0.7861
   },
   {
    "location": "HB_NORTH",
@@ -1035,7 +1107,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2249,
    "cycles_per_year": 1072.6,
-   "avg_spread_captured": 36.97
+   "avg_spread_captured": 36.97,
+   "da_rt_revenue_per_kw_year": 21.76,
+   "value_of_perfect_foresight_per_kw_year": 14.04,
+   "capture_rate": 0.6079
   },
   {
    "location": "HB_NORTH",
@@ -1052,7 +1127,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2723,
    "cycles_per_year": 546.1,
-   "avg_spread_captured": 65.94
+   "avg_spread_captured": 65.94,
+   "da_rt_revenue_per_kw_year": 17.16,
+   "value_of_perfect_foresight_per_kw_year": 11.47,
+   "capture_rate": 0.5993
   },
   {
    "location": "HB_NORTH",
@@ -1069,7 +1147,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2005,
    "cycles_per_year": 784.1,
-   "avg_spread_captured": 38.38
+   "avg_spread_captured": 38.38,
+   "da_rt_revenue_per_kw_year": 38.21,
+   "value_of_perfect_foresight_per_kw_year": 16.69,
+   "capture_rate": 0.696
   },
   {
    "location": "HB_NORTH",
@@ -1086,7 +1167,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2451,
    "cycles_per_year": 456.2,
-   "avg_spread_captured": 60.73
+   "avg_spread_captured": 60.73,
+   "da_rt_revenue_per_kw_year": 29.15,
+   "value_of_perfect_foresight_per_kw_year": 14.3,
+   "capture_rate": 0.6709
   },
   {
    "location": "HB_NORTH",
@@ -1103,7 +1187,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1812,
    "cycles_per_year": 554.6,
-   "avg_spread_captured": 37.4
+   "avg_spread_captured": 37.4,
+   "da_rt_revenue_per_kw_year": 59.83,
+   "value_of_perfect_foresight_per_kw_year": 15.86,
+   "capture_rate": 0.7905
   },
   {
    "location": "HB_NORTH",
@@ -1120,7 +1207,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2258,
    "cycles_per_year": 361.1,
-   "avg_spread_captured": 53.23
+   "avg_spread_captured": 53.23,
+   "da_rt_revenue_per_kw_year": 43.81,
+   "value_of_perfect_foresight_per_kw_year": 14.32,
+   "capture_rate": 0.7537
   },
   {
    "location": "HB_NORTH",
@@ -1137,7 +1227,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2802,
    "cycles_per_year": 1064.3,
-   "avg_spread_captured": 34.35
+   "avg_spread_captured": 34.35,
+   "da_rt_revenue_per_kw_year": 14.42,
+   "value_of_perfect_foresight_per_kw_year": 18.43,
+   "capture_rate": 0.439
   },
   {
    "location": "HB_NORTH",
@@ -1154,7 +1247,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3397,
    "cycles_per_year": 470.8,
-   "avg_spread_captured": 69.13
+   "avg_spread_captured": 69.13,
+   "da_rt_revenue_per_kw_year": 10.19,
+   "value_of_perfect_foresight_per_kw_year": 15.99,
+   "capture_rate": 0.3892
   },
   {
    "location": "HB_NORTH",
@@ -1171,7 +1267,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2772,
    "cycles_per_year": 769.1,
-   "avg_spread_captured": 37.36
+   "avg_spread_captured": 37.36,
+   "da_rt_revenue_per_kw_year": 29.97,
+   "value_of_perfect_foresight_per_kw_year": 22.4,
+   "capture_rate": 0.5722
   },
   {
    "location": "HB_NORTH",
@@ -1188,7 +1287,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3368,
    "cycles_per_year": 403.8,
-   "avg_spread_captured": 64.67
+   "avg_spread_captured": 64.67,
+   "da_rt_revenue_per_kw_year": 21.99,
+   "value_of_perfect_foresight_per_kw_year": 19.69,
+   "capture_rate": 0.5276
   },
   {
    "location": "HB_NORTH",
@@ -1205,7 +1307,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2714,
    "cycles_per_year": 546.3,
-   "avg_spread_captured": 38.14
+   "avg_spread_captured": 38.14,
+   "da_rt_revenue_per_kw_year": 55.23,
+   "value_of_perfect_foresight_per_kw_year": 21.21,
+   "capture_rate": 0.7225
   },
   {
    "location": "HB_NORTH",
@@ -1222,7 +1327,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3361,
    "cycles_per_year": 338.1,
-   "avg_spread_captured": 56.87
+   "avg_spread_captured": 56.87,
+   "da_rt_revenue_per_kw_year": 40.47,
+   "value_of_perfect_foresight_per_kw_year": 19.15,
+   "capture_rate": 0.6788
   },
   {
    "location": "HB_PAN",
@@ -1239,7 +1347,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3433,
    "cycles_per_year": 1788.8,
-   "avg_spread_captured": 31.08
+   "avg_spread_captured": 31.08,
+   "da_rt_revenue_per_kw_year": 28.84,
+   "value_of_perfect_foresight_per_kw_year": 25.65,
+   "capture_rate": 0.5292
   },
   {
    "location": "HB_PAN",
@@ -1256,7 +1367,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4144,
    "cycles_per_year": 661.8,
-   "avg_spread_captured": 78.14
+   "avg_spread_captured": 78.14,
+   "da_rt_revenue_per_kw_year": 23.17,
+   "value_of_perfect_foresight_per_kw_year": 21.29,
+   "capture_rate": 0.5211
   },
   {
    "location": "HB_PAN",
@@ -1273,7 +1387,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3238,
    "cycles_per_year": 1110.6,
-   "avg_spread_captured": 34.58
+   "avg_spread_captured": 34.58,
+   "da_rt_revenue_per_kw_year": 50.01,
+   "value_of_perfect_foresight_per_kw_year": 25.44,
+   "capture_rate": 0.6628
   },
   {
    "location": "HB_PAN",
@@ -1290,7 +1407,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3931,
    "cycles_per_year": 517.6,
-   "avg_spread_captured": 69.68
+   "avg_spread_captured": 69.68,
+   "da_rt_revenue_per_kw_year": 39.88,
+   "value_of_perfect_foresight_per_kw_year": 21.32,
+   "capture_rate": 0.6516
   },
   {
    "location": "HB_PAN",
@@ -1307,7 +1427,10 @@
    "days_covered": 366,
    "top10_day_share": 0.2961,
    "cycles_per_year": 683.1,
-   "avg_spread_captured": 35.04
+   "avg_spread_captured": 35.04,
+   "da_rt_revenue_per_kw_year": 70.97,
+   "value_of_perfect_foresight_per_kw_year": 22.95,
+   "capture_rate": 0.7557
   },
   {
    "location": "HB_PAN",
@@ -1324,7 +1447,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3669,
    "cycles_per_year": 377.0,
-   "avg_spread_captured": 59.75
+   "avg_spread_captured": 59.75,
+   "da_rt_revenue_per_kw_year": 53.78,
+   "value_of_perfect_foresight_per_kw_year": 20.54,
+   "capture_rate": 0.7237
   },
   {
    "location": "HB_PAN",
@@ -1341,7 +1467,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2021,
    "cycles_per_year": 1660.6,
-   "avg_spread_captured": 25.35
+   "avg_spread_captured": 25.35,
+   "da_rt_revenue_per_kw_year": 22.45,
+   "value_of_perfect_foresight_per_kw_year": 17.65,
+   "capture_rate": 0.5599
   },
   {
    "location": "HB_PAN",
@@ -1358,7 +1487,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2546,
    "cycles_per_year": 651.2,
-   "avg_spread_captured": 58.74
+   "avg_spread_captured": 58.74,
+   "da_rt_revenue_per_kw_year": 17.34,
+   "value_of_perfect_foresight_per_kw_year": 13.35,
+   "capture_rate": 0.565
   },
   {
    "location": "HB_PAN",
@@ -1375,7 +1507,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1803,
    "cycles_per_year": 1074.7,
-   "avg_spread_captured": 29.6
+   "avg_spread_captured": 29.6,
+   "da_rt_revenue_per_kw_year": 40.12,
+   "value_of_perfect_foresight_per_kw_year": 20.66,
+   "capture_rate": 0.6601
   },
   {
    "location": "HB_PAN",
@@ -1392,7 +1527,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2254,
    "cycles_per_year": 527.4,
-   "avg_spread_captured": 55.66
+   "avg_spread_captured": 55.66,
+   "da_rt_revenue_per_kw_year": 30.16,
+   "value_of_perfect_foresight_per_kw_year": 16.58,
+   "capture_rate": 0.6452
   },
   {
    "location": "HB_PAN",
@@ -1409,7 +1547,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1637,
    "cycles_per_year": 676.2,
-   "avg_spread_captured": 32.13
+   "avg_spread_captured": 32.13,
+   "da_rt_revenue_per_kw_year": 61.5,
+   "value_of_perfect_foresight_per_kw_year": 21.5,
+   "capture_rate": 0.7409
   },
   {
    "location": "HB_PAN",
@@ -1426,7 +1567,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2049,
    "cycles_per_year": 395.7,
-   "avg_spread_captured": 51.19
+   "avg_spread_captured": 51.19,
+   "da_rt_revenue_per_kw_year": 44.42,
+   "value_of_perfect_foresight_per_kw_year": 18.74,
+   "capture_rate": 0.7033
   },
   {
    "location": "HB_PAN",
@@ -1443,7 +1587,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2564,
    "cycles_per_year": 1504.0,
-   "avg_spread_captured": 25.07
+   "avg_spread_captured": 25.07,
+   "da_rt_revenue_per_kw_year": 15.08,
+   "value_of_perfect_foresight_per_kw_year": 20.24,
+   "capture_rate": 0.4269
   },
   {
    "location": "HB_PAN",
@@ -1460,7 +1607,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3186,
    "cycles_per_year": 540.5,
-   "avg_spread_captured": 62.73
+   "avg_spread_captured": 62.73,
+   "da_rt_revenue_per_kw_year": 10.54,
+   "value_of_perfect_foresight_per_kw_year": 16.81,
+   "capture_rate": 0.3854
   },
   {
    "location": "HB_PAN",
@@ -1477,7 +1627,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2529,
    "cycles_per_year": 981.8,
-   "avg_spread_captured": 30.21
+   "avg_spread_captured": 30.21,
+   "da_rt_revenue_per_kw_year": 30.92,
+   "value_of_perfect_foresight_per_kw_year": 25.16,
+   "capture_rate": 0.5513
   },
   {
    "location": "HB_PAN",
@@ -1494,7 +1647,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3121,
    "cycles_per_year": 456.9,
-   "avg_spread_captured": 59.54
+   "avg_spread_captured": 59.54,
+   "da_rt_revenue_per_kw_year": 22.2,
+   "value_of_perfect_foresight_per_kw_year": 21.6,
+   "capture_rate": 0.5067
   },
   {
    "location": "HB_PAN",
@@ -1511,7 +1667,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2498,
    "cycles_per_year": 636.0,
-   "avg_spread_captured": 33.51
+   "avg_spread_captured": 33.51,
+   "da_rt_revenue_per_kw_year": 56.83,
+   "value_of_perfect_foresight_per_kw_year": 24.18,
+   "capture_rate": 0.7015
   },
   {
    "location": "HB_PAN",
@@ -1528,7 +1687,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3106,
    "cycles_per_year": 366.6,
-   "avg_spread_captured": 54.19
+   "avg_spread_captured": 54.19,
+   "da_rt_revenue_per_kw_year": 41.06,
+   "value_of_perfect_foresight_per_kw_year": 21.65,
+   "capture_rate": 0.6547
   },
   {
    "location": "HB_SOUTH",
@@ -1545,7 +1707,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3711,
    "cycles_per_year": 1209.9,
-   "avg_spread_captured": 43.48
+   "avg_spread_captured": 43.48,
+   "da_rt_revenue_per_kw_year": 26.32,
+   "value_of_perfect_foresight_per_kw_year": 22.71,
+   "capture_rate": 0.5368
   },
   {
    "location": "HB_SOUTH",
@@ -1562,7 +1727,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4313,
    "cycles_per_year": 533.9,
-   "avg_spread_captured": 91.01
+   "avg_spread_captured": 91.01,
+   "da_rt_revenue_per_kw_year": 21.67,
+   "value_of_perfect_foresight_per_kw_year": 19.93,
+   "capture_rate": 0.5209
   },
   {
    "location": "HB_SOUTH",
@@ -1579,7 +1747,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3512,
    "cycles_per_year": 825.8,
-   "avg_spread_captured": 43.74
+   "avg_spread_captured": 43.74,
+   "da_rt_revenue_per_kw_year": 47.38,
+   "value_of_perfect_foresight_per_kw_year": 20.6,
+   "capture_rate": 0.697
   },
   {
    "location": "HB_SOUTH",
@@ -1596,7 +1767,10 @@
    "days_covered": 366,
    "top10_day_share": 0.4151,
    "cycles_per_year": 435.0,
-   "avg_spread_captured": 77.52
+   "avg_spread_captured": 77.52,
+   "da_rt_revenue_per_kw_year": 38.5,
+   "value_of_perfect_foresight_per_kw_year": 18.17,
+   "capture_rate": 0.6794
   },
   {
    "location": "HB_SOUTH",
@@ -1613,7 +1787,10 @@
    "days_covered": 366,
    "top10_day_share": 0.324,
    "cycles_per_year": 564.2,
-   "avg_spread_captured": 39.98
+   "avg_spread_captured": 39.98,
+   "da_rt_revenue_per_kw_year": 67.53,
+   "value_of_perfect_foresight_per_kw_year": 17.32,
+   "capture_rate": 0.7959
   },
   {
    "location": "HB_SOUTH",
@@ -1630,7 +1807,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3966,
    "cycles_per_year": 330.6,
-   "avg_spread_captured": 63.51
+   "avg_spread_captured": 63.51,
+   "da_rt_revenue_per_kw_year": 51.26,
+   "value_of_perfect_foresight_per_kw_year": 16.73,
+   "capture_rate": 0.7539
   },
   {
    "location": "HB_SOUTH",
@@ -1647,7 +1827,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1778,
    "cycles_per_year": 1089.5,
-   "avg_spread_captured": 33.93
+   "avg_spread_captured": 33.93,
+   "da_rt_revenue_per_kw_year": 18.58,
+   "value_of_perfect_foresight_per_kw_year": 14.46,
+   "capture_rate": 0.5625
   },
   {
    "location": "HB_SOUTH",
@@ -1664,7 +1847,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2195,
    "cycles_per_year": 548.1,
-   "avg_spread_captured": 60.38
+   "avg_spread_captured": 60.38,
+   "da_rt_revenue_per_kw_year": 13.84,
+   "value_of_perfect_foresight_per_kw_year": 11.86,
+   "capture_rate": 0.5384
   },
   {
    "location": "HB_SOUTH",
@@ -1681,7 +1867,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1592,
    "cycles_per_year": 789.3,
-   "avg_spread_captured": 35.85
+   "avg_spread_captured": 35.85,
+   "da_rt_revenue_per_kw_year": 34.71,
+   "value_of_perfect_foresight_per_kw_year": 16.48,
+   "capture_rate": 0.6781
   },
   {
    "location": "HB_SOUTH",
@@ -1698,7 +1887,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1965,
    "cycles_per_year": 459.5,
-   "avg_spread_captured": 56.13
+   "avg_spread_captured": 56.13,
+   "da_rt_revenue_per_kw_year": 25.49,
+   "value_of_perfect_foresight_per_kw_year": 14.01,
+   "capture_rate": 0.6453
   },
   {
    "location": "HB_SOUTH",
@@ -1715,7 +1907,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1457,
    "cycles_per_year": 559.1,
-   "avg_spread_captured": 35.61
+   "avg_spread_captured": 35.61,
+   "da_rt_revenue_per_kw_year": 56.73,
+   "value_of_perfect_foresight_per_kw_year": 15.49,
+   "capture_rate": 0.7855
   },
   {
    "location": "HB_SOUTH",
@@ -1732,7 +1927,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1825,
    "cycles_per_year": 372.4,
-   "avg_spread_captured": 49.42
+   "avg_spread_captured": 49.42,
+   "da_rt_revenue_per_kw_year": 40.25,
+   "value_of_perfect_foresight_per_kw_year": 14.01,
+   "capture_rate": 0.7418
   },
   {
    "location": "HB_SOUTH",
@@ -1749,7 +1947,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2602,
    "cycles_per_year": 1050.2,
-   "avg_spread_captured": 30.07
+   "avg_spread_captured": 30.07,
+   "da_rt_revenue_per_kw_year": 11.39,
+   "value_of_perfect_foresight_per_kw_year": 16.08,
+   "capture_rate": 0.4147
   },
   {
    "location": "HB_SOUTH",
@@ -1766,7 +1967,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3274,
    "cycles_per_year": 483.4,
-   "avg_spread_captured": 56.86
+   "avg_spread_captured": 56.86,
+   "da_rt_revenue_per_kw_year": 7.18,
+   "value_of_perfect_foresight_per_kw_year": 13.54,
+   "capture_rate": 0.3465
   },
   {
    "location": "HB_SOUTH",
@@ -1783,7 +1987,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2498,
    "cycles_per_year": 767.2,
-   "avg_spread_captured": 32.09
+   "avg_spread_captured": 32.09,
+   "da_rt_revenue_per_kw_year": 24.22,
+   "value_of_perfect_foresight_per_kw_year": 19.38,
+   "capture_rate": 0.5556
   },
   {
    "location": "HB_SOUTH",
@@ -1800,7 +2007,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3162,
    "cycles_per_year": 411.6,
-   "avg_spread_captured": 53.25
+   "avg_spread_captured": 53.25,
+   "da_rt_revenue_per_kw_year": 16.13,
+   "value_of_perfect_foresight_per_kw_year": 16.68,
+   "capture_rate": 0.4917
   },
   {
    "location": "HB_SOUTH",
@@ -1817,7 +2027,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2398,
    "cycles_per_year": 546.0,
-   "avg_spread_captured": 32.64
+   "avg_spread_captured": 32.64,
+   "da_rt_revenue_per_kw_year": 46.75,
+   "value_of_perfect_foresight_per_kw_year": 17.03,
+   "capture_rate": 0.7329
   },
   {
    "location": "HB_SOUTH",
@@ -1834,7 +2047,10 @@
    "days_covered": 297,
    "top10_day_share": 0.311,
    "cycles_per_year": 343.5,
-   "avg_spread_captured": 47.19
+   "avg_spread_captured": 47.19,
+   "da_rt_revenue_per_kw_year": 31.75,
+   "value_of_perfect_foresight_per_kw_year": 15.14,
+   "capture_rate": 0.6772
   },
   {
    "location": "HB_WEST",
@@ -1851,7 +2067,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3313,
    "cycles_per_year": 1477.0,
-   "avg_spread_captured": 40.52
+   "avg_spread_captured": 40.52,
+   "da_rt_revenue_per_kw_year": 31.6,
+   "value_of_perfect_foresight_per_kw_year": 24.73,
+   "capture_rate": 0.561
   },
   {
    "location": "HB_WEST",
@@ -1868,7 +2087,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3861,
    "cycles_per_year": 625.2,
-   "avg_spread_captured": 88.91
+   "avg_spread_captured": 88.91,
+   "da_rt_revenue_per_kw_year": 26.07,
+   "value_of_perfect_foresight_per_kw_year": 21.53,
+   "capture_rate": 0.5477
   },
   {
    "location": "HB_WEST",
@@ -1885,7 +2107,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3089,
    "cycles_per_year": 969.1,
-   "avg_spread_captured": 42.81
+   "avg_spread_captured": 42.81,
+   "da_rt_revenue_per_kw_year": 56.03,
+   "value_of_perfect_foresight_per_kw_year": 22.8,
+   "capture_rate": 0.7108
   },
   {
    "location": "HB_WEST",
@@ -1902,7 +2127,10 @@
    "days_covered": 366,
    "top10_day_share": 0.3645,
    "cycles_per_year": 506.2,
-   "avg_spread_captured": 77.04
+   "avg_spread_captured": 77.04,
+   "da_rt_revenue_per_kw_year": 45.53,
+   "value_of_perfect_foresight_per_kw_year": 20.21,
+   "capture_rate": 0.6926
   },
   {
    "location": "HB_WEST",
@@ -1919,7 +2147,10 @@
    "days_covered": 366,
    "top10_day_share": 0.2784,
    "cycles_per_year": 631.0,
-   "avg_spread_captured": 41.45
+   "avg_spread_captured": 41.45,
+   "da_rt_revenue_per_kw_year": 80.66,
+   "value_of_perfect_foresight_per_kw_year": 18.92,
+   "capture_rate": 0.81
   },
   {
    "location": "HB_WEST",
@@ -1936,7 +2167,10 @@
    "days_covered": 366,
    "top10_day_share": 0.337,
    "cycles_per_year": 384.5,
-   "avg_spread_captured": 64.24
+   "avg_spread_captured": 64.24,
+   "da_rt_revenue_per_kw_year": 62.79,
+   "value_of_perfect_foresight_per_kw_year": 17.82,
+   "capture_rate": 0.779
   },
   {
    "location": "HB_WEST",
@@ -1953,7 +2187,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2016,
    "cycles_per_year": 1291.5,
-   "avg_spread_captured": 33.7
+   "avg_spread_captured": 33.7,
+   "da_rt_revenue_per_kw_year": 23.61,
+   "value_of_perfect_foresight_per_kw_year": 15.94,
+   "capture_rate": 0.597
   },
   {
    "location": "HB_WEST",
@@ -1970,7 +2207,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2446,
    "cycles_per_year": 591.8,
-   "avg_spread_captured": 66.57
+   "avg_spread_captured": 66.57,
+   "da_rt_revenue_per_kw_year": 19.05,
+   "value_of_perfect_foresight_per_kw_year": 12.48,
+   "capture_rate": 0.6043
   },
   {
    "location": "HB_WEST",
@@ -1987,7 +2227,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1779,
    "cycles_per_year": 888.2,
-   "avg_spread_captured": 37.48
+   "avg_spread_captured": 37.48,
+   "da_rt_revenue_per_kw_year": 42.48,
+   "value_of_perfect_foresight_per_kw_year": 18.76,
+   "capture_rate": 0.6937
   },
   {
    "location": "HB_WEST",
@@ -2004,7 +2247,10 @@
    "days_covered": 365,
    "top10_day_share": 0.2156,
    "cycles_per_year": 492.7,
-   "avg_spread_captured": 62.26
+   "avg_spread_captured": 62.26,
+   "da_rt_revenue_per_kw_year": 33.43,
+   "value_of_perfect_foresight_per_kw_year": 15.27,
+   "capture_rate": 0.6864
   },
   {
    "location": "HB_WEST",
@@ -2021,7 +2267,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1588,
    "cycles_per_year": 599.8,
-   "avg_spread_captured": 38.93
+   "avg_spread_captured": 38.93,
+   "da_rt_revenue_per_kw_year": 67.62,
+   "value_of_perfect_foresight_per_kw_year": 18.77,
+   "capture_rate": 0.7828
   },
   {
    "location": "HB_WEST",
@@ -2038,7 +2287,10 @@
    "days_covered": 365,
    "top10_day_share": 0.1943,
    "cycles_per_year": 396.7,
-   "avg_spread_captured": 55.15
+   "avg_spread_captured": 55.15,
+   "da_rt_revenue_per_kw_year": 51.28,
+   "value_of_perfect_foresight_per_kw_year": 16.14,
+   "capture_rate": 0.7606
   },
   {
    "location": "HB_WEST",
@@ -2055,7 +2307,10 @@
    "days_covered": 297,
    "top10_day_share": 0.258,
    "cycles_per_year": 1325.9,
-   "avg_spread_captured": 28.16
+   "avg_spread_captured": 28.16,
+   "da_rt_revenue_per_kw_year": 15.3,
+   "value_of_perfect_foresight_per_kw_year": 18.96,
+   "capture_rate": 0.4466
   },
   {
    "location": "HB_WEST",
@@ -2072,7 +2327,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3147,
    "cycles_per_year": 495.9,
-   "avg_spread_captured": 67.74
+   "avg_spread_captured": 67.74,
+   "da_rt_revenue_per_kw_year": 10.92,
+   "value_of_perfect_foresight_per_kw_year": 16.16,
+   "capture_rate": 0.4033
   },
   {
    "location": "HB_WEST",
@@ -2089,7 +2347,10 @@
    "days_covered": 297,
    "top10_day_share": 0.2517,
    "cycles_per_year": 891.9,
-   "avg_spread_captured": 33.18
+   "avg_spread_captured": 33.18,
+   "da_rt_revenue_per_kw_year": 31.9,
+   "value_of_perfect_foresight_per_kw_year": 23.09,
+   "capture_rate": 0.5801
   },
   {
    "location": "HB_WEST",
@@ -2106,7 +2367,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3061,
    "cycles_per_year": 429.7,
-   "avg_spread_captured": 63.26
+   "avg_spread_captured": 63.26,
+   "da_rt_revenue_per_kw_year": 23.55,
+   "value_of_perfect_foresight_per_kw_year": 20.09,
+   "capture_rate": 0.5395
   },
   {
    "location": "HB_WEST",
@@ -2123,7 +2387,10 @@
    "days_covered": 297,
    "top10_day_share": 0.246,
    "cycles_per_year": 596.9,
-   "avg_spread_captured": 36.26
+   "avg_spread_captured": 36.26,
+   "da_rt_revenue_per_kw_year": 60.08,
+   "value_of_perfect_foresight_per_kw_year": 20.96,
+   "capture_rate": 0.7414
   },
   {
    "location": "HB_WEST",
@@ -2140,7 +2407,10 @@
    "days_covered": 297,
    "top10_day_share": 0.3027,
    "cycles_per_year": 357.2,
-   "avg_spread_captured": 56.57
+   "avg_spread_captured": 56.57,
+   "da_rt_revenue_per_kw_year": 44.6,
+   "value_of_perfect_foresight_per_kw_year": 18.87,
+   "capture_rate": 0.7027
   },
   {
    "location": "RHESS2_ESS1",
