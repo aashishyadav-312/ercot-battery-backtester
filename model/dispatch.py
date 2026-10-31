@@ -62,9 +62,17 @@ def _solve(prices, dt, power_mw, energy_mwh, eta, deg_cost, soc0, exclusive):
     else:
         solver = pulp.HiGHS(msg=False)
 
-    stats = prob.solve(solver)
-    if stats.status != pulp.LpSolveStatus.Optimal and not (exclusive and stats.has_solution):
-        raise RuntimeError(f"Dispatch solve failed: {stats.status.name}")
+    result = prob.solve(solver)
+    if hasattr(result, "status"):  # PuLP >= 4 (Python >= 3.12) returns a stats object
+        ok = result.status == pulp.LpSolveStatus.Optimal or (exclusive and result.has_solution)
+        status_name = result.status.name
+    else:  # PuLP 3.x (Python 3.11) returns an int status
+        ok = result == pulp.LpStatusOptimal or (
+            exclusive and prob.sol_status in (pulp.LpSolutionOptimal, pulp.LpSolutionIntegerFeasible)
+        )
+        status_name = pulp.LpStatus.get(result, str(result))
+    if not ok:
+        raise RuntimeError(f"Dispatch solve failed: {status_name}")
 
     def values(xs):
         return np.array([x.value() or 0.0 for x in xs])
