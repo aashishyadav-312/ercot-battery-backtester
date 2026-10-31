@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ercot-battery-backtester"
+version = "0.1.0"
+description = "Perfect-foresight battery arbitrage backtester for ERCOT settlement points."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "gridstatus",
+    "pandas",
+    "pyarrow",
+    "pulp",
+    "highspy",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools]
+packages = ["data", "model", "scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
