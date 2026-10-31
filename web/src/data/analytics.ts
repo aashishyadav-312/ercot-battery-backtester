@@ -1,3 +1,4 @@
+import dataNotes from './data-notes.json';
 import type { IndexRun, NodeSelection, Run } from './types';
 
 export const TOP_DAY_WARN = 0.2;
@@ -19,12 +20,9 @@ export function topDay(run: Run): TopDay | null {
   return { date: date[k], revenue: revenue[k], share: revenue[k] / total };
 }
 
-/** Known explanations for runs that trip the data-quality note (from results/FINDINGS.md). */
-const NOTES: Record<string, string> = {
-  'RHESS2_ESS1:2025':
-    'On Feb 19–20, 2025 this node’s price reached $28,340/MWh, more than five times the $5,000 offer cap (possible at a node when several congestion constraints bind). Those two days alone are about $77 of the $179/kW-yr (2h, $10/MWh degradation). Node prices are as first posted by ERCOT and could not be corrected for later price revisions, so a corrected spike would change this result much more than the 0.1–0.3% seen at hubs.',
-};
-export const dataNote = (location: string, year: number) => NOTES[`${location}:${year}`];
+/** Known explanations for runs that trip the data-quality note live in data-notes.json. */
+const NOTES: Record<string, Record<string, string>> = dataNotes.notes;
+export const dataNote = (location: string, year: number): string | undefined => NOTES[location]?.[String(year)];
 
 export const kw = (run: Run) => run.meta.power_mw * 1000;
 

@@ -1,0 +1,8 @@
+{
+  "_about": "Known explanations for runs that trip the data-quality note (best day > 20% of the period's revenue). Keyed by location, then year. Text is shown under the automatic note. Source: results/FINDINGS.md section 6.",
+  "notes": {
+    "RHESS2_ESS1": {
+      "2025": "On Feb 19–20, 2025 this node’s price reached $28,340/MWh, more than five times the $5,000 offer cap (possible at a node when several congestion constraints bind). Those two days alone are about $77 of the $179/kW-yr (2h, $10/MWh degradation). Node prices are as first posted by ERCOT and could not be corrected for later price revisions, so a corrected spike would change this result much more than the 0.1–0.3% seen at hubs."
+    }
+  }
+}

@@ -1,5 +1,30 @@
-body { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
-code { font-size: .9em; padding: 1px 5px; border-radius: 4px; background: var(--mantine-color-default-hover); }
+/* Global base only. Component styling lives in the Mantine theme (theme.ts + theme.module.css). */
+html { background: var(--app-canvas); }
+body {
+  background: var(--app-canvas);
+  font-optical-sizing: auto;
+  /* Running prose keeps proportional figures (tabular also widens the hyphen in this face).
+     Every displayed figure is tabular: tables, KPI values, selectors, charts and tooltips
+     opt in through the theme and the .tnum utility below. */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+input, button, select, textarea { font-variant-numeric: inherit; }
+.tnum { font-variant-numeric: tabular-nums; }
+code {
+  font-size: .88em; padding: 1px 5px; border-radius: 5px;
+  background: var(--mantine-color-default-hover); border: 1px solid var(--app-hairline);
+}
+::selection { background: color-mix(in srgb, var(--mantine-primary-color-filled) 24%, transparent); }
+
+/* Content arrives: a short rise + fade. Reduced motion keeps only the fade. */
+@keyframes app-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes app-fade { from { opacity: 0; } to { opacity: 1; } }
+.app-enter { animation: app-enter 420ms var(--app-ease) both; }
+.app-fade { animation: app-fade 320ms var(--app-ease) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .app-enter { animation-name: app-fade; animation-duration: 200ms; }
+  html { scroll-behavior: auto !important; }
 }

@@ -6,15 +6,15 @@ import { KpiRow, PageHeader, RunStatus } from './Overview';
 export default function Revenue() {
   const { run } = useSelectedRun();
   return (
-    <Stack gap="md">
-      <PageHeader title="Revenue" />
+    <Stack gap="lg">
+      <PageHeader title="Revenue" hero />
       <RunStatus />
       <KpiRow />
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <MonthlyRevenueCard run={run} />
         <CumulativeCard run={run} />
       </SimpleGrid>
-      <Grid gap="md">
+      <Grid gap="lg">
         <Grid.Col span={{ base: 12, md: 8 }}><DailyRevenueCard run={run} /></Grid.Col>
         <Grid.Col span={{ base: 12, md: 4 }}><TopDaysCard run={run} /></Grid.Col>
       </Grid>

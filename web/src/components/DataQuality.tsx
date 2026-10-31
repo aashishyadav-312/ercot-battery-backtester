@@ -12,14 +12,14 @@ export function DataQuality({ run }: { run?: Run }) {
   const extra = dataNote(run.meta.location, run.meta.year);
   const period = run.metrics.annualized ? 'year-to-date revenue' : 'annual revenue';
   return (
-    <Alert color="orange" variant="light" icon={<IconWarn />} title="Data-quality note: one day dominates this result" radius="md">
-      <Text size="sm">
+    <Alert color="yellow" icon={<IconWarn />} title="Data-quality note: one day dominates this result" className="app-fade">
+      <Text size="sm" lh={1.55}>
         {fmtDate(t.date)} alone earned {usd(t.revenue / (run.meta.power_mw * 1000), 1)}/kW, which is{' '}
         <b>{pct(t.share, 0)}</b> of this run&rsquo;s {period} (flag threshold: {pct(TOP_DAY_WARN)}). A figure this
         dependent on a single price event is fragile; read it as &ldquo;what one spike was worth,&rdquo; not a
         typical year.
       </Text>
-      {extra && <Text size="sm" mt={6}>{extra}</Text>}
+      {extra && <Text size="sm" lh={1.55} mt={8}>{extra}</Text>}
     </Alert>
   );
 }

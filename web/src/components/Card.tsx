@@ -22,12 +22,12 @@ interface Props {
 export function Card({ title, subtitle, csv, children, footer }: Props) {
   const [open, setOpen] = useState(false);
   const head = (
-    <Group justify="space-between" align="flex-start" wrap="nowrap" mb="xs" gap="xs">
+    <Group justify="space-between" align="flex-start" wrap="nowrap" mb="md" gap="xs">
       <div style={{ minWidth: 0 }}>
-        <Text fw={600} size="sm" lh={1.3}>{title}</Text>
-        {subtitle && <Text size="xs" c="dimmed" lh={1.35}>{subtitle}</Text>}
+        <Text component="h3" fw={620} size="md" lh={1.3} c="bright" m={0}>{title}</Text>
+        {subtitle && <Text size="sm" c="dimmed" lh={1.45} mt={2}>{subtitle}</Text>}
       </div>
-      <Group gap={2} wrap="nowrap">
+      <Group gap={2} wrap="nowrap" mt={-6} mr={-8}>
         <Tooltip label="Download CSV">
           <ActionIcon
             variant="subtle" color="gray" size="lg" aria-label={`Download ${title} as CSV`}
@@ -47,13 +47,13 @@ export function Card({ title, subtitle, csv, children, footer }: Props) {
   );
   return (
     <>
-      <Paper withBorder p="md" radius="md" component="section" aria-label={title}>
+      <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label={title} data-interactive>
         {head}
         {children(false)}
         {footer}
       </Paper>
       <Modal opened={open} onClose={() => setOpen(false)} size="90vw" centered title={title} padding="lg">
-        {subtitle && <Text size="sm" c="dimmed" mb="sm">{subtitle}</Text>}
+        {subtitle && <Text size="sm" c="dimmed" mb="md">{subtitle}</Text>}
         {open && children(true)}
         {open && footer}
       </Modal>
