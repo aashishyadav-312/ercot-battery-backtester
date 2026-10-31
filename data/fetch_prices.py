@@ -6,8 +6,11 @@ One download covers every hub and load zone for the year, so it is cached once
 as data/raw/{market}_ALL_{year}.parquet and split per location from there.
 
 Resource nodes are not in the annual archives. They come from the ERCOT public
-API, which needs ERCOT_API_USERNAME, ERCOT_API_PASSWORD and
-ERCOT_API_SUBSCRIPTION_KEY in the environment.
+API (RT: NP6-905-CD, DA: NP4-190-CD), filtered server-side by settlementPoint and
+requested a month at a time, so a node-year is 12 small requests. This needs
+ERCOT_API_USERNAME, ERCOT_API_PASSWORD and ERCOT_API_SUBSCRIPTION_KEY in the
+environment. fetch_node_sample() pulls one month of every resource node, which
+scripts/rank_nodes.py uses to pick volatile and typical nodes.
 
 Output columns: interval_start_utc, interval_start_local (US/Central), location,
 market, price ($/MWh). Timestamps are stored in UTC so DST days are unambiguous.
@@ -84,26 +87,101 @@ def _download_archive(year: int, market: str, retries: int = 4) -> pd.DataFrame:
             time.sleep(wait)
 
 
-def _download_api(location: str, year: int, market: str) -> pd.DataFrame:
+API_ENV = ("ERCOT_API_USERNAME", "ERCOT_API_PASSWORD", "ERCOT_API_SUBSCRIPTION_KEY")
+# ERCOT public API report endpoints. Both accept a settlementPoint filter, so
+# one node-year is a single ~35k-row request rather than the all-node bulk data.
+API_ENDPOINTS = {
+    "RT15": "/np6-905-cd/spp_node_zone_hub",  # RT 15-min SPPs, every settlement point
+    "DA": "/np4-190-cd/dam_stlmnt_pnt_prices",  # DA hourly SPPs
+}
+
+
+def _api_client():
     from gridstatus.ercot_api.ercot_api import ErcotAPI
 
-    env = ("ERCOT_API_USERNAME", "ERCOT_API_PASSWORD", "ERCOT_API_SUBSCRIPTION_KEY")
-    missing = [k for k in env if not os.environ.get(k)]
+    missing = [k for k in API_ENV if not os.environ.get(k)]
     if missing:
         raise RuntimeError(
-            f"{location} is a resource node, which needs the ERCOT public API. "
-            f"Set {', '.join(missing)} (free account at apiexplorer.ercot.com)."
+            f"Resource nodes need the ERCOT public API. Set {', '.join(missing)} "
+            "(free account at apiexplorer.ercot.com)."
         )
-    api = ErcotAPI(
+    return ErcotAPI(
         username=os.environ["ERCOT_API_USERNAME"],
         password=os.environ["ERCOT_API_PASSWORD"],
         public_subscription_key=os.environ["ERCOT_API_SUBSCRIPTION_KEY"],
     )
-    start = pd.Timestamp(f"{year}-01-01", tz=TZ)
-    end = min(pd.Timestamp(f"{year + 1}-01-01", tz=TZ), pd.Timestamp.now(tz=TZ).normalize())
-    getter = api.get_spp_real_time_15_min if market == "RT15" else api.get_spp_day_ahead_hourly
-    raw = getter(start, end=end)
-    return _normalize(raw[raw["Location"] == location], market)
+
+
+def _api_to_raw(df: pd.DataFrame) -> pd.DataFrame:
+    """Turn an ERCOT API report frame into the gridstatus shape _normalize reads.
+
+    API rows carry DeliveryDate + DeliveryHour (hour ending) [+ DeliveryInterval]
+    and a DSTFlag for the repeated fall-back hour. gridstatus' parse_doc turns
+    those into a tz-aware "Interval Start".
+    """
+    from gridstatus import Ercot
+
+    doc = Ercot().parse_doc(df.copy())
+    return doc.rename(columns={"SettlementPoint": "Location", "SettlementPointPrice": "SPP"})
+
+
+def _hit_api(api, market: str, start: str, end: str, retries: int = 4, **filters) -> pd.DataFrame:
+    """One filtered API query over delivery dates [start, end] (inclusive), normalized.
+
+    ERCOT's bot protection answers some requests (e.g. a full-year range) with
+    HTTP 403, and the API rate limit is HTTP 429; both are retried with backoff.
+    """
+    import requests
+
+    for attempt in range(retries + 1):
+        try:
+            raw = api.hit_ercot_api(API_ENDPOINTS[market], deliveryDateFrom=start, deliveryDateTo=end, **filters)
+            break
+        except requests.HTTPError as err:
+            code = err.response.status_code if err.response is not None else None
+            if code not in (403, 429) or attempt == retries:
+                raise
+            wait = 10 * 2**attempt
+            log.warning("ERCOT API returned %s; retrying in %ds", code, wait)
+            time.sleep(wait)
+    if raw.empty:
+        return pd.DataFrame(columns=["interval_start_utc", "location", "market", "price"])
+    return _normalize(_api_to_raw(raw), market)
+
+
+def _download_api(location: str, year: int, market: str, api=None) -> pd.DataFrame:
+    """One settlement point's prices for a year (or year to date) from the ERCOT API.
+
+    Requested one month at a time: a single full-year range is refused (HTTP 403).
+    """
+    api = api or _api_client()
+    today = pd.Timestamp.now(tz=TZ).tz_localize(None).normalize()
+    parts = []
+    for first in pd.date_range(f"{year}-01-01", f"{year}-12-01", freq="MS"):
+        if first > today:
+            break
+        last = min(first + pd.offsets.MonthEnd(0), today)
+        parts.append(_hit_api(api, market, f"{first:%Y-%m-%d}", f"{last:%Y-%m-%d}", settlementPoint=location))
+    df = pd.concat(parts, ignore_index=True)
+    df = df[df["location"] == location].drop_duplicates(["location", "interval_start_utc"])
+    return df.sort_values("interval_start_utc").reset_index(drop=True)
+
+
+def fetch_node_sample(year: int, month: int, refresh: bool = False, api=None) -> pd.DataFrame:
+    """RT 15-min prices for every resource node (type RN) for one month.
+
+    Used to rank nodes by volatility. About 700 nodes x 3k intervals, so it is
+    paged (100k rows a page) and cached as data/raw/RT15_RN_{year}-{month}.parquet.
+    """
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    path = RAW_DIR / f"RT15_RN_{year}-{month:02d}.parquet"
+    if path.exists() and not refresh:
+        return pd.read_parquet(path)
+    first = pd.Timestamp(year=year, month=month, day=1)
+    last = first + pd.offsets.MonthEnd(0)
+    df = _hit_api(api or _api_client(), "RT15", f"{first:%Y-%m-%d}", f"{last:%Y-%m-%d}", settlementPointType="RN")
+    df.to_parquet(path, index=False)
+    return df
 
 
 def _fill_gaps(df: pd.DataFrame, market: str, year: int) -> pd.DataFrame:
