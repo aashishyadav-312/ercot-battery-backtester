@@ -6,6 +6,7 @@
 //
 // --root   web/ directory whose dist/ is served (default: this one)
 // --suffix appended to every file name (default: after), so runs of two versions sit side by side
+// --pages  comma-separated subset of pages (e.g. --pages realism); skips the extra node/expanded shots
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -27,7 +28,9 @@ const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--stric
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const pages = ['overview', 'revenue', 'dispatch', 'compare', 'method'];
+const ALL_PAGES = ['overview', 'revenue', 'dispatch', 'compare', 'realism', 'method'];
+const only = arg('pages', '');
+const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
 const name = (...parts) => join(out, `${parts.join('-')}-${suffix}.png`);
 
@@ -66,7 +69,7 @@ try {
       }
 
       // Data-quality note on a volatile node, and node-vs-hub on Compare.
-      for (const [file, url] of [
+      for (const [file, url] of only ? [] : [
         ['data-quality', 'overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
         ['compare-node', 'compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
       ]) {
@@ -77,7 +80,7 @@ try {
         shots++;
       }
 
-      if (size === 'desktop') {
+      if (size === 'desktop' && !only) {
         await page.goto(`${base}#/overview?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
         await settle(page);
         await page.getByRole('button', { name: /Expand Dispatch pattern/ }).click();

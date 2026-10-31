@@ -39,6 +39,8 @@ jobs:
           # run_grid fetches the year first (hub archives, then nodes at ~2 s per
           # request), skips anything ERCOT refuses, and merges into results/index.json.
           python -m scripts.run_grid --years "$YEAR" --nodes $NODES
+      - name: Recompute the before/after RTC+B comparison
+        run: python -m scripts.rtcb
       - name: Open a pull request with the updated results
         uses: peter-evans/create-pull-request@v7
         with:
@@ -48,7 +50,8 @@ jobs:
           title: "Refresh ERCOT results"
           body: |
             Automated monthly refresh: refetched the current year for all hubs and the
-            nodes in `results/node_selection.json`, then reran `scripts.run_grid` for that year.
+            nodes in `results/node_selection.json`, then reran `scripts.run_grid` for that year
+            (perfect foresight and DA-schedule / RT-settle) and `scripts.rtcb`.
 
             Merging to `main` redeploys the site.
           delete-branch: true

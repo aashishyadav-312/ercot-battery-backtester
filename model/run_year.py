@@ -141,11 +141,45 @@ def to_json(result: dict) -> dict:
     }
 
 
-def save(result: dict) -> Path:
+DA_SCHEDULE_META = {
+    "method": "optimize each day on ERCOT day-ahead hourly settlement point prices, hold that schedule "
+    "fixed and settle it at real-time 15-minute prices (each hourly MW applies to its four 15-min intervals)",
+    "battery": "same power, energy, efficiency, degradation cost and start/end state of charge as the perfect-foresight run",
+    "comparison": "perfect-foresight and DA-scheduled revenue are compared on the same days; "
+    "value_of_perfect_foresight = perfect foresight - DA-scheduled; capture_rate = DA-scheduled / perfect foresight",
+    "da_da_revenue": "the same DA schedule paid at DA prices (what selling it day-ahead and following it exactly would earn)",
+    "da_prices": "hubs: ERCOT annual archive NP4-180-ER; resource nodes: ERCOT public API NP4-190-CD",
+}
+DA_INDEX_FIELDS = ("da_rt_revenue_per_kw_year", "value_of_perfect_foresight_per_kw_year", "capture_rate")
+
+
+def add_da_schedule(doc: dict, da: dict, pf_daily: pd.DataFrame | None = None) -> dict:
+    """Add DA-schedule / RT-settle fields to a results JSON doc, leaving every existing field as it is.
+
+    `da` is model.forecast.run_da_schedule output for the doc's days. `pf_daily`
+    ([date, revenue], full precision) defaults to the doc's own rounded daily revenue.
+    """
+    from model.forecast import summarize_da
+
+    meta, metrics = doc["meta"], doc["metrics"]
+    if pf_daily is None:
+        pf_daily = pd.DataFrame({"date": doc["daily"]["date"], "revenue": doc["daily"]["revenue"]})
+    scale = 365 / metrics["days_covered"] if metrics["annualized"] else 1.0
+    metrics.update(summarize_da(pf_daily, da["daily"], meta["power_mw"], scale))
+    meta["da_schedule"] = {**DA_SCHEDULE_META, "skipped_days": da["skipped_days"]}
+    by_day = dict(zip(da["daily"]["date"], np.round(da["daily"]["da_rt_revenue"], 2)))
+    doc["daily"]["da_rt_revenue"] = [None if d not in by_day else float(by_day[d]) for d in doc["daily"]["date"]]
+    return doc
+
+
+def save(result: dict, da: dict | None = None) -> Path:
     p = result["params"]
     path = result_path(p["location"], p["year"], p["duration_h"], p["rte"], p["deg_cost_per_mwh"])
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(to_json(result), separators=(",", ":")))
+    doc = to_json(result)
+    if da is not None:
+        add_da_schedule(doc, da, result["daily"][["date", "revenue"]])
+    path.write_text(json.dumps(doc, separators=(",", ":")))
     return path
 
 

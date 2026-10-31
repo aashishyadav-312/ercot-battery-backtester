@@ -18,8 +18,9 @@ from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 
 from data.fetch_prices import ErcotBlockedError, fetch
+from model.forecast import run_da_schedule
 from model.metrics import summarize
-from model.run_year import RESULTS_DIR, run_year, save
+from model.run_year import DA_INDEX_FIELDS, RESULTS_DIR, SOC0_FRAC, run_year, save
 
 log = logging.getLogger(__name__)
 
@@ -33,8 +34,13 @@ POWER_MW = 100.0
 
 def _run(job: tuple) -> dict:
     location, year, hours, deg = job
-    result = run_year(location, year, POWER_MW, hours, RTE, deg, prices=fetch(location, year))
-    path = save(result)
+    rt = fetch(location, year)
+    result = run_year(location, year, POWER_MW, hours, RTE, deg, prices=rt)
+    da = run_da_schedule(
+        rt, fetch(location, year, "DA"), POWER_MW, hours, RTE, deg, SOC0_FRAC, days=result["daily"]["date"].tolist()
+    )
+    path = save(result, da)
+    doc = json.loads(path.read_text())
     m = summarize(result)
     return {
         "location": location,
@@ -57,6 +63,7 @@ def _run(job: tuple) -> dict:
                 "avg_spread_captured",
             )
         },
+        **{k: doc["metrics"][k] for k in DA_INDEX_FIELDS},
     }
 
 
@@ -76,6 +83,7 @@ def main() -> None:
         try:
             for year in args.years:
                 fetch(loc, year)
+                fetch(loc, year, "DA")
             locations.append(loc)
         except ErcotBlockedError:
             raise  # a blocked runner won't recover; fail the whole run with the clear message

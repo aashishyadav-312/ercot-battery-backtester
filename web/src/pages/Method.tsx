@@ -20,7 +20,7 @@ const MODO = [
 ];
 
 export default function Method() {
-  const { nodes } = useApp();
+  const { nodes, go } = useApp();
   const { run } = useSelectedRun();
   const m = run?.meta;
   return (
@@ -39,14 +39,14 @@ export default function Method() {
 
       <Section title="Assumptions">
         <Stack gap="md" component="dl" my={0}>
-            <div key="0"><Text size="sm" fw={600}>Market and prices</Text><Text size="sm" c="dimmed">ERCOT real-time 15-minute settlement point prices. No day-ahead leg.</Text></div>
+            <div key="0"><Text size="sm" fw={600}>Market and prices</Text><Text size="sm" c="dimmed">ERCOT real-time 15-minute settlement point prices. The Realism page also uses day-ahead hourly prices, as a forecast to schedule on.</Text></div>
             <div key="1"><Text size="sm" fw={600}>Optimizer</Text><Text size="sm" c="dimmed">One linear program per Central-time day (96 intervals), solved with PuLP and HiGHS. Charge and discharge are bounded by rated power; state of charge is bounded by energy capacity.</Text></div>
             <div key="2"><Text size="sm" fw={600}>Daily boundary</Text><Text size="sm" c="dimmed">The battery starts and ends each day empty, so no energy is carried overnight and no day borrows from another.</Text></div>
             <div key="3"><Text size="sm" fw={600}>Efficiency</Text><Text size="sm" c="dimmed">85% round trip, split as √0.85 on charge and √0.85 on discharge.</Text></div>
             <div key="4"><Text size="sm" fw={600}>Degradation</Text><Text size="sm" c="dimmed">Two settings: $0 and $10 per MWh discharged. Revenue shown is net of this cost. A full cycle of a 2-hour, 100 MW battery therefore costs $2,000.</Text></div>
             <div key="5"><Text size="sm" fw={600}>Size</Text><Text size="sm" c="dimmed">Modeled as 100 MW; results are quoted per kW of power capacity, so size does not matter. Durations 1, 2 and 4 hours.</Text></div>
             <div key="6"><Text size="sm" fw={600}>Partial years</Text><Text size="sm" c="dimmed">2026 runs to Oct 24 (hubs) or Oct 30 (nodes). $/kW-yr and cycles/yr are scaled to 365 days and labeled <Badge size="sm" variant="dot" color="yellow">Annualized YTD</Badge>. Seasonality is not adjusted for, so the scaled figure is indicative only. Where exact comparisons matter, pages use matched windows of identical days.</Text></div>
-            <div key="7"><Text size="sm" fw={600}>Excluded</Text><Text size="sm" c="dimmed">Ancillary services, forecast error, transmission and interconnection costs, state-of-charge limits from market rules, and any revenue from capacity or other programs.</Text></div>
+            <div key="7"><Text size="sm" fw={600}>Excluded</Text><Text size="sm" c="dimmed">Ancillary services, forecast error (except on the Realism page, which schedules on day-ahead prices), transmission and interconnection costs, state-of-charge limits from market rules, and any revenue from capacity or other programs.</Text></div>
             <div key="8"><Text size="sm" fw={600}>Cycles</Text><Text size="sm" c="dimmed">MWh discharged divided by MWh of energy capacity, summed over the year.</Text></div>
         </Stack>
         {m && (
@@ -103,6 +103,10 @@ export default function Method() {
         <Text size="sm">
           <b>This model cannot separate RTC+B from the continuing build-out of batteries, which flattens price spreads.</b> It also leaves out ancillary
           services, where RTC+B changes battery revenue most directly. Read the 2026 numbers as &ldquo;revenue fell again,&rdquo; not &ldquo;RTC+B caused it.&rdquo;
+        </Text>
+        <Text size="sm">
+          The <Anchor component="button" size="sm" onClick={() => go('realism')}>Realism page</Anchor> compares matched windows before and after
+          Dec 5, 2025 for perfect foresight and a day-ahead-scheduled strategy, with the same caution.
         </Text>
       </Section>
 

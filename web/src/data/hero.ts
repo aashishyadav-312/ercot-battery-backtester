@@ -61,19 +61,31 @@ function rank(sel: Selection, index: IndexRun[]): Hero | null {
   return make([`${sel.location} ranks `, { em: ORD(i + 1) }, ` of ${rows.length} locations for a ${sel.duration}-hour battery in ${yr}.`]);
 }
 
+function capture(r: Run): Hero | null {
+  const c = r.metrics.capture_rate;
+  if (c == null) return null;
+  if (c <= 0) return make(['Scheduled on day-ahead prices, this battery ', { em: 'lost money' }, ` in real time in ${period(r)}.`]);
+  return make(['Scheduling on day-ahead prices captured ', { em: pct(c, 0) }, ` of the perfect-foresight revenue in ${period(r)}.`]);
+}
+
 export function heroFor(page: Page, run: Run | undefined, sel: Selection, index: IndexRun[] | null): Hero | null {
   if (page === 'compare') return index ? rank(sel, index) : null;
   if (!run) return null;
+  if (page === 'realism') return capture(run);
   if (page === 'revenue') return bestMonth(run) ?? concentration(run);
   if (page === 'dispatch') return dispatchShape(run) ?? concentration(run);
   return concentration(run);
 }
 
 /** One quiet line of context under the hero: what was modelled, and the headline $/kW-yr. */
-export function ledeFor(run: Run | undefined): string | null {
+export function ledeFor(run: Run | undefined, page?: Page): string | null {
   if (!run) return null;
   const m = run.meta;
   const r = run.metrics;
+  if (page === 'realism' && r.da_rt_revenue_per_kw_year != null) {
+    const ann = r.annualized ? ' (annualized)' : '';
+    return `A ${m.duration_h}-hour battery at ${m.location} scheduled on day-ahead prices and paid real-time prices would have earned ${usd(r.da_rt_revenue_per_kw_year, 1)}/kW-yr${ann} in ${period(run)}, against ${usd(r.pf_revenue_per_kw_year_matched, 1)} with perfect foresight.`;
+  }
   const amount = `${usd(r.revenue_per_kw_year, 1)}/kW-yr${r.annualized ? ' (annualized)' : ''}`;
   return `A ${m.duration_h}-hour battery at ${m.location} would have earned ${amount} in ${period(run)} arbitraging real-time prices with perfect foresight, net of $${m.deg_cost_per_mwh}/MWh degradation.`;
 }

@@ -1,4 +1,4 @@
-import type { IndexRun, NodeSelection, Run, Selection } from './types';
+import type { IndexRun, NodeSelection, Rtcb, Run, Selection } from './types';
 
 const BASE = `${import.meta.env.BASE_URL}data/`;
 const cache = new Map<string, Promise<unknown>>();
@@ -18,6 +18,7 @@ function getJson<T>(file: string): Promise<T> {
 
 export const loadIndex = () => getJson<{ runs: IndexRun[] }>('index.json').then((d) => d.runs);
 export const loadNodeSelection = () => getJson<NodeSelection>('node_selection.json');
+export const loadRtcb = () => getJson<Rtcb>('rtcb.json');
 export const loadRun = (file: string) => getJson<Run>(file);
 
 export function findRun(index: IndexRun[], s: Selection, location = s.location, year = s.year, duration = s.duration) {
