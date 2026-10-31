@@ -1,0 +1,57 @@
+GRID STATUS: DIRECT ERCOT DASHBOARD INVESTIGATION
+Inspected October 31, 2026. Target: https://www.gridstatus.io/live/ercot
+
+RESULT
+The real dashboard loaded successfully locally. This investigation did not encounter the Cloudflare block reported by the separate cloud session. REA directly inspected the page, captured its delivered JavaScript and produced a screenshot. This report describes the frontend and visible behavior; it does not recover Grid Status's private backend.
+
+METHOD AND PROVENANCE
+Used the installed reverse-engineer-anything skill, version 49, and its installed REA 6.8.0 CLI fallback. This chat has no connected REA MCP tools. The system Node.js 20.2.0 could not launch REA; Codex's existing bundled Node.js 24.22.1 successfully ran it, without changing the system runtime or registering another MCP server.
+REA attached to the dedicated local Chrome endpoint at 127.0.0.1:9222, filtered to https://www.gridstatus.io. Its target was titled 'ERCOT Live Dashboard and Price Map | Grid Status'. Supplementary direct browser inspection examined the Conditions, Pricing and full Nodal Price Map pages.
+
+REA evidence:
+Target listing: ev_8483ac6b70d86054b76292136ca7fd229e9a5baed7d0b33e7dc8dab8f1fd17e7
+Page capture: ev_e551a555fe61800567d664d6f8196dd765cf44810ee5e135bf68e9293b69bfee
+Screenshot: ev_d16f41fbdf86f15055be9029b030272632b9c4e9b9f5563a09d6d2c8edb588ea
+Screenshot timestamp: 2026-10-31T06:37:41.762Z (2:37 a.m. EDT).
+253 same-origin scripts were inventoried. Source hashes and capture limitations are in gridstatus-evidence-summary.json. The full raw capture remains in the task's work directory.
+
+CONFIRMED FRONTEND COMPONENTS
+1. ECharts for charts. Captured EChartsWrapper-Bv2E0CtY.js contains echarts and zrender identifiers. EChartsGraph-BpaORhYw.js imports the wrapper and contains setOption, tooltip and animation handling. The rendered charts have ZRender canvas attributes. This is direct evidence, stronger than guessing from a screenshot.
+2. Mapbox GL for the map. Captured mapbox-gl-B_wxVkTK.js contains Mapbox GL JS and mapbox-gl-js identifiers. The rendered map has mapboxgl-map/mapboxgl-canvas elements and Mapbox attribution. MapLibre was a proposed alternative in the earlier cloud report, not the library observed here.
+3. React for the interface. The delivered JSX runtime contains React and react.transitional.element identifiers; captured UI modules use JSX runtime imports.
+4. Mantine for interface controls and layout. The live DOM contains mantine-Select, mantine-Button, mantine-Grid, mantine-Paper and other Mantine component classes.
+5. AG Grid for data tables. The DOM has ag-root and AG Grid theme classes. Captured GSDataTable-D67YSq1R.js contains AG Grid/ag-grid/ag-grid-community identifiers.
+Exact installed library versions were not established. No claim is made about Tailwind, Radix, cmdk or deck.gl being used by this page.
+
+HOW THE NODE MAP IS BUILT: CAPTURED CODE EVIDENCE
+The delivered nodeLayer module defines a GeoJSON source and Mapbox circle layer. Circle color reads a feature's color property. Circle radius varies with zoom. Selected and hovered nodes receive thicker circle strokes. The layer binds popup, click and feature-search/index handlers. These are frontend implementation observations; individual user interactions were not exhaustively tested.
+The captured PriceMapLegend module defines separate color thresholds for LMP, energy, loss and congestion. It also contains fixed/dynamic color-scale controls and a nodes/hex display switch. Its UI text describes hex mode as aggregating nearby nodes using mean price. The code includes access checks for advanced controls. The full map presented an account gate, so these advanced modes were not exercised or their output validated.
+
+VISIBLE PRODUCT STRUCTURE
+The public Conditions page includes load/net-load/price/source summary cards; a stacked fuel-mix chart; an embedded node-price map with a timestamp slider; day-ahead/real-time pricing controls; block-price and SCED node-price tables; storage charging/discharging, renewable, load and outage sections; and links to underlying dataset pages.
+The Pricing page exposes a dataset selector for LMP, LMP with adders and 15-minute settlement-point prices. Visible location labels include HB_HOUSTON, HB_NORTH, HB_SOUTH and HB_WEST. An Account Required overlay limits anonymous access.
+The full Nodal Price Map exposes pricing, date/time, market, layer and data-table controls. Price Nodes, Power Plants and Grid Infrastructure are distinct visible layer categories. The map displays a free-account requirement; Grid Infrastructure has an upgrade control. Account and subscription gates were left in place.
+
+DATA ACCESS: OBSERVATIONS AND INFERENCES
+Captured frontend configuration includes app-api.gridstatus.io and api.gridstatus.io. A captured request helper prefixes frontend paths with front-end/v1 and converts a header row plus value rows into objects. Auth handling exists in the delivered request wrapper.
+This supports an architecture of a React client requesting data from hosted services, then passing results into reusable charts and GeoJSON map layers. It does not establish the backend language, database, ingestion pipeline, refresh guarantees, or all live endpoint contracts. Seeing an endpoint in client code does not establish permission to use it independently.
+
+WHAT CAN BE REUSED IN OUR PROJECT
+The observed patterns are useful: shared chart wrappers, a GeoJSON node layer, explicit price-color thresholds, time selection, hover/selection styling and reusable table components. Our own application can use these patterns and appropriate third-party libraries with an independent battery model and permitted data sources. This investigation does not supply a battery revenue optimizer or the private platform source.
+
+LIMITATIONS
+REA's capture is origin-filtered and attach-limited. Earlier network traffic is unavailable; cross-origin scripts/resources and some workers were excluded. Stored credentials and storage values were not requested. No source maps were fetched and no full static-analysis pass was performed over all modules. No backend access or complete-platform reconstruction was performed. Statements about rendered components combine direct DOM/visual observation with REA-delivered script evidence; visible access-gated controls are not evidence their full functionality was tested.
+
+SOURCE PAGES
+https://www.gridstatus.io/live/ercot
+https://www.gridstatus.io/live/ercot/pricing
+https://www.gridstatus.io/map?market=ercot
+
+SELECTED SCRIPT SOURCES OBSERVED IN REA CAPTURE
+https://www.gridstatus.io/assets/EChartsWrapper-Bv2E0CtY.js
+https://www.gridstatus.io/assets/EChartsGraph-BpaORhYw.js
+https://www.gridstatus.io/assets/mapbox-gl-B_wxVkTK.js
+https://www.gridstatus.io/assets/GSDataTable-D67YSq1R.js
+https://www.gridstatus.io/assets/jsx-runtime-DykzC2zs.js
+https://www.gridstatus.io/assets/nodeLayer-n-606zSG.js
+https://www.gridstatus.io/assets/PriceMapLegend-VKo8Mi4R.js

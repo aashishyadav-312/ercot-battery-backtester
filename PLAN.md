@@ -13,7 +13,7 @@
 | Data source | `gridstatus` Python library (ERCOT RT 15-min SPP + DA hourly SPP), plus a free ERCOT API account for the endpoints that need it | Free and open source. One node-year is about 35k rows. |
 | Storage | Parquet in `data/raw/` (gitignored), results as JSON in `results/` (committed) | Results stay small and the frontend reads plain JSON |
 | Optimizer | One LP per day: PuLP with the HiGHS solver (`highspy`) | 96 intervals per day solves in milliseconds, so a full year takes seconds |
-| Frontend | **Vite + React + TypeScript + Tailwind + ECharts**, a static site | Streamlit can't reach the premium look you want. A static site can, and it hosts for free. |
+| Frontend | **Vite + React + TypeScript + Mantine + ECharts**, a static site (MapLibre GL for the node map) | Streamlit can't reach the premium look you want. A static site can, and it hosts for free. The reference dashboard is confirmed to use React, Mantine, ECharts and Mapbox GL (see docs/investigation/). We use the same open-source building blocks, with MapLibre in place of Mapbox because it needs no token or billing. |
 | Hosting | GitHub Pages, deployed by GitHub Actions | $0, and easy to embed in the lab site with an iframe |
 | Interactivity | Precompute a grid (about 10 nodes × 1/2/4h × 2024/2025/2026 YTD × a few efficiency/degradation settings). The UI picks from it. | No server needed. Add a custom-input API later only if people ask for it. |
 
@@ -129,7 +129,8 @@ Commit and push.
 
 ### Phase 5 — Frontend v1 (functional, not pretty yet)  ·  Sonnet · medium
 ```
-Read PLAN.md. Do Phase 5 in web/ (Vite + React + TS + Tailwind + ECharts):
+Read PLAN.md. Do Phase 5 in web/ (Vite + React + TS + Mantine + ECharts; read
+docs/investigation/REA_REPORT.md section 6 for the component recipe):
 Layout like a grid-operator dashboard: left sidebar (Overview, Revenue,
 Dispatch, Compare, Method), top bar with Location / Duration / Year /
 Degradation selectors, then:
@@ -154,7 +155,7 @@ Lead with the headline finding as a hero sentence above the KPIs.
 No third-party brand names or logos. Screenshot before/after at desktop and
 phone widths. Commit and push.
 ```
-(Design patterns to borrow are in docs/DESIGN_REFERENCE.md. GridStatus blocks cloud browsers with Cloudflare, so REA can only study it from your laptop.)
+(Design patterns to borrow are in docs/DESIGN_REFERENCE.md and docs/investigation/. Do the restyle through the Mantine theme: colors, radius, fonts, spacing. Don't add a second styling system.)
 
 ### Phase 7 — Deploy  ·  Sonnet · low
 ```
