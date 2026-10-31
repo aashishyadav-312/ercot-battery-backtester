@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { Anchor, Badge, Skeleton, Table, Text } from '@mantine/core';
+import { Anchor, Badge, Table, Text } from '@mantine/core';
 import { Card, type CsvData } from './Card';
-import { Chart, axisBase, tooltipBase, type ChartTheme } from './Chart';
+import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from './Chart';
+import { ChartSkeleton } from './Skeletons';
 import type { IndexRun, NodeSelection, Run, Selection } from '../data/types';
 import { findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, num, pct, usd, yearLabel } from '../data/format';
@@ -14,9 +15,15 @@ const tag = (r: Run) => `${r.meta.location}_${r.meta.year}_${r.meta.duration_h}h
 const scenario = (r: Run) =>
   `${r.meta.location} · ${r.meta.duration_h}h · ${yearLabel(r.meta.year)} · $${r.meta.deg_cost_per_mwh}/MWh degradation`;
 
-function Loading({ h = H }: { h?: number | string }) {
-  return <Skeleton h={h} radius="md" />;
+function Loading({ h = H, variant }: { h?: number | string; variant?: 'bars' | 'grid' | 'block' }) {
+  return <ChartSkeleton h={h} variant={variant} />;
 }
+
+/** Vertical fade from a series colour to transparent, for area fills. */
+const fade = (hex: string, top = 0.22) => ({
+  type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+  colorStops: [{ offset: 0, color: hex + Math.round(top * 255).toString(16).padStart(2, '0') }, { offset: 1, color: hex + '00' }],
+});
 
 /** Months with data (a YTD run has no later months). */
 function monthsCovered(run: Run) {
@@ -110,7 +117,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
       subtitle={run ? `Average net dispatch as % of rated power; orange = discharging, blue = charging · ${scenario(run)}` : undefined}
       csv={csv}
     >
-      {(ex) => (build ? <Chart build={build} height={ex ? '72vh' : 360} label="Heatmap of average net battery dispatch by hour of day and month" /> : <Loading h={360} />)}
+      {(ex) => (build ? <Chart build={build} height={ex ? '72vh' : 360} label="Heatmap of average net battery dispatch by hour of day and month" /> : <Loading h={360} variant="grid" />)}
     </Card>
   );
 }
@@ -125,7 +132,7 @@ export function TypicalDayCard({ run }: { run?: Run }) {
   }, [run]);
   const build = useMemo(() => {
     if (!data) return undefined;
-    const lim = Math.max(0.2, Math.ceil(Math.max(...data.map(Math.abs)) * 10) / 10);
+    const lim = Math.max(0.2, Math.ceil(Math.max(...data.map(Math.abs)) * 5) / 5); // on the 20% tick grid, so end labels don't collide
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 12, top: 16, bottom: 44 },
       tooltip: {
@@ -168,7 +175,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
     const { cum, marks } = calc;
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 14, top: 56, bottom: 30 },
-      legend: { top: 0, left: 0, icon: 'circle', itemWidth: 8, textStyle: { color: t.muted, fontSize: 11 }, data: ['Cumulative revenue', 'Top-10 days'] },
+      legend: { ...legendBase(t), data: ['Cumulative revenue', 'Top-10 days'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis',
         formatter: (ps: { seriesName: string; value: [string, number, number?]; dataIndex: number }[]) => {
@@ -183,7 +190,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.series[0] }, itemStyle: { color: t.series[0] }, areaStyle: { color: t.series[0], opacity: 0.08 }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
+        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.series[0] }, itemStyle: { color: t.series[0] }, areaStyle: { color: fade(t.series[0], t.mode === 'dark' ? 0.28 : 0.18) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
         { name: 'Top-10 days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.series[1], borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
       ],
     });
@@ -214,7 +221,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
     const top = new Set(run.metrics.top10_days);
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 14, top: 56, bottom: 30 },
-      legend: { top: 0, left: 0, icon: 'circle', itemWidth: 8, textStyle: { color: t.muted, fontSize: 11 }, data: ['Other days', 'Top-10 days'] },
+      legend: { ...legendBase(t), data: ['Other days', 'Top-10 days'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'line' },
         formatter: (ps: { value: [string, number] }[]) => `<b>${fmtDate(ps[0].value[0])}</b>${top.has(ps[0].value[0]) ? ' (top-10 day)' : ''}<br/>${usd(ps[0].value[1], 2)} per kW`,
@@ -259,8 +266,8 @@ export function TopDaysCard({ run }: { run?: Run }) {
                 {rows.map((r) => (
                   <Table.Tr key={r.date}>
                     <Table.Td c="dimmed">{r.n}</Table.Td><Table.Td>{fmtDate(r.date)}</Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{usd(r.perKw, 2)}</Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(r.share, 1)}</Table.Td>
+                    <Table.Td ta="right">{usd(r.perKw, 2)}</Table.Td>
+                    <Table.Td ta="right">{pct(r.share, 1)}</Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -307,15 +314,15 @@ export function CapturePricesCard({ run }: { run?: Run }) {
 function Delta({ now, prev }: { now: number; prev?: number }) {
   if (prev == null || !prev) return null;
   const d = now / prev - 1;
-  return <Text span fz="xs" c={d >= 0 ? 'teal.7' : 'red.7'} ml={6}>{d >= 0 ? '+' : ''}{(d * 100).toFixed(0)}%</Text>;
+  return <Text span fz="xs" c={d >= 0 ? 'teal.7' : 'red.7'} fw={560} ml={6}>{d >= 0 ? '+' : ''}{(d * 100).toFixed(0)}%</Text>;
 }
 
 export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[] | null }) {
   const rows = [1, 2, 4].map((d) => (index ? findRun(index, sel, sel.location, sel.year, d) : undefined));
-  const { runs } = useRuns(rows.map((r) => r?.file));
+  const valsKey = rows.map((r) => r?.revenue_per_kw_year ?? 0).join('|');
   const build = useMemo(() => {
-    if (!runs) return undefined;
-    const vals = rows.map((r) => r?.revenue_per_kw_year ?? 0);
+    if (!index) return undefined;
+    const vals = valsKey.split('|').map(Number);
     return (t: ChartTheme) => ({
       grid: { left: 52, right: 16, top: 28, bottom: 28 },
       tooltip: { ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: { dataIndex: number }[]) => `<b>${durLabel([1, 2, 4][p[0].dataIndex])} battery</b><br/>${usd(vals[p[0].dataIndex], 1)}/kW-yr` },
@@ -327,15 +334,14 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
         data: vals.map((v, i) => ({ value: v, itemStyle: { color: [t.series[0], t.series[1], t.series[2]][i], borderRadius: [4, 4, 0, 0] } })),
       }],
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runs]);
+  }, [index, valsKey]);
   const annualized = rows.some((r) => r?.annualized);
   const csv = (): CsvData | undefined =>
-    runs && {
+    index ? {
       filename: `duration_comparison_${sel.location}_${sel.year}_deg${sel.deg}.csv`,
       headers: ['duration_h', 'usd_per_kw_yr', 'usd_per_kwh_yr', 'cycles_per_year', 'top10_day_share', 'avg_spread_usd_per_mwh', 'annualized'],
       rows: rows.map((r) => r && [r.duration_h, r.revenue_per_kw_year, +(r.revenue_per_kw_year / r.duration_h).toFixed(2), r.cycles_per_year, r.top10_day_share, r.avg_spread_captured, r.annualized ? 1 : 0]),
-    } as CsvData;
+    } as CsvData : undefined;
   return (
     <Card
       title="1h vs 2h vs 4h"
@@ -354,10 +360,10 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
                 {rows.map((r, i) => r && (
                   <Table.Tr key={r.duration_h} fw={r.duration_h === sel.duration ? 600 : undefined}>
                     <Table.Td>{durLabel(r.duration_h)}</Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{usd(r.revenue_per_kw_year)}<Delta now={r.revenue_per_kw_year} prev={rows[i - 1]?.revenue_per_kw_year} /></Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{usd(r.revenue_per_kw_year / r.duration_h)}<Delta now={r.revenue_per_kw_year / r.duration_h} prev={rows[i - 1] ? rows[i - 1]!.revenue_per_kw_year / rows[i - 1]!.duration_h : undefined} /></Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{num(r.cycles_per_year)}</Table.Td>
-                    <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(r.top10_day_share)}</Table.Td>
+                    <Table.Td ta="right">{usd(r.revenue_per_kw_year)}<Delta now={r.revenue_per_kw_year} prev={rows[i - 1]?.revenue_per_kw_year} /></Table.Td>
+                    <Table.Td ta="right">{usd(r.revenue_per_kw_year / r.duration_h)}<Delta now={r.revenue_per_kw_year / r.duration_h} prev={rows[i - 1] ? rows[i - 1]!.revenue_per_kw_year / rows[i - 1]!.duration_h : undefined} /></Table.Td>
+                    <Table.Td ta="right">{num(r.cycles_per_year)}</Table.Td>
+                    <Table.Td ta="right">{pct(r.top10_day_share)}</Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -383,14 +389,24 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
   }, [hub, nodes, isHub, sel.location]);
 
   const files = YEARS3.flatMap((y) => members.map((m) => (index ? findRun(index, sel, m, y)?.file : undefined)));
-  const { runs, loading } = useRuns(members.length > 1 ? files : []);
+  const { runs, files: loaded } = useRuns(members.length > 1 ? files : []);
+
+  // Names come from the files actually loaded (which may still be the previous selection's
+  // while the next loads), so a stale chart is never labelled with the new locations.
+  const shown = useMemo(() => {
+    if (!runs || !loaded || !index || runs.length < 6 || runs.length % 3) return undefined;
+    const n = runs.length / 3;
+    const names = loaded.slice(0, n).map((f, i) => index.find((r) => r.file === f)?.location ?? members[i]);
+    return { names, n };
+  }, [runs, loaded, index, members]);
 
   // For each year, compare every member over the days that all members cover.
   const calc = useMemo(() => {
-    if (!runs || members.length < 2) return undefined;
+    if (!runs || !shown) return undefined;
+    const { names, n } = shown;
     return YEARS3.map((y, yi) => {
-      const rs = members.map((_, mi) => runs[yi * members.length + mi]);
-      if (rs.some((r) => !r)) return { year: y, vals: members.map(() => null as number | null), days: 0, first: '', last: '' };
+      const rs = names.map((_, mi) => runs[yi * n + mi]);
+      if (rs.some((r) => !r)) return { year: y, vals: names.map(() => null as number | null), days: 0, first: '', last: '' };
       let common = new Set(rs[0]!.daily.date);
       rs.slice(1).forEach((r) => (common = new Set(r!.daily.date.filter((d) => common.has(d)))));
       const vals = rs.map((r) => {
@@ -403,11 +419,12 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
     });
   }, [runs, members]);
 
+  const names = shown?.names ?? members;
   const build = useMemo(() => {
     if (!calc) return undefined;
     return (t: ChartTheme) => ({
       grid: { left: 52, right: 12, top: 56, bottom: 28 },
-      legend: { top: 0, left: 0, icon: 'circle', itemWidth: 8, textStyle: { color: t.muted, fontSize: 11 }, data: members },
+      legend: { ...legendBase(t), data: names },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (ps: { seriesName: string; value: number; marker: string; dataIndex: number }[]) =>
@@ -415,18 +432,18 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
       },
       xAxis: { type: 'category', data: YEARS3.map(yearLabel), ...axisBase(t) },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW (matched window)', nameGap: 8 },
-      series: members.map((m, mi) => ({
+      series: names.map((m, mi) => ({
         name: m, type: 'bar', barMaxWidth: 30,
-        itemStyle: { color: mi === 0 ? t.axis : t.series[mi - 1], borderRadius: [3, 3, 0, 0] },
+        itemStyle: { color: mi === 0 ? t.baseline : t.series[mi - 1], borderRadius: [4, 4, 0, 0] },
         data: calc.map((c) => c.vals[mi]),
       })),
     });
-  }, [calc, members]);
+  }, [calc, names]);
 
   const csv = (): CsvData | undefined =>
     calc && {
       filename: `node_vs_hub_${sel.location}_${sel.duration}h_deg${sel.deg}.csv`,
-      headers: ['year', 'window_first_day', 'window_last_day', 'days', ...members.map((m) => `${m}_usd_per_kw`), ...members.slice(1).map((m) => `${m}_over_${hub}`)],
+      headers: ['year', 'window_first_day', 'window_last_day', 'days', ...names.map((m) => `${m}_usd_per_kw`), ...names.slice(1).map((m) => `${m}_over_${names[0]}`)],
       rows: calc.map((c) => [c.year, c.first, c.last, c.days, ...c.vals.map((v) => (v == null ? null : +v.toFixed(3))), ...c.vals.slice(1).map((v) => (v == null || !c.vals[0] ? null : +(v / c.vals[0]).toFixed(3)))]),
     };
 
@@ -442,10 +459,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
   } else {
     body = (
       <>
-        {loading || !build ? <Loading h={240} /> : null}
-        {!loading && build && (
-          <Chart build={build} height={240} label="Node versus hub revenue by year" />
-        )}
+        {build ? <Chart build={build} height={240} label="Node versus hub revenue by year" /> : <Loading h={240} />}
       </>
     );
   }
@@ -454,7 +468,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
       title={isHub ? 'Hub vs the nodes near it' : 'Node vs its hub'}
       subtitle={`Same battery, same days: ${sel.duration}h, $${sel.deg}/MWh degradation. Nodes are matched to the hub of their load zone.`}
       csv={members.length > 1 ? csv : undefined}
-      footer={calc ? <NodeHubTable members={members} calc={calc} /> : undefined}
+      footer={calc && members.length > 1 ? <NodeHubTable members={names} calc={calc} /> : undefined}
     >
       {(ex) => (ex && build && members.length > 1 ? <Chart build={build} height="62vh" label="Node versus hub revenue by year" /> : body)}
     </Card>
@@ -473,7 +487,7 @@ function NodeHubTable({ members, calc }: { members: string[]; calc: { year: numb
             <Table.Tr key={c.year}>
               <Table.Td>{yearLabel(c.year)} <Text span c="dimmed" fz="xs">({c.days})</Text></Table.Td>
               {c.vals.map((v, i) => (
-                <Table.Td key={members[i]} ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                <Table.Td key={members[i]} ta="right">
                   {i === 0 ? usd(v) : v != null && c.vals[0] ? <b>{(v / c.vals[0]).toFixed(2)}×</b> : '–'}
                   {i > 0 && v != null && <Text span fz="xs" c="dimmed" ml={6}>{usd(v)}</Text>}
                 </Table.Td>
@@ -493,14 +507,14 @@ function NodeHubTable({ members, calc }: { members: string[]; calc: { year: numb
 export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: IndexRun[] | null; nodes: NodeSelection | null }) {
   const { go } = useApp();
   const rows = index ? [...new Map(index.map((r) => [r.location, r])).keys()].map((l) => findRun(index, sel, l)).filter(Boolean) as IndexRun[] : [];
-  const { runs } = useRuns(rows.map((r) => r.file));
+  const { runs, files: loaded } = useRuns(rows.map((r) => r.file));
   const data = useMemo(() => {
-    if (!runs) return undefined;
-    return rows
-      .map((r, i) => ({ r, top: topDay(runs[i]!) }))
+    if (!runs || !loaded || !index) return undefined;
+    return loaded
+      .map((f, i) => ({ r: index.find((x) => x.file === f), top: runs[i] ? topDay(runs[i]!) : null }))
+      .filter((d): d is { r: IndexRun; top: ReturnType<typeof topDay> } => !!d.r)
       .sort((a, b) => b.r.revenue_per_kw_year - a.r.revenue_per_kw_year);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runs]);
+  }, [runs, loaded, index]);
   const build = useMemo(() => {
     if (!data) return undefined;
     const sorted = [...data].reverse();
@@ -520,7 +534,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
         label: { show: true, position: 'right', color: t.text, fontSize: 11, formatter: (p: { value: number }) => usd(p.value, 0) },
         data: sorted.map((d) => ({
           value: d.r.revenue_per_kw_year,
-          itemStyle: { color: d.r.location === sel.location ? t.series[0] : d.r.location_type === 'hub' ? t.axis : t.series[2], borderRadius: [0, 4, 4, 0] },
+          itemStyle: { color: d.r.location === sel.location ? t.series[0] : d.r.location_type === 'hub' ? t.baseline : t.series[2], borderRadius: [0, 4, 4, 0] },
         })),
       }],
     });
@@ -539,7 +553,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
       csv={csv}
     >
       {(ex) =>
-        !data || !build ? <Loading h={420} /> : (
+        !data || !build ? <Loading h={300} /> : (
           <>
             <Chart build={build} height={ex ? '50vh' : 300} label="Revenue by location, ranked" />
             <div style={{ overflowX: 'auto' }}>
@@ -549,15 +563,15 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
                   {data.map(({ r, top }) => (
                     <Table.Tr key={r.location} fw={r.location === sel.location ? 600 : undefined}>
                       <Table.Td>
-                        <Anchor component="button" size="sm" onClick={() => go('compare', { location: r.location })} fw="inherit">{r.location}</Anchor>
-                        {grp(r.location) && <Badge ml={6} size="xs" variant="light" color={grp(r.location)!.group === 'high' ? 'orange' : 'gray'}>{grp(r.location)!.group === 'high' ? 'volatile' : 'typical'}</Badge>}
+                        <Anchor component="button" size="sm" c="inherit" underline="always" onClick={() => go('compare', { location: r.location })} fw="inherit">{r.location}</Anchor>
+                        {grp(r.location) && <Badge ml={6} size="xs" variant="light" color={grp(r.location)!.group === 'high' ? 'yellow' : 'gray'}>{grp(r.location)!.group === 'high' ? 'volatile' : 'typical'}</Badge>}
                       </Table.Td>
-                      <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{usd(r.revenue_per_kw_year)}</Table.Td>
-                      <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{pct(r.top10_day_share)}</Table.Td>
-                      <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                        {top && top.share > TOP_DAY_WARN ? <Badge size="xs" color="orange" variant="light">{pct(top.share)} · check</Badge> : pct(top?.share)}
+                      <Table.Td ta="right">{usd(r.revenue_per_kw_year)}</Table.Td>
+                      <Table.Td ta="right">{pct(r.top10_day_share)}</Table.Td>
+                      <Table.Td ta="right">
+                        {top && top.share > TOP_DAY_WARN ? <Badge size="xs" color="yellow" variant="light">{pct(top.share)} · check</Badge> : pct(top?.share)}
                       </Table.Td>
-                      <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{num(r.cycles_per_year)}</Table.Td>
+                      <Table.Td ta="right">{num(r.cycles_per_year)}</Table.Td>
                     </Table.Tr>
                   ))}
                 </Table.Tbody>

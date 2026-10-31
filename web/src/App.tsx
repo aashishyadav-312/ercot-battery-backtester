@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import {
-  ActionIcon, AppShell, Burger, Group, NavLink, Skeleton, Stack, Text, Title, Tooltip, useComputedColorScheme, useMantineColorScheme,
+  ActionIcon, AppShell, Burger, Group, NavLink, Skeleton, Stack, Text, Tooltip, useComputedColorScheme, useMantineColorScheme,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
 import { IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRevenue, IconSun } from './components/Icons';
@@ -28,7 +28,7 @@ function SchemeToggle() {
   return (
     <Tooltip label={`Switch to ${next} mode`}>
       <ActionIcon
-        variant="default" size="lg" aria-label={`Switch to ${next} mode`}
+        variant="subtle" color="gray" size="lg" aria-label={`Switch to ${next} mode`}
         onClick={() => { setColorScheme(next); try { localStorage.setItem('ebb-scheme', next); } catch { /* storage unavailable */ } }}
       >
         {scheme === 'dark' ? <IconSun /> : <IconMoon />}
@@ -40,24 +40,27 @@ function SchemeToggle() {
 export default function App() {
   const { page, go, error, index } = useApp();
   const [opened, { toggle, close }] = useDisclosure();
+  const [{ y }] = useWindowScroll();
   useEffect(() => { document.title = `${NAV.find((n) => n.page === page)!.label} · ERCOT Battery Backtester`; }, [page]);
 
   const Page = { overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, method: Method }[page];
   return (
     <AppShell
       header={{ height: 60 }}
-      navbar={{ width: 232, breakpoint: 'md', collapsed: { mobile: !opened } }}
-      padding={{ base: 'md', md: 'lg' }}
+      navbar={{ width: 236, breakpoint: 'md', collapsed: { mobile: !opened } }}
+      padding={{ base: 'md', md: 'xl' }}
+      transitionDuration={260}
+      transitionTimingFunction="cubic-bezier(0.22, 1, 0.36, 1)"
     >
-      <AppShell.Header>
-        <Group h="100%" px="md" justify="space-between" wrap="nowrap" gap="sm">
+      <AppShell.Header data-scrolled={y > 4 || undefined}>
+        <Group h="100%" px={{ base: 'md', md: 'lg' }} justify="space-between" wrap="nowrap" gap="sm">
           <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
             <Burger opened={opened} onClick={toggle} hiddenFrom="md" size="sm" aria-label="Toggle navigation" />
-            <Group gap={8} wrap="nowrap" c="accent" style={{ minWidth: 0 }}>
+            <Group gap={10} wrap="nowrap" c="accent" style={{ minWidth: 0 }}>
               <IconBattery />
-              <Title order={1} fz={16} fw={650} c="var(--mantine-color-text)" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <Text fz={15} fw={640} c="bright" style={{ letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 ERCOT Battery Backtester
-              </Title>
+              </Text>
             </Group>
           </Group>
           <Group gap="sm" wrap="nowrap">
@@ -67,28 +70,30 @@ export default function App() {
         </Group>
       </AppShell.Header>
 
-      <AppShell.Navbar p="sm" aria-label="Pages">
-        <Stack gap={2}>
+      <AppShell.Navbar p="sm" pt="md" aria-label="Pages">
+        <Stack gap={4}>
           {NAV.map(({ page: p, label, icon: Icon }) => (
             <NavLink
-              key={p} label={label} leftSection={<Icon />} active={page === p} variant="light"
-              onClick={() => { go(p); close(); }} component="button" style={{ borderRadius: 8 }}
+              key={p} label={label} leftSection={<Icon />} active={page === p}
+              aria-current={page === p ? 'page' : undefined}
+              onClick={() => { go(p); close(); }} component="button"
             />
           ))}
         </Stack>
-        <Text size="xs" c="dimmed" mt="auto" px="xs" lh={1.4}>
+        <Text size="xs" c="dimmed" mt="auto" px="sm" pb="xs" lh={1.5}>
           Perfect-foresight energy arbitrage on ERCOT real-time prices. An upper bound, not a forecast.
         </Text>
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <div style={{ maxWidth: 1320, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           {page !== 'method' && (
-            <div style={{ marginBottom: 'var(--mantine-spacing-md)' }}>
-              <Group hiddenFrom="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>
-            </div>
+            <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>
           )}
-          {error ? <Text c="red">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} /> : <Page />}
+          {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
+          <div key={page} className="app-enter">
+            {error ? <Text c="red">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} radius="lg" /> : <Page />}
+          </div>
         </div>
       </AppShell.Main>
     </AppShell>

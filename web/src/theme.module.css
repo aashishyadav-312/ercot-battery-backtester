@@ -1,0 +1,198 @@
+/*
+ * Theme rules the createTheme() object can't express: pseudo-classes, media queries,
+ * backdrop materials and keyframes. Wired to components via `classNames` in theme.ts only.
+ */
+
+/* ------------------------------------------------------------------ shell */
+.shell {
+  --app-shell-border-color: var(--app-hairline);
+}
+
+/* Translucent sticky bar: content scrolls under a blurred, saturated layer. The hairline
+   only appears once something is underneath it (data-scrolled), like a scroll-edge effect. */
+.header {
+  background-color: var(--app-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 240ms var(--app-ease), background-color 240ms var(--app-ease);
+}
+.header[data-scrolled] {
+  border-bottom-color: var(--app-hairline);
+}
+
+.navbar {
+  background-color: var(--app-canvas);
+  border-right: 1px solid var(--app-hairline);
+}
+
+.main {
+  background-color: var(--app-canvas);
+  min-height: 100dvh;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .header {
+    background-color: var(--app-canvas);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border-bottom-color: var(--app-hairline);
+  }
+}
+@media (prefers-contrast: more) {
+  .header { background-color: var(--app-canvas); border-bottom-color: var(--app-hairline-strong); }
+  .paper[data-with-border] { border-color: var(--app-hairline-strong); }
+}
+
+/* ------------------------------------------------------------------ type */
+/* Tracking is size-specific: tighten as type grows, open slightly as it shrinks. */
+.title {
+  font-optical-sizing: auto;
+  letter-spacing: -0.012em;
+  color: var(--mantine-color-bright);
+}
+.title:where([data-order='1']) { letter-spacing: -0.028em; }
+.title:where([data-order='2']) { letter-spacing: -0.022em; }
+.title:where([data-order='3']) { letter-spacing: -0.016em; }
+
+.text { font-optical-sizing: auto; }
+.text:where([data-size='xs']) { letter-spacing: 0.005em; }
+
+/* ------------------------------------------------------------------ surfaces */
+.paper {
+  transition: border-color 200ms var(--app-ease), box-shadow 240ms var(--app-ease);
+}
+.paper[data-with-border] {
+  border-color: var(--app-hairline);
+  box-shadow: var(--mantine-shadow-xs);
+}
+@media (hover: hover) {
+  .paper[data-interactive]:hover {
+    border-color: var(--app-card-hover-border);
+    box-shadow: var(--mantine-shadow-md);
+  }
+}
+:where([data-mantine-color-scheme='dark']) .paper[data-with-border] { box-shadow: none; }
+
+/* ------------------------------------------------------------------ nav */
+.navLink {
+  border-radius: var(--mantine-radius-md);
+  padding: 9px 12px;
+  color: var(--mantine-color-dimmed);
+  transition: background-color 160ms var(--app-ease), color 160ms var(--app-ease);
+}
+.navLink:hover { color: var(--mantine-color-text); }
+.navLink:active { transform: scale(0.985); transition-duration: 80ms; }
+.navLink[data-active] {
+  background-color: var(--mantine-color-default);
+  color: var(--mantine-color-bright);
+  box-shadow: var(--mantine-shadow-sm), inset 0 0 0 1px var(--app-hairline);
+}
+.navLink[data-active]:hover { background-color: var(--mantine-color-default); }
+.navLink[data-active] .navSection { color: var(--mantine-primary-color-filled); }
+.navLabel { font-size: var(--mantine-font-size-sm); font-weight: 560; }
+.navSection { transition: color 160ms var(--app-ease); }
+
+/* ------------------------------------------------------------------ controls */
+.actionIcon {
+  transition: background-color 140ms var(--app-ease), color 140ms var(--app-ease), transform 100ms var(--app-ease);
+}
+.actionIcon:where([data-variant='subtle']) { color: var(--mantine-color-dimmed); }
+.actionIcon:where([data-variant='subtle']):hover { color: var(--mantine-color-text); }
+/* Feedback on press, not release. */
+.actionIcon:active:not(:disabled) { transform: scale(0.94); }
+
+.selectInput {
+  font-weight: 520;
+  font-variant-numeric: tabular-nums;
+  background-color: var(--mantine-color-default-hover);
+  border-color: transparent;
+  transition: background-color 140ms var(--app-ease), border-color 140ms var(--app-ease), box-shadow 140ms var(--app-ease);
+}
+.selectInput:hover { background-color: var(--mantine-color-default); border-color: var(--app-hairline-strong); }
+.selectInput:focus, .selectInput:focus-within {
+  background-color: var(--mantine-color-default);
+  border-color: var(--mantine-primary-color-filled);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--mantine-primary-color-filled) 18%, transparent);
+}
+.inputLabel { font-size: var(--mantine-font-size-xs); font-weight: 560; color: var(--mantine-color-dimmed); margin-bottom: 4px; }
+.dropdown {
+  border-color: var(--app-hairline);
+  padding: 4px;
+}
+.option { font-variant-numeric: tabular-nums; border-radius: var(--mantine-radius-sm); font-size: var(--mantine-font-size-sm); }
+.option[data-combobox-selected], .option[aria-selected='true'] {
+  background-color: var(--mantine-primary-color-light);
+  color: var(--mantine-primary-color-light-color);
+  font-weight: 560;
+}
+.groupLabel {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mantine-color-dimmed);
+}
+
+.tooltip {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 520;
+  padding: 5px 9px;
+}
+
+.modalContent { border: 1px solid var(--app-hairline); }
+.modalHeader { padding-bottom: 4px; }
+.modalTitle { font-weight: 620; font-size: var(--mantine-font-size-lg); letter-spacing: -0.01em; }
+
+/* ------------------------------------------------------------------ data */
+.anchor {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 28%, transparent);
+  transition: text-decoration-color 140ms var(--app-ease), color 140ms var(--app-ease);
+}
+.anchor:hover { text-decoration-color: currentColor; }
+
+.table { --table-border-color: var(--app-hairline); --table-hover-color: var(--mantine-color-default-hover); }
+.th {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 560;
+  color: var(--mantine-color-dimmed);
+  white-space: nowrap;
+}
+.tr { transition: background-color 120ms var(--app-ease); }
+
+.badge {
+  text-transform: none;
+  font-weight: 560;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+
+.alert {
+  /* A tint, not a fill: the note should be noticed, not shout over the data. */
+  background-color: color-mix(in srgb, var(--alert-bg) 42%, var(--mantine-color-body));
+  border: 1px solid color-mix(in srgb, var(--alert-color, currentColor) 20%, transparent);
+}
+.alertTitle { font-weight: 620; }
+
+/* Skeleton: a soft travelling sheen instead of a hard pulse. */
+.skeleton[data-visible]::before { background-color: var(--mantine-color-body); }
+.skeleton[data-visible]::after {
+  background-color: transparent;
+  background-image: linear-gradient(
+    100deg,
+    var(--mantine-color-default-hover) 30%,
+    color-mix(in srgb, var(--mantine-color-default-hover) 40%, var(--mantine-color-body)) 50%,
+    var(--mantine-color-default-hover) 70%
+  );
+  background-size: 300% 100%;
+}
+.skeleton[data-animate]::after { animation: sheen 1.6s var(--app-ease-inout) infinite; }
+@keyframes sheen {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton[data-animate]::after { animation: none; }
+  .actionIcon:active:not(:disabled), .navLink:active { transform: none; }
+}

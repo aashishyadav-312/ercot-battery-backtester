@@ -82,7 +82,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
 }
 
-/** Load one run file; `file` undefined means "no such combination". */
+/**
+ * Load one run file; `file` undefined means "no such combination".
+ * While a new file loads, the previous run stays on screen (`stale`) so charts can animate
+ * from the old values to the new ones instead of unmounting to a skeleton. Everything a
+ * card shows is derived from the run object itself, so stale content is self-consistent.
+ */
 export function useRun(file: string | undefined) {
   const [state, setState] = useState<{ file?: string; run?: Run; error?: string }>({});
   useEffect(() => {
@@ -96,10 +101,19 @@ export function useRun(file: string | undefined) {
     };
   }, [file]);
   const ready = state.file === file;
-  return { run: ready ? state.run : undefined, error: ready ? state.error : undefined, loading: !!file && !ready };
+  return {
+    run: file ? state.run : undefined,
+    error: ready ? state.error : undefined,
+    loading: !!file && !ready,
+    stale: !!file && !ready && !!state.run,
+  };
 }
 
-/** Load several run files together (order preserved; undefined entries stay undefined). */
+/**
+ * Load several run files together (order preserved; undefined entries stay undefined).
+ * Like useRun, the previous set stays available while the next loads; `files` names the
+ * files the returned runs belong to, so callers label stale data correctly.
+ */
 export function useRuns(files: (string | undefined)[]) {
   const key = files.join('|');
   const [state, setState] = useState<{ key?: string; runs?: (Run | undefined)[]; error?: string }>({});
@@ -114,5 +128,10 @@ export function useRuns(files: (string | undefined)[]) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   const ready = state.key === key;
-  return { runs: ready ? state.runs : undefined, error: ready ? state.error : undefined, loading: !ready };
+  return {
+    runs: state.runs,
+    files: state.key != null ? state.key.split('|').map((f) => f || undefined) : undefined,
+    error: ready ? state.error : undefined,
+    loading: !ready,
+  };
 }
