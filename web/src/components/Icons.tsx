@@ -8,6 +8,7 @@ export const IconRevenue = mk(<><path d="M3 20h18" /><path d="M6 16V10M12 16V5M1
 export const IconDispatch = mk(<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18M15 3v18" /></>);
 export const IconCompare = mk(<><path d="M7 4v16M17 4v16" /><path d="M3 8l4-4 4 4M13 16l4 4 4-4" /></>);
 export const IconRealism = mk(<><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></>);
+export const IconEconomics = mk(<><circle cx="12" cy="12" r="9" /><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.7.8-2.7 2 0 3 5.6 1.3 5.6 4.3 0 1.2-1.2 2.1-2.9 2.1-1.4 0-2.5-.6-3-1.6M12 6.2v1.6M12 16.4v1.6" /></>);
 export const IconMethod = mk(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>);
 export const IconDownload = mk(<><path d="M12 4v11M7 11l5 5 5-5" /><path d="M4 20h16" /></>);
 export const IconExpand = mk(<><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></>);
