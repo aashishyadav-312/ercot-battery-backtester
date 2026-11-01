@@ -71,7 +71,7 @@ function capture(r: Run): Hero | null {
 export function heroFor(page: Page, run: Run | undefined, sel: Selection, index: IndexRun[] | null): Hero | null {
   if (page === 'compare') return index ? rank(sel, index) : null;
   if (!run) return null;
-  if (page === 'realism') return capture(run);
+  if (page === 'realism') return capture(run) ?? concentration(run);
   if (page === 'revenue') return bestMonth(run) ?? concentration(run);
   if (page === 'dispatch') return dispatchShape(run) ?? concentration(run);
   return concentration(run);
