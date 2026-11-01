@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest a new location, chart, page or improvement to the ERCOT Battery Backtester.
+title: "Feature: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. The more you can say about what you were trying to do, the easier it is to build the right thing.
+        For a wrong number or a bug, please use a regular issue instead.
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+      description: The question you wanted the site to answer, in your own words.
+      placeholder: "I wanted to see what a 4-hour battery would have earned at a node near Corpus Christi."
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: A new location, chart, filter, page or explanation. A rough sketch or a link to an example is welcome.
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the site is this about?
+      options:
+        - Start here / learning
+        - Overview
+        - Revenue
+        - Dispatch
+        - Compare
+        - Realism
+        - Method / assumptions
+        - Data or locations
+        - Something else
+    validations:
+      required: false
+  - type: input
+    id: contact
+    attributes:
+      label: Contact (optional)
+      description: Only if you would like a reply outside GitHub.
+    validations:
+      required: false

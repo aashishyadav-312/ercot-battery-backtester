@@ -2,8 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { IndexRun, NodeSelection, Run, Selection } from './data/types';
 import { DEGS, DURATIONS, YEARS, loadIndex, loadNodeSelection, loadRun } from './data/loader';
 
-export type Page = 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'method' | 'about';
-export const PAGES: Page[] = ['overview', 'revenue', 'dispatch', 'compare', 'realism', 'method', 'about'];
+export type Page = 'start' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'method' | 'about';
+export const PAGES: Page[] = ['start', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method', 'about'];
 
 const DEFAULT: Selection = { location: 'HB_HOUSTON', duration: 2, year: 2025, deg: 10 };
 
@@ -27,7 +27,7 @@ function parseHash(): { page: Page; sel: Selection } {
   };
 }
 
-function buildHash(page: Page, s: Selection) {
+export function buildHash(page: Page, s: Selection) {
   const q = new URLSearchParams({ loc: s.location, dur: String(s.duration), year: String(s.year), deg: String(s.deg) });
   return `#/${page}?${q}`;
 }
