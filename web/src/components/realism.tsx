@@ -43,25 +43,29 @@ function locationsOf(index: IndexRun[]) {
 // ---------------------------------------------------------------- KPI row
 export function RealismKpis({ run }: { run?: Run }) {
   const m = run?.metrics;
+  // A run without DA fields (an older results file) shows dashes, not "undefined".
+  const has = m?.da_rt_revenue_per_kw_year != null;
+  const missing = 'No day-ahead result for this run.';
   const ann = !!m?.annualized;
-  const badge = ann ? 'Annualized YTD' : undefined;
+  const badge = ann && has ? 'Annualized YTD' : undefined;
+  const v = (x: string) => (m ? (has ? x : '–') : undefined);
   return (
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
       <Kpi
-        label="DA-scheduled" unit="$/kW-yr" badge={badge} value={m ? usd(m.da_rt_revenue_per_kw_year, 1) : undefined}
-        hint={m && `Scheduled on day-ahead prices, paid real-time prices. Lost money on ${m.da_losing_days} of ${m.da_days_matched} days.`}
+        label="DA-scheduled" unit="$/kW-yr" badge={badge} value={v(usd(m?.da_rt_revenue_per_kw_year, 1))}
+        hint={m && (has ? `Scheduled on day-ahead prices, paid real-time prices. Lost money on ${m.da_losing_days} of ${m.da_days_matched} days.` : missing)}
       />
       <Kpi
-        label="Perfect foresight" unit="$/kW-yr" badge={badge} value={m ? usd(m.pf_revenue_per_kw_year_matched, 1) : undefined}
+        label="Perfect foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.pf_revenue_per_kw_year_matched, 1))}
         hint="Same battery and days, scheduled with real-time prices known in advance."
       />
       <Kpi
-        label="Value of foresight" unit="$/kW-yr" badge={badge} value={m ? usd(m.value_of_perfect_foresight_per_kw_year, 1) : undefined}
+        label="Value of foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.value_of_perfect_foresight_per_kw_year, 1))}
         hint="Perfect foresight minus DA-scheduled: what knowing real-time prices in advance is worth."
       />
       <Kpi
-        label="Capture rate" value={m ? pct(m.capture_rate, 0) : undefined}
-        hint={m && `DA-scheduled ÷ perfect foresight. Selling the same schedule day-ahead would have earned ${usd(m.da_da_revenue_per_kw_year, 1)}/kW-yr.`}
+        label="Capture rate" value={v(pct(m?.capture_rate, 0))}
+        hint={m && (has ? `DA-scheduled ÷ perfect foresight. Selling the same schedule day-ahead would have earned ${usd(m.da_da_revenue_per_kw_year, 1)}/kW-yr.` : 'DA-scheduled ÷ perfect foresight.')}
       />
     </SimpleGrid>
   );
@@ -117,7 +121,9 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
       csv={csv}
     >
       {(ex) =>
-        !rows || !build ? <ChartSkeleton h={380} /> : (
+        !rows || !build ? <ChartSkeleton h={380} /> : !rows.some((r) => r.byDur.some((x) => x?.capture_rate != null)) ? (
+          <Text size="sm" c="dimmed" py="md">No day-ahead results for {yearLabel(sel.year)} yet. Try reloading the page.</Text>
+        ) : (
           <>
             <Split>
             <Chart build={build} height={ex ? '62vh' : 400} label="Capture rate by location for 1, 2 and 4 hour batteries" />
@@ -207,7 +213,10 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
       subtitle={run ? `$ per kW, net of degradation · ${run.meta.location} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
       csv={csv}
     >
-      {(ex) => (build ? <Chart build={build} height={ex ? '62vh' : 300} label="Monthly revenue, perfect foresight versus day-ahead scheduled" /> : <ChartSkeleton h={300} />)}
+      {(ex) =>
+        build ? <Chart build={build} height={ex ? '62vh' : 300} label="Monthly revenue, perfect foresight versus day-ahead scheduled" />
+          : run ? <Text size="sm" c="dimmed" py="md">No day-ahead result for this run. Try reloading the page.</Text>
+            : <ChartSkeleton h={300} />}
     </Card>
   );
 }
