@@ -76,6 +76,8 @@ try {
         ]),
         // A resource node selected on the map (side panel showing a node vs its hub).
         ...(!only || pages.includes('map') ? [['map-node', 'map?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
+        // Heat mode: every resource node (Phase 12). Runs last because the mode is remembered in localStorage.
+        ...(!only || pages.includes('map') ? [['map-heat', 'map?view=heat&loc=HB_HOUSTON&dur=2&year=2025&deg=10']] : []),
       ]) {
         await page.goto(`${base}#/${url}`);
         await settle(page);

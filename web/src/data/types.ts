@@ -203,3 +203,44 @@ export interface TexasGeo {
   state: GeoFeature;
   counties: { type: 'FeatureCollection'; features: GeoFeature[] };
 }
+
+/** One resource node in the all-node run (Phase 12, results/nodes_{year}_{hours}h.json). Summary metrics only. */
+export interface NodeRec {
+  code: string;
+  rank: number;
+  /** Settlement load zone and its trading hub; null when the node is no longer in ERCOT's settlement point list. */
+  lz: string | null;
+  hub: string | null;
+  sub: string | null;
+  /** Null when no EIA-860 plant could be matched (never guessed). */
+  lat: number | null;
+  lon: number | null;
+  geo: string | null;
+  /** Perfect-foresight and DA-scheduled (RT-settled) revenue, $/kW-yr. */
+  rev: number;
+  da_rev: number;
+  capture: number | null;
+  top10: number | null;
+  cycles: number;
+  spread: number;
+  corr_hub: number | null;
+  mean_price: number;
+  /** Revenue by month, $/kW (Jan..Dec). */
+  monthly: number[];
+  monthly_da: number[];
+}
+
+export type HubRec = Omit<NodeRec, 'rank' | 'lz' | 'hub' | 'sub' | 'lat' | 'lon' | 'geo' | 'corr_hub'> & { corr_hub: null };
+
+export interface NodesFile {
+  meta: {
+    year: number; duration_h: number; rte: number; deg_cost_per_mwh: number; power_mw: number;
+    n_nodes_in_data: number; n_nodes: number; n_nodes_geocoded: number;
+    excluded_counts: Record<string, number>;
+    quantiles_rev: Record<string, number>;
+    runtime_s: { load_prices: number; solve: number; total: number };
+    price_source: string; complete_rule: string;
+  };
+  hubs: HubRec[];
+  nodes: NodeRec[];
+}
