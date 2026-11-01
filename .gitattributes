@@ -3,3 +3,6 @@
 *.webp binary
 *.jpg binary
 *.parquet binary
+*.ebp binary
+*.wasm binary
+*.gz binary

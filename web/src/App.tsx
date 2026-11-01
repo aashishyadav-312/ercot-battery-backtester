@@ -5,7 +5,7 @@ import {
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconAbout, IconBattery, IconCompare, IconDispatch, IconEconomics, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
+import { IconAbout, IconBattery, IconCompare, IconCustom, IconDispatch, IconEconomics, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
 import Start from './pages/Start';
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
@@ -14,12 +14,16 @@ import Dispatch from './pages/Dispatch';
 import Compare from './pages/Compare';
 import Realism from './pages/Realism';
 import Economics from './pages/Economics';
+const Custom = lazy(() => import('./pages/Custom')); // the solver and worker load only when someone opens this page
 import Method from './pages/Method';
 import About from './pages/About';
 import { SiteFooter } from './components/SiteFooter';
 import { dataThrough } from './data/site';
 import { fmtDate } from './data/format';
 
+
+/** Pages without the top-bar scenario selectors (they have none, or their own inputs). */
+const OWN_INPUTS: Page[] = ['method', 'about', 'start', 'custom'];
 
 const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'start', label: 'Start here', icon: IconStart },
@@ -30,6 +34,7 @@ const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'compare', label: 'Compare', icon: IconCompare },
   { page: 'realism', label: 'Realism', icon: IconRealism },
   { page: 'economics', label: 'Economics', icon: IconEconomics },
+  { page: 'custom', label: 'Custom run', icon: IconCustom },
   { page: 'method', label: 'Method', icon: IconMethod },
   { page: 'about', label: 'About', icon: IconAbout },
 ];
@@ -77,7 +82,7 @@ export default function App() {
     try { (window as unknown as { goatcounter?: { count: (o: object) => void } }).goatcounter?.count({ path: `/${page}`, title: document.title }); } catch { /* blocked */ }
   }, [page]);
 
-  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, economics: Economics, method: Method, about: About }[page];
+  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, economics: Economics, custom: Custom, method: Method, about: About }[page];
   return (
     <AppShell
       header={{ height: 60 }}
@@ -99,7 +104,7 @@ export default function App() {
           </Group>
           <Group gap="sm" wrap="nowrap">
             <DataBadge />
-            {page !== 'method' && page !== 'about' && page !== 'start' && <Group visibleFrom="md"><Selectors /></Group>}
+            {!OWN_INPUTS.includes(page) && <Group visibleFrom="md"><Selectors /></Group>}
             <SchemeToggle />
           </Group>
         </Group>
@@ -122,7 +127,7 @@ export default function App() {
 
       <AppShell.Main>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          {page !== 'method' && page !== 'about' && page !== 'start' && (
+          {!OWN_INPUTS.includes(page) && (
             <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>
           )}
           {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}

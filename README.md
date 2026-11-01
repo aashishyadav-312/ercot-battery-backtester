@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -40,6 +40,10 @@ data/fetch_all_nodes.py   # every settlement point at once from ERCOT's archive 
 scripts/run_all_nodes.py  # daily LP at every resource node, summary only -> results/nodes_{year}_{hours}h.json (Map heat mode)
 scripts/node_findings.py  # prints the FINDINGS section 9 tables from the all-node results
 scripts/geocode_extra.py  # EIA-860M and ERCOT GIS queue (county-level) geocoding stages
+data/price_files.py       # compact per-location-year price files (EBP1) for the in-browser custom run
+scripts/export_prices.py  # results/prices/*.ebp for the 10 detailed locations (Phase 15)
+scripts/parity_reference.py # Python numbers on those files -> results/parity/reference.json
+web/src/custom/           # highs-js port of the daily LP, year runner, Web Worker, parity test
 results/               # precomputed JSON for the web app
 web/                   # Vite + React + Mantine + ECharts frontend (Phase 5)
 tests/
@@ -97,6 +101,35 @@ Then point `ALL_NODES_FILE` in `web/src/data/loader.ts` at the new year, update 
   `scripts/location_overrides.json`.
 - The web app loads `nodes_2025_2h.json` only when the Map page is switched to "All nodes (heat)".
 
+## Custom runs in the browser (Phase 15)
+
+```bash
+python -m scripts.export_prices       # results/prices/{location}_{year}.ebp + index.json
+python -m scripts.parity_reference    # results/parity/reference.json (Python numbers on those files)
+cd web && npx vitest run src/custom   # highs-js port + parity test
+```
+
+- **Price files:** one gzip file per location-year with the RT 15-minute and DA hourly settlement point prices exactly as
+  `data.fetch_prices.fetch` returns them, stored as whole cents (ERCOT prices have two decimals, so this is exact). Format
+  in [data/price_files.py](data/price_files.py). The 10 detailed locations x 2024-2026 are 30 files, 2.48 MB in total
+  (about 90 KB per full year), served from GitHub Pages under `data/prices/`. All-node price files are not published.
+- **Solver:** [web/src/custom/dispatch.ts](web/src/custom/dispatch.ts) ports `optimize_day` to
+  [highs-js](https://github.com/lovasoa/highs-js), including the MILP fallback (0.01% gap, 10 s limit). highs-js 1.15.4
+  bundles HiGHS 1.15.1, the same version `highspy` uses here, and the model is passed in PuLP's column and row order.
+  [runner.ts](web/src/custom/runner.ts) ports `run_year`, `run_da_schedule` and the metrics; it runs in a Web Worker
+  ([worker.ts](web/src/custom/worker.ts)) and reports progress after each month. Energy only: no ancillary services yet.
+- **Parity:** [parity.test.ts](web/src/custom/parity.test.ts) runs three full years (HB_HOUSTON 2025 2h $10/MWh;
+  HB_PAN 2024 1h $0, the run with the most MILP-fallback days; RUSSEKST_RN 2025 4h $10) plus a MILP-fallback day and both
+  2025 DST days (92 and 100 intervals), and requires every metric within 0.5% of Python on the same files.
+- **Page:** `#/custom` ([web/src/pages/Custom.tsx](web/src/pages/Custom.tsx)). Inputs: location (the 10 detailed locations),
+  power 1-2,000 MW, duration 0.5-8 h, round-trip efficiency 50-100%, degradation $0-200/MWh, a date range within one
+  year, and the strategy shown (perfect foresight or DA-scheduled; both are always solved). The URL holds every input
+  (`#/custom?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&from=2025-06-01&to=2025-08-31&strat=da`), so a run can be shared;
+  opening a link runs it. Results use the Overview cards. When the inputs match a precomputed run, the page prints both
+  figures as a check. A full year at 2 h solves in about 2 s in the browser; $0 degradation at negative-price locations
+  is slower because of MILP-fallback days (HB_PAN 2024 1h $0: about 4 minutes), with progress shown per month and a
+  Cancel button. The solver (3.5 MB WebAssembly, 1.2 MB gzipped) loads only on this page.
+
 ## Realism: DA-scheduled vs perfect foresight, and RTC+B
 
 ```bash
@@ -117,7 +150,7 @@ python -m scripts.rtcb              # writes results/rtcb.json
 | Workflow | Trigger | What it does |
 |---|---|---|
 | [`deploy.yml`](.github/workflows/deploy.yml) | push to `main`, manual | Copies `results/*.json` into `web/public/data`, builds `web/` (Vite base `/ercot-battery-backtester/`, hash routing) and publishes `web/dist` to GitHub Pages. |
-| [`ci.yml`](.github/workflows/ci.yml) | pull requests | Runs `pytest` (Python 3.11, `pip install -e ".[dev]"`) and the web build. |
+| [`ci.yml`](.github/workflows/ci.yml) | pull requests | Runs `pytest` (Python 3.11, `pip install -e ".[dev]"`), `npm test` (including the browser-vs-Python parity test) and the web build. |
 | [`refresh.yml`](.github/workflows/refresh.yml) | monthly (06:17 UTC on the 3rd), manual | Detailed locations only (the all-node run is a yearly local job, above). Refetches the current year for all hubs and the nodes in `results/node_selection.json` (uses the `ERCOT_API_*` secrets), reruns `scripts.run_grid` (perfect foresight and DA-scheduled) for that year and `scripts.rtcb`, and opens a PR with the updated results. Merging it redeploys the site. Timeout 60 minutes. |
 
 ERCOT's bot protection can block GitHub's runner IPs. The refresh job sets `ERCOT_FAIL_FAST=1`, so an HTTP 403 stops the run with an explanatory error instead of backing off. If that happens, run the refresh locally (`python -m scripts.run_grid --years <year> --nodes ...`) and commit the results.

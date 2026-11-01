@@ -28,3 +28,4 @@ export const IconMap = mk(<><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z
 export const IconPlus = mk(<path d="M12 5v14M5 12h14" />);
 export const IconMinus = mk(<path d="M5 12h14" />);
 export const IconReset = mk(<><path d="M4 12a8 8 0 1 0 2.5-5.8" /><path d="M4 4v4.5h4.5" /></>);
+export const IconCustom = mk(<><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="18" cy="18" r="2" /></>);

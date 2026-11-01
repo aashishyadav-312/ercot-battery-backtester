@@ -43,3 +43,10 @@ export const HUBS = ['HB_HOUSTON', 'HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_PAN'];
 export const DURATIONS = [1, 2, 4];
 export const YEARS = [2024, 2025, 2026];
 export const DEGS = [0, 10];
+
+/** Price files for the in-browser custom run (results/prices/index.json, Phase 15). */
+export interface PriceIndex {
+  total_bytes: number;
+  files: { location: string; year: number; file: string; bytes: number; rt_first_day: string; rt_last_day: string; da_last_day: string }[];
+}
+export const loadPriceIndex = () => getJson<PriceIndex>('prices/index.json');

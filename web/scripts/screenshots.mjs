@@ -28,7 +28,7 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['start', 'map', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'method'];
+const ALL_PAGES = ['start', 'map', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
@@ -62,6 +62,8 @@ try {
 
       for (const p of pages) {
         await page.goto(`${base}#/${p}?loc=HB_HOUSTON&dur=2&year=2025&deg=10`);
+        // The custom run solves in the browser after load; wait for its results.
+        if (p === 'custom') await page.getByText(/days solved in/).waitFor({ timeout: 120_000 });
         await settle(page);
         if (arg('strategy', 'energy') === 'stacked' && ['overview', 'revenue', 'realism'].includes(p)) {
           await page.getByText('Energy + AS', { exact: true }).click();

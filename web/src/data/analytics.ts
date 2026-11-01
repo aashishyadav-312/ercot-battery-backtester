@@ -37,3 +37,7 @@ export function locationGroups(index: IndexRun[]) {
   index.forEach((r) => (r.location_type === 'hub' ? hubs : nodes).add(r.location));
   return { hubs: [...hubs], nodes: [...nodes] };
 }
+
+/** Badge for a scaled-to-365-days figure: year-to-date when the run starts on Jan 1, else a custom range. */
+export const annualizedBadge = (run: Run | undefined) =>
+  run?.metrics.annualized ? (run.meta.first_day.endsWith('-01-01') ? 'Annualized YTD' : 'Annualized') : undefined;

@@ -7,7 +7,7 @@ import { Kpi } from './Kpi';
 import type { IndexRun, Rtcb, RtcbPrices, Run, Selection } from '../data/types';
 import { DURATIONS, findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, pct, usd, yearLabel } from '../data/format';
-import { kw } from '../data/analytics';
+import { annualizedBadge, kw } from '../data/analytics';
 import { useApp } from '../state';
 import { locAxis, locFull } from '../data/site';
 
@@ -47,8 +47,7 @@ export function RealismKpis({ run }: { run?: Run }) {
   // A run without DA fields (an older results file) shows dashes, not "undefined".
   const has = m?.da_rt_revenue_per_kw_year != null;
   const missing = 'No day-ahead result for this run.';
-  const ann = !!m?.annualized;
-  const badge = ann && has ? 'Annualized YTD' : undefined;
+  const badge = has ? annualizedBadge(run) : undefined;
   const v = (x: string) => (m ? (has ? x : '–') : undefined);
   return (
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>

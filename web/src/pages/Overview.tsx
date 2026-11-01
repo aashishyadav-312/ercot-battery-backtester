@@ -8,11 +8,14 @@ import { CumulativeCard, DurationCard, HeatmapCard, MonthlyRevenueCard } from '.
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { fmtDate, num, pct, usd } from '../data/format';
-import { topDay } from '../data/analytics';
+import { annualizedBadge, topDay } from '../data/analytics';
 import { heroFor, ledeFor } from '../data/hero';
+import type { Run } from '../data/types';
 
-export function KpiRow() {
-  const { run } = useSelectedRun();
+/** KPI tiles for the top-bar selection, or for `run` when given (a custom run). */
+export function KpiRow({ run: given }: { run?: Run } = {}) {
+  const selected = useSelectedRun();
+  const run = given ?? selected.run;
   const m = run?.metrics;
   const ann = !!m?.annualized;
   const t = run ? topDay(run) : null;
@@ -20,7 +23,7 @@ export function KpiRow() {
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
       <Kpi
         label="Revenue" term={['usd_per_kw_yr', 'degradation_cost']} unit="$/kW-yr" value={m ? usd(m.revenue_per_kw_year, 1) : undefined}
-        badge={ann ? 'Annualized YTD' : undefined}
+        badge={annualizedBadge(run)}
         hint={m && (ann
           ? `Actual ${usd(m.revenue_per_kw_period, 1)}/kW over ${m.days_covered} days (${fmtDate(run!.meta.first_day)} to ${fmtDate(run!.meta.last_day)}), scaled to 365 days.`
           : `Full ${run!.meta.year}, ${m.days_covered} days, net of degradation cost.`)}
@@ -31,7 +34,7 @@ export function KpiRow() {
       />
       <Kpi
         label="Cycles" term="cycles" unit="/yr" value={m ? num(m.cycles_per_year) : undefined}
-        badge={ann ? 'Annualized YTD' : undefined}
+        badge={annualizedBadge(run)}
         hint="Full-capacity equivalents: energy discharged divided by energy capacity."
       />
       <Kpi
