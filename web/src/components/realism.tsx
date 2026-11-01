@@ -9,6 +9,7 @@ import { DURATIONS, findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, pct, usd, yearLabel } from '../data/format';
 import { kw } from '../data/analytics';
 import { useApp } from '../state';
+import { locAxis, locFull } from '../data/site';
 
 const tnum = { fontVariantNumeric: 'tabular-nums' } as const;
 /** Signed dollars with a true minus sign: −$1.4. */
@@ -52,19 +53,19 @@ export function RealismKpis({ run }: { run?: Run }) {
   return (
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
       <Kpi
-        label="DA-scheduled" unit="$/kW-yr" badge={badge} value={v(usd(m?.da_rt_revenue_per_kw_year, 1))}
+        label="DA-scheduled" term={['da', 'rt', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.da_rt_revenue_per_kw_year, 1))}
         hint={m && (has ? `Scheduled on day-ahead prices, paid real-time prices. Lost money on ${m.da_losing_days} of ${m.da_days_matched} days.` : missing)}
       />
       <Kpi
-        label="Perfect foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.pf_revenue_per_kw_year_matched, 1))}
+        label="Perfect foresight" term={['perfect_foresight', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.pf_revenue_per_kw_year_matched, 1))}
         hint="Same battery and days, scheduled with real-time prices known in advance."
       />
       <Kpi
-        label="Value of foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.value_of_perfect_foresight_per_kw_year, 1))}
+        label="Value of foresight" term="perfect_foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.value_of_perfect_foresight_per_kw_year, 1))}
         hint="Perfect foresight minus DA-scheduled: what knowing real-time prices in advance is worth."
       />
       <Kpi
-        label="Capture rate" value={v(pct(m?.capture_rate, 0))}
+        label="Capture rate" term="capture_rate" value={v(pct(m?.capture_rate, 0))}
         hint={m && (has ? `DA-scheduled ÷ perfect foresight. Selling the same schedule day-ahead would have earned ${usd(m.da_da_revenue_per_kw_year, 1)}/kW-yr.` : 'DA-scheduled ÷ perfect foresight.')}
       />
     </SimpleGrid>
@@ -86,7 +87,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
     if (!rows) return undefined;
     const rev = [...rows].reverse(); // top-to-bottom in reading order
     return (t: ChartTheme) => ({
-      grid: { left: 108, right: 20, top: 30, bottom: 28 },
+      grid: { left: 124, right: 20, top: 30, bottom: 28 },
       legend: { ...legendBase(t), data: DURATIONS.map((d) => `${durLabel(d)} battery`) },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
@@ -99,7 +100,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
         },
       },
       xAxis: { type: 'value', min: 0, max: 1, ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: (v: number) => `${Math.round(v * 100)}%` } },
-      yAxis: { type: 'category', data: rev.map((r) => r.loc), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, fontWeight: (v: string) => (v === sel.location ? 600 : 400) } },
+      yAxis: { type: 'category', data: rev.map((r) => locAxis(r.loc)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14, fontWeight: (v: string) => (v === locAxis(sel.location) ? 600 : 400) } },
       series: DURATIONS.map((d, i) => ({
         name: `${durLabel(d)} battery`, type: 'bar', barMaxWidth: 8, barGap: '25%',
         itemStyle: { color: t.series[i], borderRadius: [0, 3, 3, 0] },
@@ -116,7 +117,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
   const di = DURATIONS.indexOf(sel.duration);
   return (
     <Card
-      title="Capture rate by location and duration"
+      title="Capture rate by location and duration" terms={['capture_rate', 'perfect_foresight', 'da']}
       subtitle={`DA-scheduled revenue as a share of perfect foresight · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
       csv={csv}
     >
@@ -126,7 +127,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
         ) : (
           <>
             <Split>
-            <Chart build={build} height={ex ? '62vh' : 400} label="Capture rate by location for 1, 2 and 4 hour batteries" />
+            <Chart build={build} height={ex ? '75vh' : 520} label="Capture rate by location for 1, 2 and 4 hour batteries" />
             <div style={{ overflowX: 'auto' }}>
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={460} highlightOnHover>
                 <Table.Thead>
@@ -141,7 +142,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
                     return x && (
                       <Table.Tr key={loc} fw={loc === sel.location ? 600 : undefined}>
                         <Table.Td>
-                          <Anchor component="button" size="sm" c="inherit" underline="always" fw="inherit" onClick={() => go('realism', { location: loc })}>{loc}</Anchor>
+                          <Anchor component="button" size="sm" c="inherit" underline="always" fw="inherit" onClick={() => go('realism', { location: loc })}>{locFull(loc)}</Anchor>
                           {!hub && <Badge ml={6} size="xs" variant="light" color="gray">node</Badge>}
                         </Table.Td>
                         <Table.Td ta="right">{usd(x.revenue_per_kw_year)}</Table.Td>
@@ -209,8 +210,8 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
     };
   return (
     <Card
-      title="Month by month: perfect foresight vs DA-scheduled"
-      subtitle={run ? `$ per kW, net of degradation · ${run.meta.location} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
+      title="Month by month: perfect foresight vs DA-scheduled" terms={['perfect_foresight', 'da', 'capture_rate']}
+      subtitle={run ? `$ per kW, net of degradation · ${locFull(run.meta.location)} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
       csv={csv}
     >
       {(ex) =>
@@ -273,7 +274,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
   const w = rtcb?.meta;
   return (
     <Card
-      title={`Before vs after RTC+B · ${sel.location}`}
+      title={`Before vs after RTC+B · ${locFull(sel.location)}`} terms="rtcb"
       subtitle={w ? `${durLabel(sel.duration)} battery, $${sel.deg}/MWh degradation. ${fmtDate(w.before.start)} – ${fmtDate(w.before.end)} vs ${fmtDate(w.after.start)} – ${fmtDate(w.after.end)}, same calendar days. Ignores the year selector.` : undefined}
       csv={csv}
     >
@@ -331,15 +332,15 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
     if (!rows) return undefined;
     const rev = [...rows].reverse();
     return (t: ChartTheme) => ({
-      grid: { left: 108, right: 20, top: 30, bottom: 28 },
+      grid: { left: 124, right: 20, top: 30, bottom: 28 },
       legend: { ...legendBase(t), data: ['Perfect foresight', 'DA-scheduled'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (ps: { dataIndex: number; marker: string; seriesName: string; value: number }[]) =>
-          `<b>${rev[ps[0].dataIndex].l}</b> · after vs before<br/>` + ps.map((p) => `${p.marker} ${p.seriesName}: ${signed(p.value)}`).join('<br/>'),
+          `<b>${locFull(rev[ps[0].dataIndex].l)}</b> · after vs before<br/>` + ps.map((p) => `${p.marker} ${p.seriesName}: ${signed(p.value)}`).join('<br/>'),
       },
       xAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: (v: number) => `${Math.round(v * 100)}%` } },
-      yAxis: { type: 'category', data: rev.map((r) => r.l), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11 } },
+      yAxis: { type: 'category', data: rev.map((r) => locAxis(r.l)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14 } },
       series: [
         { name: 'Perfect foresight', type: 'bar', barMaxWidth: 9, barGap: '25%', data: rev.map((r) => r.run.change.pf_revenue), itemStyle: { color: t.baseline, borderRadius: 3 } },
         { name: 'DA-scheduled', type: 'bar', barMaxWidth: 9, data: rev.map((r) => r.run.change.da_rt_revenue), itemStyle: { color: t.series[0], borderRadius: 3 } },
@@ -358,7 +359,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
     };
   return (
     <Card
-      title="Before vs after RTC+B · every location"
+      title="Before vs after RTC+B · every location" terms={['rtcb', 'perfect_foresight', 'da']}
       subtitle={`Change in revenue over matched windows · ${durLabel(sel.duration)} battery · $${sel.deg}/MWh degradation`}
       csv={csv}
     >
@@ -366,7 +367,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
         !rows || !build ? <ChartSkeleton h={360} /> : (
           <>
             <Split>
-            <Chart build={build} height={ex ? '55vh' : 360} label="Percent change in revenue after RTC+B by location" />
+            <Chart build={build} height={ex ? '70vh' : 460} label="Percent change in revenue after RTC+B by location" />
             <div style={{ overflowX: 'auto' }}>
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={560} highlightOnHover>
                 <Table.Thead>
@@ -378,7 +379,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
                 <Table.Tbody style={{ ...tnum, whiteSpace: 'nowrap' }}>
                   {rows.map(({ l, loc, run }) => (
                     <Table.Tr key={l} fw={l === sel.location ? 600 : undefined}>
-                      <Table.Td><Anchor component="button" size="sm" c="inherit" underline="always" fw="inherit" onClick={() => go('realism', { location: l })}>{l}</Anchor></Table.Td>
+                      <Table.Td><Anchor component="button" size="sm" c="inherit" underline="always" fw="inherit" onClick={() => go('realism', { location: l })}>{locFull(l)}</Anchor></Table.Td>
                       <Table.Td ta="right">{usd(run.before.pf_revenue_per_kw, 0)} → {usd(run.after.pf_revenue_per_kw, 0)}<Change v={run.change.pf_revenue} /></Table.Td>
                       <Table.Td ta="right">{usd(run.before.da_rt_revenue_per_kw, 0)} → {usd(run.after.da_rt_revenue_per_kw, 0)}<Change v={run.change.da_rt_revenue} /></Table.Td>
                       <Table.Td ta="right">{pct(run.before.capture_rate)} → {pct(run.after.capture_rate)}</Table.Td>

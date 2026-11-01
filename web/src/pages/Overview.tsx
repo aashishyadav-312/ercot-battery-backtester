@@ -17,23 +17,23 @@ export function KpiRow() {
   return (
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
       <Kpi
-        label="Revenue" unit="$/kW-yr" value={m ? usd(m.revenue_per_kw_year, 1) : undefined}
+        label="Revenue" term={['usd_per_kw_yr', 'degradation_cost']} unit="$/kW-yr" value={m ? usd(m.revenue_per_kw_year, 1) : undefined}
         badge={ann ? 'Annualized YTD' : undefined}
         hint={m && (ann
           ? `Actual ${usd(m.revenue_per_kw_period, 1)}/kW over ${m.days_covered} days (${fmtDate(run!.meta.first_day)} to ${fmtDate(run!.meta.last_day)}), scaled to 365 days.`
           : `Full ${run!.meta.year}, ${m.days_covered} days, net of degradation cost.`)}
       />
       <Kpi
-        label="Top-10-day share" value={m ? pct(m.top10_day_share, 1) : undefined}
+        label="Top-10-day share" term="top10_day_share" value={m ? pct(m.top10_day_share, 1) : undefined}
         hint={t ? `Best day: ${fmtDate(t.date)}, ${pct(t.share, 1)} of ${ann ? 'YTD' : 'annual'} revenue.` : undefined}
       />
       <Kpi
-        label="Cycles" unit="/yr" value={m ? num(m.cycles_per_year) : undefined}
+        label="Cycles" term="cycles" unit="/yr" value={m ? num(m.cycles_per_year) : undefined}
         badge={ann ? 'Annualized YTD' : undefined}
         hint="Full-capacity equivalents: energy discharged divided by energy capacity."
       />
       <Kpi
-        label="Spread captured" unit="$/MWh" value={m ? usd(m.avg_spread_captured, 0) : undefined}
+        label="Spread captured" term="spread_captured" unit="$/MWh" value={m ? usd(m.avg_spread_captured, 0) : undefined}
         hint={m ? `Sells at ${usd(m.avg_discharge_price, 0)}, buys at ${usd(m.avg_charge_price, 0)} on average.` : undefined}
       />
     </SimpleGrid>
