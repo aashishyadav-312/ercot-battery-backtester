@@ -5,7 +5,8 @@ Each day is solved separately and starts and ends empty. 85% round-trip efficien
 services. 100 MW battery; results are per kW, so size doesn't matter. 2026 hub data runs through
 Oct 24, 2026; 2026 node data through Oct 30. Every figure below comes from `results/*.json`
 (180 runs: 5 hubs and 5 resource nodes, listed in `results/index.json`). Sections 7 and 8
-add a day-ahead-scheduled strategy and a before/after RTC+B comparison.
+add a day-ahead-scheduled strategy and a before/after RTC+B comparison. Section 9 runs one
+standard configuration at all 642 resource nodes with complete 2025 data (`results/nodes_2025_2h.json`).
 
 ## 1. Ten days carry a fifth to two-fifths of the year
 Share of a 2-hour battery's annual revenue earned on its 10 best days ($10/MWh degradation):
@@ -220,6 +221,95 @@ schedules on day-ahead prices fell by a larger share (27–41%) than the perfect
 (8–22%)." Not:
 "RTC+B caused it."
 
+## 9. All 642 resource nodes: half earn within 10% of their hub; 2% earn 2–4.5×
+
+**Setup.** One standard configuration: 2-hour battery, 85% round-trip efficiency, $10/MWh degradation, 2025, the same daily
+LP as the detailed runs (perfect foresight, plus the DA-scheduled / RT-settled strategy). ERCOT priced 776 resource nodes
+during 2025; 642 have complete data (both strategies solve all 365 days). The other 134 have less than 99% of the year's RT
+intervals, mostly nodes that came online or retired during the year. Results are in `results/nodes_2025_2h.json` (summary
+metrics and monthly revenue only); print these tables with `python -m scripts.node_findings`.
+
+**Check against the detailed runs.** The five detailed nodes reproduce their existing results exactly (e.g. RHESS2_ESS1
+$179.18, RUSSEKST_RN $175.95). The hubs come out 0.8–1.6% higher than the detailed hub runs ($40.07 vs $39.68 at
+HB_HOUSTON), because the bulk files are prices as posted while the detailed hub runs use the annual archive, which
+includes later corrections (27 of 35,040 HB_HOUSTON intervals differ). Ratios below use the bulk hub figures so node and
+hub are on identical data.
+
+**Distribution of node revenue vs its hub** (hub = trading hub of the node's settlement load zone; HB_HOUSTON $40.1,
+HB_NORTH $43.8, HB_SOUTH $40.1, HB_WEST $49.1, HB_PAN $47.1 per kW-yr):
+
+| Percentile | p10 | p25 | p50 | p75 | p90 | p99 | max |
+|---|---|---|---|---|---|---|---|
+| Node $/kW-yr | 39.0 | 41.9 | 47.4 | 58.1 | 69.9 | 106.5 | 179.2 |
+| Node ÷ own hub | 0.95× | 0.99× | 1.07× | 1.30× | 1.44× | 2.34× | 4.46× |
+
+| Node ÷ hub | < 0.9× | 0.9–1.1× | 1.1–1.5× | 1.5–2× | 2–3× | ≥ 3× |
+|---|---|---|---|---|---|---|
+| Nodes | 24 (4%) | 349 (54%) | 230 (36%) | 26 (4%) | 8 (1%) | 4 (1%) |
+
+- **Half the nodes are within ±10% of their hub.** Finding 6's "a typical node is its hub" holds across the whole system,
+  not just the two typical picks.
+- **Few nodes earn much less than their hub** (4% below 0.9×, worst 0.81×). An arbitrage battery loses little by sitting
+  at an ordinary node, and congestion mostly adds spread.
+- **The tail is real but thin.** 38 nodes (6%) earn 1.5× their hub or more, and 12 (2%) earn 2× or more. RHESS2_ESS1 and
+  RUSSEKST_RN, picked in Phase 4 from one month of volatility, turn out to be #1 and #2 of 642 for 2025.
+- **Congestion pays where prices decouple.** Nodes whose prices track their hub less closely earn relatively more
+  (Spearman correlation between price-correlation-with-hub and node÷hub ratio: −0.30). The top three all have
+  correlation ≤ 0.39.
+- **DA scheduling captures less at the best nodes.** The median node's capture rate is 0.60, at the bottom of the hubs'
+  0.60–0.68, and 16 of the top 20 sit at 0.33–0.56: their spikes are local and RT-only, so a schedule built on DA
+  prices misses them. NF_BRP_RN (0.71) and RHESS2_ESS1 (0.73) are exceptions; their high prices also showed in DA.
+
+**By load zone:**
+
+| Load zone | Nodes | Median $/kW-yr | 90th pct | Median ÷ hub | In top 20 |
+|---|---|---|---|---|---|
+| LZ_WEST | 222 | 62.9 | 71.3 | 1.28× | 9 |
+| LZ_SOUTH | 189 | 45.4 | 62.8 | 1.13× | 9 |
+| LZ_NORTH | 134 | 46.8 | 56.2 | 1.07× | 2 |
+| LZ_HOUSTON | 96 | 40.2 | 41.9 | 1.00× | 0 |
+
+West Texas nodes earn more than the West hub itself (median 1.28×): the hub averages over buses that are less congested
+than where the wind, solar and storage plants sit. Houston nodes are their hub (90th percentile only $41.9). Congestion value
+is a West and South Texas story.
+
+**Top 20 nodes, 2025** (perfect foresight $/kW-yr, with DA-scheduled revenue and price correlation with the hub):
+
+| # | Node | Load zone (substation) | $/kW-yr | ÷ hub | DA-sched. | Capture | Top-10 share | Corr. hub |
+|---|---|---|---|---|---|---|---|---|
+| 1 | RHESS2_ESS1 | LZ_SOUTH (GEORSO) | 179.2 | 4.46× | 130.2 | 0.73 | 64% | 0.10 |
+| 2 | RUSSEKST_RN | LZ_WEST (RUSSEKST) | 176.0 | 3.58× | 58.5 | 0.33 | 15% | 0.39 |
+| 3 | JUNCTION_RN | LZ_SOUTH (JUNCTION) | 122.0 | 3.04× | 41.8 | 0.34 | 28% | 0.33 |
+| 4 | JUNORTH_RN | LZ_SOUTH (JUNORTH) | 121.9 | 3.04× | 41.4 | 0.34 | 28% | 0.33 |
+| 5 | APPALOSA_ALL | LZ_WEST (PALOUSE) | 117.0 | 2.38× | 44.5 | 0.38 | 14% | 0.62 |
+| 6 | GUNMTN_NODE | LZ_WEST (GUNSW) | 111.6 | 2.27× | 56.6 | 0.51 | 13% | 0.71 |
+| 7 | NF_BRP_RN | LZ_SOUTH (ANDICE) | 110.6 | 2.75× | 78.5 | 0.71 | 56% | 0.11 |
+| 8 | FERMI_ALL | LZ_SOUTH (MAXWELL) | 100.7 | 2.51× | 40.8 | 0.40 | 20% | 0.55 |
+| 9 | ALP_BESS_RN | LZ_WEST (LMESA) | 94.6 | 1.93× | 50.6 | 0.53 | 17% | 0.77 |
+| 10 | LAMESASLR_G | LZ_WEST (LMESA) | 94.6 | 1.93× | 50.6 | 0.53 | 17% | 0.77 |
+| 11 | AMISTAD_ALL | LZ_SOUTH (AMISTAD) | 90.7 | 2.26× | 43.6 | 0.48 | 25% | 0.53 |
+| 12 | HAMI_BESS_RN | LZ_SOUTH (HAMILTON) | 90.6 | 2.26× | 43.8 | 0.48 | 25% | 0.53 |
+| 13 | POTSVIL_RN | LZ_NORTH (POTSVIL) | 89.5 | 2.04× | 58.9 | 0.66 | 26% | 0.58 |
+| 14 | CATARINA_B1 | LZ_SOUTH (CATARINA) | 85.1 | 2.12× | 41.3 | 0.49 | 15% | 0.70 |
+| 15 | SGM_SIGNALMT | LZ_WEST (SGMTN) | 84.9 | 1.73× | 39.3 | 0.46 | 21% | 0.73 |
+| 16 | JUNG_SLR_RN | LZ_NORTH (JUNG_SLR) | 84.8 | 1.93× | 52.7 | 0.62 | 44% | 0.29 |
+| 17 | CFLATS_UNIT | LZ_WEST (TREADWEL) | 84.7 | 1.73× | 43.4 | 0.51 | 21% | 0.76 |
+| 18 | JDKNS_RN | LZ_WEST (JDKNS) | 81.7 | 1.66× | 40.2 | 0.49 | 22% | 0.45 |
+| 19 | CARBN_BSP_1 | LZ_WEST (CARBN) | 81.5 | 1.66× | 40.0 | 0.49 | 21% | 0.76 |
+| 20 | HOLCOMB_RN1 | LZ_SOUTH (HOLCOMB) | 77.5 | 1.93× | 43.7 | 0.56 | 13% | 0.79 |
+
+Top 20 by load zone: **9 West, 9 South, 2 North, 0 Houston.** Several entries are the same electrical pocket listed
+twice (JUNCTION_RN/JUNORTH_RN, ALP_BESS_RN/LAMESASLR_G at substation LMESA, AMISTAD_ALL/HAMI_BESS_RN), so the top 20 cover
+about 17 distinct locations. Even the 20th node earns 1.9× its hub, but with a DA-scheduled strategy every top-20 node
+except RHESS2_ESS1 and NF_BRP_RN earns $39–59/kW-yr, about what the hubs earn with perfect foresight ($40–49). Most of
+the node premium needs RT foresight to capture.
+
+**Caveats.** One year and one configuration; the 2025 ranking is not a forecast (finding 6 shows CAMWIND_RN's edge
+moving between years). Prices are as first posted, without ERCOT's later corrections, which matters most for the extreme
+spikes behind RHESS2_ESS1 and NF_BRP_RN (top-10-day shares of 64% and 56%). Only 226 of the 642 nodes (35%) could be
+placed on the map from EIA-860 plant records (7 of the top 20); the rest are in the Map page's table but have no marker.
+Coordinates are never guessed (`results/geocoding_log_all_nodes.md`).
+
 ## Validation against published benchmarks
 Real ERCOT battery revenue from Modo Energy's ERCOT BESS Index covers **all** revenue
 (arbitrage plus ancillary services), earned by real operators without perfect foresight:
@@ -241,7 +331,8 @@ Sources:
 - [Modo Energy: ERCOT battery revenue benchmark, November 2025](https://modoenergy.com/research/ercot-battery-revenue-benchmark-november-2025-battery-energy-storage-bess-capture-rates)
 
 ## Not done yet
-- **More nodes:** the 5 nodes are a sample. The 10-location target in PLAN.md could add nodes
-  near HB_HOUSTON, HB_NORTH and HB_PAN; none of the picks sit in those load zones.
+- **More nodes:** the 5 detailed nodes are a sample; section 9 covers every node, but only for one configuration and
+  one year, and with summary metrics only.
+- **Geocoding:** 35% of nodes can be placed from EIA-860; more need hand review (`scripts/location_overrides.json`).
 - **Load zones:** excluded because the archive mixes two conflicting series (see README).
 - **Ancillary services:** still not modeled (PLAN.md Phase 8c). They matter most for judging RTC+B.

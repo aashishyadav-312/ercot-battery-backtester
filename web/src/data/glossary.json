@@ -1,61 +1,69 @@
 {
-  "_about": "Plain-language definitions shown in the info-icon tooltips. Keys are referenced from components (Info term=...).",
-  "terms": {
-    "perfect_foresight": {
-      "term": "Perfect foresight",
-      "definition": "Each day's charge and discharge schedule is chosen with that day's real-time prices already known. No real operator can do this, so it is a ceiling on energy arbitrage, not a forecast."
-    },
-    "capture_rate": {
-      "term": "Capture rate",
-      "definition": "Revenue from scheduling on day-ahead prices (and being paid real-time prices) divided by the perfect-foresight revenue for the same battery and days. 70% means the realistic strategy kept 70 cents of every perfect-foresight dollar."
-    },
-    "usd_per_kw_yr": {
-      "term": "$/kW-yr",
-      "definition": "Dollars earned per year for each kilowatt of power capacity. Because it is per kW, a 10 MW and a 100 MW battery with the same duration have the same figure. 2026 values are scaled up from year-to-date to 365 days."
-    },
-    "usd_per_kwh_yr": {
-      "term": "$/kWh-yr",
-      "definition": "Dollars earned per year for each kilowatt-hour of energy capacity. Equals $/kW-yr divided by the duration in hours, so it shows how well each hour of storage is used."
-    },
-    "cycles": {
-      "term": "Cycles",
-      "definition": "Full-capacity equivalents per year: total energy discharged divided by the battery's energy capacity. Two half-depth discharges count as one cycle."
-    },
-    "spread_captured": {
-      "term": "Spread captured",
-      "definition": "Average price the battery sold at minus the average price it bought at, weighted by energy, in $/MWh. Efficiency losses and degradation cost come out of this spread."
-    },
-    "hub": {
-      "term": "Hub",
-      "definition": "An ERCOT trading hub: an average price over many nodes in a region (Houston, North, South, West, Panhandle). Hubs are a smooth reference price; no battery sits at a hub."
-    },
-    "resource_node": {
-      "term": "Resource node",
-      "definition": "The settlement point where one generator or battery is paid. Its price includes local grid congestion, so it can differ a lot from the hub and spike more often."
-    },
-    "load_zone": {
-      "term": "Load zone",
-      "definition": "An ERCOT region whose customers pay one averaged price (for example LZ_WEST). Here each resource node is matched to the hub of its load zone for comparison."
-    },
-    "da": {
-      "term": "DA (day-ahead)",
-      "definition": "The day-ahead market, cleared the day before for each hour. A strategy that is \"DA-scheduled\" plans its charge and discharge from these prices, then is paid real-time prices."
-    },
-    "rt": {
-      "term": "RT (real-time)",
-      "definition": "The real-time market, with prices every 15 minutes (settlement point prices). Most of the revenue in this model is earned and measured at these prices."
-    },
-    "rtcb": {
-      "term": "RTC+B",
-      "definition": "Real-Time Co-optimization plus Batteries, an ERCOT market redesign that went live on Dec 5, 2025. It buys energy and ancillary services together every few minutes and changes how battery revenue is earned."
-    },
-    "degradation_cost": {
-      "term": "Degradation cost",
-      "definition": "A charge per MWh discharged ($0 or $10 here) standing in for battery wear. Revenue shown is net of it, and it makes the optimizer skip trades that are too thin to be worth the wear."
-    },
-    "top10_day_share": {
-      "term": "Top-10-day share",
-      "definition": "The share of the period's total revenue earned on its ten best days. A high share means the result depends on a few price spikes."
-    }
+ "_about": "Plain-language definitions shown in the info-icon tooltips. Keys are referenced from components (Info term=...).",
+ "terms": {
+  "perfect_foresight": {
+   "term": "Perfect foresight",
+   "definition": "Each day's charge and discharge schedule is chosen with that day's real-time prices already known. No real operator can do this, so it is a ceiling on energy arbitrage, not a forecast."
+  },
+  "capture_rate": {
+   "term": "Capture rate",
+   "definition": "Revenue from scheduling on day-ahead prices (and being paid real-time prices) divided by the perfect-foresight revenue for the same battery and days. 70% means the realistic strategy kept 70 cents of every perfect-foresight dollar."
+  },
+  "usd_per_kw_yr": {
+   "term": "$/kW-yr",
+   "definition": "Dollars earned per year for each kilowatt of power capacity. Because it is per kW, a 10 MW and a 100 MW battery with the same duration have the same figure. 2026 values are scaled up from year-to-date to 365 days."
+  },
+  "usd_per_kwh_yr": {
+   "term": "$/kWh-yr",
+   "definition": "Dollars earned per year for each kilowatt-hour of energy capacity. Equals $/kW-yr divided by the duration in hours, so it shows how well each hour of storage is used."
+  },
+  "cycles": {
+   "term": "Cycles",
+   "definition": "Full-capacity equivalents per year: total energy discharged divided by the battery's energy capacity. Two half-depth discharges count as one cycle."
+  },
+  "spread_captured": {
+   "term": "Spread captured",
+   "definition": "Average price the battery sold at minus the average price it bought at, weighted by energy, in $/MWh. Efficiency losses and degradation cost come out of this spread."
+  },
+  "hub": {
+   "term": "Hub",
+   "definition": "An ERCOT trading hub: an average price over many nodes in a region (Houston, North, South, West, Panhandle). Hubs are a smooth reference price; no battery sits at a hub."
+  },
+  "resource_node": {
+   "term": "Resource node",
+   "definition": "The settlement point where one generator or battery is paid. Its price includes local grid congestion, so it can differ a lot from the hub and spike more often."
+  },
+  "load_zone": {
+   "term": "Load zone",
+   "definition": "An ERCOT region whose customers pay one averaged price (for example LZ_WEST). Here each resource node is matched to the hub of its load zone for comparison."
+  },
+  "da": {
+   "term": "DA (day-ahead)",
+   "definition": "The day-ahead market, cleared the day before for each hour. A strategy that is \"DA-scheduled\" plans its charge and discharge from these prices, then is paid real-time prices."
+  },
+  "rt": {
+   "term": "RT (real-time)",
+   "definition": "The real-time market, with prices every 15 minutes (settlement point prices). Most of the revenue in this model is earned and measured at these prices."
+  },
+  "rtcb": {
+   "term": "RTC+B",
+   "definition": "Real-Time Co-optimization plus Batteries, an ERCOT market redesign that went live on Dec 5, 2025. It buys energy and ancillary services together every few minutes and changes how battery revenue is earned."
+  },
+  "degradation_cost": {
+   "term": "Degradation cost",
+   "definition": "A charge per MWh discharged ($0 or $10 here) standing in for battery wear. Revenue shown is net of it, and it makes the optimizer skip trades that are too thin to be worth the wear."
+  },
+  "top10_day_share": {
+   "term": "Top-10-day share",
+   "definition": "The share of the period's total revenue earned on its ten best days. A high share means the result depends on a few price spikes."
+  },
+  "corr_hub": {
+   "term": "Correlation with hub",
+   "definition": "How closely a node's 15-minute real-time price moves with its load zone's trading hub over the year (1 = moves exactly together). Low values mean local congestion often pulls the node's price away from the hub."
+  },
+  "quantile_scale": {
+   "term": "Quantile colour scale",
+   "definition": "Nodes are sorted by $/kW-yr and split into classes holding about the same number of nodes each, so every colour is used equally. Class edges are uneven in dollars because a few nodes earn far more than the rest."
   }
+ }
 }
