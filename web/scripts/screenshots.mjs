@@ -28,7 +28,7 @@ const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--stric
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['start', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method'];
+const ALL_PAGES = ['start', 'map', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method'];
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
@@ -69,9 +69,13 @@ try {
       }
 
       // Data-quality note on a volatile node, and node-vs-hub on Compare.
-      for (const [file, url] of only ? [] : [
-        ['data-quality', 'overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
-        ['compare-node', 'compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
+      for (const [file, url] of [
+        ...(only ? [] : [
+          ['data-quality', 'overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
+          ['compare-node', 'compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
+        ]),
+        // A resource node selected on the map (side panel showing a node vs its hub).
+        ...(!only || pages.includes('map') ? [['map-node', 'map?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
       ]) {
         await page.goto(`${base}#/${url}`);
         await settle(page);

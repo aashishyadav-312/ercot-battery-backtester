@@ -165,3 +165,41 @@ export interface Walkthrough {
   };
   days: WalkDay[];
 }
+
+/** One settlement point on the Map page (results/locations.json, built by scripts/build_locations.py). */
+export interface LocationRec {
+  code: string;
+  name: string;
+  region: string | null;
+  type: 'hub' | 'node';
+  load_zone: string;
+  substation: string | null;
+  nearest_hub: string | null;
+  /** False when no coordinates could be found; lat/lon are then null and the node is not drawn. */
+  geocoded: boolean;
+  lat: number | null;
+  lon: number | null;
+  /** "representative_city" for hubs, otherwise the data source the coordinates were copied from. */
+  coordinate_source: string | null;
+  marker_city?: string;
+  match: {
+    method: string | null;
+    confidence: 'high' | 'medium' | 'reviewed' | null;
+    plants?: { eia_plant_code: number; eia_plant_name: string; county: string }[];
+    evidence: string;
+  };
+}
+
+export interface LocationsFile {
+  meta: { hub_footnote: string; coordinate_policy: string; ercot_doc: string; ercot_publish_date: string | null; eia_year: number; n_nodes: number; n_nodes_geocoded: number };
+  locations: LocationRec[];
+}
+
+type Ring = [number, number][];
+interface GeoFeature { type: 'Feature'; properties: { name: string }; geometry: { type: 'Polygon'; coordinates: Ring[] } | { type: 'MultiPolygon'; coordinates: Ring[][] } }
+/** Texas outline and counties cut from us-atlas by scripts/build-texas.mjs. */
+export interface TexasGeo {
+  source: string;
+  state: GeoFeature;
+  counties: { type: 'FeatureCollection'; features: GeoFeature[] };
+}

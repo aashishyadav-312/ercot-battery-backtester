@@ -1,0 +1,262 @@
+{
+ "meta": {
+  "ercot_doc": "CIM_Oct_ML4_1_11032026_SP_List_and_EB_Mapping",
+  "ercot_publish_date": "2026-10-28",
+  "eia_year": 2025,
+  "hub_footnote": "A hub is a price average over many buses, so it has no single location. Hub markers sit at a representative city and show the hub's area, not a site.",
+  "coordinate_policy": "Resource-node coordinates are copied from EIA-860 plant records matched to the node. Nodes that could not be matched have no coordinates and are not drawn.",
+  "n_nodes": 5,
+  "n_nodes_geocoded": 5
+ },
+ "locations": [
+  {
+   "code": "HB_HOUSTON",
+   "name": "Houston Hub",
+   "region": "Houston area",
+   "type": "hub",
+   "load_zone": "LZ_HOUSTON",
+   "load_zone_share": 1.0,
+   "substation": null,
+   "nearest_hub": "HB_HOUSTON",
+   "geocoded": true,
+   "lat": 29.7604,
+   "lon": -95.3698,
+   "coordinate_source": "representative_city",
+   "marker_city": "Houston",
+   "match": {
+    "method": "representative_city",
+    "confidence": null,
+    "evidence": "Hub is a price average, not a place. Drawn at Houston."
+   }
+  },
+  {
+   "code": "HB_NORTH",
+   "name": "North Hub",
+   "region": "North Texas",
+   "type": "hub",
+   "load_zone": "LZ_NORTH",
+   "load_zone_share": 1.0,
+   "substation": null,
+   "nearest_hub": "HB_NORTH",
+   "geocoded": true,
+   "lat": 32.7767,
+   "lon": -96.797,
+   "coordinate_source": "representative_city",
+   "marker_city": "Dallas",
+   "match": {
+    "method": "representative_city",
+    "confidence": null,
+    "evidence": "Hub is a price average, not a place. Drawn at Dallas."
+   }
+  },
+  {
+   "code": "HB_SOUTH",
+   "name": "South Hub",
+   "region": "South Texas",
+   "type": "hub",
+   "load_zone": "LZ_SOUTH",
+   "load_zone_share": 1.0,
+   "substation": null,
+   "nearest_hub": "HB_SOUTH",
+   "geocoded": true,
+   "lat": 29.4241,
+   "lon": -98.4936,
+   "coordinate_source": "representative_city",
+   "marker_city": "San Antonio",
+   "match": {
+    "method": "representative_city",
+    "confidence": null,
+    "evidence": "Hub is a price average, not a place. Drawn at San Antonio."
+   }
+  },
+  {
+   "code": "HB_WEST",
+   "name": "West Hub",
+   "region": "West Texas",
+   "type": "hub",
+   "load_zone": "LZ_WEST",
+   "load_zone_share": 1.0,
+   "substation": null,
+   "nearest_hub": "HB_WEST",
+   "geocoded": true,
+   "lat": 31.9973,
+   "lon": -102.0779,
+   "coordinate_source": "representative_city",
+   "marker_city": "Midland",
+   "match": {
+    "method": "representative_city",
+    "confidence": null,
+    "evidence": "Hub is a price average, not a place. Drawn at Midland."
+   }
+  },
+  {
+   "code": "HB_PAN",
+   "name": "Panhandle Hub",
+   "region": "Texas Panhandle",
+   "type": "hub",
+   "load_zone": "LZ_WEST",
+   "load_zone_share": 1.0,
+   "substation": null,
+   "nearest_hub": "HB_PAN",
+   "geocoded": true,
+   "lat": 35.222,
+   "lon": -101.8313,
+   "coordinate_source": "representative_city",
+   "marker_city": "Amarillo",
+   "match": {
+    "method": "representative_city",
+    "confidence": null,
+    "evidence": "Hub is a price average, not a place. Drawn at Amarillo."
+   }
+  },
+  {
+   "code": "ANSON1_ALL",
+   "name": "Anson 1",
+   "region": "West Texas",
+   "type": "node",
+   "load_zone": "LZ_WEST",
+   "substation": "PHNTMHL",
+   "nearest_hub": "HB_WEST",
+   "ercot_units": [
+    "ANSON1_UNIT1",
+    "ANSON1_UNIT2",
+    "ANSON2_UNIT1"
+   ],
+   "geocoded": true,
+   "lat": 32.80832,
+   "lon": -99.91825,
+   "coordinate_source": "EIA-860 2025 plant latitude/longitude",
+   "match": {
+    "method": "name_match",
+    "confidence": "medium",
+    "plants": [
+     {
+      "eia_plant_code": 64026,
+      "eia_plant_name": "ANSON Solar Center, LLC",
+      "county": "Jones"
+     },
+     {
+      "eia_plant_code": 69149,
+      "eia_plant_name": "Anson 2 Solar",
+      "county": "Jones"
+     }
+    ],
+    "evidence": "Name rule: 'anson' prefix-matches plant 'ANSON Solar Center, LLC'; 'anson' prefix-matches plant 'Anson 2 Solar'."
+   }
+  },
+  {
+   "code": "CAMWIND_RN",
+   "name": "Camwind",
+   "region": "South Texas",
+   "type": "node",
+   "load_zone": "LZ_SOUTH",
+   "substation": "PAREDES",
+   "nearest_hub": "HB_SOUTH",
+   "ercot_units": [
+    "CAMWIND_ESR1",
+    "CAMWIND_UNIT1"
+   ],
+   "geocoded": true,
+   "lat": 26.19528,
+   "lon": -97.46611,
+   "coordinate_source": "EIA-860 2025 plant latitude/longitude",
+   "match": {
+    "method": "name_match",
+    "confidence": "medium",
+    "plants": [
+     {
+      "eia_plant_code": 59118,
+      "eia_plant_name": "Cameron Wind 1 LLC",
+      "county": "Cameron"
+     }
+    ],
+    "evidence": "Name rule: 'camwind' abbreviation-matches plant 'Cameron Wind 1 LLC'. Storage unit has a battery at the plant."
+   }
+  },
+  {
+   "code": "RHESS2_ESS1",
+   "name": "Rhess 2 storage",
+   "region": "South Texas",
+   "type": "node",
+   "load_zone": "LZ_SOUTH",
+   "substation": "GEORSO",
+   "nearest_hub": "HB_SOUTH",
+   "ercot_units": [
+    "GEORSO_ESR1"
+   ],
+   "geocoded": true,
+   "lat": 30.58783,
+   "lon": -97.68702,
+   "coordinate_source": "EIA-860 2025 plant latitude/longitude",
+   "match": {
+    "method": "manual_review",
+    "confidence": "reviewed",
+    "plants": [
+     {
+      "eia_plant_code": 60649,
+      "eia_plant_name": "Rabbit Hill Energy Storage Project",
+      "county": "Williamson"
+     }
+    ],
+    "evidence": "ERCOT lists RHESS2_ESS1 as a single energy-storage unit (ESR1) at substation GEORSO, load zone LZ_SOUTH. A public plant listing gives the Rabbit Hill Energy Storage Project (EIA plant 60649, 9.9 MW battery, Williamson County) the ERCOT LMP node RHESS2_ESS1. The node name abbreviates 'Rabbit Hill Energy Storage S...'. Source: https://www.infrasure.ai/plant/60649-rabbit-hill-energy-storage-project"
+   }
+  },
+  {
+   "code": "RUSSEKST_RN",
+   "name": "Russek St",
+   "region": "West Texas",
+   "type": "node",
+   "load_zone": "LZ_WEST",
+   "substation": "RUSSEKST",
+   "nearest_hub": "HB_WEST",
+   "ercot_units": [
+    "RUSSEKST_ESR1"
+   ],
+   "geocoded": true,
+   "lat": 31.18349,
+   "lon": -101.46036,
+   "coordinate_source": "EIA-860 2025 plant latitude/longitude",
+   "match": {
+    "method": "name_match",
+    "confidence": "medium",
+    "plants": [
+     {
+      "eia_plant_code": 67495,
+      "eia_plant_name": "Russek",
+      "county": "Reagan"
+     }
+    ],
+    "evidence": "Name rule: 'russekst' prefix-matches plant 'Russek'. Storage unit has a battery at the plant."
+   }
+  },
+  {
+   "code": "WIPOPA_3_4",
+   "name": "Wipopa 3-4",
+   "region": "South Texas",
+   "type": "node",
+   "load_zone": "LZ_SOUTH",
+   "substation": "PINECR",
+   "nearest_hub": "HB_SOUTH",
+   "ercot_units": [
+    "WIPOPA_WPP_G3",
+    "WIPOPA_WPP_G4"
+   ],
+   "geocoded": true,
+   "lat": 30.02547,
+   "lon": -96.9945,
+   "coordinate_source": "EIA-860 2025 plant latitude/longitude",
+   "match": {
+    "method": "name_match",
+    "confidence": "medium",
+    "plants": [
+     {
+      "eia_plant_code": 56674,
+      "eia_plant_name": "Winchester Power Park",
+      "county": "Fayette"
+     }
+    ],
+    "evidence": "Name rule: 'wipopa' abbreviation-matches plant 'Winchester Power Park'. ERCOT unit prefix 'WPP' equals the plant name's initials."
+   }
+  }
+ ]
+}

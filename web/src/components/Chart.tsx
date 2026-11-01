@@ -52,6 +52,10 @@ interface Props {
   build: (t: ChartTheme) => EChartsCoreOption;
   height: number | string;
   label: string;
+  /** Called once with the live echarts instance (for imperative actions such as zoom buttons). */
+  onChartReady?: (chart: echarts.ECharts) => void;
+  /** Called for clicks on chart elements; `params` is echarts' event payload. */
+  onClick?: (params: { componentType?: string; seriesType?: string; data?: unknown }) => void;
 }
 
 type SeriesLike = { id?: string; name?: string };
@@ -64,16 +68,22 @@ type SeriesLike = { id?: string; name?: string };
  * new ones. Series that disappear are removed (replaceMerge). Reduced motion turns animation off.
  * The SVG renderer keeps text as real text, so axis labels get tabular figures from CSS.
  */
-export function Chart({ build, height, label }: Props) {
+export function Chart({ build, height, label, onChartReady, onClick }: Props) {
   const scheme = useComputedColorScheme('light');
   const reduce = useReducedMotion();
   const el = useRef<HTMLDivElement>(null);
   const inst = useRef<echarts.ECharts | null>(null);
+  const clickRef = useRef(onClick);
+  clickRef.current = onClick;
+  const readyRef = useRef(onChartReady);
+  readyRef.current = onChartReady;
 
   useEffect(() => {
     if (!el.current) return;
     const chart = echarts.init(el.current, undefined, { renderer: 'svg' });
     inst.current = chart;
+    chart.on('click', (p) => clickRef.current?.(p as Parameters<NonNullable<Props['onClick']>>[0]));
+    readyRef.current?.(chart);
     const ro = new ResizeObserver(() => chart.resize({ animation: { duration: 0 } }));
     ro.observe(el.current);
     return () => {

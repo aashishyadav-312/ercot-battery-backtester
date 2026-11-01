@@ -1,0 +1,9 @@
+{
+ "_about": "Hand-reviewed placements for resource nodes the automatic rules in build_locations.py cannot match. Each entry names an EIA-860 plant (code and exact name, checked at build time) and the evidence. Coordinates still come from the EIA plant record; nothing is typed in by hand.",
+ "RHESS2_ESS1": {
+  "eia_plant_code": 60649,
+  "eia_plant_name": "Rabbit Hill Energy Storage Project",
+  "evidence": "ERCOT lists RHESS2_ESS1 as a single energy-storage unit (ESR1) at substation GEORSO, load zone LZ_SOUTH. A public plant listing gives the Rabbit Hill Energy Storage Project (EIA plant 60649, 9.9 MW battery, Williamson County) the ERCOT LMP node RHESS2_ESS1. The node name abbreviates 'Rabbit Hill Energy Storage S...'.",
+  "source": "https://www.infrasure.ai/plant/60649-rabbit-hill-energy-storage-project"
+ }
+}
