@@ -10,6 +10,8 @@ export const SITE = {
   email: 'aashish.yadav@duke.edu',
   repo: 'https://github.com/aashishyadav-312/ercot-battery-backtester',
   issues: 'https://github.com/aashishyadav-312/ercot-battery-backtester/issues',
+  /** Opens the feature-request form (.github/ISSUE_TEMPLATE/feature_request.yml; live once merged to main). */
+  featureRequest: 'https://github.com/aashishyadav-312/ercot-battery-backtester/issues/new?template=feature_request.yml',
 };
 
 // ------------------------------------------------------------ friendly location names

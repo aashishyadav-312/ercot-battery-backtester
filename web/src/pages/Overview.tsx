@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Alert, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { Kpi } from '../components/Kpi';
 import { DataQuality } from '../components/DataQuality';
+import { StartBanner } from '../components/StartBanner';
 import { CumulativeCard, DurationCard, HeatmapCard, MonthlyRevenueCard } from '../components/cards';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
@@ -100,6 +101,7 @@ export default function Overview() {
   const { sel, index } = useApp();
   return (
     <Stack gap="lg">
+      <StartBanner />
       <PageHeader title="Overview" hero />
       <RunStatus />
       <KpiRow />

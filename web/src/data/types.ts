@@ -133,3 +133,35 @@ export interface Rtcb {
   meta: { event: string; before: { start: string; end: string }; after: { start: string; end: string }; caveat: string };
   locations: Record<string, { location_type: 'hub' | 'node'; matched_days: number; prices: { before: RtcbPrices; after: RtcbPrices }; runs: RtcbRun[] }>;
 }
+
+/** One featured day for the "Start here" walkthrough (results/walkthrough.json, built by scripts/build_walkthrough.py). */
+export interface WalkDay {
+  date: string;
+  kind: 'top' | 'typical' | 'quiet' | 'negative';
+  label: string;
+  /** Net revenue for the day in dollars (after degradation cost). */
+  revenue: number;
+  /** Real-time price, $/MWh, one value per 15-minute interval (96). */
+  price: number[];
+  /** Battery output in MW per interval: positive = discharging (selling), negative = charging (buying). */
+  net_mw: number[];
+  /** State of charge in MWh at the end of each interval. */
+  soc_mwh: number[];
+  /** Day-ahead hourly price, $/MWh (24 values), where available. */
+  da_price?: number[];
+}
+
+export interface Walkthrough {
+  meta: {
+    location: string;
+    year: number;
+    power_mw: number;
+    duration_h: number;
+    energy_mwh: number;
+    rte: number;
+    deg_cost_per_mwh: number;
+    interval_minutes: number;
+    year_revenue_per_kw: number;
+  };
+  days: WalkDay[];
+}

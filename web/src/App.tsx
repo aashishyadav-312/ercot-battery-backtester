@@ -5,7 +5,8 @@ import {
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconAbout, IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconSun } from './components/Icons';
+import { IconAbout, IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
+import Start from './pages/Start';
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
@@ -19,6 +20,7 @@ import { fmtDate } from './data/format';
 
 
 const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
+  { page: 'start', label: 'Start here', icon: IconStart },
   { page: 'overview', label: 'Overview', icon: IconOverview },
   { page: 'revenue', label: 'Revenue', icon: IconRevenue },
   { page: 'dispatch', label: 'Dispatch', icon: IconDispatch },
@@ -71,7 +73,7 @@ export default function App() {
     try { (window as unknown as { goatcounter?: { count: (o: object) => void } }).goatcounter?.count({ path: `/${page}`, title: document.title }); } catch { /* blocked */ }
   }, [page]);
 
-  const Page = { overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method, about: About }[page];
+  const Page = { start: Start, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method, about: About }[page];
   return (
     <AppShell
       header={{ height: 60 }}
@@ -93,7 +95,7 @@ export default function App() {
           </Group>
           <Group gap="sm" wrap="nowrap">
             <DataBadge />
-            {page !== 'method' && page !== 'about' && <Group visibleFrom="md"><Selectors /></Group>}
+            {page !== 'method' && page !== 'about' && page !== 'start' && <Group visibleFrom="md"><Selectors /></Group>}
             <SchemeToggle />
           </Group>
         </Group>
@@ -116,7 +118,7 @@ export default function App() {
 
       <AppShell.Main>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          {page !== 'method' && page !== 'about' && (
+          {page !== 'method' && page !== 'about' && page !== 'start' && (
             <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>
           )}
           {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}

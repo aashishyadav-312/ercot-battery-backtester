@@ -4,7 +4,7 @@ import { useReducedMotion } from '@mantine/hooks';
 import * as echarts from 'echarts/core';
 import { BarChart, HeatmapChart, LineChart, ScatterChart } from 'echarts/charts';
 import {
-  AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkLineComponent, TooltipComponent, VisualMapComponent,
+  AriaComponent, DataZoomComponent, GridComponent, LegendComponent, MarkAreaComponent, MarkLineComponent, TitleComponent, TooltipComponent, VisualMapComponent,
 } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import type { EChartsCoreOption } from 'echarts/core';
@@ -12,7 +12,7 @@ import { CHART, CHART_FONT } from '../theme';
 
 echarts.use([
   BarChart, LineChart, HeatmapChart, ScatterChart, GridComponent, TooltipComponent, LegendComponent,
-  VisualMapComponent, MarkLineComponent, DataZoomComponent, AriaComponent, SVGRenderer,
+  VisualMapComponent, MarkLineComponent, MarkAreaComponent, TitleComponent, DataZoomComponent, AriaComponent, SVGRenderer,
 ]);
 
 export type ChartTheme = (typeof CHART)['light'] & { mode: 'light' | 'dark' };

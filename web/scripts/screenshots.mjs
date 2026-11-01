@@ -28,7 +28,7 @@ const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--stric
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['overview', 'revenue', 'dispatch', 'compare', 'realism', 'method'];
+const ALL_PAGES = ['start', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method'];
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };

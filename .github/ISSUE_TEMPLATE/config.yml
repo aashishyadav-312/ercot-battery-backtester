@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: The model's assumptions
+    url: https://aashishyadav-312.github.io/ercot-battery-backtester/#/method
+    about: Read what the model includes and leaves out before suggesting a change.

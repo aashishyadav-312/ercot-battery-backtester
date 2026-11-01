@@ -29,6 +29,7 @@ scripts/add_da_schedule.py # add DA-scheduled fields to existing results without
 scripts/rtcb.py        # before vs after RTC+B over matched windows -> results/rtcb.json
 scripts/rank_nodes.py  # pick resource nodes by RT price volatility
 scripts/compare_nodes.py # node vs its hub over matched days
+scripts/build_walkthrough.py # 15-min prices + schedule for featured days -> results/walkthrough.json (Start here page)
 results/               # precomputed JSON for the web app
 web/                   # Vite + React + Mantine + ECharts frontend (Phase 5)
 tests/

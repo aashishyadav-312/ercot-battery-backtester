@@ -12,7 +12,7 @@ PW_CHROMIUM_PATH=/path/to/chromium npm run screenshots   # needs a build; writes
 
 - `public/data/` is generated from `../results/` by `scripts/copy-data.mjs` (git-ignored).
 - The URL hash holds the page and the selectors, e.g. `#/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10`.
-- Pages: Overview, Revenue, Dispatch, Compare, Method. Every card has a CSV download and an expand button.
+- Pages: Start here, Overview, Revenue, Dispatch, Compare, Realism, Method, About. Every card has a CSV download and an expand button.
 - A data-quality note appears when a run's best day is more than 20% of its revenue (`src/components/DataQuality.tsx`).
   Known explanations for specific runs live in `src/data/data-notes.json` (location → year → text), not in code.
 - Each page leads with one hero sentence for the current selection (`src/data/hero.ts`), e.g.
@@ -33,3 +33,14 @@ media queries), wired in via `classNames`. `src/styles.css` holds only global ba
 - **Motion:** page enter (rise + fade), chart value transitions, skeleton sheen, press feedback on icons.
   `prefers-reduced-motion` turns chart animation off, keeps only fades, and stops the sheen;
   `prefers-reduced-transparency` and `prefers-contrast` make the header solid.
+
+### Start here (Phase 10)
+`src/pages/Start.tsx` is the first nav item (`#/start`). Overview shows a one-time banner to first-time visitors; dismissal is
+remembered in `localStorage` key `ebb-start-seen` (every read and write is in try/catch, so blocked storage only means it shows again).
+- The one-day walkthrough reads `results/walkthrough.json` (13 featured days at Houston Hub, 2025: the ten best, a typical, a quiet and
+  the most negative-price day). Rebuild it with `python -m scripts.build_walkthrough`; it re-solves each day and refuses to write if the
+  revenue differs from the stored year run. Step text is generated from the data in `src/data/walkthrough.ts`.
+- Page cards use thumbnails in `public/thumbs/` (regenerate with `node scripts/make-thumbs.mjs` after a build).
+- `node scripts/check-start.mjs` checks the two-click path, banner persistence (including blocked storage), the walkthrough controls and
+  console errors, and writes the `*-p10-after.png` screenshots. Set `PW_CHROMIUM_PATH` if Playwright's own browser is not installed.
+- Issue form for feature requests: `.github/ISSUE_TEMPLATE/feature_request.yml` (the "Suggest a feature" link works once it is on `main`).
