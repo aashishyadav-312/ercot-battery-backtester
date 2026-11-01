@@ -216,6 +216,9 @@ export interface NodeRec {
   lat: number | null;
   lon: number | null;
   geo: string | null;
+  /** "plant": EIA plant coordinates. "county": county-level match (ERCOT GIS queue), drawn at the county's Census point. */
+  prec: 'plant' | 'county' | null;
+  county: string | null;
   /** Perfect-foresight and DA-scheduled (RT-settled) revenue, $/kW-yr. */
   rev: number;
   da_rev: number;
@@ -230,12 +233,12 @@ export interface NodeRec {
   monthly_da: number[];
 }
 
-export type HubRec = Omit<NodeRec, 'rank' | 'lz' | 'hub' | 'sub' | 'lat' | 'lon' | 'geo' | 'corr_hub'> & { corr_hub: null };
+export type HubRec = Omit<NodeRec, 'rank' | 'lz' | 'hub' | 'sub' | 'lat' | 'lon' | 'geo' | 'prec' | 'county' | 'corr_hub'> & { corr_hub: null };
 
 export interface NodesFile {
   meta: {
     year: number; duration_h: number; rte: number; deg_cost_per_mwh: number; power_mw: number;
-    n_nodes_in_data: number; n_nodes: number; n_nodes_geocoded: number;
+    n_nodes_in_data: number; n_nodes: number; n_nodes_geocoded: number; n_nodes_county_level?: number;
     excluded_counts: Record<string, number>;
     quantiles_rev: Record<string, number>;
     runtime_s: { load_prices: number; solve: number; total: number };

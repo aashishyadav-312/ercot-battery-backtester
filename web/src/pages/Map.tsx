@@ -76,7 +76,10 @@ export default function MapPage() {
     }
     setFocus({ code, n: Date.now() });
   };
-  const heatNode = heatSel && all.data ? all.data.nodes.find((n) => n.code === heatSel) : undefined;
+  // In heat mode every resource node, including the 5 detailed ones, uses the all-node panel so its
+  // node-vs-hub ratio divides by hub revenue from the same bulk prices (hubs keep the detailed panel).
+  const heatCode = heatSel ?? (heatOn ? sel.location : null);
+  const heatNode = heatCode && all.data ? all.data.nodes.find((n) => n.code === heatCode) : undefined;
 
   const error = locs.error ?? texas.error ?? (heatOn ? all.error : undefined);
   const geo = texas.data;
@@ -134,7 +137,7 @@ export default function MapPage() {
           )}
         </Paper>
         {ready && heatNode && all.data ? (
-          <NodePanel node={heatNode} data={all.data} onDetailed={(c) => choose(c)} />
+          <NodePanel node={heatNode} data={all.data} onDetailed={(c) => choose(c)} detailed={list?.some((l) => l.code === heatNode.code)} />
         ) : ready && selected ? <MapPanel loc={selected} locations={list} index={index} /> : <Skeleton h={phone ? 300 : 560} radius="lg" aria-hidden />}
       </div>
 
@@ -188,7 +191,9 @@ export default function MapPage() {
             <>
               {' '}and, for all nodes, the{' '}
               <Anchor size="xs" href={`${SITE.repo}/blob/main/results/geocoding_log_all_nodes.md`} target="_blank" rel="noreferrer">all-node geocoding log</Anchor>
-              {' '}({all.data.meta.n_nodes_geocoded} of {all.data.meta.n_nodes} nodes with complete {all.data.meta.year} data placed; the rest are in the table but not on the map).
+              {' '}({all.data.meta.n_nodes_geocoded} of {all.data.meta.n_nodes} nodes with complete {all.data.meta.year} data placed
+              {all.data.meta.n_nodes_county_level ? `, ${all.data.meta.n_nodes_county_level} of them only to a county from ERCOT’s interconnection queue (rings at the county centre)` : ''};
+              the rest are in the table but not on the map).
               {' '}Heat mode covers {all.data.meta.n_nodes} of {all.data.meta.n_nodes_in_data} resource nodes in ERCOT’s {all.data.meta.year} prices; nodes that started, retired or had data gaps during the year are left out
             </>
           )}.

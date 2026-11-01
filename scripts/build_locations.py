@@ -70,7 +70,8 @@ HUB_CITIES = {
     "HB_PAN": ("Amarillo", 35.2220, -101.8313),
 }
 
-MAX_CLUSTER_KM = 5.0  # plants matched to one node must lie this close together
+MAX_CLUSTER_KM = 5.0
+CONFLICT_KM = 100.0  # plant placement vs GIS queue county further apart than this: leave the node unplaced  # plants matched to one node must lie this close together
 TEXAS_BBOX = (25.8, 36.6, -106.7, -93.5)  # lat_min, lat_max, lon_min, lon_max (sanity check)
 
 
@@ -343,83 +344,194 @@ def write_log(locs: list[dict], path: Path, meta: dict) -> None:
     path.write_text("\n".join(lines) + "\n")
 
 
-def build_all_nodes(points: pd.DataFrame, unit_map: pd.DataFrame, plants: pd.DataFrame, gens: pd.DataFrame, overrides: dict) -> list[dict]:
-    """Phase 12: place every resource node in the ERCOT list with the same rules as ``build``.
+def build_all_nodes(points: pd.DataFrame, unit_map: pd.DataFrame, plants: pd.DataFrame, gens: pd.DataFrame, overrides: dict,
+                    extra: dict | None = None) -> list[dict]:
+    """Phase 12: place every resource node in the ERCOT list.
 
-    Compact records (no unit lists) for results/node_locations.json, which
-    scripts/run_all_nodes.py merges into the all-node results.
+    Stages, first match wins: EIA-860 annual LMP node, hand overrides, EIA-860 annual name rules
+    (all three in ``match_node``), then, when ``extra`` holds them, EIA-860M monthly name rules and
+    the ERCOT GIS queue (county-level). See scripts/geocode_extra.py.
     """
+    from scripts.geocode_extra import match_eia860m, match_gis
+
+    extra = extra or {}
     nodes = points.dropna(subset=["RESOURCE_NODE"]).drop_duplicates("RESOURCE_NODE")
     units_by = {k: list(zip(g["UNIT_SUBSTATION"], g["UNIT_NAME"])) for k, g in unit_map.groupby("RESOURCE_NODE")}
+    buses_by = {k: set(pd.to_numeric(g["PSSE_BUS_NUMBER"], errors="coerce").dropna().astype(int)) for k, g in points.groupby("SUBSTATION")}
     out = []
     for i, row in enumerate(nodes.sort_values("RESOURCE_NODE").itertuples(), 1):
-        code = row.RESOURCE_NODE
-        res = match_node(code, units_by.get(code, []), plants, gens, overrides)
-        rec = {"code": code, "load_zone": row.SETTLEMENT_LOAD_ZONE, "substation": row.SUBSTATION}
-        if res["status"] == "matched":
-            rec |= {"lat": res["lat"], "lon": res["lon"], "method": res["method"], "confidence": res["confidence"],
-                    "plant": "; ".join(f"{p['eia_plant_name']} ({p['county']})" for p in res["plants"]), "evidence": res["evidence"]}
+        code, units = row.RESOURCE_NODE, units_by.get(row.RESOURCE_NODE, [])
+        res = match_node(code, units, plants, gens, overrides)
+        reasons = [f"EIA-860: {res.get('reason')}"] if res["status"] != "matched" else []
+        if res["status"] != "matched" and "m_plants" in extra:
+            res = match_eia860m(code, units, extra["m_plants"], extra["m_gens"])
+            if res["status"] != "matched":
+                reasons.append(f"EIA-860M: {res['reason']}")
+        if res["status"] != "matched" and "gis" in extra:
+            res = match_gis(code, row.SUBSTATION, units, extra["gis"], extra["centroids"], buses_by.get(row.SUBSTATION))
+            if res["status"] != "matched":
+                reasons.append(f"GIS queue: {res['reason']}")
+        rec = {"code": code, "load_zone": row.SETTLEMENT_LOAD_ZONE, "substation": row.SUBSTATION,
+               "units": [f"{s}_{u}" for s, u in units]}
+        if res["status"] == "matched" and res["method"] != "gis_queue_county" and "gis" in extra:
+            # Cross-check plant-level placements against the GIS queue county (validates both sources).
+            chk = match_gis(code, row.SUBSTATION, units, extra["gis"], extra["centroids"], buses_by.get(row.SUBSTATION))
+            plant_counties = sorted({str(p["county"]).title() for p in res["plants"]})
+            rec_check = None if chk["status"] != "matched" else {
+                "gis_county": chk["county"], "plant_counties": plant_counties, "agrees": chk["county"] in plant_counties}
         else:
-            rec |= {"lat": None, "lon": None, "method": None, "confidence": None, "plant": None, "evidence": res["reason"]}
+            rec_check = None
+        rec["check"] = rec_check
+        if rec_check and not rec_check["agrees"]:
+            glat, glon = extra["centroids"][rec_check["gis_county"]]
+            km = haversine_km(res["lat"], res["lon"], glat, glon)
+            rec_check["km"] = round(km)
+            if km > CONFLICT_KM:
+                # Two public sources put the node far apart: neither is trusted, the node is left unplaced.
+                res = {"status": "unmatched", "reason": f"conflict: {res['method']} placed it at {', '.join(p['eia_plant_name'] for p in res['plants'])} "
+                       f"({', '.join(rec_check['plant_counties'])} County) but the GIS queue puts it in {rec_check['gis_county']} County, {km:.0f} km away"}
+        if res["status"] == "matched":
+            county_level = res["method"] == "gis_queue_county"
+            plant = None if county_level else "; ".join(f"{p['eia_plant_name']} ({p['county']})" for p in res["plants"])
+            rec |= {"lat": res["lat"], "lon": res["lon"], "method": res["method"], "confidence": res["confidence"],
+                    "precision": "county" if county_level else "plant", "county": res.get("county"),
+                    "plant": plant, "evidence": res["evidence"]}
+        else:
+            rec |= {"lat": None, "lon": None, "method": None, "confidence": None, "precision": None, "county": None,
+                    "plant": None, "evidence": " | ".join(reasons)}
         out.append(rec)
         if i % 100 == 0:
             log.info("geocoded %d / %d nodes", i, len(nodes))
     return out
 
 
-def write_all_nodes_log(recs: list[dict], path: Path, meta: dict, ran: set[str] | None) -> None:
-    def rate(rs: list[dict]) -> str:
-        n = sum(r["lat"] is not None for r in rs)
-        return f"{n} of {len(rs)} ({n / len(rs):.0%})" if rs else "0 of 0"
+METHOD_LABEL = {
+    "eia860_lmp_node": "EIA-860 LMP node ID (plant, high)",
+    "manual_review": "hand review (plant, reviewed)",
+    "name_match": "EIA-860 name rule (plant, medium)",
+    "eia860m_name_match": "EIA-860M name rule (plant, medium)",
+    "gis_queue_county": "ERCOT GIS queue (county-level)",
+}
 
-    by_method: dict[str, int] = {}
-    for r in recs:
-        by_method[r["method"] or "not geocoded"] = by_method.get(r["method"] or "not geocoded", 0) + 1
+
+def _rate(rs: list[dict], n: int | None = None) -> str:
+    n = len(rs) if n is None else n
+    k = sum(r["lat"] is not None for r in rs)
+    return f"{k} of {n} ({k / n:.0%})" if n else "0 of 0"
+
+
+def write_all_nodes_log(recs: list[dict], path: Path, meta: dict, run: list[dict] | None) -> None:
+    by_code = {r["code"]: r for r in recs}
     lines = [
         "# Geocoding log, all resource nodes (Phase 12)",
         "",
-        "Generated by `python -m scripts.build_locations --all-nodes`, with the same rules as the Phase 11 log",
-        "(`geocoding_log.md`): coordinates are only ever copied from an EIA-860 plant record; nothing is estimated.",
+        "Generated by `python -m scripts.build_locations --all-nodes`. Coordinates are only ever copied from a public record:",
+        "an EIA-860 or EIA-860M plant row (plant-level) or, for ERCOT GIS queue matches, a Census county internal point",
+        "(county-level: shows the county, not the site). Nothing is estimated. Stages, first match wins:",
         "",
-        f"Sources: ERCOT Settlement Points List and Electrical Buses Mapping (`{meta['ercot_doc']}`, published {meta['ercot_publish_date']}); "
-        f"EIA-860 {EIA_YEAR} plant file.",
+        "1. EIA-860 annual: the node or its ERCOT resource name is the plant's 'RTO/ISO LMP Node Designation'.",
+        "2. Hand review: `scripts/location_overrides.json`.",
+        "3. EIA-860 annual name rules (prefix / word abbreviation, battery check, matches within 5 km).",
+        f"4. EIA-860M monthly ({meta.get('eia860m', 'n/a')}) name rules, same tests, for plants too new for the annual file.",
+        f"5. ERCOT GIS interconnection queue ({meta.get('gis_reports', 'n/a')} monthly reports pooled): project name rule or",
+        "   substation = POI; all matches in one county; drawn at that county's Census Gazetteer internal point.",
         "",
-        f"**Match rate: {rate(recs)} resource nodes in the ERCOT list placed.**",
+        f"Sources: ERCOT Settlement Points List (`{meta['ercot_doc']}`, published {meta['ercot_publish_date']}); EIA-860 {EIA_YEAR}; "
+        f"EIA-860M {meta.get('eia860m', 'n/a')}; ERCOT GIS reports; Census Gazetteer {meta.get('gazetteer', 'n/a')}.",
+        "",
+        f"**All {len(recs)} resource nodes in the ERCOT list: {_rate(recs)} placed "
+        f"({sum(r['precision'] == 'plant' for r in recs)} plant-level, {sum(r['precision'] == 'county' for r in recs)} county-level).**",
     ]
-    if ran is not None:
-        in_list = [r for r in recs if r["code"] in ran]
-        placed = sum(r["lat"] is not None for r in in_list)
-        gone = len(ran) - len(in_list)
-        lines.append(f"**Of the {len(ran)} nodes with complete data in the all-node run: {placed} placed ({placed / len(ran):.0%})"
-                     + (f"; {gone} no longer in the ERCOT list, so not geocoded" if gone else "") + ".**")
-    lines += ["", "| Method | Nodes |", "|---|---|"] + [f"| {k} | {v} |" for k, v in sorted(by_method.items(), key=lambda kv: -kv[1])]
-    lines += ["", "## Placed", "", "| Node | Substation | Load zone | Method | Confidence | EIA plant (county) | Lat, lon |", "|---|---|---|---|---|---|---|"]
+    if run:
+        rr = [by_code.get(n["code"], {"lat": None, "precision": None}) for n in run]
+        top = rr[:20]
+        lines += [
+            f"**The {len(run)} nodes with complete data in the all-node run: {_rate(rr)} placed "
+            f"({sum(r['precision'] == 'plant' for r in rr)} plant-level, {sum(r['precision'] == 'county' for r in rr)} county-level).**",
+            f"**Top 20 by $/kW-yr: {_rate(top)} placed ({sum(r['precision'] == 'plant' for r in top)} plant-level, "
+            f"{sum(r['precision'] == 'county' for r in top)} county-level).**",
+        ]
+    counts: dict[str, int] = {}
+    for r in recs:
+        counts[r["method"] or "not placed"] = counts.get(r["method"] or "not placed", 0) + 1
+    lines += ["", "| Stage | Nodes |", "|---|---|"]
+    lines += [f"| {METHOD_LABEL.get(k, k)} | {counts[k]} |" for k in [*METHOD_LABEL, "not placed"] if k in counts]
+    lines += ["", "## Placed", "", "| Node | Substation | Load zone | Stage | Precision | Plant (county) or county | Lat, lon |", "|---|---|---|---|---|---|---|"]
     for r in recs:
         if r["lat"] is not None:
-            lines.append(f"| `{r['code']}` | {r['substation']} | {r['load_zone']} | {r['method']} | {r['confidence']} | {r['plant']} | {r['lat']}, {r['lon']} |")
-    lines += ["", "## Not geocoded", "", "| Node | Substation | Load zone | Reason |", "|---|---|---|---|"]
-    for r in recs:
-        if r["lat"] is None:
-            lines.append(f"| `{r['code']}` | {r['substation']} | {r['load_zone']} | {r['evidence']} |")
+            where = r["plant"] or f"{r['county']} County"
+            lines.append(f"| `{r['code']}` | {r['substation']} | {r['load_zone']} | {r['method']} | {r['precision']} | {where} | {r['lat']}, {r['lon']} |")
+    lines += ["", "### Evidence", ""]
+    lines += [f"- `{r['code']}`: {r['evidence']}" for r in recs if r["lat"] is not None]
+    checked = [r for r in recs if r.get("check")]
+    disagree = [r for r in checked if not r["check"]["agrees"]]
+    lines += ["", "## Cross-check: plant-level placements vs the GIS queue county", "",
+              f"For {len(checked)} plant-level nodes the GIS queue rule also finds a county; it agrees with the EIA plant's county for "
+              f"{len(checked) - len(disagree)} ({(len(checked) - len(disagree)) / max(len(checked), 1):.0%}). Disagreements are listed for hand review: "
+              "either the EIA name match or the queue match is wrong, or the project spans a county line.", "",
+              f"Where the two are more than {CONFLICT_KM:.0f} km apart the node is left unplaced.", "",
+              "| Node | EIA plant county | GIS queue county | Distance | Result |", "|---|---|---|---|---|"]
+    lines += [f"| `{r['code']}` | {', '.join(r['check']['plant_counties'])} | {r['check']['gis_county']} | {r['check']['km']} km | "
+              f"{'unplaced (conflict)' if r['lat'] is None else 'kept, plant-level'} |" for r in disagree]
+    lines += ["", "## Not placed", "", "| Node | Substation | Load zone | Why not |", "|---|---|---|---|"]
+    lines += [f"| `{r['code']}` | {r['substation']} | {r['load_zone']} | {r['evidence']} |" for r in recs if r["lat"] is None]
+    path.write_text("\n".join(lines) + "\n")
+
+
+def write_review_list(recs: list[dict], run: list[dict], path: Path, n: int = 50) -> None:
+    """The n highest-earning nodes that no stage placed, for hand review into location_overrides.json."""
+    by_code = {r["code"]: r for r in recs}
+    todo = [(node, by_code.get(node["code"])) for node in run if (by_code.get(node["code"]) or {}).get("lat") is None][:n]
+    lines = [
+        f"# Hand review: top {len(todo)} unplaced nodes by $/kW-yr",
+        "",
+        "Nodes from `results/nodes_2025_2h.json` (2-hour, 2025) that no automatic stage could place, highest revenue first.",
+        "To place one, find its plant in EIA-860 or EIA-860M and add an entry to `scripts/location_overrides.json`",
+        "(`eia_plant_code`, exact `eia_plant_name`, `evidence`, `source`), then rerun",
+        "`python -m scripts.build_locations --all-nodes` and `python -m scripts.run_all_nodes --remerge`.",
+        "The override must name an EIA-860 annual plant; coordinates are still copied from EIA, never typed in.",
+        "",
+        "| Rank | Node | $/kW-yr | Load zone | Substation | ERCOT units | Why the rules failed |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for node, rec in todo:
+        rec = rec or {"substation": node.get("sub"), "units": [], "evidence": "not in the current ERCOT settlement point list"}
+        units = ", ".join(rec.get("units") or []) or "–"
+        lines.append(f"| {node['rank']} | `{node['code']}` | {node['rev']:.1f} | {node.get('lz') or '–'} | {rec.get('substation') or '–'} | {units} | {rec['evidence']} |")
     path.write_text("\n".join(lines) + "\n")
 
 
 def main_all_nodes(refresh: bool) -> None:
+    from scripts.geocode_extra import county_points, fetch_eia860m, fetch_gis_reports, read_eia860m, read_gis
+
     overrides = {k: v for k, v in json.loads(OVERRIDES_JSON.read_text()).items() if not k.startswith("_")}
     ercot_blob, doc = fetch_ercot(refresh)
     points, unit_map = read_ercot(ercot_blob)
     plants, gens = read_eia(fetch_eia(refresh))
-    recs = build_all_nodes(points, unit_map, plants, gens, overrides)
-    meta = {"ercot_doc": doc["name"], "ercot_publish_date": doc["publish_date"], "eia_year": EIA_YEAR,
-            "n_nodes": len(recs), "n_nodes_geocoded": sum(r["lat"] is not None for r in recs)}
-    slim = [{k: r[k] for k in ("code", "load_zone", "substation", "lat", "lon", "method", "confidence")} for r in recs]
+    m_path, m_label = fetch_eia860m(refresh)
+    m_plants, m_gens = read_eia860m(m_path)
+    reports = fetch_gis_reports(refresh)
+    gis = read_gis(reports)
+    centroids, gaz = county_points(refresh)
+    log.info("EIA-860M %s: %d ERCOT plants; GIS: %d projects from %d reports", m_label, len(m_plants), len(gis), len(reports))
+    recs = build_all_nodes(points, unit_map, plants, gens, overrides,
+                           {"m_plants": m_plants, "m_gens": m_gens, "gis": gis, "centroids": centroids})
+    meta = {"ercot_doc": doc["name"], "ercot_publish_date": doc["publish_date"], "eia_year": EIA_YEAR, "eia860m": m_label,
+            "gis_reports": len(reports), "gis_report_names": [r[0] for r in reports], "gazetteer": gaz,
+            "n_nodes": len(recs), "n_nodes_geocoded": sum(r["lat"] is not None for r in recs),
+            "n_nodes_county_level": sum(r["precision"] == "county" for r in recs),
+            "gis_crosscheck": {"checked": sum(bool(r.get("check")) for r in recs),
+                               "agree": sum(bool(r.get("check")) and r["check"]["agrees"] for r in recs)}}
+    slim = [{k: r[k] for k in ("code", "load_zone", "substation", "lat", "lon", "method", "confidence", "precision", "county")} for r in recs]
     (RESULTS / "node_locations.json").write_text(json.dumps({"meta": meta, "nodes": slim}, separators=(",", ":")) + "\n")
-    ran = None
+    run = None
     runs = sorted(RESULTS.glob("nodes_*_*h.json"))
     if runs:
-        ran = {n["code"] for n in json.loads(runs[-1].read_text())["nodes"]}
-    write_all_nodes_log(recs, RESULTS / "geocoding_log_all_nodes.md", meta, ran)
-    log.info("wrote results/node_locations.json: %d of %d resource nodes placed", meta["n_nodes_geocoded"], meta["n_nodes"])
+        run = sorted(json.loads(runs[-1].read_text())["nodes"], key=lambda n: n["rank"])
+    write_all_nodes_log(recs, RESULTS / "geocoding_log_all_nodes.md", meta, run)
+    if run:
+        write_review_list(recs, run, RESULTS / "geocoding_review_top50.md")
+    log.info("wrote results/node_locations.json: %d of %d placed (%d county-level)", meta["n_nodes_geocoded"], meta["n_nodes"], meta["n_nodes_county_level"])
 
 
 def main() -> None:

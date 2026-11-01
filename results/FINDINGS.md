@@ -226,7 +226,7 @@ schedules on day-ahead prices fell by a larger share (27–41%) than the perfect
 **Setup.** One standard configuration: 2-hour battery, 85% round-trip efficiency, $10/MWh degradation, 2025, the same daily
 LP as the detailed runs (perfect foresight, plus the DA-scheduled / RT-settled strategy). ERCOT priced 776 resource nodes
 during 2025; 642 have complete data (both strategies solve all 365 days). The other 134 have less than 99% of the year's RT
-intervals, mostly nodes that came online or retired during the year. Results are in `results/nodes_2025_2h.json` (summary
+intervals (see the completeness note below). Results are in `results/nodes_2025_2h.json` (summary
 metrics and monthly revenue only); print these tables with `python -m scripts.node_findings`.
 
 **Check against the detailed runs.** The five detailed nodes reproduce their existing results exactly (e.g. RHESS2_ESS1
@@ -234,6 +234,14 @@ $179.18, RUSSEKST_RN $175.95). The hubs come out 0.8–1.6% higher than the deta
 HB_HOUSTON), because the bulk files are prices as posted while the detailed hub runs use the annual archive, which
 includes later corrections (27 of 35,040 HB_HOUSTON intervals differ). Ratios below use the bulk hub figures so node and
 hub are on identical data.
+
+**Every ratio in this section uses bulk hub prices.** Each node-vs-hub ratio here, in the Map page's Top nodes table and in
+its all-node side panel divides by hub revenue from the same bulk files and the same pipeline as the node (checked in
+`scripts/run_all_nodes.py`, `scripts/node_findings.py` and the web code), so none of the numbers below change. One place
+did mix sources: in heat mode, clicking one of the 5 detailed nodes opened the detailed panel, which divides by the
+archive-based hub runs (RHESS2_ESS1 showed 4.5× there against 4.46× in the table). Heat mode now uses the all-node panel
+for every resource node. Finding 6 keeps archive hubs on purpose (it compares the detailed runs), which is why it gives
+RHESS2_ESS1 4.54× in 2025 and this section 4.46×.
 
 **Distribution of node revenue vs its hub** (hub = trading hub of the node's settlement load zone; HB_HOUSTON $40.1,
 HB_NORTH $43.8, HB_SOUTH $40.1, HB_WEST $49.1, HB_PAN $47.1 per kW-yr):
@@ -304,11 +312,64 @@ about 17 distinct locations. Even the 20th node earns 1.9× its hub, but with a 
 except RHESS2_ESS1 and NF_BRP_RN earns $39–59/kW-yr, about what the hubs earn with perfect foresight ($40–49). Most of
 the node premium needs RT foresight to capture.
 
-**Caveats.** One year and one configuration; the 2025 ranking is not a forecast (finding 6 shows CAMWIND_RN's edge
-moving between years). Prices are as first posted, without ERCOT's later corrections, which matters most for the extreme
-spikes behind RHESS2_ESS1 and NF_BRP_RN (top-10-day shares of 64% and 56%). Only 226 of the 642 nodes (35%) could be
-placed on the map from EIA-860 plant records (7 of the top 20); the rest are in the Map page's table but have no marker.
-Coordinates are never guessed (`results/geocoding_log_all_nodes.md`).
+**Does the premium last? Top 20 in 2024 vs 2025.** Same configuration and the same bulk source for 2024
+(`results/nodes_2024_2h.json`: 561 complete nodes; 2024 hubs $54–66/kW-yr). The 2024 run reproduces the detailed 2024
+results exactly for the 4 detailed nodes it covers, and the hubs within 0.25%. "Premium" means at least 1.5× the node's own
+hub. Nodes without a complete 2024 are compared with their hub over the days they do have.
+
+| # | Node | Load zone | 2025 $/kW-yr | 2025 ÷ hub | Top-10 share 2025 | 2024 $/kW-yr | 2024 ÷ hub | Top-10 share 2024 | Flag |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | RHESS2_ESS1 | LZ_SOUTH | 179.2 | 4.46× | 64% | 107.3 | 1.90× | 46% | both years |
+| 2 | RUSSEKST_RN | LZ_WEST | 176.0 | 3.58× | 15% | partial¹ | 2.43× | – | both years |
+| 3 | JUNCTION_RN | LZ_SOUTH | 122.0 | 3.04× | 28% | 150.7 | 2.66× | 25% | both years |
+| 4 | JUNORTH_RN | LZ_SOUTH | 121.9 | 3.04× | 28% | partial² | 5.02× | – | both years (short 2024) |
+| 5 | APPALOSA_ALL | LZ_WEST | 117.0 | 2.38× | 14% | 122.1 | 1.86× | 22% | both years |
+| 6 | GUNMTN_NODE | LZ_WEST | 111.6 | 2.27× | 13% | 95.5 | 1.46× | 27% | weaker in 2024 |
+| 7 | NF_BRP_RN | LZ_SOUTH | 110.6 | 2.75× | 56% | 81.6 | 1.44× | 37% | weaker in 2024 |
+| 8 | FERMI_ALL | LZ_SOUTH | 100.7 | 2.51× | 20% | 102.3 | 1.81× | 25% | both years |
+| 9 | ALP_BESS_RN | LZ_WEST | 94.6 | 1.93× | 17% | partial³ | 1.60× | – | both years |
+| 10 | LAMESASLR_G | LZ_WEST | 94.6 | 1.93× | 17% | 97.7 | 1.49× | 26% | weaker in 2024 |
+| 11 | AMISTAD_ALL | LZ_SOUTH | 90.7 | 2.26× | 25% | 98.8 | 1.75× | 28% | both years |
+| 12 | HAMI_BESS_RN | LZ_SOUTH | 90.6 | 2.26× | 25% | 98.8 | 1.75× | 28% | both years |
+| 13 | POTSVIL_RN | LZ_NORTH | 89.5 | 2.04× | 26% | 69.8 | 1.24× | 38% | **2025 only** |
+| 14 | CATARINA_B1 | LZ_SOUTH | 85.1 | 2.12× | 15% | 129.4 | 2.29× | 31% | both years |
+| 15 | SGM_SIGNALMT | LZ_WEST | 84.9 | 1.73× | 21% | 98.0 | 1.49× | 28% | weaker in 2024 |
+| 16 | JUNG_SLR_RN | LZ_NORTH | 84.8 | 1.93× | 44% | – | – | – | **no 2024 data** (28 days) |
+| 17 | CFLATS_UNIT | LZ_WEST | 84.7 | 1.73× | 21% | 112.1 | 1.71× | 25% | both years |
+| 18 | JDKNS_RN | LZ_WEST | 81.7 | 1.66× | 22% | 91.5 | 1.39× | 27% | weaker in 2024 |
+| 19 | CARBN_BSP_1 | LZ_WEST | 81.5 | 1.66× | 21% | 92.7 | 1.41× | 29% | weaker in 2024 |
+| 20 | HOLCOMB_RN1 | LZ_SOUTH | 77.5 | 1.93× | 13% | 105.2 | 1.86× | 35% | both years |
+
+¹ 363 days (no ERCOT prices Jan 1–3, 2024): $158.7 vs hub $65.3/kW. ² 118 days from September 2024: $66.2 vs hub
+$13.2/kW, a quiet season, so the ratio is inflated. ³ 245 days: $69.7 vs hub $43.6/kW.
+
+- **12 of the top 20 earned at least 1.5× their hub in 2024 too**, and 6 more earned 1.39–1.49× (flagged "weaker in
+  2024"): the location premium mostly persists, though usually smaller in 2024. 2024 dollars are higher across the
+  board because hub revenue was higher.
+- **Flagged: POTSVIL_RN** earned 2.04× its hub in 2025 but only 1.24× in 2024, so its premium shows in one year only.
+  **JUNG_SLR_RN** has no usable 2024 history (28 days); its 2025 rank rests on one year, with 44% of revenue from 10 days.
+- **The top-10-day share separates spike nodes from steady ones.** RHESS2_ESS1 (64%), NF_BRP_RN (56%) and JUNG_SLR_RN
+  (44%) depend on a few days. RUSSEKST_RN, APPALOSA_ALL, GUNMTN_NODE and HOLCOMB_RN1 (13–15%) earn their premium steadily
+  through the year, which is the more durable kind.
+
+**Completeness rule: the newest nodes, many of them batteries, are left out.** A node needs at least 99% of the year's RT
+intervals. Of the 134 resource nodes this drops in 2025, 130 first appear partway through the year (median coverage half
+the year; starts spread from January to December) and 4 retired. 80 of the 130 late starters are batteries (an ESR/ESS/BESS
+unit or node name), 62% against 30% among the 642 nodes kept. So section 9 describes the 2025 fleet as it stood at the start
+of the year, and leaves out much of the storage built during it. A partial-year comparison (as in the table above) could
+add them later.
+
+**Where the nodes are on the map.** 296 of the 642 nodes (46%) are now placed, up from 226 (35%): 225 at their EIA plant
+and 71 only to a county, from the ERCOT interconnection queue (shown as rings at the county's centre, labelled
+county-level). EIA-860M (September 2026) added no new plant-level matches: the EIA-860 2025 file already includes proposed
+plants, and the 9 ERCOT plants new in 860M match no unplaced node. Of the top 20, 9 are placed (7 plant-level,
+2 county-level). Checked against the 98 plant-placed nodes the queue also finds, the queue's county agrees 86% of the time,
+and every disagreement but one is a neighbouring county. The exception, CANYONWD_ALL (EIA name match in Comal County, queue
+in Scurry County, 411 km apart), is now left unplaced. The 50 highest-earning unplaced nodes are listed for hand review in
+`results/geocoding_review_top50.md`. Details: `results/geocoding_log_all_nodes.md`.
+
+**Caveats.** One configuration; two years are not a forecast. Prices are as first posted, without ERCOT's later
+corrections, which matters most for the extreme spikes behind RHESS2_ESS1 and NF_BRP_RN. Coordinates are never guessed.
 
 ## Validation against published benchmarks
 Real ERCOT battery revenue from Modo Energy's ERCOT BESS Index covers **all** revenue
@@ -333,6 +394,8 @@ Sources:
 ## Not done yet
 - **More nodes:** the 5 detailed nodes are a sample; section 9 covers every node, but only for one configuration and
   one year, and with summary metrics only.
-- **Geocoding:** 35% of nodes can be placed from EIA-860; more need hand review (`scripts/location_overrides.json`).
+- **Geocoding:** 46% of nodes are placed (11% only to a county); the top-50 unplaced list awaits hand review
+  (`results/geocoding_review_top50.md` → `scripts/location_overrides.json`).
+- **Mid-year nodes:** 130 nodes that started during 2025 (80 of them batteries) are not in section 9.
 - **Load zones:** excluded because the archive mixes two conflicting series (see README).
 - **Ancillary services:** still not modeled (PLAN.md Phase 8c). They matter most for judging RTC+B.

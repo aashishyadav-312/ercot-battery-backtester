@@ -1,5 +1,10 @@
 name: Refresh current-year results
 
+# Refreshes the 10 detailed locations only. The all-node run (data/fetch_all_nodes.py,
+# scripts/run_all_nodes.py -> results/nodes_{year}_2h.json) is deliberately NOT part of this
+# workflow: it downloads ~35,000 ERCOT archive files (~30 min, often refused from GitHub runner
+# IPs) and covers complete years only. It is a yearly local job; see README "All resource nodes".
+
 on:
   schedule:
     - cron: "17 6 3 * *" # 06:17 UTC on the 3rd of each month
