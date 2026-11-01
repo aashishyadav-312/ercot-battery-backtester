@@ -64,6 +64,62 @@
   "quantile_scale": {
    "term": "Quantile colour scale",
    "definition": "Nodes are sorted by $/kW-yr and split into classes holding about the same number of nodes each, so every colour is used equally. Class edges are uneven in dollars because a few nodes earn far more than the rest."
+  },
+  "installed_cost": {
+   "term": "Installed cost ($/kWh)",
+   "definition": "All-in upfront cost to build the battery, per kWh of energy capacity: cells, inverters, civil work, interconnection and development. A 2-hour battery at $300/kWh costs $600 per kW of power. Quotes vary widely by year and scope, so treat the default as a placeholder."
+  },
+  "fixed_om": {
+   "term": "Fixed O&M ($/kW-yr)",
+   "definition": "Yearly operations and maintenance cost that does not depend on how much the battery runs: monitoring, site upkeep, insurance, warranty and service contracts. Per kW of power capacity."
+  },
+  "augmentation": {
+   "term": "Augmentation",
+   "definition": "Cells fade with use, so owners often add battery modules part-way through the project to restore capacity. Modeled here as one payment, in dollars per kWh of energy capacity, at the end of the year you choose."
+  },
+  "project_life": {
+   "term": "Project life",
+   "definition": "Years of operation counted in the cash flows. Nothing is earned after this, and no resale value is assumed."
+  },
+  "discount_rate": {
+   "term": "Discount rate",
+   "definition": "The yearly return you require; future dollars are shrunk by it to get today's value. Higher rates punish projects that earn their money late. Real (no inflation) terms, matching the model."
+  },
+  "itc": {
+   "term": "Investment tax credit",
+   "definition": "A share of the installed cost returned through the tax system. It is your input: this site does not encode any tax law, and eligibility, rate and timing depend on the project. Modeled as a reduction of the year-0 outlay."
+  },
+  "revenue_haircut": {
+   "term": "Revenue haircut",
+   "definition": "A cut applied to the modeled revenue to move away from perfect foresight toward what an operator might actually earn (forecast error, outages, bidding limits, unmodeled costs). 30% means you keep 70% of the modeled revenue."
+  },
+  "revenue_decline": {
+   "term": "Annual revenue decline",
+   "definition": "How much revenue shrinks each year, as a percentage of the prior year. It stands in for price spreads narrowing as more batteries arrive, plus capacity fade. 3% a year compounds to about 46% lower by year 20."
+  },
+  "npv": {
+   "term": "Net present value (NPV)",
+   "definition": "Every year's cash flow shrunk to today's dollars at the discount rate, then added up, minus the upfront cost. Above zero means the project earns more than the required return. Shown per kW of power capacity."
+  },
+  "irr": {
+   "term": "Internal rate of return (IRR)",
+   "definition": "The discount rate at which NPV is exactly zero: the project's own yearly return. Compare it with your required return. Shown as 'none' when the project never earns back its cost."
+  },
+  "payback": {
+   "term": "Simple payback",
+   "definition": "Years until cumulative cash flow, with no discounting, gets back the upfront cost. Ignores everything after that point and ignores the time value of money."
+  },
+  "lcos": {
+   "term": "Levelized cost of storage (LCOS)",
+   "definition": "The break-even price: all lifetime costs (upfront, O&M, augmentation) in today's dollars divided by the MWh the battery discharges, also in discounted terms. Charging electricity is not included because the revenue is already net of it."
+  },
+  "breakeven_capex": {
+   "term": "Breakeven capex",
+   "definition": "The installed cost per kWh at which NPV is exactly zero, holding every other input fixed. If real quotes are below it, the project clears your required return under these assumptions."
+  },
+  "tornado": {
+   "term": "Sensitivity (tornado) chart",
+   "definition": "Each input is moved down and up by a fixed step while the rest stay put, and the bar shows how far NPV moves. Longest bars are the inputs that matter most. It does not show combinations of changes."
   }
  }
 }

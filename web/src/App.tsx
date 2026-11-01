@@ -5,7 +5,7 @@ import {
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconAbout, IconBattery, IconCompare, IconDispatch, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
+import { IconAbout, IconBattery, IconCompare, IconDispatch, IconEconomics, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
 import Start from './pages/Start';
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
@@ -13,6 +13,7 @@ import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
 import Compare from './pages/Compare';
 import Realism from './pages/Realism';
+import Economics from './pages/Economics';
 import Method from './pages/Method';
 import About from './pages/About';
 import { SiteFooter } from './components/SiteFooter';
@@ -28,6 +29,7 @@ const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'dispatch', label: 'Dispatch', icon: IconDispatch },
   { page: 'compare', label: 'Compare', icon: IconCompare },
   { page: 'realism', label: 'Realism', icon: IconRealism },
+  { page: 'economics', label: 'Economics', icon: IconEconomics },
   { page: 'method', label: 'Method', icon: IconMethod },
   { page: 'about', label: 'About', icon: IconAbout },
 ];
@@ -75,7 +77,7 @@ export default function App() {
     try { (window as unknown as { goatcounter?: { count: (o: object) => void } }).goatcounter?.count({ path: `/${page}`, title: document.title }); } catch { /* blocked */ }
   }, [page]);
 
-  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method, about: About }[page];
+  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, economics: Economics, method: Method, about: About }[page];
   return (
     <AppShell
       header={{ height: 60 }}
