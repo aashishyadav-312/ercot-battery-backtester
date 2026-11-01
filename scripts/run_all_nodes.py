@@ -127,6 +127,29 @@ def check_parity(rows: list[dict], year: int, hours: float, rte: float, deg: flo
     return out
 
 
+def location_fields(code: str, locs: dict) -> dict:
+    """Load zone, hub and map position for a node from results/node_locations.json.
+    prec is "plant" (EIA plant coordinates) or "county" (GIS queue match, drawn at the county's Census point)."""
+    loc = locs.get(code, {})
+    zone = loc.get("load_zone")
+    return {"lz": zone, "hub": ZONE_HUB.get(zone), "sub": loc.get("substation"), "lat": loc.get("lat"), "lon": loc.get("lon"),
+            "geo": loc.get("method"), "prec": loc.get("precision"), "county": loc.get("county")}
+
+
+def remerge(path) -> None:
+    """Refresh only the location fields of an existing all-node file (after re-geocoding), without re-solving."""
+    doc = json.loads(path.read_text())
+    locs = _locations()
+    fields = list(location_fields("", {}).keys())
+    order = ["code", *fields]
+    doc["nodes"] = [{**{k: n[k] for k in ("code",)}, **location_fields(n["code"], locs),
+                     **{k: v for k, v in n.items() if k not in order}} for n in doc["nodes"]]
+    doc["meta"]["n_nodes_geocoded"] = sum(n["lat"] is not None for n in doc["nodes"])
+    doc["meta"]["n_nodes_county_level"] = sum(n["prec"] == "county" for n in doc["nodes"])
+    path.write_text(json.dumps(doc, separators=(",", ":")))
+    log.info("Re-merged locations into %s: %d placed (%d county-level)", path.name, doc["meta"]["n_nodes_geocoded"], doc["meta"]["n_nodes_county_level"])
+
+
 def _locations() -> dict:
     if not LOCATIONS_FILE.exists():
         log.warning("%s not found; nodes will have no coordinates or load zone", LOCATIONS_FILE.name)
@@ -142,8 +165,12 @@ def main() -> None:
     ap.add_argument("--deg-cost", type=float, default=10.0)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--limit", type=int, help="run only the first N nodes (for a quick test)")
+    ap.add_argument("--remerge", action="store_true", help="only refresh coordinates from results/node_locations.json (no solving)")
     args = ap.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    if args.remerge:
+        remerge(nodes_path(args.year, args.hours))
+        return
     t0 = time.monotonic()
 
     rt_all = fetch_year(args.year, "RT15")
@@ -197,18 +224,8 @@ def main() -> None:
         if not complete:
             excluded["days_skipped"].append(r["code"])
             continue
-        loc = locs.get(r["code"], {})
-        zone = loc.get("load_zone")
-        nodes_out.append({
-            "code": r["code"],
-            "lz": zone,
-            "hub": ZONE_HUB.get(zone),
-            "sub": loc.get("substation"),
-            "lat": loc.get("lat"),
-            "lon": loc.get("lon"),
-            "geo": loc.get("method"),
-            **{k: v for k, v in r.items() if k not in ("code", "skipped_pf", "skipped_da", "days_solved")},
-        })
+        nodes_out.append({"code": r["code"], **location_fields(r["code"], locs),
+                          **{k: v for k, v in r.items() if k not in ("code", "skipped_pf", "skipped_da", "days_solved")}})
     nodes_out.sort(key=lambda r: -r["rev"])
     for i, r in enumerate(nodes_out, 1):
         r["rank"] = i
@@ -231,6 +248,7 @@ def main() -> None:
         "n_nodes_in_data": len(nodes),
         "n_nodes": len(nodes_out),
         "n_nodes_geocoded": sum(r["lat"] is not None for r in nodes_out),
+        "n_nodes_county_level": sum(r["prec"] == "county" for r in nodes_out),
         "excluded_counts": {k: len(v) for k, v in excluded.items()},
         "excluded": excluded,
         "quantiles_rev": {f"p{q}": round(float(np.percentile(revs, q)), 2) for q in (10, 25, 50, 75, 90)} if len(revs) else {},
@@ -242,6 +260,8 @@ def main() -> None:
             "monthly": "PF revenue by month, $/kW", "monthly_da": "DA-scheduled revenue by month, $/kW",
             "lz": "ERCOT settlement load zone", "hub": "trading hub of that load zone", "sub": "substation",
             "geo": "how lat/lon were found (see results/geocoding_log_all_nodes.md)",
+            "prec": "plant: EIA plant coordinates; county: county-level, drawn at the county's Census internal point",
+            "county": "county for county-level placements",
         },
         "parity_with_detailed_runs": parity,
         "runtime_s": {"load_prices": round(t_load), "solve": round(t_solve), "total": round(time.monotonic() - t0)},

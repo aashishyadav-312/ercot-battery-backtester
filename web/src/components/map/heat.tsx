@@ -5,6 +5,7 @@ import { Info } from '../Info';
 import { heatColor, rampAt } from './scale';
 import { MONTHS, downloadCsv, pct, usd } from '../../data/format';
 import { locFull, zoneFull } from '../../data/site';
+import { useApp } from '../../state';
 import type { HubRec, NodeRec, NodesFile } from '../../data/types';
 
 /** "2-hour battery, 2025, 85% round-trip, $10/MWh degradation" for the all-node file. */
@@ -40,8 +41,14 @@ export function HeatLegend({ breaks, meta }: { breaks: number[]; meta: NodesFile
         <Group gap="md" wrap="wrap">
           <Group gap={6} wrap="nowrap">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill={rampAt(0.6, mode)} stroke={outline} /></svg>
-            <Text size="xs" c="dimmed">Resource node ({meta.n_nodes_geocoded} placed)</Text>
+            <Text size="xs" c="dimmed">Resource node at its plant ({meta.n_nodes_geocoded - (meta.n_nodes_county_level ?? 0)})</Text>
           </Group>
+          {!!meta.n_nodes_county_level && (
+            <Group gap={6} wrap="nowrap">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke={rampAt(0.6, mode)} strokeWidth="2" /></svg>
+              <Text size="xs" c="dimmed">County-level only, drawn at the county centre ({meta.n_nodes_county_level})</Text>
+            </Group>
+          )}
           <Group gap={6} wrap="nowrap">
             <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="6.5" fill={rampAt(0.6, mode)} stroke="var(--mantine-color-text)" strokeWidth="2" /></svg>
             <Text size="xs" c="dimmed">Detailed location (labelled; hubs are diamonds)</Text>
@@ -88,7 +95,8 @@ function MonthlySpark({ node }: { node: NodeRec | HubRec }) {
 }
 
 /** Side panel for a node that only has summary metrics (not one of the 10 detailed locations). */
-export function NodePanel({ node, data, onDetailed }: { node: NodeRec; data: NodesFile; onDetailed: (code: string) => void }) {
+export function NodePanel({ node, data, onDetailed, detailed }: { node: NodeRec; data: NodesFile; onDetailed: (code: string) => void; detailed?: boolean }) {
+  const { go } = useApp();
   const hub = data.hubs.find((h) => h.code === node.hub);
   const ratio = hub && hub.rev > 0 ? node.rev / hub.rev : null;
   const max = Math.max(node.rev, hub?.rev ?? 0, 1e-9);
@@ -137,11 +145,14 @@ export function NodePanel({ node, data, onDetailed }: { node: NodeRec; data: Nod
             </div>
           ))}
         </div>
+        {detailed && <Button variant="filled" onClick={() => go('overview', { location: node.code })}>Open full results in Overview</Button>}
         {node.hub && <Button variant="default" onClick={() => onDetailed(node.hub!)}>Open the {locFull(node.hub)} details</Button>}
         <Text size="xs" c="dimmed" lh={1.5}>
           {node.lat == null
-            ? 'Not placed on the map: no EIA-860 plant record could be matched to this node. Coordinates are never guessed.'
-            : `Marker at the EIA-860 plant matched to this node (${node.geo === 'eia860_lmp_node' ? 'EIA node ID, high confidence' : node.geo === 'manual_review' ? 'hand review' : 'name match, medium confidence'}).`}
+            ? 'Not placed on the map: no EIA plant or ERCOT queue record could be matched to this node. Coordinates are never guessed.'
+            : node.prec === 'county'
+              ? `County-level only: an ERCOT interconnection-queue record puts this node in ${node.county} County. The ring sits at the county’s centre, not at the site.`
+              : `Marker at the ${node.geo === 'eia860m_name_match' ? 'EIA-860M' : 'EIA-860'} plant matched to this node (${node.geo === 'eia860_lmp_node' ? 'EIA node ID, high confidence' : node.geo === 'manual_review' ? 'hand review' : 'name match, medium confidence'}).`}
         </Text>
       </Stack>
     </Paper>
@@ -190,8 +201,8 @@ export function TopNodesTable({ data, breaks, selected, onSelect }: { data: Node
   const click = (key: Key) => setSort((s) => (s.key === key ? { key, desc: !s.desc } : { key, desc: !['code', 'lz', 'rank'].includes(key) }));
   const csv = () => downloadCsv(
     `ercot_nodes_${data.meta.year}_${data.meta.duration_h}h.csv`,
-    ['rank', 'node', 'load_zone', 'hub', 'usd_per_kw_yr', 'vs_hub', 'da_scheduled_usd_per_kw_yr', 'capture_rate', 'top10_share', 'cycles', 'spread_usd_mwh', 'corr_hub', 'lat', 'lon'],
-    rows.map((r) => [r.rank, r.code, r.lz, r.hub, r.rev, vsHub(r)?.toFixed(3) ?? null, r.da_rev, r.capture, r.top10, r.cycles, r.spread, r.corr_hub, r.lat, r.lon]),
+    ['rank', 'node', 'load_zone', 'hub', 'usd_per_kw_yr', 'vs_hub', 'da_scheduled_usd_per_kw_yr', 'capture_rate', 'top10_share', 'cycles', 'spread_usd_mwh', 'corr_hub', 'lat', 'lon', 'position_precision', 'county'],
+    rows.map((r) => [r.rank, r.code, r.lz, r.hub, r.rev, vsHub(r)?.toFixed(3) ?? null, r.da_rev, r.capture, r.top10, r.cycles, r.spread, r.corr_hub, r.lat, r.lon, r.prec, r.county]),
   );
 
   return (
@@ -237,7 +248,7 @@ export function TopNodesTable({ data, breaks, selected, onSelect }: { data: Node
                         <span aria-hidden="true" style={{ width: 9, height: 9, borderRadius: 5, flex: 'none', background: heatColor(r.rev, breaks, mode), border: '1px solid var(--mantine-color-default-border)' }} />
                         <Text size="sm" fw={600} c="bright" ff="monospace">{r.code}</Text>
                       </Group>
-                      {r.lat == null && <Text size="xs" c="dimmed">not on map</Text>}
+                      {r.lat == null ? <Text size="xs" c="dimmed">not on map</Text> : r.prec === 'county' && <Text size="xs" c="dimmed">county-level ({r.county})</Text>}
                     </UnstyledButton>
                   </Table.Td>
                   <Table.Td><Text size="sm">{r.lz ?? '–'}</Text></Table.Td>

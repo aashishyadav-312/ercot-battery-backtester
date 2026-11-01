@@ -104,9 +104,14 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         emphasis: { scale: 1.6, focus: 'none' },
         data: heat.nodes.filter((n) => n.lat != null && n.lon != null && !detailed.has(n.code)).map((n) => {
           const on = n.code === heat.selected;
-          return {
+          const c = heatColor(n.rev, heat.breaks, t.mode);
+          // County-level placements are rings: the position is the county, not the site.
+          return n.prec === 'county' ? {
+            name: n.code, code: n.code, county: n.county, value: [n.lon, n.lat, n.rev, n.capture], symbol: 'circle', symbolSize: on ? 14 : 10, z: on ? 30 : 7,
+            itemStyle: { color: 'transparent', borderColor: on ? t.text : c, borderWidth: on ? 2.5 : 2, opacity: 0.95 },
+          } : {
             name: n.code, code: n.code, value: [n.lon, n.lat, n.rev, n.capture], symbolSize: on ? 13 : 8, z: on ? 30 : 8,
-            itemStyle: { color: heatColor(n.rev, heat.breaks, t.mode), borderColor: on ? t.text : t.surface, borderWidth: on ? 2.5 : 0.6, opacity: 0.95 },
+            itemStyle: { color: c, borderColor: on ? t.text : t.surface, borderWidth: on ? 2.5 : 0.6, opacity: 0.95 },
           };
         }),
       }] : [];
@@ -125,8 +130,10 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         tooltip: {
           ...tooltipBase(t),
           trigger: 'item',
-          formatter: (p: { seriesType?: string; name: string; value: (number | null)[] }) => 
-            p.seriesType === 'scatter' ? `<b>${p.name}</b><br/>${p.value[2] == null ? '–' : usd(p.value[2], 1)} per kW-yr` : '',
+          formatter: (p: { seriesType?: string; name: string; value: (number | null)[]; data?: { county?: string | null } }) =>
+            p.seriesType === 'scatter'
+              ? `<b>${p.name}</b><br/>${p.value[2] == null ? '–' : usd(p.value[2], 1)} per kW-yr${p.data?.county ? `<br/><i>County-level: somewhere in ${p.data.county} County</i>` : ''}`
+              : '',
         },
         geo: {
           map: MAP_NAME, roam: true, silent: true, scaleLimit: { min: 1, max: 14 }, aspectScale: 0.86, layoutCenter: ['50%', '52%'], layoutSize: '104%',
