@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -21,11 +21,16 @@ pytest
 ```
 data/fetch_prices.py   # gridstatus -> data/raw/*.parquet (gitignored)
 model/dispatch.py      # daily LP: optimize_day
+model/ancillary.py     # energy + AS capacity screen with shared power/SOC backing
+data/fetch_ancillary.py # cached hourly DA and settled 15-minute RT AS prices
 model/run_year.py      # loops days, saves results
 model/metrics.py       # $/kW-yr, top-10-day share, heatmap
 model/forecast.py      # schedule on DA prices, settle at RT (capture rate)
 scripts/build_locations.py  # results/locations.json + geocoding_log.md for the Map page (ERCOT settlement points + EIA-860 plant coordinates)
 scripts/run_grid.py    # batch run over locations x durations x years (PF + DA-scheduled)
+scripts/run_ancillary.py # separate strategy grid, checkpoints and AS-exposure sensitivity
+scripts/finalize_ancillary.py # normalize published AS detail files, stamp manifest metadata
+scripts/ancillary_findings.py # audit coverage, runtime, numerical bounds and period revenue
 scripts/add_da_schedule.py # add DA-scheduled fields to existing results without rerunning PF
 scripts/rtcb.py        # before vs after RTC+B over matched windows -> results/rtcb.json
 scripts/rank_nodes.py  # pick resource nodes by RT price volatility
@@ -50,6 +55,7 @@ python -m data.fetch_prices --location HB_HOUSTON --year 2025 --market RT15   # 
 - **Resource nodes** come from the ERCOT public API (RT: NP6-905-CD, DA: NP4-190-CD), filtered by settlement point and requested a month at a time (about 2 s apart, under the 30-per-minute limit). Set `ERCOT_API_USERNAME`, `ERCOT_API_PASSWORD` and `ERCOT_API_SUBSCRIPTION_KEY`. These are prices as first posted; the hub archives include later price corrections (a 0.1–0.3% revenue difference at HB_HOUSTON 2024).
 - **Picking nodes:** `python -m scripts.rank_nodes --year 2025 --month 8` ranks every resource node by RT price volatility in one month and writes `results/node_selection.json`. Then `python -m scripts.run_grid --hubs --nodes <nodes>` (an empty `--hubs` runs only the nodes and merges them into `results/index.json`), and `python -m scripts.compare_nodes` prints node vs hub over matched days.
 - **Load zones** (`LZ_*`) are excluded for now. The archives carry two price series per zone (load-weighted and energy-weighted) under the same label, and they disagree.
+- **Ancillary capacity screen:** [the Phase 14 method](docs/ANCILLARY_METHOD.md) documents the DA-to-RT price switch at RTC+B, reserve-duration assumptions, separate API energy baseline, and reproduction command. The new comparison uses actual period $/kW, with the energy-only strategy retained.
 - Timestamps are stored in UTC, with a US/Central copy. Single missing intervals are forward-filled; longer gaps stay empty.
 - ERCOT's website rate-limits bursts of requests (HTTP 403 from its bot protection). If that happens, wait a few minutes and rerun. Cached files are never downloaded again.
 

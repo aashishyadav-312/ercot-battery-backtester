@@ -16,7 +16,7 @@ export function SiteFooter() {
         <Anchor size="xs" component="button" onClick={() => go('about')}>About</Anchor>
       </Text>
       <Text size="xs" c="dimmed" lh={1.6} maw={820} mt={4} pb="lg">
-        An independent project, not affiliated with ERCOT or any company. Prices are ERCOT public data. Results are a modeled upper bound,
+        An independent project, not affiliated with ERCOT or any company. Prices are ERCOT public data. Results are illustrative models,
         not a forecast or investment advice.
       </Text>
     </footer>

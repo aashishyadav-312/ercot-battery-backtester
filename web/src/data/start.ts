@@ -78,8 +78,8 @@ export const LEFT_OUT: LeftOut[] = [
     body: 'Each day’s schedule is chosen knowing that day’s real prices. No real operator has that. The Realism page shows how much is kept when the schedule is set from day-ahead prices instead.',
   },
   {
-    title: 'Ancillary services', effect: 'Understates revenue',
-    body: 'Batteries are also paid to stand ready: regulation, reserves and similar products. For the real ERCOT fleet these were most of 2024 revenue (see Method). This model counts energy arbitrage only.',
+    title: 'Ancillary services in energy-only charts', effect: 'Understates revenue', term: 'ancillary_services',
+    body: 'The original energy-only charts exclude reserve payments. The separate Energy + AS comparison adds capacity reservation revenue, but activation energy, qualification, outages and penalties are still outside that screen. See Method for its assumptions.',
   },
   {
     title: 'Degradation', effect: 'Overstates revenue',

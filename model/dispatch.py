@@ -53,14 +53,16 @@ def _solve(prices, dt, power_mw, energy_mwh, eta, deg_cost, soc0, exclusive):
         prob += soc[t + 1] == soc[t] + c[t] * eta * dt - d[t] * (dt / eta)
         prob += c[t] + d[t] <= power_mw
 
+    # Match the ancillary solver's thread count: HiGHS shares its scheduler
+    # within a process, and process-parallel grids must not oversubscribe it.
     if exclusive:
         for t in np.flatnonzero(np.asarray(prices) <= 0):
             mode = prob.add_variable(f"m_{t}", cat="Binary")
             prob += c[t] <= power_mw * mode
             prob += d[t] <= power_mw * (1 - mode)
-        solver = pulp.HiGHS(msg=False, gapRel=_MILP_GAP, timeLimit=_MILP_TIME_LIMIT_S)
+        solver = pulp.HiGHS(msg=False, gapRel=_MILP_GAP, timeLimit=_MILP_TIME_LIMIT_S, threads=1)
     else:
-        solver = pulp.HiGHS(msg=False)
+        solver = pulp.HiGHS(msg=False, threads=1)
 
     result = prob.solve(solver)
     if hasattr(result, "status"):  # PuLP >= 4 (Python >= 3.12) returns a stats object
