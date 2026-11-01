@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApp, useRun } from './state';
-import { findRun, loadWalkthrough } from './data/loader';
+import { findRun, loadLocations, loadTexas, loadWalkthrough } from './data/loader';
 import type { Walkthrough } from './data/types';
 
 /** The run (index row + full JSON) for the current top-bar selection. While a new run loads, the previous one is kept (`stale`). */
@@ -25,3 +25,24 @@ export function useWalkthrough() {
   }, []);
   return state;
 }
+
+/** Load a cached JSON file once, with `data` / `error` state. */
+function useLoaded<T>(load: () => Promise<T>) {
+  const [state, setState] = useState<{ data?: T; error?: string }>({});
+  useEffect(() => {
+    let live = true;
+    load()
+      .then((data) => live && setState({ data }))
+      .catch((e) => live && setState({ error: String(e) }));
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return state;
+}
+
+/** Settlement points with coordinates for the Map page (results/locations.json). */
+export const useLocations = () => useLoaded(loadLocations);
+/** Texas outline and counties for the Map page; only fetched when the Map page opens. */
+export const useTexas = () => useLoaded(loadTexas);

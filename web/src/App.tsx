@@ -1,12 +1,13 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import {
   ActionIcon, AppShell, Badge, Burger, Group, NavLink, Skeleton, Stack, Text, Tooltip, useComputedColorScheme, useMantineColorScheme,
 } from '@mantine/core';
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconAbout, IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
+import { IconAbout, IconBattery, IconCompare, IconDispatch, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
 import Start from './pages/Start';
+const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
@@ -21,6 +22,7 @@ import { fmtDate } from './data/format';
 
 const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'start', label: 'Start here', icon: IconStart },
+  { page: 'map', label: 'Map', icon: IconMap },
   { page: 'overview', label: 'Overview', icon: IconOverview },
   { page: 'revenue', label: 'Revenue', icon: IconRevenue },
   { page: 'dispatch', label: 'Dispatch', icon: IconDispatch },
@@ -73,7 +75,7 @@ export default function App() {
     try { (window as unknown as { goatcounter?: { count: (o: object) => void } }).goatcounter?.count({ path: `/${page}`, title: document.title }); } catch { /* blocked */ }
   }, [page]);
 
-  const Page = { start: Start, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method, about: About }[page];
+  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method, about: About }[page];
   return (
     <AppShell
       header={{ height: 60 }}
@@ -123,7 +125,7 @@ export default function App() {
           )}
           {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
           <div key={page} className="app-enter">
-            {error ? <Text c="red">Could not load results: {error}</Text> : !index && (page === 'method' || page === 'about') ? <Skeleton h={300} radius="lg" /> : <Page />}
+            {error ? <Text c="red">Could not load results: {error}</Text> : !index && (page === 'method' || page === 'about') ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><Page /></Suspense>}
           </div>
           <SiteFooter />
         </div>

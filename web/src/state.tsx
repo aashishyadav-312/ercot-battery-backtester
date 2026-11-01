@@ -2,8 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { IndexRun, NodeSelection, Run, Selection } from './data/types';
 import { DEGS, DURATIONS, YEARS, loadIndex, loadNodeSelection, loadRun } from './data/loader';
 
-export type Page = 'start' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'method' | 'about';
-export const PAGES: Page[] = ['start', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method', 'about'];
+export type Page = 'start' | 'map' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'method' | 'about';
+export const PAGES: Page[] = ['start', 'map', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'method', 'about'];
 
 const DEFAULT: Selection = { location: 'HB_HOUSTON', duration: 2, year: 2025, deg: 10 };
 

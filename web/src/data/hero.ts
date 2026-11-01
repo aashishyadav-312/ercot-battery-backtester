@@ -69,7 +69,19 @@ function capture(r: Run): Hero | null {
   return make(['Scheduling on day-ahead prices captured ', { em: pct(c, 0) }, ` of the perfect-foresight revenue in ${period(r)}.`]);
 }
 
+/** Map page: the spread between the best and weakest tracked location for the chosen scenario. */
+function mapSpread(sel: Selection, index: IndexRun[]): Hero | null {
+  const rows = index
+    .filter((r) => r.year === sel.year && r.duration_h === sel.duration && r.deg_cost_per_mwh === sel.deg)
+    .sort((a, b) => b.revenue_per_kw_year - a.revenue_per_kw_year);
+  if (rows.length < 2) return null;
+  const [best, worst] = [rows[0], rows[rows.length - 1]];
+  const yr = best.annualized ? `${sel.year} so far` : String(sel.year);
+  return make([`Where the battery sits matters: in ${yr}, ${locFull(best.location)} earned `, { em: `${usd(best.revenue_per_kw_year, 0)}/kW-yr` }, `, against `, { em: `${usd(worst.revenue_per_kw_year, 0)}/kW-yr` }, ` at ${locFull(worst.location)}.`]);
+}
+
 export function heroFor(page: Page, run: Run | undefined, sel: Selection, index: IndexRun[] | null): Hero | null {
+  if (page === 'map') return index ? mapSpread(sel, index) : null;
   if (page === 'compare') return index ? rank(sel, index) : null;
   if (!run) return null;
   if (page === 'realism') return capture(run) ?? concentration(run);

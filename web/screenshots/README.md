@@ -8,7 +8,7 @@ Every file comes in a pair: `<view>-<width>-<scheme>-before.png` is the Phase 5 
 - **Schemes:** `light` and `dark`.
 - **Views:** `overview`, `revenue`, `dispatch`, `compare`, `method` (HB_HOUSTON, 2-hour, 2025,
   $10/MWh), plus `data-quality` (RHESS2_ESS1 2025, the run that trips the note),
-  `compare-node` (RUSSEKST_RN vs its hub) and `expanded-heatmap` (desktop, HB_HOUSTON 2026 YTD).
+  `map` and `map-node` (Map page; RUSSEKST_RN selected; suffix `p11-after`), `compare-node` (RUSSEKST_RN vs its hub) and `expanded-heatmap` (desktop, HB_HOUSTON 2026 YTD).
 
 Regenerate:
 

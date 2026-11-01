@@ -23,3 +23,7 @@ export const IconBattery = () => (
 );
 export const IconAbout = mk(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 7.6v.01" /></>);
 export const IconStart = mk(<><path d="M5 4v17" /><path d="M5 5h11l-2.5 4L16 13H5" /></>);
+export const IconMap = mk(<><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z" /><path d="M9 4v13.5M15 6.5V20" /></>);
+export const IconPlus = mk(<path d="M12 5v14M5 12h14" />);
+export const IconMinus = mk(<path d="M5 12h14" />);
+export const IconReset = mk(<><path d="M4 12a8 8 0 1 0 2.5-5.8" /><path d="M4 4v4.5h4.5" /></>);

@@ -12,7 +12,7 @@ PW_CHROMIUM_PATH=/path/to/chromium npm run screenshots   # needs a build; writes
 
 - `public/data/` is generated from `../results/` by `scripts/copy-data.mjs` (git-ignored).
 - The URL hash holds the page and the selectors, e.g. `#/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10`.
-- Pages: Start here, Overview, Revenue, Dispatch, Compare, Realism, Method, About. Every card has a CSV download and an expand button.
+- Pages: Start here, Map, Overview, Revenue, Dispatch, Compare, Realism, Method, About. Every card has a CSV download and an expand button.
 - A data-quality note appears when a run's best day is more than 20% of its revenue (`src/components/DataQuality.tsx`).
   Known explanations for specific runs live in `src/data/data-notes.json` (location → year → text), not in code.
 - Each page leads with one hero sentence for the current selection (`src/data/hero.ts`), e.g.
@@ -44,3 +44,10 @@ remembered in `localStorage` key `ebb-start-seen` (every read and write is in tr
 - `node scripts/check-start.mjs` checks the two-click path, banner persistence (including blocked storage), the walkthrough controls and
   console errors, and writes the `*-p10-after.png` screenshots. Set `PW_CHROMIUM_PATH` if Playwright's own browser is not installed.
 - Issue form for feature requests: `.github/ISSUE_TEMPLATE/feature_request.yml` (the "Suggest a feature" link works once it is on `main`).
+
+### Map page
+`#/map` draws Texas counties with ECharts' `geo` component (no mapping library). `scripts/build-texas.mjs` cuts Texas out of
+`us-atlas` (Census boundaries) into `public/data/texas.json`; `results/locations.json` supplies coordinates. The page is
+lazy-loaded so the geo component stays out of the main bundle. Markers: size = $/kW-yr, colour = capture rate, for the
+selected duration, year and degradation. Rebuild the locations file with `python -m scripts.build_locations`; every match
+and every node that could not be geocoded is listed in `results/geocoding_log.md`. Hubs sit at a representative city.
