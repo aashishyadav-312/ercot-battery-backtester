@@ -7,6 +7,7 @@ export const IconOverview = mk(<><rect x="3" y="3" width="7" height="9" rx="1.5"
 export const IconRevenue = mk(<><path d="M3 20h18" /><path d="M6 16V10M12 16V5M18 16v-4" /></>);
 export const IconDispatch = mk(<><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M3 15h18M9 3v18M15 3v18" /></>);
 export const IconCompare = mk(<><path d="M7 4v16M17 4v16" /><path d="M3 8l4-4 4 4M13 16l4 4 4-4" /></>);
+export const IconRealism = mk(<><circle cx="12" cy="12" r="8.5" /><circle cx="12" cy="12" r="4" /><path d="M12 2v3M12 19v3M2 12h3M19 12h3" /></>);
 export const IconMethod = mk(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>);
 export const IconDownload = mk(<><path d="M12 4v11M7 11l5 5 5-5" /><path d="M4 20h16" /></>);
 export const IconExpand = mk(<><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></>);

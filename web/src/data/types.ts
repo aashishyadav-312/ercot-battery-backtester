@@ -14,6 +14,10 @@ export interface IndexRun {
   top10_day_share: number | null;
   cycles_per_year: number;
   avg_spread_captured: number;
+  /** DA-schedule / RT-settle (Phase 8). Same days as perfect foresight. */
+  da_rt_revenue_per_kw_year?: number;
+  value_of_perfect_foresight_per_kw_year?: number;
+  capture_rate?: number | null;
 }
 
 export interface RunMeta {
@@ -51,12 +55,21 @@ export interface RunMetrics {
   avg_spread_captured: number;
   monthly_revenue_per_kw: Record<string, number>;
   heatmap_net_mw: { months: number[]; hours: number[]; values: number[][] };
+  da_rt_revenue_per_kw_year?: number;
+  da_rt_revenue_per_kw_period?: number;
+  da_da_revenue_per_kw_year?: number;
+  pf_revenue_per_kw_year_matched?: number;
+  value_of_perfect_foresight_per_kw_year?: number;
+  capture_rate?: number | null;
+  da_days_matched?: number;
+  da_losing_days?: number;
+  da_cycles_per_year?: number;
 }
 
 export interface Run {
   meta: RunMeta;
   metrics: RunMetrics;
-  daily: { date: string[]; revenue: number[]; cycles: number[] };
+  daily: { date: string[]; revenue: number[]; cycles: number[]; da_rt_revenue?: (number | null)[] };
 }
 
 export interface NodeInfo {
@@ -84,4 +97,39 @@ export interface Selection {
   duration: number;
   year: number;
   deg: number;
+}
+
+export interface RtcbWindowRevenue {
+  pf_revenue_per_kw: number;
+  da_rt_revenue_per_kw: number;
+  value_of_perfect_foresight_per_kw: number;
+  capture_rate: number | null;
+  da_losing_days: number;
+}
+
+export interface RtcbRun {
+  duration_h: number;
+  deg_cost_per_mwh: number;
+  days: number;
+  before: RtcbWindowRevenue;
+  after: RtcbWindowRevenue;
+  change: { pf_revenue: number | null; da_rt_revenue: number | null; capture_rate_pts: number };
+  monthly: { months: number[]; pf_before: number[]; pf_after: number[]; da_rt_before: number[]; da_rt_after: number[] };
+}
+
+export interface RtcbPrices {
+  rt_mean: number;
+  da_mean: number;
+  rt_minus_da_mean: number;
+  rt_minus_da_mean_abs: number;
+  rt_std: number;
+  rt_intraday_std_mean: number;
+  rt_intraday_std_median: number;
+  rt_intervals_over_1000: number;
+  rt_intervals_below_0: number;
+}
+
+export interface Rtcb {
+  meta: { event: string; before: { start: string; end: string }; after: { start: string; end: string }; caveat: string };
+  locations: Record<string, { location_type: 'hub' | 'node'; matched_days: number; prices: { before: RtcbPrices; after: RtcbPrices }; runs: RtcbRun[] }>;
 }

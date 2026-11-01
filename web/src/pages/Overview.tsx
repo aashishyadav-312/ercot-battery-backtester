@@ -66,7 +66,7 @@ function HeroSentence() {
   const { page, index } = useApp();
   const { sel, run } = useSelectedRun();
   const hero = heroFor(page, run, sel, index);
-  const lede = ledeFor(run);
+  const lede = ledeFor(run, page);
   return (
     <>
       {hero ? (

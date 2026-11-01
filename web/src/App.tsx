@@ -5,11 +5,12 @@ import {
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRevenue, IconSun } from './components/Icons';
+import { IconBattery, IconCompare, IconDispatch, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconSun } from './components/Icons';
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
 import Compare from './pages/Compare';
+import Realism from './pages/Realism';
 import Method from './pages/Method';
 
 
@@ -18,6 +19,7 @@ const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'revenue', label: 'Revenue', icon: IconRevenue },
   { page: 'dispatch', label: 'Dispatch', icon: IconDispatch },
   { page: 'compare', label: 'Compare', icon: IconCompare },
+  { page: 'realism', label: 'Realism', icon: IconRealism },
   { page: 'method', label: 'Method', icon: IconMethod },
 ];
 
@@ -43,7 +45,7 @@ export default function App() {
   const [{ y }] = useWindowScroll();
   useEffect(() => { document.title = `${NAV.find((n) => n.page === page)!.label} · ERCOT Battery Backtester`; }, [page]);
 
-  const Page = { overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, method: Method }[page];
+  const Page = { overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, method: Method }[page];
   return (
     <AppShell
       header={{ height: 60 }}

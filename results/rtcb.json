@@ -1,0 +1,5780 @@
+{
+ "meta": {
+  "event": "RTC+B (real-time co-optimization plus batteries) went live in ERCOT on Dec 5, 2025",
+  "before": {
+   "start": "2024-12-05",
+   "end": "2025-10-24"
+  },
+  "after": {
+   "start": "2025-12-05",
+   "end": "2026-10-24"
+  },
+  "matching": "each after-day is paired with the same calendar day one year earlier; a pair is used only if both days have results",
+  "revenue_units": "$ per kW over the matched days (not annualized)",
+  "rt_minus_da": "each 15-min RT price minus the DA price of the hour that contains it",
+  "rt_intraday_std": "standard deviation of the 15-min RT price within each day, averaged (or median) over days",
+  "caveat": "Before/after describes what changed, not why. Battery capacity kept growing, and load, gas prices, weather and transmission also changed between the windows. This model cannot isolate the effect of RTC+B from those, and it leaves out ancillary services, where RTC+B changes battery revenue most directly."
+ },
+ "locations": {
+  "ANSON1_ALL": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 34.9,
+      "da_rt_revenue_per_kw": 20.73,
+      "value_of_perfect_foresight_per_kw": 14.17,
+      "capture_rate": 0.5939,
+      "da_losing_days": 14
+     },
+     "after": {
+      "pf_revenue_per_kw": 30.59,
+      "da_rt_revenue_per_kw": 13.91,
+      "value_of_perfect_foresight_per_kw": 16.68,
+      "capture_rate": 0.4548,
+      "da_losing_days": 17
+     },
+     "change": {
+      "pf_revenue": -0.1235,
+      "da_rt_revenue": -0.329,
+      "capture_rate_pts": -13.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.988,
+       3.995,
+       2.754,
+       3.391,
+       4.705,
+       4.873,
+       2.494,
+       2.988,
+       2.71,
+       2.333,
+       2.67
+      ],
+      "pf_after": [
+       2.019,
+       5.085,
+       1.768,
+       3.058,
+       4.049,
+       2.076,
+       1.757,
+       1.703,
+       3.552,
+       2.906,
+       2.621
+      ],
+      "da_rt_before": [
+       1.232,
+       2.954,
+       1.397,
+       1.953,
+       2.973,
+       3.091,
+       1.21,
+       1.282,
+       1.487,
+       1.544,
+       1.605
+      ],
+      "da_rt_after": [
+       1.197,
+       1.412,
+       0.821,
+       1.713,
+       1.743,
+       0.857,
+       0.894,
+       0.818,
+       1.778,
+       1.257,
+       1.424
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 27.62,
+      "da_rt_revenue_per_kw": 16.62,
+      "value_of_perfect_foresight_per_kw": 11.0,
+      "capture_rate": 0.6019,
+      "da_losing_days": 44
+     },
+     "after": {
+      "pf_revenue_per_kw": 23.92,
+      "da_rt_revenue_per_kw": 9.81,
+      "value_of_perfect_foresight_per_kw": 14.11,
+      "capture_rate": 0.4103,
+      "da_losing_days": 48
+     },
+     "change": {
+      "pf_revenue": -0.134,
+      "da_rt_revenue": -0.4097,
+      "capture_rate_pts": -19.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.406,
+       3.314,
+       2.096,
+       2.546,
+       3.916,
+       4.222,
+       1.918,
+       2.361,
+       2.031,
+       1.761,
+       2.048
+      ],
+      "pf_after": [
+       1.472,
+       4.485,
+       1.221,
+       2.356,
+       3.314,
+       1.353,
+       1.15,
+       1.208,
+       2.987,
+       2.234,
+       2.14
+      ],
+      "da_rt_before": [
+       0.78,
+       2.496,
+       1.12,
+       1.499,
+       2.561,
+       2.767,
+       0.876,
+       0.948,
+       1.123,
+       1.186,
+       1.267
+      ],
+      "da_rt_after": [
+       0.817,
+       0.991,
+       0.438,
+       1.171,
+       1.301,
+       0.509,
+       0.55,
+       0.545,
+       1.481,
+       0.899,
+       1.111
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 52.72,
+      "da_rt_revenue_per_kw": 36.82,
+      "value_of_perfect_foresight_per_kw": 15.9,
+      "capture_rate": 0.6985,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 49.19,
+      "da_rt_revenue_per_kw": 28.31,
+      "value_of_perfect_foresight_per_kw": 20.88,
+      "capture_rate": 0.5756,
+      "da_losing_days": 16
+     },
+     "change": {
+      "pf_revenue": -0.067,
+      "da_rt_revenue": -0.2311,
+      "capture_rate_pts": -12.3
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.899,
+       5.846,
+       4.415,
+       5.264,
+       6.789,
+       7.133,
+       3.76,
+       4.416,
+       4.248,
+       3.739,
+       4.21
+      ],
+      "pf_after": [
+       3.441,
+       8.232,
+       2.979,
+       4.869,
+       6.34,
+       3.215,
+       2.82,
+       2.743,
+       5.611,
+       4.597,
+       4.339
+      ],
+      "da_rt_before": [
+       1.916,
+       4.675,
+       2.779,
+       3.439,
+       4.888,
+       5.38,
+       2.293,
+       2.723,
+       2.797,
+       2.885,
+       3.048
+      ],
+      "da_rt_after": [
+       2.153,
+       3.573,
+       1.678,
+       3.016,
+       4.018,
+       1.628,
+       1.653,
+       1.719,
+       3.601,
+       2.603,
+       2.669
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 41.55,
+      "da_rt_revenue_per_kw": 28.74,
+      "value_of_perfect_foresight_per_kw": 12.8,
+      "capture_rate": 0.6919,
+      "da_losing_days": 44
+     },
+     "after": {
+      "pf_revenue_per_kw": 38.74,
+      "da_rt_revenue_per_kw": 20.61,
+      "value_of_perfect_foresight_per_kw": 18.13,
+      "capture_rate": 0.5321,
+      "da_losing_days": 44
+     },
+     "change": {
+      "pf_revenue": -0.0676,
+      "da_rt_revenue": -0.2829,
+      "capture_rate_pts": -16.0
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.981,
+       4.803,
+       3.365,
+       4.023,
+       5.596,
+       6.138,
+       2.864,
+       3.454,
+       3.207,
+       2.853,
+       3.261
+      ],
+      "pf_after": [
+       2.539,
+       7.275,
+       2.078,
+       3.764,
+       5.248,
+       2.113,
+       1.912,
+       1.946,
+       4.732,
+       3.567,
+       3.565
+      ],
+      "da_rt_before": [
+       1.085,
+       3.769,
+       1.969,
+       2.662,
+       4.061,
+       4.771,
+       1.688,
+       2.125,
+       2.081,
+       2.194,
+       2.339
+      ],
+      "da_rt_after": [
+       1.442,
+       2.812,
+       1.04,
+       2.042,
+       3.204,
+       1.003,
+       1.002,
+       1.148,
+       2.993,
+       1.927,
+       2.001
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 71.98,
+      "da_rt_revenue_per_kw": 56.21,
+      "value_of_perfect_foresight_per_kw": 15.77,
+      "capture_rate": 0.7809,
+      "da_losing_days": 10
+     },
+     "after": {
+      "pf_revenue_per_kw": 72.21,
+      "da_rt_revenue_per_kw": 53.02,
+      "value_of_perfect_foresight_per_kw": 19.2,
+      "capture_rate": 0.7341,
+      "da_losing_days": 15
+     },
+     "change": {
+      "pf_revenue": 0.0032,
+      "da_rt_revenue": -0.0568,
+      "capture_rate_pts": -4.7
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.865,
+       7.582,
+       6.217,
+       7.356,
+       8.971,
+       9.645,
+       5.126,
+       6.077,
+       5.975,
+       5.267,
+       5.902
+      ],
+      "pf_after": [
+       5.144,
+       12.546,
+       4.49,
+       6.899,
+       9.155,
+       4.57,
+       4.232,
+       4.118,
+       8.08,
+       6.464,
+       6.517
+      ],
+      "da_rt_before": [
+       2.724,
+       6.312,
+       4.422,
+       5.601,
+       7.193,
+       8.076,
+       3.629,
+       4.428,
+       4.594,
+       4.539,
+       4.692
+      ],
+      "da_rt_after": [
+       3.788,
+       7.677,
+       3.293,
+       5.904,
+       7.343,
+       3.002,
+       2.95,
+       3.233,
+       6.342,
+       4.573,
+       4.911
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 55.47,
+      "da_rt_revenue_per_kw": 41.69,
+      "value_of_perfect_foresight_per_kw": 13.78,
+      "capture_rate": 0.7516,
+      "da_losing_days": 54
+     },
+     "after": {
+      "pf_revenue_per_kw": 56.28,
+      "da_rt_revenue_per_kw": 38.78,
+      "value_of_perfect_foresight_per_kw": 17.5,
+      "capture_rate": 0.689,
+      "da_losing_days": 46
+     },
+     "change": {
+      "pf_revenue": 0.0146,
+      "da_rt_revenue": -0.0698,
+      "capture_rate_pts": -6.3
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.528,
+       6.023,
+       4.679,
+       5.552,
+       7.251,
+       8.111,
+       3.75,
+       4.642,
+       4.484,
+       3.906,
+       4.545
+      ],
+      "pf_after": [
+       3.762,
+       11.055,
+       3.079,
+       5.217,
+       7.555,
+       2.955,
+       2.891,
+       2.822,
+       6.708,
+       4.933,
+       5.301
+      ],
+      "da_rt_before": [
+       1.445,
+       4.652,
+       2.792,
+       4.079,
+       5.779,
+       6.922,
+       2.504,
+       3.349,
+       3.268,
+       3.308,
+       3.591
+      ],
+      "da_rt_after": [
+       2.54,
+       6.237,
+       2.027,
+       4.221,
+       5.882,
+       1.755,
+       1.813,
+       2.089,
+       5.175,
+       3.322,
+       3.717
+      ]
+     }
+    }
+   ],
+   "location_type": "node",
+   "prices": {
+    "before": {
+     "rt_mean": 27.82,
+     "da_mean": 29.08,
+     "rt_minus_da_mean": -1.26,
+     "rt_minus_da_mean_abs": 12.29,
+     "rt_std": 51.38,
+     "rt_intraday_std_mean": 24.23,
+     "rt_intraday_std_median": 14.9,
+     "rt_intervals_over_1000": 14,
+     "rt_intervals_below_0": 2943
+    },
+    "after": {
+     "rt_mean": 27.89,
+     "da_mean": 30.66,
+     "rt_minus_da_mean": -2.77,
+     "rt_minus_da_mean_abs": 14.0,
+     "rt_std": 50.7,
+     "rt_intraday_std_mean": 23.3,
+     "rt_intraday_std_median": 14.7,
+     "rt_intervals_over_1000": 16,
+     "rt_intervals_below_0": 4418
+    }
+   },
+   "matched_days": 324
+  },
+  "CAMWIND_RN": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 34.04,
+      "da_rt_revenue_per_kw": 13.9,
+      "value_of_perfect_foresight_per_kw": 20.14,
+      "capture_rate": 0.4083,
+      "da_losing_days": 31
+     },
+     "after": {
+      "pf_revenue_per_kw": 35.56,
+      "da_rt_revenue_per_kw": 16.54,
+      "value_of_perfect_foresight_per_kw": 19.02,
+      "capture_rate": 0.4651,
+      "da_losing_days": 30
+     },
+     "change": {
+      "pf_revenue": 0.0447,
+      "da_rt_revenue": 0.1899,
+      "capture_rate_pts": 5.7
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.872,
+       2.649,
+       3.085,
+       3.862,
+       3.058,
+       3.29,
+       2.831,
+       2.33,
+       7.214,
+       1.773,
+       2.072
+      ],
+      "pf_after": [
+       1.895,
+       3.642,
+       2.047,
+       2.67,
+       3.701,
+       9.885,
+       1.33,
+       1.486,
+       2.699,
+       4.192,
+       2.01
+      ],
+      "da_rt_before": [
+       1.071,
+       0.891,
+       1.562,
+       1.687,
+       1.28,
+       1.161,
+       1.241,
+       0.729,
+       2.549,
+       0.751,
+       0.975
+      ],
+      "da_rt_after": [
+       1.037,
+       0.964,
+       0.964,
+       0.867,
+       1.088,
+       6.052,
+       0.407,
+       0.621,
+       1.482,
+       2.244,
+       0.81
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 25.06,
+      "da_rt_revenue_per_kw": 7.91,
+      "value_of_perfect_foresight_per_kw": 17.15,
+      "capture_rate": 0.3158,
+      "da_losing_days": 77
+     },
+     "after": {
+      "pf_revenue_per_kw": 28.03,
+      "da_rt_revenue_per_kw": 12.62,
+      "value_of_perfect_foresight_per_kw": 15.41,
+      "capture_rate": 0.4502,
+      "da_losing_days": 77
+     },
+     "change": {
+      "pf_revenue": 0.1185,
+      "da_rt_revenue": 0.5954,
+      "capture_rate_pts": 13.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.298,
+       1.812,
+       2.29,
+       2.81,
+       1.879,
+       2.293,
+       2.006,
+       1.612,
+       6.4,
+       1.149,
+       1.514
+      ],
+      "pf_after": [
+       1.279,
+       2.814,
+       1.296,
+       1.861,
+       2.822,
+       9.207,
+       0.786,
+       0.925,
+       2.057,
+       3.487,
+       1.498
+      ],
+      "da_rt_before": [
+       0.774,
+       0.599,
+       1.181,
+       1.188,
+       0.703,
+       0.769,
+       0.89,
+       0.355,
+       0.415,
+       0.425,
+       0.615
+      ],
+      "da_rt_after": [
+       0.761,
+       0.465,
+       0.518,
+       0.754,
+       0.838,
+       5.567,
+       0.125,
+       0.285,
+       0.976,
+       1.792,
+       0.539
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 50.53,
+      "da_rt_revenue_per_kw": 24.4,
+      "value_of_perfect_foresight_per_kw": 26.13,
+      "capture_rate": 0.4829,
+      "da_losing_days": 25
+     },
+     "after": {
+      "pf_revenue_per_kw": 56.18,
+      "da_rt_revenue_per_kw": 33.19,
+      "value_of_perfect_foresight_per_kw": 23.0,
+      "capture_rate": 0.5907,
+      "da_losing_days": 21
+     },
+     "change": {
+      "pf_revenue": 0.1118,
+      "da_rt_revenue": 0.3602,
+      "capture_rate_pts": 10.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.747,
+       4.088,
+       4.787,
+       5.855,
+       4.404,
+       4.923,
+       4.122,
+       3.351,
+       10.422,
+       2.69,
+       3.141
+      ],
+      "pf_after": [
+       3.039,
+       5.554,
+       3.178,
+       4.145,
+       5.555,
+       15.675,
+       2.12,
+       2.389,
+       4.208,
+       7.087,
+       3.235
+      ],
+      "da_rt_before": [
+       1.713,
+       1.959,
+       2.68,
+       3.159,
+       2.461,
+       2.418,
+       2.092,
+       1.427,
+       3.284,
+       1.443,
+       1.768
+      ],
+      "da_rt_after": [
+       1.957,
+       2.115,
+       1.972,
+       2.297,
+       2.429,
+       12.2,
+       0.834,
+       1.269,
+       2.894,
+       3.538,
+       1.685
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 37.66,
+      "da_rt_revenue_per_kw": 16.13,
+      "value_of_perfect_foresight_per_kw": 21.53,
+      "capture_rate": 0.4282,
+      "da_losing_days": 67
+     },
+     "after": {
+      "pf_revenue_per_kw": 44.75,
+      "da_rt_revenue_per_kw": 24.61,
+      "value_of_perfect_foresight_per_kw": 20.14,
+      "capture_rate": 0.55,
+      "da_losing_days": 77
+     },
+     "change": {
+      "pf_revenue": 0.1883,
+      "da_rt_revenue": 0.5257,
+      "capture_rate_pts": 12.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.882,
+       2.87,
+       3.645,
+       4.396,
+       2.88,
+       3.608,
+       2.939,
+       2.277,
+       9.144,
+       1.731,
+       2.287
+      ],
+      "pf_after": [
+       2.077,
+       4.32,
+       2.076,
+       2.917,
+       4.291,
+       14.639,
+       1.288,
+       1.498,
+       3.151,
+       6.006,
+       2.486
+      ],
+      "da_rt_before": [
+       1.129,
+       1.285,
+       1.859,
+       2.208,
+       1.538,
+       1.753,
+       1.468,
+       0.707,
+       2.263,
+       0.785,
+       1.129
+      ],
+      "da_rt_after": [
+       1.325,
+       1.148,
+       1.04,
+       1.367,
+       1.782,
+       11.21,
+       0.316,
+       0.629,
+       1.913,
+       2.723,
+       1.157
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 66.0,
+      "da_rt_revenue_per_kw": 39.44,
+      "value_of_perfect_foresight_per_kw": 26.56,
+      "capture_rate": 0.5975,
+      "da_losing_days": 32
+     },
+     "after": {
+      "pf_revenue_per_kw": 81.36,
+      "da_rt_revenue_per_kw": 53.68,
+      "value_of_perfect_foresight_per_kw": 27.67,
+      "capture_rate": 0.6599,
+      "da_losing_days": 20
+     },
+     "change": {
+      "pf_revenue": 0.2327,
+      "da_rt_revenue": 0.3611,
+      "capture_rate_pts": 6.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.717,
+       5.872,
+       6.456,
+       7.922,
+       5.976,
+       6.723,
+       5.503,
+       4.384,
+       11.452,
+       3.656,
+       4.339
+      ],
+      "pf_after": [
+       4.297,
+       7.843,
+       4.53,
+       5.743,
+       7.548,
+       23.727,
+       3.139,
+       3.589,
+       5.592,
+       10.469,
+       4.882
+      ],
+      "da_rt_before": [
+       2.543,
+       3.53,
+       4.287,
+       4.896,
+       4.079,
+       4.106,
+       3.264,
+       2.739,
+       4.797,
+       2.302,
+       2.893
+      ],
+      "da_rt_after": [
+       3.049,
+       4.543,
+       3.378,
+       3.756,
+       4.75,
+       15.909,
+       1.702,
+       2.519,
+       4.196,
+       6.572,
+       3.311
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 48.34,
+      "da_rt_revenue_per_kw": 24.93,
+      "value_of_perfect_foresight_per_kw": 23.41,
+      "capture_rate": 0.5157,
+      "da_losing_days": 75
+     },
+     "after": {
+      "pf_revenue_per_kw": 64.59,
+      "da_rt_revenue_per_kw": 37.73,
+      "value_of_perfect_foresight_per_kw": 26.86,
+      "capture_rate": 0.5841,
+      "da_losing_days": 74
+     },
+     "change": {
+      "pf_revenue": 0.3362,
+      "da_rt_revenue": 0.5134,
+      "capture_rate_pts": 6.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.459,
+       4.191,
+       4.826,
+       6.003,
+       4.019,
+       4.972,
+       3.877,
+       2.853,
+       9.757,
+       2.267,
+       3.12
+      ],
+      "pf_after": [
+       2.875,
+       6.098,
+       2.913,
+       3.97,
+       5.819,
+       22.175,
+       1.85,
+       2.228,
+       3.976,
+       8.884,
+       3.803
+      ],
+      "da_rt_before": [
+       1.442,
+       2.4,
+       2.661,
+       3.4,
+       2.519,
+       2.925,
+       2.367,
+       1.445,
+       2.847,
+       1.138,
+       1.787
+      ],
+      "da_rt_after": [
+       1.811,
+       2.536,
+       1.657,
+       2.236,
+       3.36,
+       13.968,
+       0.646,
+       1.391,
+       2.673,
+       5.127,
+       2.322
+      ]
+     }
+    }
+   ],
+   "location_type": "node",
+   "prices": {
+    "before": {
+     "rt_mean": 21.6,
+     "da_mean": 21.21,
+     "rt_minus_da_mean": 0.39,
+     "rt_minus_da_mean_abs": 11.64,
+     "rt_std": 54.04,
+     "rt_intraday_std_mean": 20.56,
+     "rt_intraday_std_median": 13.43,
+     "rt_intervals_over_1000": 14,
+     "rt_intervals_below_0": 5472
+    },
+    "after": {
+     "rt_mean": 29.91,
+     "da_mean": 27.31,
+     "rt_minus_da_mean": 2.6,
+     "rt_minus_da_mean_abs": 15.65,
+     "rt_std": 135.7,
+     "rt_intraday_std_mean": 25.4,
+     "rt_intraday_std_median": 12.3,
+     "rt_intervals_over_1000": 34,
+     "rt_intervals_below_0": 3584
+    }
+   },
+   "matched_days": 324
+  },
+  "HB_HOUSTON": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 31.12,
+      "da_rt_revenue_per_kw": 16.82,
+      "value_of_perfect_foresight_per_kw": 14.29,
+      "capture_rate": 0.5407,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 24.11,
+      "da_rt_revenue_per_kw": 9.94,
+      "value_of_perfect_foresight_per_kw": 14.17,
+      "capture_rate": 0.4123,
+      "da_losing_days": 18
+     },
+     "change": {
+      "pf_revenue": -0.2253,
+      "da_rt_revenue": -0.409,
+      "capture_rate_pts": -12.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.558,
+       1.835,
+       2.148,
+       3.391,
+       4.235,
+       5.137,
+       3.087,
+       2.769,
+       2.454,
+       2.298,
+       2.203
+      ],
+      "pf_after": [
+       1.271,
+       2.84,
+       1.524,
+       2.644,
+       3.916,
+       1.637,
+       1.38,
+       1.415,
+       3.051,
+       2.578,
+       1.849
+      ],
+      "da_rt_before": [
+       1.018,
+       0.985,
+       1.086,
+       1.831,
+       2.67,
+       2.814,
+       1.141,
+       1.146,
+       1.349,
+       1.324,
+       1.46
+      ],
+      "da_rt_after": [
+       0.765,
+       0.932,
+       0.623,
+       1.061,
+       1.396,
+       0.74,
+       0.485,
+       0.629,
+       1.401,
+       1.085,
+       0.823
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 24.48,
+      "da_rt_revenue_per_kw": 12.42,
+      "value_of_perfect_foresight_per_kw": 12.06,
+      "capture_rate": 0.5073,
+      "da_losing_days": 48
+     },
+     "after": {
+      "pf_revenue_per_kw": 18.02,
+      "da_rt_revenue_per_kw": 6.27,
+      "value_of_perfect_foresight_per_kw": 11.75,
+      "capture_rate": 0.3479,
+      "da_losing_days": 66
+     },
+     "change": {
+      "pf_revenue": -0.2639,
+      "da_rt_revenue": -0.4952,
+      "capture_rate_pts": -15.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.079,
+       1.246,
+       1.586,
+       2.662,
+       3.558,
+       4.461,
+       2.4,
+       2.191,
+       1.798,
+       1.776,
+       1.726
+      ],
+      "pf_after": [
+       0.812,
+       2.289,
+       1.009,
+       2.046,
+       3.24,
+       1.043,
+       0.843,
+       0.928,
+       2.476,
+       1.935,
+       1.396
+      ],
+      "da_rt_before": [
+       0.639,
+       0.541,
+       0.592,
+       1.364,
+       2.23,
+       2.403,
+       0.745,
+       0.849,
+       0.971,
+       0.995,
+       1.094
+      ],
+      "da_rt_after": [
+       0.415,
+       0.506,
+       0.289,
+       0.604,
+       0.996,
+       0.477,
+       0.247,
+       0.348,
+       1.083,
+       0.763,
+       0.54
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 46.21,
+      "da_rt_revenue_per_kw": 30.31,
+      "value_of_perfect_foresight_per_kw": 15.9,
+      "capture_rate": 0.6559,
+      "da_losing_days": 10
+     },
+     "after": {
+      "pf_revenue_per_kw": 37.64,
+      "da_rt_revenue_per_kw": 20.18,
+      "value_of_perfect_foresight_per_kw": 17.46,
+      "capture_rate": 0.5362,
+      "da_losing_days": 15
+     },
+     "change": {
+      "pf_revenue": -0.1855,
+      "da_rt_revenue": -0.3342,
+      "capture_rate_pts": -12.0
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.245,
+       2.96,
+       3.385,
+       5.113,
+       5.969,
+       7.333,
+       4.32,
+       4.023,
+       3.812,
+       3.558,
+       3.491
+      ],
+      "pf_after": [
+       2.118,
+       4.479,
+       2.46,
+       4.117,
+       5.829,
+       2.563,
+       2.133,
+       2.21,
+       4.678,
+       4.03,
+       3.021
+      ],
+      "da_rt_before": [
+       1.552,
+       2.002,
+       2.185,
+       3.313,
+       4.24,
+       4.777,
+       2.093,
+       2.251,
+       2.571,
+       2.56,
+       2.767
+      ],
+      "da_rt_after": [
+       1.478,
+       2.111,
+       1.211,
+       2.11,
+       3.169,
+       1.472,
+       0.934,
+       1.294,
+       2.718,
+       2.109,
+       1.575
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 35.92,
+      "da_rt_revenue_per_kw": 22.21,
+      "value_of_perfect_foresight_per_kw": 13.71,
+      "capture_rate": 0.6183,
+      "da_losing_days": 50
+     },
+     "after": {
+      "pf_revenue_per_kw": 27.99,
+      "da_rt_revenue_per_kw": 13.05,
+      "value_of_perfect_foresight_per_kw": 14.94,
+      "capture_rate": 0.4662,
+      "da_losing_days": 64
+     },
+     "change": {
+      "pf_revenue": -0.2208,
+      "da_rt_revenue": -0.4124,
+      "capture_rate_pts": -15.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.47,
+       1.992,
+       2.467,
+       3.975,
+       4.924,
+       6.361,
+       3.289,
+       3.153,
+       2.82,
+       2.728,
+       2.739
+      ],
+      "pf_after": [
+       1.325,
+       3.553,
+       1.626,
+       3.143,
+       4.803,
+       1.649,
+       1.3,
+       1.434,
+       3.8,
+       3.05,
+       2.312
+      ],
+      "da_rt_before": [
+       0.864,
+       1.112,
+       1.305,
+       2.402,
+       3.398,
+       4.113,
+       1.474,
+       1.681,
+       1.841,
+       1.921,
+       2.095
+      ],
+      "da_rt_after": [
+       0.743,
+       1.3,
+       0.608,
+       1.222,
+       2.514,
+       0.902,
+       0.414,
+       0.739,
+       2.123,
+       1.487,
+       1.0
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 62.91,
+      "da_rt_revenue_per_kw": 47.52,
+      "value_of_perfect_foresight_per_kw": 15.39,
+      "capture_rate": 0.7553,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 53.95,
+      "da_rt_revenue_per_kw": 37.9,
+      "value_of_perfect_foresight_per_kw": 16.05,
+      "capture_rate": 0.7025,
+      "da_losing_days": 17
+     },
+     "change": {
+      "pf_revenue": -0.1424,
+      "da_rt_revenue": -0.2024,
+      "capture_rate_pts": -5.3
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.939,
+       4.374,
+       4.833,
+       6.974,
+       7.688,
+       9.823,
+       5.451,
+       5.51,
+       5.437,
+       4.951,
+       4.931
+      ],
+      "pf_after": [
+       3.137,
+       6.773,
+       3.587,
+       5.673,
+       8.096,
+       3.76,
+       3.05,
+       3.277,
+       6.515,
+       5.545,
+       4.532
+      ],
+      "da_rt_before": [
+       2.117,
+       3.31,
+       3.467,
+       5.385,
+       6.049,
+       7.354,
+       3.072,
+       4.168,
+       4.29,
+       4.077,
+       4.227
+      ],
+      "da_rt_after": [
+       2.408,
+       4.369,
+       2.469,
+       4.237,
+       5.775,
+       2.632,
+       1.692,
+       2.344,
+       5.093,
+       3.79,
+       3.09
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 47.5,
+      "da_rt_revenue_per_kw": 33.51,
+      "value_of_perfect_foresight_per_kw": 13.99,
+      "capture_rate": 0.7055,
+      "da_losing_days": 58
+     },
+     "after": {
+      "pf_revenue_per_kw": 39.07,
+      "da_rt_revenue_per_kw": 24.8,
+      "value_of_perfect_foresight_per_kw": 14.27,
+      "capture_rate": 0.6347,
+      "da_losing_days": 64
+     },
+     "change": {
+      "pf_revenue": -0.1775,
+      "da_rt_revenue": -0.2599,
+      "capture_rate_pts": -7.1
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.776,
+       2.885,
+       3.444,
+       5.281,
+       6.153,
+       8.383,
+       3.968,
+       4.192,
+       3.977,
+       3.646,
+       3.796
+      ],
+      "pf_after": [
+       1.857,
+       5.323,
+       2.294,
+       4.162,
+       6.599,
+       2.33,
+       1.795,
+       2.027,
+       5.153,
+       4.098,
+       3.425
+      ],
+      "da_rt_before": [
+       0.99,
+       1.863,
+       1.997,
+       3.805,
+       4.65,
+       6.183,
+       1.976,
+       3.052,
+       2.987,
+       2.897,
+       3.115
+      ],
+      "da_rt_after": [
+       1.166,
+       2.945,
+       1.154,
+       2.775,
+       4.623,
+       1.509,
+       0.681,
+       1.292,
+       3.918,
+       2.648,
+       2.083
+      ]
+     }
+    }
+   ],
+   "location_type": "hub",
+   "prices": {
+    "before": {
+     "rt_mean": 32.43,
+     "da_mean": 33.81,
+     "rt_minus_da_mean": -1.38,
+     "rt_minus_da_mean_abs": 11.12,
+     "rt_std": 42.48,
+     "rt_intraday_std_mean": 21.25,
+     "rt_intraday_std_median": 13.36,
+     "rt_intervals_over_1000": 8,
+     "rt_intervals_below_0": 539
+    },
+    "after": {
+     "rt_mean": 33.09,
+     "da_mean": 35.51,
+     "rt_minus_da_mean": -2.42,
+     "rt_minus_da_mean_abs": 11.82,
+     "rt_std": 35.0,
+     "rt_intraday_std_mean": 17.73,
+     "rt_intraday_std_median": 11.5,
+     "rt_intervals_over_1000": 2,
+     "rt_intervals_below_0": 484
+    }
+   },
+   "matched_days": 324
+  },
+  "HB_NORTH": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 32.32,
+      "da_rt_revenue_per_kw": 20.14,
+      "value_of_perfect_foresight_per_kw": 12.17,
+      "capture_rate": 0.6234,
+      "da_losing_days": 13
+     },
+     "after": {
+      "pf_revenue_per_kw": 28.29,
+      "da_rt_revenue_per_kw": 12.65,
+      "value_of_perfect_foresight_per_kw": 15.64,
+      "capture_rate": 0.4472,
+      "da_losing_days": 19
+     },
+     "change": {
+      "pf_revenue": -0.1247,
+      "da_rt_revenue": -0.3719,
+      "capture_rate_pts": -17.6
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.743,
+       3.809,
+       2.594,
+       3.332,
+       4.441,
+       4.629,
+       2.112,
+       2.795,
+       2.486,
+       2.17,
+       2.205
+      ],
+      "pf_after": [
+       1.562,
+       4.798,
+       1.711,
+       2.81,
+       4.176,
+       1.679,
+       1.324,
+       1.534,
+       3.384,
+       3.264,
+       2.045
+      ],
+      "da_rt_before": [
+       1.167,
+       3.02,
+       1.47,
+       1.95,
+       2.825,
+       2.962,
+       1.189,
+       1.22,
+       1.399,
+       1.472,
+       1.47
+      ],
+      "da_rt_after": [
+       0.916,
+       1.129,
+       0.772,
+       1.151,
+       1.668,
+       0.797,
+       0.582,
+       0.746,
+       1.766,
+       1.907,
+       1.214
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 26.0,
+      "da_rt_revenue_per_kw": 16.04,
+      "value_of_perfect_foresight_per_kw": 9.96,
+      "capture_rate": 0.617,
+      "da_losing_days": 46
+     },
+     "after": {
+      "pf_revenue_per_kw": 22.39,
+      "da_rt_revenue_per_kw": 8.85,
+      "value_of_perfect_foresight_per_kw": 13.54,
+      "capture_rate": 0.3952,
+      "da_losing_days": 63
+     },
+     "change": {
+      "pf_revenue": -0.1388,
+      "da_rt_revenue": -0.4483,
+      "capture_rate_pts": -22.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.243,
+       3.218,
+       2.033,
+       2.616,
+       3.767,
+       4.026,
+       1.567,
+       2.286,
+       1.868,
+       1.661,
+       1.714
+      ],
+      "pf_after": [
+       1.089,
+       4.234,
+       1.184,
+       2.147,
+       3.505,
+       1.104,
+       0.863,
+       1.081,
+       2.884,
+       2.718,
+       1.578
+      ],
+      "da_rt_before": [
+       0.743,
+       2.57,
+       1.188,
+       1.493,
+       2.391,
+       2.615,
+       0.853,
+       0.927,
+       1.024,
+       1.126,
+       1.115
+      ],
+      "da_rt_after": [
+       0.558,
+       0.759,
+       0.417,
+       0.672,
+       1.24,
+       0.485,
+       0.328,
+       0.465,
+       1.431,
+       1.583,
+       0.908
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 48.95,
+      "da_rt_revenue_per_kw": 35.1,
+      "value_of_perfect_foresight_per_kw": 13.85,
+      "capture_rate": 0.717,
+      "da_losing_days": 10
+     },
+     "after": {
+      "pf_revenue_per_kw": 45.21,
+      "da_rt_revenue_per_kw": 25.98,
+      "value_of_perfect_foresight_per_kw": 19.23,
+      "capture_rate": 0.5747,
+      "da_losing_days": 18
+     },
+     "change": {
+      "pf_revenue": -0.0764,
+      "da_rt_revenue": -0.2598,
+      "capture_rate_pts": -14.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.542,
+       5.602,
+       4.255,
+       5.17,
+       6.354,
+       6.674,
+       3.308,
+       4.13,
+       3.891,
+       3.521,
+       3.504
+      ],
+      "pf_after": [
+       2.599,
+       7.703,
+       2.855,
+       4.319,
+       6.433,
+       2.675,
+       2.103,
+       2.432,
+       5.355,
+       5.361,
+       3.374
+      ],
+      "da_rt_before": [
+       1.821,
+       4.675,
+       2.884,
+       3.402,
+       4.458,
+       5.028,
+       2.273,
+       2.397,
+       2.635,
+       2.786,
+       2.739
+      ],
+      "da_rt_after": [
+       1.599,
+       3.074,
+       1.546,
+       2.22,
+       3.88,
+       1.61,
+       1.088,
+       1.579,
+       3.613,
+       3.539,
+       2.233
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 38.88,
+      "da_rt_revenue_per_kw": 26.99,
+      "value_of_perfect_foresight_per_kw": 11.89,
+      "capture_rate": 0.6941,
+      "da_losing_days": 50
+     },
+     "after": {
+      "pf_revenue_per_kw": 35.72,
+      "da_rt_revenue_per_kw": 18.81,
+      "value_of_perfect_foresight_per_kw": 16.91,
+      "capture_rate": 0.5265,
+      "da_losing_days": 58
+     },
+     "change": {
+      "pf_revenue": -0.0813,
+      "da_rt_revenue": -0.3031,
+      "capture_rate_pts": -16.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.723,
+       4.616,
+       3.324,
+       4.035,
+       5.301,
+       5.765,
+       2.43,
+       3.326,
+       2.937,
+       2.699,
+       2.724
+      ],
+      "pf_after": [
+       1.806,
+       6.781,
+       1.983,
+       3.278,
+       5.4,
+       1.769,
+       1.357,
+       1.69,
+       4.553,
+       4.48,
+       2.622
+      ],
+      "da_rt_before": [
+       1.029,
+       3.796,
+       2.079,
+       2.507,
+       3.582,
+       4.404,
+       1.651,
+       1.828,
+       1.916,
+       2.127,
+       2.068
+      ],
+      "da_rt_after": [
+       0.915,
+       2.337,
+       0.981,
+       1.358,
+       3.083,
+       1.016,
+       0.574,
+       1.015,
+       2.961,
+       2.913,
+       1.653
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 66.69,
+      "da_rt_revenue_per_kw": 53.58,
+      "value_of_perfect_foresight_per_kw": 13.11,
+      "capture_rate": 0.8034,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 66.06,
+      "da_rt_revenue_per_kw": 47.73,
+      "value_of_perfect_foresight_per_kw": 18.34,
+      "capture_rate": 0.7224,
+      "da_losing_days": 18
+     },
+     "change": {
+      "pf_revenue": -0.0094,
+      "da_rt_revenue": -0.1092,
+      "capture_rate_pts": -8.1
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.379,
+       7.259,
+       6.208,
+       7.193,
+       8.281,
+       8.806,
+       4.485,
+       5.701,
+       5.522,
+       4.966,
+       4.891
+      ],
+      "pf_after": [
+       3.863,
+       11.596,
+       4.328,
+       5.942,
+       9.238,
+       3.97,
+       3.048,
+       3.636,
+       7.759,
+       7.556,
+       5.129
+      ],
+      "da_rt_before": [
+       2.472,
+       6.193,
+       4.697,
+       5.486,
+       6.49,
+       7.349,
+       3.49,
+       4.497,
+       4.365,
+       4.364,
+       4.176
+      ],
+      "da_rt_after": [
+       2.786,
+       6.725,
+       3.153,
+       4.639,
+       6.895,
+       2.841,
+       1.945,
+       2.834,
+       6.057,
+       5.971,
+       3.881
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 51.27,
+      "da_rt_revenue_per_kw": 39.43,
+      "value_of_perfect_foresight_per_kw": 11.84,
+      "capture_rate": 0.769,
+      "da_losing_days": 55
+     },
+     "after": {
+      "pf_revenue_per_kw": 51.13,
+      "da_rt_revenue_per_kw": 34.5,
+      "value_of_perfect_foresight_per_kw": 16.62,
+      "capture_rate": 0.6749,
+      "da_losing_days": 57
+     },
+     "change": {
+      "pf_revenue": -0.0027,
+      "da_rt_revenue": -0.125,
+      "capture_rate_pts": -9.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.139,
+       5.712,
+       4.763,
+       5.458,
+       6.713,
+       7.429,
+       3.135,
+       4.423,
+       4.111,
+       3.657,
+       3.727
+      ],
+      "pf_after": [
+       2.611,
+       10.141,
+       2.955,
+       4.367,
+       7.705,
+       2.541,
+       1.838,
+       2.398,
+       6.448,
+       6.176,
+       3.945
+      ],
+      "da_rt_before": [
+       1.28,
+       4.709,
+       3.166,
+       3.937,
+       5.038,
+       6.264,
+       2.35,
+       3.391,
+       3.052,
+       3.169,
+       3.068
+      ],
+      "da_rt_after": [
+       1.572,
+       5.381,
+       1.978,
+       3.177,
+       5.529,
+       1.709,
+       0.917,
+       1.72,
+       4.858,
+       4.759,
+       2.905
+      ]
+     }
+    }
+   ],
+   "location_type": "hub",
+   "prices": {
+    "before": {
+     "rt_mean": 31.0,
+     "da_mean": 32.04,
+     "rt_minus_da_mean": -1.04,
+     "rt_minus_da_mean_abs": 11.73,
+     "rt_std": 50.13,
+     "rt_intraday_std_mean": 22.5,
+     "rt_intraday_std_median": 13.54,
+     "rt_intervals_over_1000": 13,
+     "rt_intervals_below_0": 908
+    },
+    "after": {
+     "rt_mean": 32.47,
+     "da_mean": 34.68,
+     "rt_minus_da_mean": -2.21,
+     "rt_minus_da_mean_abs": 13.51,
+     "rt_std": 49.52,
+     "rt_intraday_std_mean": 21.72,
+     "rt_intraday_std_median": 11.96,
+     "rt_intervals_over_1000": 13,
+     "rt_intervals_below_0": 1077
+    }
+   },
+   "matched_days": 324
+  },
+  "HB_PAN": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 35.94,
+      "da_rt_revenue_per_kw": 20.26,
+      "value_of_perfect_foresight_per_kw": 15.68,
+      "capture_rate": 0.5638,
+      "da_losing_days": 15
+     },
+     "after": {
+      "pf_revenue_per_kw": 30.88,
+      "da_rt_revenue_per_kw": 13.53,
+      "value_of_perfect_foresight_per_kw": 17.35,
+      "capture_rate": 0.4381,
+      "da_losing_days": 21
+     },
+     "change": {
+      "pf_revenue": -0.1408,
+      "da_rt_revenue": -0.3322,
+      "capture_rate_pts": -12.6
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.402,
+       4.093,
+       2.758,
+       3.408,
+       5.127,
+       5.101,
+       2.13,
+       2.983,
+       2.814,
+       2.437,
+       2.69
+      ],
+      "pf_after": [
+       2.151,
+       5.488,
+       1.881,
+       3.106,
+       4.018,
+       1.98,
+       1.77,
+       1.683,
+       3.681,
+       2.746,
+       2.379
+      ],
+      "da_rt_before": [
+       1.451,
+       3.029,
+       1.423,
+       1.719,
+       3.008,
+       3.019,
+       1.146,
+       1.154,
+       1.292,
+       1.501,
+       1.521
+      ],
+      "da_rt_after": [
+       1.264,
+       1.417,
+       0.891,
+       1.698,
+       1.594,
+       0.795,
+       0.867,
+       0.753,
+       1.806,
+       1.151,
+       1.294
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 27.54,
+      "da_rt_revenue_per_kw": 15.76,
+      "value_of_perfect_foresight_per_kw": 11.79,
+      "capture_rate": 0.572,
+      "da_losing_days": 54
+     },
+     "after": {
+      "pf_revenue_per_kw": 23.76,
+      "da_rt_revenue_per_kw": 9.44,
+      "value_of_perfect_foresight_per_kw": 14.31,
+      "capture_rate": 0.3975,
+      "da_losing_days": 50
+     },
+     "change": {
+      "pf_revenue": -0.1373,
+      "da_rt_revenue": -0.401,
+      "capture_rate_pts": -17.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.691,
+       3.394,
+       2.113,
+       2.45,
+       4.078,
+       4.291,
+       1.43,
+       2.316,
+       2.031,
+       1.759,
+       1.99
+      ],
+      "pf_after": [
+       1.501,
+       4.782,
+       1.251,
+       2.371,
+       3.253,
+       1.27,
+       1.177,
+       1.146,
+       3.073,
+       2.097,
+       1.834
+      ],
+      "da_rt_before": [
+       0.999,
+       2.518,
+       1.099,
+       1.323,
+       2.424,
+       2.612,
+       0.713,
+       0.847,
+       0.909,
+       1.125,
+       1.186
+      ],
+      "da_rt_after": [
+       0.865,
+       1.085,
+       0.443,
+       1.146,
+       1.149,
+       0.47,
+       0.562,
+       0.457,
+       1.505,
+       0.844,
+       0.916
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 53.72,
+      "da_rt_revenue_per_kw": 35.61,
+      "value_of_perfect_foresight_per_kw": 18.11,
+      "capture_rate": 0.6629,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 49.1,
+      "da_rt_revenue_per_kw": 27.45,
+      "value_of_perfect_foresight_per_kw": 21.65,
+      "capture_rate": 0.5591,
+      "da_losing_days": 22
+     },
+     "change": {
+      "pf_revenue": -0.086,
+      "da_rt_revenue": -0.2291,
+      "capture_rate_pts": -10.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.56,
+       6.012,
+       4.389,
+       5.163,
+       7.306,
+       7.341,
+       3.333,
+       4.381,
+       4.23,
+       3.826,
+       4.182
+      ],
+      "pf_after": [
+       3.465,
+       8.756,
+       3.079,
+       4.917,
+       6.247,
+       3.086,
+       2.844,
+       2.666,
+       5.826,
+       4.381,
+       3.828
+      ],
+      "da_rt_before": [
+       2.369,
+       4.689,
+       2.735,
+       3.101,
+       4.819,
+       5.194,
+       2.142,
+       2.596,
+       2.414,
+       2.722,
+       2.831
+      ],
+      "da_rt_after": [
+       2.29,
+       3.637,
+       1.753,
+       2.958,
+       3.803,
+       1.608,
+       1.664,
+       1.593,
+       3.564,
+       2.293,
+       2.283
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 41.28,
+      "da_rt_revenue_per_kw": 26.81,
+      "value_of_perfect_foresight_per_kw": 14.47,
+      "capture_rate": 0.6494,
+      "da_losing_days": 57
+     },
+     "after": {
+      "pf_revenue_per_kw": 38.11,
+      "da_rt_revenue_per_kw": 19.62,
+      "value_of_perfect_foresight_per_kw": 18.49,
+      "capture_rate": 0.5148,
+      "da_losing_days": 49
+     },
+     "change": {
+      "pf_revenue": -0.0768,
+      "da_rt_revenue": -0.2682,
+      "capture_rate_pts": -13.5
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.494,
+       4.902,
+       3.366,
+       3.827,
+       5.848,
+       6.155,
+       2.283,
+       3.358,
+       3.077,
+       2.81,
+       3.164
+      ],
+      "pf_after": [
+       2.474,
+       7.7,
+       2.073,
+       3.756,
+       5.119,
+       1.987,
+       1.931,
+       1.808,
+       4.883,
+       3.387,
+       2.994
+      ],
+      "da_rt_before": [
+       1.566,
+       3.679,
+       1.802,
+       2.319,
+       3.756,
+       4.464,
+       1.363,
+       2.024,
+       1.668,
+       2.003,
+       2.165
+      ],
+      "da_rt_after": [
+       1.562,
+       2.811,
+       1.003,
+       1.981,
+       2.995,
+       0.973,
+       0.998,
+       1.009,
+       2.967,
+       1.715,
+       1.607
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 72.55,
+      "da_rt_revenue_per_kw": 53.51,
+      "value_of_perfect_foresight_per_kw": 19.04,
+      "capture_rate": 0.7375,
+      "da_losing_days": 15
+     },
+     "after": {
+      "pf_revenue_per_kw": 70.95,
+      "da_rt_revenue_per_kw": 50.08,
+      "value_of_perfect_foresight_per_kw": 20.87,
+      "capture_rate": 0.7059,
+      "da_losing_days": 19
+     },
+     "change": {
+      "pf_revenue": -0.0221,
+      "da_rt_revenue": -0.0641,
+      "capture_rate_pts": -3.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       4.874,
+       7.706,
+       6.17,
+       7.065,
+       9.623,
+       9.734,
+       4.555,
+       5.971,
+       5.742,
+       5.241,
+       5.865
+      ],
+      "pf_after": [
+       5.034,
+       13.049,
+       4.479,
+       6.838,
+       8.891,
+       4.373,
+       4.227,
+       3.952,
+       8.406,
+       6.136,
+       5.562
+      ],
+      "da_rt_before": [
+       3.487,
+       6.196,
+       4.199,
+       4.901,
+       7.265,
+       7.545,
+       3.274,
+       4.202,
+       3.814,
+       4.16,
+       4.463
+      ],
+      "da_rt_after": [
+       3.838,
+       7.605,
+       3.206,
+       5.671,
+       6.875,
+       2.885,
+       2.956,
+       2.88,
+       6.346,
+       3.792,
+       4.025
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 54.96,
+      "da_rt_revenue_per_kw": 38.56,
+      "value_of_perfect_foresight_per_kw": 16.4,
+      "capture_rate": 0.7016,
+      "da_losing_days": 63
+     },
+     "after": {
+      "pf_revenue_per_kw": 54.68,
+      "da_rt_revenue_per_kw": 35.93,
+      "value_of_perfect_foresight_per_kw": 18.75,
+      "capture_rate": 0.6571,
+      "da_losing_days": 49
+     },
+     "change": {
+      "pf_revenue": -0.0051,
+      "da_rt_revenue": -0.0682,
+      "capture_rate_pts": -4.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.34,
+       6.059,
+       4.658,
+       5.199,
+       7.692,
+       8.051,
+       3.059,
+       4.493,
+       4.175,
+       3.784,
+       4.448
+      ],
+      "pf_after": [
+       3.657,
+       11.51,
+       2.954,
+       5.09,
+       7.285,
+       2.79,
+       2.844,
+       2.6,
+       6.95,
+       4.671,
+       4.332
+      ],
+      "da_rt_before": [
+       2.175,
+       4.51,
+       2.685,
+       3.542,
+       5.529,
+       6.289,
+       1.978,
+       3.146,
+       2.465,
+       2.952,
+       3.288
+      ],
+      "da_rt_after": [
+       2.521,
+       6.191,
+       1.84,
+       4.011,
+       5.427,
+       1.713,
+       1.765,
+       1.73,
+       5.183,
+       2.643,
+       2.904
+      ]
+     }
+    }
+   ],
+   "location_type": "hub",
+   "prices": {
+    "before": {
+     "rt_mean": 23.87,
+     "da_mean": 25.15,
+     "rt_minus_da_mean": -1.28,
+     "rt_minus_da_mean_abs": 13.02,
+     "rt_std": 51.78,
+     "rt_intraday_std_mean": 23.86,
+     "rt_intraday_std_median": 15.27,
+     "rt_intervals_over_1000": 13,
+     "rt_intervals_below_0": 5623
+    },
+    "after": {
+     "rt_mean": 24.77,
+     "da_mean": 27.58,
+     "rt_minus_da_mean": -2.81,
+     "rt_minus_da_mean_abs": 14.05,
+     "rt_std": 50.02,
+     "rt_intraday_std_mean": 22.83,
+     "rt_intraday_std_median": 14.57,
+     "rt_intervals_over_1000": 16,
+     "rt_intervals_below_0": 6021
+    }
+   },
+   "matched_days": 324
+  },
+  "HB_SOUTH": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 28.31,
+      "da_rt_revenue_per_kw": 16.28,
+      "value_of_perfect_foresight_per_kw": 12.03,
+      "capture_rate": 0.5751,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 23.99,
+      "da_rt_revenue_per_kw": 10.26,
+      "value_of_perfect_foresight_per_kw": 13.73,
+      "capture_rate": 0.4277,
+      "da_losing_days": 16
+     },
+     "change": {
+      "pf_revenue": -0.1526,
+      "da_rt_revenue": -0.3698,
+      "capture_rate_pts": -14.7
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.508,
+       2.084,
+       2.099,
+       3.122,
+       3.884,
+       4.254,
+       2.011,
+       2.611,
+       2.56,
+       2.034,
+       2.145
+      ],
+      "pf_after": [
+       1.636,
+       3.585,
+       1.514,
+       2.486,
+       3.782,
+       1.612,
+       1.2,
+       1.375,
+       2.8,
+       2.244,
+       1.759
+      ],
+      "da_rt_before": [
+       0.983,
+       1.0,
+       0.992,
+       1.864,
+       2.564,
+       2.822,
+       1.144,
+       1.059,
+       1.278,
+       1.219,
+       1.36
+      ],
+      "da_rt_after": [
+       0.991,
+       1.156,
+       0.796,
+       1.162,
+       1.352,
+       0.748,
+       0.524,
+       0.687,
+       1.289,
+       0.779,
+       0.78
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 21.9,
+      "da_rt_revenue_per_kw": 12.13,
+      "value_of_perfect_foresight_per_kw": 9.77,
+      "capture_rate": 0.5538,
+      "da_losing_days": 46
+     },
+     "after": {
+      "pf_revenue_per_kw": 18.01,
+      "da_rt_revenue_per_kw": 6.48,
+      "value_of_perfect_foresight_per_kw": 11.53,
+      "capture_rate": 0.3598,
+      "da_losing_days": 55
+     },
+     "change": {
+      "pf_revenue": -0.1776,
+      "da_rt_revenue": -0.4658,
+      "capture_rate_pts": -19.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.053,
+       1.489,
+       1.514,
+       2.436,
+       3.236,
+       3.652,
+       1.447,
+       2.067,
+       1.869,
+       1.479,
+       1.654
+      ],
+      "pf_after": [
+       1.15,
+       3.002,
+       1.021,
+       1.891,
+       3.067,
+       1.018,
+       0.708,
+       0.935,
+       2.265,
+       1.64,
+       1.312
+      ],
+      "da_rt_before": [
+       0.64,
+       0.518,
+       0.53,
+       1.426,
+       2.129,
+       2.465,
+       0.816,
+       0.77,
+       0.914,
+       0.9,
+       1.018
+      ],
+      "da_rt_after": [
+       0.638,
+       0.697,
+       0.451,
+       0.691,
+       0.983,
+       0.454,
+       0.248,
+       0.4,
+       0.991,
+       0.445,
+       0.481
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 43.3,
+      "da_rt_revenue_per_kw": 30.01,
+      "value_of_perfect_foresight_per_kw": 13.29,
+      "capture_rate": 0.6931,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 38.22,
+      "da_rt_revenue_per_kw": 21.46,
+      "value_of_perfect_foresight_per_kw": 16.77,
+      "capture_rate": 0.5613,
+      "da_losing_days": 13
+     },
+     "change": {
+      "pf_revenue": -0.1173,
+      "da_rt_revenue": -0.2849,
+      "capture_rate_pts": -13.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.207,
+       3.283,
+       3.335,
+       4.879,
+       5.653,
+       6.343,
+       3.166,
+       3.858,
+       3.948,
+       3.23,
+       3.396
+      ],
+      "pf_after": [
+       2.749,
+       5.715,
+       2.507,
+       3.927,
+       5.762,
+       2.552,
+       1.924,
+       2.251,
+       4.391,
+       3.56,
+       2.888
+      ],
+      "da_rt_before": [
+       1.547,
+       2.325,
+       2.031,
+       3.356,
+       4.228,
+       4.927,
+       2.195,
+       2.097,
+       2.382,
+       2.379,
+       2.543
+      ],
+      "da_rt_after": [
+       1.746,
+       2.975,
+       1.579,
+       2.15,
+       3.099,
+       1.441,
+       1.018,
+       1.38,
+       2.634,
+       1.676,
+       1.757
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 33.15,
+      "da_rt_revenue_per_kw": 21.91,
+      "value_of_perfect_foresight_per_kw": 11.25,
+      "capture_rate": 0.6608,
+      "da_losing_days": 41
+     },
+     "after": {
+      "pf_revenue_per_kw": 28.6,
+      "da_rt_revenue_per_kw": 14.17,
+      "value_of_perfect_foresight_per_kw": 14.43,
+      "capture_rate": 0.4955,
+      "da_losing_days": 54
+     },
+     "change": {
+      "pf_revenue": -0.1373,
+      "da_rt_revenue": -0.3533,
+      "capture_rate_pts": -16.5
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.458,
+       2.297,
+       2.38,
+       3.776,
+       4.607,
+       5.432,
+       2.288,
+       3.005,
+       2.914,
+       2.364,
+       2.632
+      ],
+      "pf_after": [
+       1.908,
+       4.751,
+       1.683,
+       2.947,
+       4.682,
+       1.63,
+       1.14,
+       1.508,
+       3.535,
+       2.615,
+       2.2
+      ],
+      "da_rt_before": [
+       0.898,
+       1.374,
+       1.08,
+       2.484,
+       3.36,
+       4.272,
+       1.562,
+       1.521,
+       1.677,
+       1.765,
+       1.915
+      ],
+      "da_rt_after": [
+       1.049,
+       2.104,
+       0.903,
+       1.318,
+       2.424,
+       0.824,
+       0.483,
+       0.818,
+       2.044,
+       1.021,
+       1.183
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 60.51,
+      "da_rt_revenue_per_kw": 48.32,
+      "value_of_perfect_foresight_per_kw": 12.19,
+      "capture_rate": 0.7985,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 55.99,
+      "da_rt_revenue_per_kw": 41.16,
+      "value_of_perfect_foresight_per_kw": 14.83,
+      "capture_rate": 0.7351,
+      "da_losing_days": 11
+     },
+     "change": {
+      "pf_revenue": -0.0747,
+      "da_rt_revenue": -0.1482,
+      "capture_rate_pts": -6.3
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.003,
+       4.673,
+       4.789,
+       6.862,
+       7.52,
+       8.676,
+       4.416,
+       5.376,
+       5.692,
+       4.579,
+       4.921
+      ],
+      "pf_after": [
+       4.088,
+       8.674,
+       3.805,
+       5.513,
+       8.205,
+       3.801,
+       2.846,
+       3.482,
+       6.159,
+       4.978,
+       4.438
+      ],
+      "da_rt_before": [
+       2.163,
+       3.709,
+       3.382,
+       5.425,
+       6.49,
+       7.466,
+       3.425,
+       4.078,
+       4.239,
+       3.879,
+       4.062
+      ],
+      "da_rt_after": [
+       3.117,
+       5.949,
+       3.017,
+       4.532,
+       5.738,
+       2.582,
+       1.895,
+       2.755,
+       5.014,
+       3.196,
+       3.363
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 44.94,
+      "da_rt_revenue_per_kw": 33.96,
+      "value_of_perfect_foresight_per_kw": 10.98,
+      "capture_rate": 0.7556,
+      "da_losing_days": 46
+     },
+     "after": {
+      "pf_revenue_per_kw": 40.9,
+      "da_rt_revenue_per_kw": 27.7,
+      "value_of_perfect_foresight_per_kw": 13.21,
+      "capture_rate": 0.6771,
+      "da_losing_days": 57
+     },
+     "change": {
+      "pf_revenue": -0.0899,
+      "da_rt_revenue": -0.1843,
+      "capture_rate_pts": -7.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.847,
+       3.149,
+       3.346,
+       5.171,
+       5.917,
+       7.245,
+       3.032,
+       4.026,
+       4.191,
+       3.238,
+       3.776
+      ],
+      "pf_after": [
+       2.75,
+       7.189,
+       2.457,
+       3.966,
+       6.651,
+       2.355,
+       1.599,
+       2.231,
+       4.781,
+       3.556,
+       3.37
+      ],
+      "da_rt_before": [
+       1.139,
+       2.104,
+       1.833,
+       3.865,
+       4.928,
+       6.261,
+       2.254,
+       2.922,
+       2.948,
+       2.709,
+       2.993
+      ],
+      "da_rt_after": [
+       1.858,
+       4.442,
+       1.625,
+       3.102,
+       4.568,
+       1.401,
+       0.827,
+       1.663,
+       3.866,
+       2.028,
+       2.316
+      ]
+     }
+    }
+   ],
+   "location_type": "hub",
+   "prices": {
+    "before": {
+     "rt_mean": 30.03,
+     "da_mean": 31.22,
+     "rt_minus_da_mean": -1.18,
+     "rt_minus_da_mean_abs": 10.04,
+     "rt_std": 37.01,
+     "rt_intraday_std_mean": 19.84,
+     "rt_intraday_std_median": 13.44,
+     "rt_intervals_over_1000": 5,
+     "rt_intervals_below_0": 954
+    },
+    "after": {
+     "rt_mean": 31.79,
+     "da_mean": 34.1,
+     "rt_minus_da_mean": -2.31,
+     "rt_minus_da_mean_abs": 11.73,
+     "rt_std": 39.38,
+     "rt_intraday_std_mean": 17.95,
+     "rt_intraday_std_median": 11.0,
+     "rt_intervals_over_1000": 2,
+     "rt_intervals_below_0": 693
+    }
+   },
+   "matched_days": 324
+  },
+  "HB_WEST": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 35.26,
+      "da_rt_revenue_per_kw": 21.29,
+      "value_of_perfect_foresight_per_kw": 13.97,
+      "capture_rate": 0.6038,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 30.02,
+      "da_rt_revenue_per_kw": 13.73,
+      "value_of_perfect_foresight_per_kw": 16.29,
+      "capture_rate": 0.4573,
+      "da_losing_days": 16
+     },
+     "change": {
+      "pf_revenue": -0.1486,
+      "da_rt_revenue": -0.3551,
+      "capture_rate_pts": -14.7
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.151,
+       4.076,
+       2.93,
+       3.445,
+       4.684,
+       4.996,
+       2.192,
+       3.119,
+       2.777,
+       2.37,
+       2.52
+      ],
+      "pf_after": [
+       2.145,
+       5.054,
+       1.747,
+       2.98,
+       4.091,
+       2.028,
+       1.557,
+       1.679,
+       3.521,
+       2.811,
+       2.41
+      ],
+      "da_rt_before": [
+       1.258,
+       2.996,
+       1.593,
+       1.91,
+       3.049,
+       3.278,
+       1.239,
+       1.331,
+       1.544,
+       1.489,
+       1.602
+      ],
+      "da_rt_after": [
+       1.281,
+       1.376,
+       0.832,
+       1.572,
+       1.869,
+       0.882,
+       0.815,
+       0.823,
+       1.719,
+       1.275,
+       1.286
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 28.17,
+      "da_rt_revenue_per_kw": 17.4,
+      "value_of_perfect_foresight_per_kw": 10.77,
+      "capture_rate": 0.6177,
+      "da_losing_days": 37
+     },
+     "after": {
+      "pf_revenue_per_kw": 23.61,
+      "da_rt_revenue_per_kw": 9.77,
+      "value_of_perfect_foresight_per_kw": 13.84,
+      "capture_rate": 0.4138,
+      "da_losing_days": 42
+     },
+     "change": {
+      "pf_revenue": -0.1619,
+      "da_rt_revenue": -0.4385,
+      "capture_rate_pts": -20.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.594,
+       3.444,
+       2.232,
+       2.648,
+       3.937,
+       4.354,
+       1.601,
+       2.464,
+       2.104,
+       1.818,
+       1.974
+      ],
+      "pf_after": [
+       1.578,
+       4.451,
+       1.203,
+       2.294,
+       3.394,
+       1.371,
+       1.034,
+       1.199,
+       2.957,
+       2.182,
+       1.949
+      ],
+      "da_rt_before": [
+       0.964,
+       2.581,
+       1.242,
+       1.468,
+       2.564,
+       2.961,
+       0.948,
+       0.989,
+       1.21,
+       1.189,
+       1.286
+      ],
+      "da_rt_after": [
+       0.884,
+       1.014,
+       0.471,
+       1.091,
+       1.394,
+       0.557,
+       0.548,
+       0.561,
+       1.406,
+       0.903,
+       0.939
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 53.9,
+      "da_rt_revenue_per_kw": 38.15,
+      "value_of_perfect_foresight_per_kw": 15.75,
+      "capture_rate": 0.7078,
+      "da_losing_days": 8
+     },
+     "after": {
+      "pf_revenue_per_kw": 48.35,
+      "da_rt_revenue_per_kw": 28.21,
+      "value_of_perfect_foresight_per_kw": 20.15,
+      "capture_rate": 0.5833,
+      "da_losing_days": 13
+     },
+     "change": {
+      "pf_revenue": -0.103,
+      "da_rt_revenue": -0.2606,
+      "capture_rate_pts": -12.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.218,
+       6.048,
+       4.689,
+       5.42,
+       6.818,
+       7.328,
+       3.539,
+       4.624,
+       4.368,
+       3.809,
+       4.04
+      ],
+      "pf_after": [
+       3.606,
+       8.192,
+       2.937,
+       4.709,
+       6.412,
+       3.157,
+       2.557,
+       2.709,
+       5.583,
+       4.498,
+       3.993
+      ],
+      "da_rt_before": [
+       2.142,
+       4.789,
+       2.871,
+       3.604,
+       5.012,
+       5.583,
+       2.426,
+       2.895,
+       2.93,
+       2.887,
+       3.012
+      ],
+      "da_rt_after": [
+       2.248,
+       3.594,
+       1.676,
+       2.842,
+       4.158,
+       1.757,
+       1.579,
+       1.716,
+       3.56,
+       2.63,
+       2.445
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 42.88,
+      "da_rt_revenue_per_kw": 30.32,
+      "value_of_perfect_foresight_per_kw": 12.57,
+      "capture_rate": 0.707,
+      "da_losing_days": 36
+     },
+     "after": {
+      "pf_revenue_per_kw": 38.19,
+      "da_rt_revenue_per_kw": 20.64,
+      "value_of_perfect_foresight_per_kw": 17.54,
+      "capture_rate": 0.5406,
+      "da_losing_days": 41
+     },
+     "change": {
+      "pf_revenue": -0.1094,
+      "da_rt_revenue": -0.3193,
+      "capture_rate_pts": -16.6
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.328,
+       5.013,
+       3.6,
+       4.213,
+       5.654,
+       6.349,
+       2.63,
+       3.631,
+       3.339,
+       2.951,
+       3.177
+      ],
+      "pf_after": [
+       2.68,
+       7.234,
+       2.055,
+       3.632,
+       5.33,
+       2.147,
+       1.726,
+       1.919,
+       4.696,
+       3.523,
+       3.248
+      ],
+      "da_rt_before": [
+       1.5,
+       3.935,
+       1.98,
+       2.739,
+       4.08,
+       4.989,
+       1.861,
+       2.243,
+       2.273,
+       2.31,
+       2.407
+      ],
+      "da_rt_after": [
+       1.486,
+       2.913,
+       1.057,
+       1.981,
+       3.299,
+       1.129,
+       1.017,
+       1.162,
+       2.884,
+       1.931,
+       1.785
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 75.35,
+      "da_rt_revenue_per_kw": 59.39,
+      "value_of_perfect_foresight_per_kw": 15.96,
+      "capture_rate": 0.7882,
+      "da_losing_days": 5
+     },
+     "after": {
+      "pf_revenue_per_kw": 71.34,
+      "da_rt_revenue_per_kw": 52.79,
+      "value_of_perfect_foresight_per_kw": 18.55,
+      "capture_rate": 0.74,
+      "da_losing_days": 12
+     },
+     "change": {
+      "pf_revenue": -0.0532,
+      "da_rt_revenue": -0.1111,
+      "capture_rate_pts": -4.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       4.459,
+       8.018,
+       6.643,
+       7.773,
+       9.145,
+       10.0,
+       5.132,
+       6.466,
+       6.348,
+       5.548,
+       5.82
+      ],
+      "pf_after": [
+       5.394,
+       12.478,
+       4.452,
+       6.593,
+       9.352,
+       4.605,
+       3.904,
+       4.109,
+       8.047,
+       6.378,
+       6.023
+      ],
+      "da_rt_before": [
+       3.16,
+       6.693,
+       4.589,
+       5.998,
+       7.473,
+       8.426,
+       3.926,
+       4.606,
+       5.046,
+       4.714,
+       4.762
+      ],
+      "da_rt_after": [
+       3.899,
+       7.506,
+       3.276,
+       5.603,
+       7.456,
+       3.238,
+       2.978,
+       3.269,
+       6.253,
+       4.749,
+       4.56
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 58.67,
+      "da_rt_revenue_per_kw": 45.16,
+      "value_of_perfect_foresight_per_kw": 13.51,
+      "capture_rate": 0.7698,
+      "da_losing_days": 39
+     },
+     "after": {
+      "pf_revenue_per_kw": 55.64,
+      "da_rt_revenue_per_kw": 38.9,
+      "value_of_perfect_foresight_per_kw": 16.74,
+      "capture_rate": 0.6992,
+      "da_losing_days": 44
+     },
+     "change": {
+      "pf_revenue": -0.0516,
+      "da_rt_revenue": -0.1386,
+      "capture_rate_pts": -7.1
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       3.104,
+       6.407,
+       5.061,
+       5.96,
+       7.438,
+       8.47,
+       3.711,
+       4.969,
+       4.818,
+       4.18,
+       4.551
+      ],
+      "pf_after": [
+       3.996,
+       10.997,
+       3.077,
+       4.982,
+       7.752,
+       3.061,
+       2.59,
+       2.812,
+       6.649,
+       4.879,
+       4.848
+      ],
+      "da_rt_before": [
+       2.001,
+       5.161,
+       2.967,
+       4.467,
+       5.929,
+       7.246,
+       2.833,
+       3.429,
+       3.83,
+       3.586,
+       3.712
+      ],
+      "da_rt_after": [
+       2.612,
+       6.113,
+       2.095,
+       4.07,
+       6.088,
+       1.979,
+       1.905,
+       2.17,
+       4.994,
+       3.467,
+       3.41
+      ]
+     }
+    }
+   ],
+   "location_type": "hub",
+   "prices": {
+    "before": {
+     "rt_mean": 32.03,
+     "da_mean": 32.9,
+     "rt_minus_da_mean": -0.87,
+     "rt_minus_da_mean_abs": 12.61,
+     "rt_std": 50.94,
+     "rt_intraday_std_mean": 24.94,
+     "rt_intraday_std_median": 16.45,
+     "rt_intervals_over_1000": 13,
+     "rt_intervals_below_0": 2232
+    },
+    "after": {
+     "rt_mean": 30.23,
+     "da_mean": 32.72,
+     "rt_minus_da_mean": -2.49,
+     "rt_minus_da_mean_abs": 14.21,
+     "rt_std": 51.32,
+     "rt_intraday_std_mean": 23.56,
+     "rt_intraday_std_median": 14.51,
+     "rt_intervals_over_1000": 14,
+     "rt_intervals_below_0": 4097
+    }
+   },
+   "matched_days": 324
+  },
+  "RHESS2_ESS1": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 107.03,
+      "da_rt_revenue_per_kw": 74.38,
+      "value_of_perfect_foresight_per_kw": 32.66,
+      "capture_rate": 0.6949,
+      "da_losing_days": 27
+     },
+     "after": {
+      "pf_revenue_per_kw": 58.4,
+      "da_rt_revenue_per_kw": 25.51,
+      "value_of_perfect_foresight_per_kw": 32.89,
+      "capture_rate": 0.4368,
+      "da_losing_days": 23
+     },
+     "change": {
+      "pf_revenue": -0.4544,
+      "da_rt_revenue": -0.657,
+      "capture_rate_pts": -25.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.496,
+       2.92,
+       44.29,
+       3.325,
+       20.905,
+       6.699,
+       4.944,
+       3.845,
+       8.207,
+       4.372,
+       6.028
+      ],
+      "pf_after": [
+       1.854,
+       4.372,
+       1.598,
+       2.661,
+       4.049,
+       1.869,
+       10.578,
+       5.822,
+       17.75,
+       4.912,
+       2.933
+      ],
+      "da_rt_before": [
+       0.979,
+       1.545,
+       39.663,
+       1.801,
+       14.469,
+       3.402,
+       1.56,
+       1.359,
+       3.821,
+       2.583,
+       3.194
+      ],
+      "da_rt_after": [
+       0.981,
+       1.517,
+       0.822,
+       1.177,
+       1.467,
+       0.845,
+       9.379,
+       2.19,
+       4.299,
+       1.558,
+       1.275
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 100.0,
+      "da_rt_revenue_per_kw": 70.27,
+      "value_of_perfect_foresight_per_kw": 29.73,
+      "capture_rate": 0.7027,
+      "da_losing_days": 69
+     },
+     "after": {
+      "pf_revenue_per_kw": 51.7,
+      "da_rt_revenue_per_kw": 21.88,
+      "value_of_perfect_foresight_per_kw": 29.82,
+      "capture_rate": 0.4232,
+      "da_losing_days": 68
+     },
+     "change": {
+      "pf_revenue": -0.483,
+      "da_rt_revenue": -0.6886,
+      "capture_rate_pts": -27.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.032,
+       2.287,
+       43.72,
+       2.624,
+       20.203,
+       6.036,
+       4.267,
+       3.246,
+       7.405,
+       3.727,
+       5.449
+      ],
+      "pf_after": [
+       1.356,
+       3.782,
+       1.113,
+       2.062,
+       3.35,
+       1.242,
+       9.997,
+       5.182,
+       17.013,
+       4.176,
+       2.432
+      ],
+      "da_rt_before": [
+       0.626,
+       1.108,
+       39.163,
+       1.299,
+       13.959,
+       3.011,
+       1.244,
+       0.981,
+       3.681,
+       2.269,
+       2.93
+      ],
+      "da_rt_after": [
+       0.613,
+       1.075,
+       0.454,
+       0.746,
+       1.124,
+       0.528,
+       9.111,
+       2.07,
+       3.872,
+       1.366,
+       0.923
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 181.54,
+      "da_rt_revenue_per_kw": 134.02,
+      "value_of_perfect_foresight_per_kw": 47.53,
+      "capture_rate": 0.7382,
+      "da_losing_days": 22
+     },
+     "after": {
+      "pf_revenue_per_kw": 87.85,
+      "da_rt_revenue_per_kw": 40.33,
+      "value_of_perfect_foresight_per_kw": 47.52,
+      "capture_rate": 0.459,
+      "da_losing_days": 21
+     },
+     "change": {
+      "pf_revenue": -0.5161,
+      "da_rt_revenue": -0.6991,
+      "capture_rate_pts": -27.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.197,
+       4.413,
+       84.393,
+       5.207,
+       33.629,
+       10.3,
+       6.451,
+       5.693,
+       12.697,
+       7.201,
+       9.363
+      ],
+      "pf_after": [
+       3.119,
+       6.838,
+       2.67,
+       4.183,
+       6.155,
+       2.917,
+       13.859,
+       9.65,
+       26.275,
+       7.517,
+       4.667
+      ],
+      "da_rt_before": [
+       1.536,
+       2.691,
+       71.644,
+       3.363,
+       26.15,
+       5.954,
+       2.185,
+       2.824,
+       6.261,
+       4.739,
+       6.668
+      ],
+      "da_rt_after": [
+       1.712,
+       3.627,
+       1.651,
+       2.183,
+       3.337,
+       1.492,
+       12.11,
+       3.649,
+       4.79,
+       3.34,
+       2.434
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 170.8,
+      "da_rt_revenue_per_kw": 126.15,
+      "value_of_perfect_foresight_per_kw": 44.65,
+      "capture_rate": 0.7386,
+      "da_losing_days": 67
+     },
+     "after": {
+      "pf_revenue_per_kw": 77.5,
+      "da_rt_revenue_per_kw": 33.39,
+      "value_of_perfect_foresight_per_kw": 44.11,
+      "capture_rate": 0.4309,
+      "da_losing_days": 68
+     },
+     "change": {
+      "pf_revenue": -0.5463,
+      "da_rt_revenue": -0.7353,
+      "capture_rate_pts": -30.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.434,
+       3.389,
+       83.459,
+       4.092,
+       32.533,
+       9.331,
+       5.453,
+       4.803,
+       11.546,
+       6.233,
+       8.525
+      ],
+      "pf_after": [
+       2.28,
+       5.863,
+       1.847,
+       3.215,
+       5.102,
+       1.96,
+       12.98,
+       8.685,
+       25.214,
+       6.441,
+       3.918
+      ],
+      "da_rt_before": [
+       0.87,
+       1.83,
+       70.685,
+       2.431,
+       25.294,
+       5.283,
+       1.552,
+       2.113,
+       5.829,
+       4.12,
+       6.14
+      ],
+      "da_rt_after": [
+       1.024,
+       2.748,
+       0.954,
+       1.405,
+       2.738,
+       0.902,
+       11.608,
+       3.113,
+       4.142,
+       2.866,
+       1.894
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 279.2,
+      "da_rt_revenue_per_kw": 235.78,
+      "value_of_perfect_foresight_per_kw": 43.42,
+      "capture_rate": 0.8445,
+      "da_losing_days": 19
+     },
+     "after": {
+      "pf_revenue_per_kw": 118.76,
+      "da_rt_revenue_per_kw": 69.63,
+      "value_of_perfect_foresight_per_kw": 49.13,
+      "capture_rate": 0.5863,
+      "da_losing_days": 21
+     },
+     "change": {
+      "pf_revenue": -0.5746,
+      "da_rt_revenue": -0.7047,
+      "capture_rate_pts": -25.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.973,
+       5.935,
+       140.623,
+       7.353,
+       50.039,
+       14.794,
+       8.063,
+       8.157,
+       17.042,
+       11.101,
+       13.122
+      ],
+      "pf_after": [
+       4.662,
+       10.137,
+       4.071,
+       5.906,
+       8.829,
+       4.341,
+       15.308,
+       15.332,
+       32.707,
+       10.547,
+       6.92
+      ],
+      "da_rt_before": [
+       2.17,
+       4.317,
+       127.475,
+       5.327,
+       44.629,
+       10.703,
+       4.464,
+       5.313,
+       11.798,
+       8.694,
+       10.889
+      ],
+      "da_rt_after": [
+       3.08,
+       6.839,
+       3.205,
+       4.583,
+       6.236,
+       2.698,
+       13.485,
+       7.748,
+       10.979,
+       6.0,
+       4.776
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 263.2,
+      "da_rt_revenue_per_kw": 220.49,
+      "value_of_perfect_foresight_per_kw": 42.71,
+      "capture_rate": 0.8377,
+      "da_losing_days": 66
+     },
+     "after": {
+      "pf_revenue_per_kw": 103.1,
+      "da_rt_revenue_per_kw": 56.48,
+      "value_of_perfect_foresight_per_kw": 46.62,
+      "capture_rate": 0.5478,
+      "da_losing_days": 70
+     },
+     "change": {
+      "pf_revenue": -0.6083,
+      "da_rt_revenue": -0.7438,
+      "capture_rate_pts": -29.0
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.807,
+       4.379,
+       139.176,
+       5.642,
+       48.422,
+       13.337,
+       6.602,
+       6.789,
+       15.441,
+       9.687,
+       11.921
+      ],
+      "pf_after": [
+       3.343,
+       8.627,
+       2.718,
+       4.386,
+       7.312,
+       2.849,
+       13.978,
+       13.88,
+       31.182,
+       9.018,
+       5.802
+      ],
+      "da_rt_before": [
+       1.101,
+       2.797,
+       124.686,
+       3.769,
+       43.071,
+       9.438,
+       3.501,
+       4.148,
+       10.536,
+       7.508,
+       9.938
+      ],
+      "da_rt_after": [
+       1.869,
+       5.328,
+       1.788,
+       3.201,
+       5.099,
+       1.538,
+       12.464,
+       6.623,
+       9.833,
+       4.92,
+       3.815
+      ]
+     }
+    }
+   ],
+   "location_type": "node",
+   "prices": {
+    "before": {
+     "rt_mean": 68.95,
+     "da_mean": 57.72,
+     "rt_minus_da_mean": 11.23,
+     "rt_minus_da_mean_abs": 54.99,
+     "rt_std": 665.03,
+     "rt_intraday_std_mean": 86.62,
+     "rt_intraday_std_median": 18.45,
+     "rt_intervals_over_1000": 170,
+     "rt_intervals_below_0": 847
+    },
+    "after": {
+     "rt_mean": 42.68,
+     "da_mean": 44.03,
+     "rt_minus_da_mean": -1.35,
+     "rt_minus_da_mean_abs": 23.61,
+     "rt_std": 158.03,
+     "rt_intraday_std_mean": 42.14,
+     "rt_intraday_std_median": 14.19,
+     "rt_intervals_over_1000": 69,
+     "rt_intervals_below_0": 714
+    }
+   },
+   "matched_days": 324
+  },
+  "RUSSEKST_RN": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 143.2,
+      "da_rt_revenue_per_kw": 37.19,
+      "value_of_perfect_foresight_per_kw": 106.0,
+      "capture_rate": 0.2597,
+      "da_losing_days": 41
+     },
+     "after": {
+      "pf_revenue_per_kw": 62.97,
+      "da_rt_revenue_per_kw": 17.27,
+      "value_of_perfect_foresight_per_kw": 45.7,
+      "capture_rate": 0.2742,
+      "da_losing_days": 41
+     },
+     "change": {
+      "pf_revenue": -0.5603,
+      "da_rt_revenue": -0.5356,
+      "capture_rate_pts": 1.5
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       14.412,
+       16.017,
+       13.068,
+       6.974,
+       9.101,
+       15.29,
+       11.426,
+       18.394,
+       19.187,
+       14.816,
+       4.511
+      ],
+      "pf_after": [
+       5.005,
+       11.738,
+       7.1,
+       5.004,
+       6.795,
+       4.877,
+       5.454,
+       3.822,
+       4.618,
+       5.043,
+       3.509
+      ],
+      "da_rt_before": [
+       5.11,
+       2.414,
+       2.759,
+       3.164,
+       2.941,
+       4.142,
+       2.532,
+       3.677,
+       5.764,
+       3.875,
+       0.816
+      ],
+      "da_rt_after": [
+       1.528,
+       3.18,
+       1.664,
+       1.716,
+       2.46,
+       0.563,
+       0.388,
+       1.49,
+       1.632,
+       1.382,
+       1.262
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 132.71,
+      "da_rt_revenue_per_kw": 33.38,
+      "value_of_perfect_foresight_per_kw": 99.33,
+      "capture_rate": 0.2515,
+      "da_losing_days": 51
+     },
+     "after": {
+      "pf_revenue_per_kw": 53.96,
+      "da_rt_revenue_per_kw": 13.74,
+      "value_of_perfect_foresight_per_kw": 40.21,
+      "capture_rate": 0.2547,
+      "da_losing_days": 59
+     },
+     "change": {
+      "pf_revenue": -0.5934,
+      "da_rt_revenue": -0.5884,
+      "capture_rate_pts": 0.3
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       13.581,
+       15.019,
+       12.099,
+       6.111,
+       8.201,
+       14.298,
+       10.508,
+       17.373,
+       17.988,
+       13.765,
+       3.767
+      ],
+      "pf_after": [
+       4.318,
+       10.762,
+       6.333,
+       4.101,
+       5.858,
+       3.938,
+       4.55,
+       3.103,
+       3.869,
+       4.244,
+       2.881
+      ],
+      "da_rt_before": [
+       4.797,
+       2.439,
+       2.293,
+       3.09,
+       2.532,
+       3.688,
+       2.069,
+       3.326,
+       5.186,
+       3.457,
+       0.5
+      ],
+      "da_rt_after": [
+       1.106,
+       2.831,
+       1.619,
+       1.215,
+       2.07,
+       0.185,
+       0.036,
+       1.244,
+       1.327,
+       1.028,
+       1.081
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 195.83,
+      "da_rt_revenue_per_kw": 70.65,
+      "value_of_perfect_foresight_per_kw": 125.17,
+      "capture_rate": 0.3608,
+      "da_losing_days": 35
+     },
+     "after": {
+      "pf_revenue_per_kw": 91.67,
+      "da_rt_revenue_per_kw": 32.85,
+      "value_of_perfect_foresight_per_kw": 58.82,
+      "capture_rate": 0.3584,
+      "da_losing_days": 37
+     },
+     "change": {
+      "pf_revenue": -0.5319,
+      "da_rt_revenue": -0.535,
+      "capture_rate_pts": -0.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       21.168,
+       23.598,
+       18.063,
+       10.242,
+       12.628,
+       20.04,
+       14.842,
+       24.353,
+       24.635,
+       19.663,
+       6.595
+      ],
+      "pf_after": [
+       7.48,
+       17.296,
+       10.347,
+       7.28,
+       9.897,
+       6.864,
+       7.208,
+       5.784,
+       6.843,
+       7.337,
+       5.333
+      ],
+      "da_rt_before": [
+       10.136,
+       5.806,
+       6.124,
+       5.895,
+       5.602,
+       8.825,
+       4.361,
+       6.342,
+       8.291,
+       7.193,
+       2.079
+      ],
+      "da_rt_after": [
+       2.61,
+       5.946,
+       3.112,
+       3.072,
+       4.662,
+       1.206,
+       0.863,
+       2.947,
+       3.329,
+       2.557,
+       2.547
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 181.26,
+      "da_rt_revenue_per_kw": 61.93,
+      "value_of_perfect_foresight_per_kw": 119.33,
+      "capture_rate": 0.3417,
+      "da_losing_days": 44
+     },
+     "after": {
+      "pf_revenue_per_kw": 78.75,
+      "da_rt_revenue_per_kw": 25.82,
+      "value_of_perfect_foresight_per_kw": 52.93,
+      "capture_rate": 0.3279,
+      "da_losing_days": 55
+     },
+     "change": {
+      "pf_revenue": -0.5655,
+      "da_rt_revenue": -0.5831,
+      "capture_rate_pts": -1.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       19.989,
+       22.194,
+       16.74,
+       9.011,
+       11.33,
+       18.646,
+       13.553,
+       22.95,
+       23.055,
+       18.255,
+       5.539
+      ],
+      "pf_after": [
+       6.425,
+       15.931,
+       9.243,
+       6.009,
+       8.554,
+       5.546,
+       5.987,
+       4.742,
+       5.734,
+       6.179,
+       4.402
+      ],
+      "da_rt_before": [
+       9.373,
+       5.279,
+       5.278,
+       5.138,
+       4.853,
+       7.944,
+       3.578,
+       5.068,
+       7.583,
+       6.366,
+       1.474
+      ],
+      "da_rt_after": [
+       1.762,
+       5.266,
+       2.816,
+       2.195,
+       3.937,
+       0.523,
+       0.205,
+       2.399,
+       2.76,
+       1.777,
+       2.18
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 246.49,
+      "da_rt_revenue_per_kw": 115.19,
+      "value_of_perfect_foresight_per_kw": 131.3,
+      "capture_rate": 0.4673,
+      "da_losing_days": 32
+     },
+     "after": {
+      "pf_revenue_per_kw": 124.29,
+      "da_rt_revenue_per_kw": 61.4,
+      "value_of_perfect_foresight_per_kw": 62.88,
+      "capture_rate": 0.494,
+      "da_losing_days": 37
+     },
+     "change": {
+      "pf_revenue": -0.4958,
+      "da_rt_revenue": -0.467,
+      "capture_rate_pts": 2.7
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       28.694,
+       32.031,
+       23.638,
+       13.46,
+       15.802,
+       23.781,
+       17.377,
+       29.329,
+       29.055,
+       24.463,
+       8.858
+      ],
+      "pf_after": [
+       10.174,
+       24.228,
+       13.516,
+       9.62,
+       13.574,
+       9.178,
+       9.013,
+       8.336,
+       9.318,
+       9.775,
+       7.554
+      ],
+      "da_rt_before": [
+       16.962,
+       12.06,
+       11.574,
+       8.86,
+       9.356,
+       13.284,
+       6.979,
+       11.114,
+       11.394,
+       10.161,
+       3.444
+      ],
+      "da_rt_after": [
+       4.818,
+       11.761,
+       6.225,
+       6.044,
+       8.143,
+       2.317,
+       2.15,
+       5.406,
+       5.921,
+       3.882,
+       4.736
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 226.59,
+      "da_rt_revenue_per_kw": 99.42,
+      "value_of_perfect_foresight_per_kw": 127.17,
+      "capture_rate": 0.4388,
+      "da_losing_days": 46
+     },
+     "after": {
+      "pf_revenue_per_kw": 106.19,
+      "da_rt_revenue_per_kw": 48.74,
+      "value_of_perfect_foresight_per_kw": 57.45,
+      "capture_rate": 0.459,
+      "da_losing_days": 57
+     },
+     "change": {
+      "pf_revenue": -0.5314,
+      "da_rt_revenue": -0.5098,
+      "capture_rate_pts": 2.0
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       27.083,
+       30.161,
+       21.864,
+       11.681,
+       14.002,
+       21.833,
+       15.609,
+       27.396,
+       27.002,
+       22.566,
+       7.396
+      ],
+      "pf_after": [
+       8.667,
+       22.387,
+       11.96,
+       7.876,
+       11.745,
+       7.354,
+       7.366,
+       6.831,
+       7.705,
+       8.107,
+       6.197
+      ],
+      "da_rt_before": [
+       15.628,
+       11.111,
+       10.413,
+       7.385,
+       8.022,
+       11.596,
+       5.798,
+       8.453,
+       10.106,
+       8.727,
+       2.182
+      ],
+      "da_rt_after": [
+       3.365,
+       10.482,
+       5.328,
+       4.552,
+       6.981,
+       1.096,
+       1.343,
+       4.3,
+       4.759,
+       2.529,
+       4.006
+      ]
+     }
+    }
+   ],
+   "location_type": "node",
+   "prices": {
+    "before": {
+     "rt_mean": 83.35,
+     "da_mean": 83.57,
+     "rt_minus_da_mean": -0.23,
+     "rt_minus_da_mean_abs": 57.25,
+     "rt_std": 167.27,
+     "rt_intraday_std_mean": 98.54,
+     "rt_intraday_std_median": 44.44,
+     "rt_intervals_over_1000": 145,
+     "rt_intervals_below_0": 2187
+    },
+    "after": {
+     "rt_mean": 46.05,
+     "da_mean": 49.53,
+     "rt_minus_da_mean": -3.48,
+     "rt_minus_da_mean_abs": 28.86,
+     "rt_std": 79.22,
+     "rt_intraday_std_mean": 44.23,
+     "rt_intraday_std_median": 23.97,
+     "rt_intervals_over_1000": 13,
+     "rt_intervals_below_0": 3331
+    }
+   },
+   "matched_days": 324
+  },
+  "WIPOPA_3_4": {
+   "runs": [
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 30.96,
+      "da_rt_revenue_per_kw": 18.0,
+      "value_of_perfect_foresight_per_kw": 12.96,
+      "capture_rate": 0.5814,
+      "da_losing_days": 11
+     },
+     "after": {
+      "pf_revenue_per_kw": 25.26,
+      "da_rt_revenue_per_kw": 10.67,
+      "value_of_perfect_foresight_per_kw": 14.59,
+      "capture_rate": 0.4223,
+      "da_losing_days": 16
+     },
+     "change": {
+      "pf_revenue": -0.1841,
+      "da_rt_revenue": -0.4072,
+      "capture_rate_pts": -15.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.478,
+       2.204,
+       2.275,
+       3.241,
+       4.491,
+       4.786,
+       2.52,
+       2.826,
+       2.8,
+       2.095,
+       2.247
+      ],
+      "pf_after": [
+       1.597,
+       3.703,
+       1.549,
+       2.627,
+       4.188,
+       1.654,
+       1.202,
+       1.438,
+       3.202,
+       2.417,
+       1.679
+      ],
+      "da_rt_before": [
+       0.984,
+       1.399,
+       1.004,
+       1.963,
+       3.002,
+       3.114,
+       1.189,
+       1.162,
+       1.423,
+       1.342,
+       1.418
+      ],
+      "da_rt_after": [
+       0.95,
+       1.262,
+       0.723,
+       1.202,
+       1.465,
+       0.773,
+       0.54,
+       0.704,
+       1.49,
+       0.916,
+       0.642
+      ]
+     }
+    },
+    {
+     "duration_h": 1.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 24.54,
+      "da_rt_revenue_per_kw": 13.78,
+      "value_of_perfect_foresight_per_kw": 10.76,
+      "capture_rate": 0.5614,
+      "da_losing_days": 40
+     },
+     "after": {
+      "pf_revenue_per_kw": 19.24,
+      "da_rt_revenue_per_kw": 6.98,
+      "value_of_perfect_foresight_per_kw": 12.26,
+      "capture_rate": 0.3627,
+      "da_losing_days": 57
+     },
+     "change": {
+      "pf_revenue": -0.216,
+      "da_rt_revenue": -0.4935,
+      "capture_rate_pts": -19.9
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.022,
+       1.614,
+       1.697,
+       2.551,
+       3.837,
+       4.171,
+       1.97,
+       2.281,
+       2.107,
+       1.55,
+       1.742
+      ],
+      "pf_after": [
+       1.113,
+       3.136,
+       1.075,
+       2.029,
+       3.456,
+       1.052,
+       0.718,
+       0.993,
+       2.652,
+       1.805,
+       1.213
+      ],
+      "da_rt_before": [
+       0.621,
+       0.936,
+       0.496,
+       1.519,
+       2.599,
+       2.758,
+       0.865,
+       0.81,
+       1.061,
+       1.029,
+       1.084
+      ],
+      "da_rt_after": [
+       0.593,
+       0.807,
+       0.389,
+       0.752,
+       1.128,
+       0.466,
+       0.265,
+       0.422,
+       1.191,
+       0.585,
+       0.382
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 46.96,
+      "da_rt_revenue_per_kw": 32.45,
+      "value_of_perfect_foresight_per_kw": 14.51,
+      "capture_rate": 0.691,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 39.98,
+      "da_rt_revenue_per_kw": 22.27,
+      "value_of_perfect_foresight_per_kw": 17.71,
+      "capture_rate": 0.5571,
+      "da_losing_days": 15
+     },
+     "change": {
+      "pf_revenue": -0.1486,
+      "da_rt_revenue": -0.3137,
+      "capture_rate_pts": -13.4
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.181,
+       3.441,
+       3.549,
+       5.061,
+       6.509,
+       7.074,
+       3.709,
+       4.186,
+       4.332,
+       3.365,
+       3.555
+      ],
+      "pf_after": [
+       2.646,
+       5.93,
+       2.581,
+       4.138,
+       6.309,
+       2.599,
+       1.919,
+       2.34,
+       4.994,
+       3.862,
+       2.659
+      ],
+      "da_rt_before": [
+       1.576,
+       2.517,
+       2.123,
+       3.542,
+       4.794,
+       5.395,
+       2.275,
+       2.312,
+       2.754,
+       2.515,
+       2.647
+      ],
+      "da_rt_after": [
+       1.692,
+       2.974,
+       1.593,
+       2.215,
+       3.297,
+       1.48,
+       1.032,
+       1.415,
+       3.017,
+       2.033,
+       1.521
+      ]
+     }
+    },
+    {
+     "duration_h": 2.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 36.85,
+      "da_rt_revenue_per_kw": 24.36,
+      "value_of_perfect_foresight_per_kw": 12.49,
+      "capture_rate": 0.6611,
+      "da_losing_days": 41
+     },
+     "after": {
+      "pf_revenue_per_kw": 30.36,
+      "da_rt_revenue_per_kw": 15.17,
+      "value_of_perfect_foresight_per_kw": 15.19,
+      "capture_rate": 0.4997,
+      "da_losing_days": 58
+     },
+     "change": {
+      "pf_revenue": -0.1761,
+      "da_rt_revenue": -0.3773,
+      "capture_rate_pts": -16.1
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.429,
+       2.458,
+       2.612,
+       3.956,
+       5.465,
+       6.151,
+       2.845,
+       3.339,
+       3.298,
+       2.512,
+       2.781
+      ],
+      "pf_after": [
+       1.806,
+       4.99,
+       1.776,
+       3.171,
+       5.237,
+       1.677,
+       1.141,
+       1.589,
+       4.106,
+       2.909,
+       1.96
+      ],
+      "da_rt_before": [
+       0.877,
+       1.629,
+       1.18,
+       2.658,
+       3.95,
+       4.747,
+       1.671,
+       1.673,
+       2.052,
+       1.898,
+       2.021
+      ],
+      "da_rt_after": [
+       0.978,
+       2.131,
+       0.899,
+       1.413,
+       2.7,
+       0.878,
+       0.497,
+       0.853,
+       2.429,
+       1.394,
+       1.002
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 0.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 65.31,
+      "da_rt_revenue_per_kw": 51.81,
+      "value_of_perfect_foresight_per_kw": 13.5,
+      "capture_rate": 0.7933,
+      "da_losing_days": 12
+     },
+     "after": {
+      "pf_revenue_per_kw": 58.21,
+      "da_rt_revenue_per_kw": 41.98,
+      "value_of_perfect_foresight_per_kw": 16.22,
+      "capture_rate": 0.7213,
+      "da_losing_days": 11
+     },
+     "change": {
+      "pf_revenue": -0.1087,
+      "da_rt_revenue": -0.1897,
+      "capture_rate_pts": -7.2
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       2.971,
+       4.891,
+       5.035,
+       7.12,
+       8.604,
+       9.623,
+       4.989,
+       5.817,
+       6.276,
+       4.823,
+       5.159
+      ],
+      "pf_after": [
+       3.891,
+       9.011,
+       3.92,
+       5.827,
+       9.016,
+       3.867,
+       2.811,
+       3.549,
+       6.933,
+       5.398,
+       3.984
+      ],
+      "da_rt_before": [
+       2.23,
+       3.871,
+       3.594,
+       5.692,
+       7.316,
+       8.202,
+       3.5,
+       4.369,
+       4.69,
+       4.126,
+       4.223
+      ],
+      "da_rt_after": [
+       2.787,
+       6.071,
+       3.106,
+       4.684,
+       6.185,
+       2.647,
+       1.873,
+       2.745,
+       5.624,
+       3.577,
+       2.683
+      ]
+     }
+    },
+    {
+     "duration_h": 4.0,
+     "deg_cost_per_mwh": 10.0,
+     "days": 324,
+     "before": {
+      "pf_revenue_per_kw": 49.77,
+      "da_rt_revenue_per_kw": 37.44,
+      "value_of_perfect_foresight_per_kw": 12.34,
+      "capture_rate": 0.7521,
+      "da_losing_days": 46
+     },
+     "after": {
+      "pf_revenue_per_kw": 43.19,
+      "da_rt_revenue_per_kw": 28.66,
+      "value_of_perfect_foresight_per_kw": 14.53,
+      "capture_rate": 0.6637,
+      "da_losing_days": 64
+     },
+     "change": {
+      "pf_revenue": -0.1322,
+      "da_rt_revenue": -0.2345,
+      "capture_rate_pts": -8.8
+     },
+     "monthly": {
+      "months": [
+       12,
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10
+      ],
+      "pf_before": [
+       1.811,
+       3.359,
+       3.614,
+       5.427,
+       7.011,
+       8.191,
+       3.628,
+       4.486,
+       4.769,
+       3.479,
+       3.997
+      ],
+      "pf_after": [
+       2.556,
+       7.542,
+       2.595,
+       4.311,
+       7.483,
+       2.426,
+       1.584,
+       2.285,
+       5.539,
+       3.956,
+       2.913
+      ],
+      "da_rt_before": [
+       1.117,
+       2.268,
+       2.059,
+       4.14,
+       5.747,
+       6.997,
+       2.349,
+       3.189,
+       3.426,
+       2.956,
+       3.187
+      ],
+      "da_rt_after": [
+       1.505,
+       4.624,
+       1.719,
+       3.271,
+       5.03,
+       1.471,
+       0.838,
+       1.634,
+       4.465,
+       2.385,
+       1.722
+      ]
+     }
+    }
+   ],
+   "location_type": "node",
+   "prices": {
+    "before": {
+     "rt_mean": 31.82,
+     "da_mean": 33.0,
+     "rt_minus_da_mean": -1.18,
+     "rt_minus_da_mean_abs": 10.81,
+     "rt_std": 42.98,
+     "rt_intraday_std_mean": 21.91,
+     "rt_intraday_std_median": 14.32,
+     "rt_intervals_over_1000": 9,
+     "rt_intervals_below_0": 794
+    },
+    "after": {
+     "rt_mean": 33.21,
+     "da_mean": 35.44,
+     "rt_minus_da_mean": -2.23,
+     "rt_minus_da_mean_abs": 12.44,
+     "rt_std": 41.73,
+     "rt_intraday_std_mean": 18.74,
+     "rt_intraday_std_median": 11.75,
+     "rt_intervals_over_1000": 3,
+     "rt_intervals_below_0": 656
+    }
+   },
+   "matched_days": 324
+  }
+ }
+}

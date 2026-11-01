@@ -4,7 +4,8 @@ Model: perfect-foresight energy arbitrage on ERCOT real-time 15-minute settlemen
 Each day is solved separately and starts and ends empty. 85% round-trip efficiency. No ancillary
 services. 100 MW battery; results are per kW, so size doesn't matter. 2026 hub data runs through
 Oct 24, 2026; 2026 node data through Oct 30. Every figure below comes from `results/*.json`
-(180 runs: 5 hubs and 5 resource nodes, listed in `results/index.json`).
+(180 runs: 5 hubs and 5 resource nodes, listed in `results/index.json`). Sections 7 and 8
+add a day-ahead-scheduled strategy and a before/after RTC+B comparison.
 
 ## 1. Ten days carry a fifth to two-fifths of the year
 Share of a 2-hour battery's annual revenue earned on its 10 best days ($10/MWh degradation):
@@ -116,6 +117,109 @@ corrections report keeps only recent months (Jan–Aug 2026 at the time of writi
 2024–2025 node prices can't be corrected. A corrected spike at a node, such as RHESS2_ESS1's
 February 2025 one, would change that node's result much more than 0.3%.
 
+## 7. Scheduling on day-ahead prices captures about two-thirds of perfect foresight, less in 2026
+Each day is optimized on ERCOT's day-ahead hourly prices with the same battery, the schedule is
+held fixed, and it is paid real-time 15-minute prices (each hourly MW applies to its four
+15-minute intervals). The DA price is used only as a forecast. Perfect-foresight and
+DA-scheduled revenue are compared on identical days. "Value of perfect foresight" is the gap
+between them, and the capture rate is DA-scheduled ÷ perfect foresight. Fields:
+`metrics.da_rt_revenue_per_kw_year`, `value_of_perfect_foresight_per_kw_year` and
+`capture_rate` in each results JSON and in `results/index.json`.
+
+Capture rate, 2-hour battery, $10/MWh degradation:
+
+| Location | 2024 | 2025 | 2026 YTD | 2025: PF → DA-scheduled ($/kW-yr) |
+|---|---|---|---|---|
+| HB_HOUSTON | 68% | 61% | 46% | 39.7 → 24.2 |
+| HB_NORTH | 70% | 67% | 53% | 43.4 → 29.2 |
+| HB_SOUTH | 68% | 65% | 49% | 39.5 → 25.5 |
+| HB_WEST | 69% | 69% | 54% | 48.7 → 33.4 |
+| HB_PAN | 65% | 65% | 51% | 46.8 → 30.2 |
+| ANSON1_ALL (typical node) | 69% | 67% | 53% | 47.4 → 31.9 |
+| WIPOPA_3_4 (typical node) | 66% | 64% | 49% | 42.8 → 27.5 |
+| CAMWIND_RN (volatile node) | 50% | 45% | 54% | 43.5 → 19.4 |
+| RHESS2_ESS1 (volatile node) | 65% | 73% | 43% | 179.2 → 130.2 |
+| RUSSEKST_RN (volatile node) | 47% | 33% | 33% | 176.0 → 58.5 |
+
+What this says:
+- **At hubs and typical nodes, the DA plan reached 61–70% of perfect foresight in 2024–2025.**
+  The gap, the value of perfect foresight, was $14–22/kW-yr in every hub-year, including 2026.
+  It barely moved while perfect-foresight revenue fell, which is why the capture rate fell.
+- **Longer batteries capture more.** Hubs in 2025: 50–60% for 1-hour, 61–69% for 2-hour,
+  70–76% for 4-hour. A 1-hour battery earns its money on a few sharp intervals, which the hourly
+  DA price often doesn't foresee; a 4-hour battery mostly follows the daily shape, which DA does.
+- **Congested nodes are harder to forecast from DA.** RUSSEKST_RN captured only 33–47%, so its
+  lead over HB_WEST (2.4–3.6× with perfect foresight, section 6) shrinks to 1.2–1.75× for the
+  DA-scheduled strategy ($/kW-yr). RHESS2_ESS1 kept 73% in 2025 because its February spike was
+  partly visible day-ahead: DA prices reached $6,863/MWh those mornings, and the DA schedule
+  earned $67 of the $77/kW that perfect foresight made on Feb 19–20.
+- **The DA schedule loses money at RT on 39–90 days a year** (out of ~365), when real-time
+  prices move against the plan. Perfect foresight never has a losing day.
+- **Selling the same schedule day-ahead would have paid more** at every hub in every year (for
+  example HB_HOUSTON 2025: $29.4/kW-yr at DA prices vs $24.2 at RT): in the hours the
+  schedule discharged, RT prices on balance came in below the DA prices it was planned on. That is a two-settlement market position, which this
+  section doesn't model as the strategy; it's reported as `da_da_revenue_per_kw_year`.
+
+One plain forecast is not what operators do. They re-forecast through the day, sell ancillary
+services and bid around their state of charge, so they can land above or below these figures.
+The capture rate is a reference point, not an estimate of real capture.
+
+## 8. Before vs after RTC+B: the DA-scheduled strategy fell more than perfect foresight
+RTC+B went live on Dec 5, 2025. Windows: **Dec 5, 2024 – Oct 24, 2025** vs **Dec 5, 2025 –
+Oct 24, 2026**. Each day in the second window is paired with the same calendar day a year
+earlier (324 pairs at every location), so the months match. `results/rtcb.json`,
+`python -m scripts.rtcb`. 2-hour battery, $10/MWh degradation, $/kW over the window:
+
+| Location | PF before → after | DA-scheduled before → after | Capture | Mean \|RT − DA\| ($/MWh) | RT std ($/MWh) | Median daily RT std |
+|---|---|---|---|---|---|---|
+| HB_HOUSTON | 35.9 → 28.0 (−22%) | 22.2 → 13.1 (−41%) | 62% → 47% | 11.1 → 11.8 | 42.5 → 35.0 | 13.4 → 11.5 |
+| HB_NORTH | 38.9 → 35.7 (−8%) | 27.0 → 18.8 (−30%) | 69% → 53% | 11.7 → 13.5 | 50.1 → 49.5 | 13.5 → 12.0 |
+| HB_SOUTH | 33.2 → 28.6 (−14%) | 21.9 → 14.2 (−35%) | 66% → 50% | 10.0 → 11.7 | 37.0 → 39.4 | 13.4 → 11.0 |
+| HB_WEST | 42.9 → 38.2 (−11%) | 30.3 → 20.6 (−32%) | 71% → 54% | 12.6 → 14.2 | 50.9 → 51.3 | 16.5 → 14.5 |
+| HB_PAN | 41.3 → 38.1 (−8%) | 26.8 → 19.6 (−27%) | 65% → 51% | 13.0 → 14.1 | 51.8 → 50.0 | 15.3 → 14.6 |
+| ANSON1_ALL | 41.6 → 38.7 (−7%) | 28.7 → 20.6 (−28%) | 69% → 53% | 12.3 → 14.0 | 51.4 → 50.7 | 14.9 → 14.7 |
+| WIPOPA_3_4 | 36.9 → 30.4 (−18%) | 24.4 → 15.2 (−38%) | 66% → 50% | 10.8 → 12.4 | 43.0 → 41.7 | 14.3 → 11.8 |
+| CAMWIND_RN | 37.7 → 44.8 (+19%) | 16.1 → 24.6 (+53%) | 43% → 55% | 11.6 → 15.7 | 54.0 → 135.7 | 13.4 → 12.3 |
+| RHESS2_ESS1 | 170.8 → 77.5 (−55%) | 126.2 → 33.4 (−74%) | 74% → 43% | 55.0 → 23.6 | 665 → 158 | 18.5 → 14.2 |
+| RUSSEKST_RN | 181.3 → 78.8 (−57%) | 61.9 → 25.8 (−58%) | 34% → 33% | 57.3 → 28.9 | 167 → 79 | 44.4 → 24.0 |
+
+**What changed** (measured, same days of the year):
+- At all five hubs and both typical nodes, perfect-foresight arbitrage fell 7–22% and the
+  DA-scheduled strategy fell more, 27–41%. Capture dropped 13–17 points for a 2-hour battery
+  (16–22 points for 1-hour, 4–9 points for 4-hour).
+- Real-time prices moved further from day-ahead: mean |RT − DA| rose 6–17% at hubs, and RT
+  settled further below DA on average (mean RT − DA went from about −$1 to about −$2.5/MWh).
+- Within-day RT price movement got smaller: the median day's RT price standard deviation fell
+  5–18% at hubs. Overall RT standard deviation, which a few spikes dominate, was mixed (−18% at
+  Houston, +6% at South).
+- The two congested nodes lost more than half their arbitrage value, mostly because extreme
+  prices became rarer (RT intervals above $1,000/MWh: 170 → 69 at RHESS2_ESS1, 145 → 13 at
+  RUSSEKST_RN). CAMWIND_RN went the other way: more spikes, higher revenue.
+
+Read together: less within-day spread for perfect foresight to capture, and a DA price that was
+a worse guide to where RT would land. That combination fits the larger fall for the
+DA-scheduled strategy.
+
+**What caused it** (not established):
+- The capture rate was already drifting before RTC+B (hub 2-hour capture fell 0–7 points from
+  2024 to 2025, full years), but the drop across Dec 5, 2025 is at least twice as large
+  (13–17 points).
+- Even so, **this model can't isolate RTC+B from fleet growth.** ERCOT's battery capacity kept
+  growing quickly through both windows, and more batteries chasing the same spreads would also
+  flatten intraday prices and change how RT departs from DA. Load, gas prices, weather and
+  transmission also changed. There is no control group here: every ERCOT location got RTC+B on
+  the same day.
+- The model leaves out ancillary services, where RTC+B changes battery revenue most directly.
+  A fall in arbitrage revenue says nothing on its own about total battery revenue.
+- One year per side, and arbitrage revenue is lumpy (section 1), so a single storm or heat wave
+  in either window can move these numbers a lot. The node results in particular hang on a
+  handful of spike days.
+
+Fair summary: "After RTC+B, arbitrage revenue at hubs fell again, and a simple strategy that
+schedules on day-ahead prices fell by a larger share (27–41%) than the perfect-foresight ceiling
+(8–22%)." Not:
+"RTC+B caused it."
+
 ## Validation against published benchmarks
 Real ERCOT battery revenue from Modo Energy's ERCOT BESS Index covers **all** revenue
 (arbitrage plus ancillary services), earned by real operators without perfect foresight:
@@ -140,3 +244,4 @@ Sources:
 - **More nodes:** the 5 nodes are a sample. The 10-location target in PLAN.md could add nodes
   near HB_HOUSTON, HB_NORTH and HB_PAN; none of the picks sit in those load zones.
 - **Load zones:** excluded because the archive mixes two conflicting series (see README).
+- **Ancillary services:** still not modeled (PLAN.md Phase 8c). They matter most for judging RTC+B.
