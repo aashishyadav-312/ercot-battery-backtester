@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 15 in progress (in-browser engine: price files for the 10 detailed locations, the daily LP and MILP fallback ported to highs-js in a Web Worker, parity with Python within 0.5%; the Custom run panel is next). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -101,7 +101,7 @@ Then point `ALL_NODES_FILE` in `web/src/data/loader.ts` at the new year, update 
   `scripts/location_overrides.json`.
 - The web app loads `nodes_2025_2h.json` only when the Map page is switched to "All nodes (heat)".
 
-## Custom runs in the browser (Phase 15, engine only so far)
+## Custom runs in the browser (Phase 15)
 
 ```bash
 python -m scripts.export_prices       # results/prices/{location}_{year}.ebp + index.json
@@ -121,6 +121,14 @@ cd web && npx vitest run src/custom   # highs-js port + parity test
 - **Parity:** [parity.test.ts](web/src/custom/parity.test.ts) runs three full years (HB_HOUSTON 2025 2h $10/MWh;
   HB_PAN 2024 1h $0, the run with the most MILP-fallback days; RUSSEKST_RN 2025 4h $10) plus a MILP-fallback day and both
   2025 DST days (92 and 100 intervals), and requires every metric within 0.5% of Python on the same files.
+- **Page:** `#/custom` ([web/src/pages/Custom.tsx](web/src/pages/Custom.tsx)). Inputs: location (the 10 detailed locations),
+  power 1-2,000 MW, duration 0.5-8 h, round-trip efficiency 50-100%, degradation $0-200/MWh, a date range within one
+  year, and the strategy shown (perfect foresight or DA-scheduled; both are always solved). The URL holds every input
+  (`#/custom?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&from=2025-06-01&to=2025-08-31&strat=da`), so a run can be shared;
+  opening a link runs it. Results use the Overview cards. When the inputs match a precomputed run, the page prints both
+  figures as a check. A full year at 2 h solves in about 2 s in the browser; $0 degradation at negative-price locations
+  is slower because of MILP-fallback days (HB_PAN 2024 1h $0: about 4 minutes), with progress shown per month and a
+  Cancel button. The solver (3.5 MB WebAssembly, 1.2 MB gzipped) loads only on this page.
 
 ## Realism: DA-scheduled vs perfect foresight, and RTC+B
 

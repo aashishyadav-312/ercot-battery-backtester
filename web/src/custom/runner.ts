@@ -51,6 +51,7 @@ export interface DayRow {
   daCycles: number | null;
 }
 
+/** Sent as each calendar month starts (and once at the end): `month` is being solved, `daysDone` are finished. */
 export interface Progress {
   month: string;
   daysDone: number;
@@ -105,7 +106,7 @@ const round = (x: number, d: number) => Math.round(x * 10 ** d) / 10 ** d;
 
 /**
  * Run both strategies over [startDate, endDate] using one price file per year
- * (in any order). Calls onProgress after each calendar month.
+ * (in any order). Calls onProgress as each calendar month starts and once at the end.
  */
 export function runCustom(
   highs: Highs,
@@ -131,6 +132,10 @@ export function runCustom(
 
   slices.forEach((s, k) => {
     const { file, rtDay } = s;
+    const month = rtDay.date.slice(0, 7);
+    if (onProgress && (k === 0 || slices[k - 1].rtDay.date.slice(0, 7) !== month)) {
+      onProgress({ month, daysDone: k, daysTotal: slices.length });
+    }
     const rt: Series = file.rt;
     const missing = expectedIntervals(rtDay.date, rt.stepMs) - (rtDay.count - missingCount(rt, rtDay));
     const prices = missing > MAX_GAP_INTERVALS ? null : filledDay(rt, rtDay);
@@ -167,12 +172,8 @@ export function runCustom(
         daCycles: da?.cycles ?? null,
       });
     }
-    const month = rtDay.date.slice(0, 7);
-    const next = slices[k + 1];
-    if (onProgress && (!next || next.rtDay.date.slice(0, 7) !== month)) {
-      onProgress({ month, daysDone: k + 1, daysTotal: slices.length });
-    }
   });
+  onProgress?.({ month: slices[slices.length - 1]?.rtDay.date.slice(0, 7) ?? '', daysDone: slices.length, daysTotal: slices.length });
   if (!days.length) throw new Error('no complete days in the selected range');
 
   // Annualization follows model/metrics.py: a full calendar year is not scaled;
@@ -195,7 +196,9 @@ export function runCustom(
     const key = singleYear ? String(Number(d.date.slice(5, 7))) : d.date.slice(0, 7);
     monthly[key] = (monthly[key] ?? 0) + d.revenue / kw;
   }
-  const months = [...heat.keys()].sort((a, b) => a - b);
+  // Rows for every month from January, as the charts index them by month number
+  // (a range starting mid-year gets zero rows before it; a full year is unchanged).
+  const months = Array.from({ length: Math.max(...heat.keys()) }, (_, i) => i + 1);
 
   const matched = days.filter((d) => d.daRtRevenue !== null);
   const pfMatched = matched.reduce((a, d) => a + d.revenue, 0);
@@ -222,8 +225,8 @@ export function runCustom(
       months,
       hours: Array.from({ length: 24 }, (_, h) => h),
       values: months.map((m) => {
-        const c = heat.get(m)!;
-        return Array.from(c.sum, (s, h) => (c.n[h] ? round(s / c.n[h], 1) : 0));
+        const c = heat.get(m);
+        return Array.from({ length: 24 }, (_, h) => (c?.n[h] ? round(c.sum[h] / c.n[h], 1) : 0));
       }),
     },
     da_rt_revenue_per_kw_year: round((daRt / kw) * scale, 2),

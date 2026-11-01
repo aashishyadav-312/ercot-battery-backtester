@@ -70,3 +70,26 @@ describe('US/Central days', () => {
     expect(Array.from(filledDay(s, { date: 'x', start: 0, count: 5 })!)).toEqual([1, 1, 1, 3, 3]);
   });
 });
+
+describe('runCustom progress', () => {
+  it('reports each month as it starts, then once at the end', async () => {
+    const { runCustom } = await import('./runner');
+    const startMs = Date.UTC(2025, 0, 1, 6); // local midnight, Jan 1 2025
+    const days = 31 + 28;
+    const rt = Float64Array.from({ length: days * 96 }, (_, i) => 50 + 30 * Math.sin((i / 96) * 2 * Math.PI));
+    const da = Float64Array.from({ length: days * 24 }, (_, i) => 50 + 30 * Math.sin((i / 24) * 2 * Math.PI));
+    const file = {
+      header: { format: 'EBP1', location: 'X', year: 2025, rt: { start_utc: '', step_minutes: 15, count: rt.length }, da: { start_utc: '', step_minutes: 60, count: da.length }, sources: {} },
+      rt: { startMs, stepMs: 900_000, price: rt },
+      da: { startMs, stepMs: 3_600_000, price: da },
+    };
+    const seen: [string, number][] = [];
+    const r = runCustom(highs, [file], { location: 'X', startDate: '2025-01-01', endDate: '2025-12-31', powerMw: 100, durationH: 2, rte: 0.85, degCost: 0 }, (p) =>
+      seen.push([p.month, p.daysDone]),
+    );
+    expect(seen).toEqual([['2025-01', 0], ['2025-02', 31], ['2025-02', 59]]);
+    expect(r.run.meta.days_solved).toBe(59);
+    expect(r.run.metrics.annualized).toBe(true);
+    expect(r.run.metrics.heatmap_net_mw.months).toEqual([1, 2]);
+  });
+});
