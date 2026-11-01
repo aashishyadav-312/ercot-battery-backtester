@@ -383,13 +383,92 @@ Real ERCOT battery revenue from Modo Energy's ERCOT BESS Index covers **all** re
 Perfect-foresight arbitrage should beat real operators' arbitrage revenue, and it does in both
 years, with a gap consistent with typical capture rates. No run falls outside a plausible
 range. The 2025-vs-2024 fall in our results (−17% to −34% in matched windows) points the same
-way as Modo's reported halving of total fleet revenue. The fall in ancillary-service prices,
-which our model doesn't cover, accounts for the rest.
+way as Modo's reported halving of total fleet revenue. Ancillary-service prices also changed, but the energy-only model cannot attribute the remainder of the fleet revenue change. Section 10 adds a separate capacity screening model.
 
 Sources:
 - [Modo Energy: Why were ERCOT battery revenues so low in 2025?](https://modoenergy.com/research/why-were-ercot-battery-revenues-so-low-in-2025-weather-energy-arbitrage-builodout) (Feb 3, 2026: 2025 Nowcast ~$29.4/kW; 2024 $56/kW; 2023 $193/kW)
 - [Modo Energy: ERCOT BESS revenues H1 2024](https://modoenergy.com/research/ercot-battery-energy-storage-revenues-h1-january-june-2024-owners-ancillary-services-arbitrage-bess-index-jupiter-power-key-capture) (~$70/kW annualized in H1 2024; arbitrage 26% of revenue)
 - [Modo Energy: ERCOT battery revenue benchmark, November 2025](https://modoenergy.com/research/ercot-battery-revenue-benchmark-november-2025-battery-energy-storage-bess-capture-rates)
+
+## 10. Ancillary capacity changes the revenue stack, with important limits
+
+Phase 14 adds a separate energy + ancillary capacity screen. The original energy-only results, rankings and Economics inputs are retained. Both strategies in the new comparison are solved on the same as-posted ERCOT API energy prices and complete days. The original hub results use corrected annual archives, so their numbers can differ slightly from this new baseline.
+
+AS prices are system-wide, but AS earnings are **not** necessarily equal across locations: a reserve award competes with energy arbitrage for the same power and stored energy. The optimizer shares those limits across Regulation Up, Regulation Down, RRS, ECRS and Non-Spin.
+
+### Houston example: 100 MW / 2 hours, 85% RTE, $10/MWh discharge degradation
+
+| Period | Covered days | Energy-only baseline | Energy in stack | AS receipts | Stack total |
+|---|---:|---:|---:|---:|---:|
+| Full 2024 | 366 | $54.34 | $43.14 | $58.74 | $101.88 |
+| Full 2025 | 365 | $40.07 | $35.44 | $18.26 | $53.70 |
+| 2026 through Oct 24 | 297 | $26.68 | $24.99 | $9.18 | $34.16 |
+
+All amounts are actual **$/kW over the stated period**, net of scheduled discharge degradation, not annualized. Components and totals are rounded independently. AS receipts are not all incremental revenue: in 2025 the capacity screen displaces energy trades. Limiting total AS awards to 50% of rated MW reduces the 2025 total from $53.70 to **$47.88/kW** (energy $37.47, AS $10.41). This sensitivity changes exposure, not market clearing prices; it is not a full market-depth model.
+
+The product mix moved. At Houston (2h, $10/MWh) ECRS was the largest 2024 product ($28.13 of $58.74/kW AS), RRS the largest in 2025 ($7.02 of $18.26), and in 2026 through Oct 24 Regulation Down and Up lead ($4.33 and $3.23) while RRS is near zero ($0.06).
+
+### All locations: energy-only vs energy + AS (2 hours, $10/MWh)
+
+| Location | 2024 energy-only → stack | 2025 energy-only → stack | 2026 (to Oct 24/28) energy-only → stack |
+|---|---:|---:|---:|
+| HB_HOUSTON | $54.34 → $101.88 (1.87×) | $40.07 → $53.70 (1.34×) | $26.68 → $34.16 (1.28×) |
+| HB_NORTH | $56.15 → $103.46 (1.84×) | $43.84 → $57.38 (1.31×) | $33.92 → $41.03 (1.21×) |
+| HB_SOUTH | $56.57 → $103.52 (1.83×) | $40.13 → $53.92 (1.34×) | $26.69 → $33.96 (1.27×) |
+| HB_WEST | $65.61 → $111.74 (1.70×) | $49.10 → $62.25 (1.27×) | $35.51 → $42.50 (1.20×) |
+| HB_PAN | $61.06 → $107.36 (1.76×) | $47.14 → $60.62 (1.29×) | $35.64 → $42.65 (1.20×) |
+| ANSON1_ALL | $60.62 → $106.77 (1.76×) | $47.37 → $60.49 (1.28×) | $36.49 → $43.57 (1.19×) |
+| CAMWIND_RN | $70.31 → $116.62 (1.66×) | $43.45 → $59.24 (1.36×) | $42.91 → $50.67 (1.18×) |
+| RHESS2_ESS1 | $107.29 → $150.43 (1.40×) | $179.18 → $191.02 (1.07×) | $75.44 → $82.34 (1.09×) |
+| RUSSEKST_RN | $158.75 → $203.07 (1.28×) | $175.95 → $187.72 (1.07×) | $72.64 → $79.47 (1.09×) |
+| WIPOPA_3_4 | $54.83 → $101.64 (1.85×) | $42.81 → $56.16 (1.31×) | $28.76 → $36.11 (1.26×) |
+
+AS receipts in the stack are similar everywhere ($54–59/kW in 2024, $16–20 in 2025, $8–10 in 2026) because AS prices are system-wide; the small differences come from each location's energy opportunity cost. The stack therefore adds the most, proportionally, where energy arbitrage is weakest, and the least at the high-spread nodes RHESS2_ESS1 and RUSSEKST_RN. Hubs end Oct 24, 2026 and nodes Oct 28 (see coverage below). RUSSEKST_RN 2024 covers 363 days.
+
+Longer batteries earn more energy but add slightly less from AS. Houston 2025, $10/MWh: 1-hour $27.08 → $40.82 (+$13.74), 2-hour $40.07 → $53.70 (+$13.62), 4-hour $53.47 → $65.57 (+$12.10).
+
+### Before vs after RTC+B, with the AS split
+
+Same 324 calendar-day pairs (Dec 5, 2024–Oct 24, 2025 vs Dec 5, 2025–Oct 24, 2026), 2 hours, $10/MWh, actual $/kW over the window:
+
+| Location | Before: energy-only / stack (AS) | After: energy-only / stack (AS) |
+|---|---:|---:|
+| HB_HOUSTON | $36.31 / $48.85 ($16.68) | $28.01 / $35.77 ($9.51) |
+| HB_NORTH | $39.28 / $51.84 ($16.76) | $35.72 / $43.12 ($9.02) |
+| HB_SOUTH | $33.78 / $46.71 ($16.96) | $28.60 / $36.14 ($9.46) |
+| HB_WEST | $43.28 / $55.58 ($16.23) | $38.19 / $45.43 ($8.78) |
+| HB_PAN | $41.68 / $54.16 ($16.50) | $38.12 / $45.41 ($8.82) |
+| ANSON1_ALL | $41.55 / $53.80 ($16.21) | $38.74 / $45.96 ($8.70) |
+| CAMWIND_RN | $37.66 / $52.23 ($18.04) | $44.75 / $52.65 ($10.26) |
+| RHESS2_ESS1 | $170.80 / $181.74 ($14.69) | $77.50 / $84.54 ($8.46) |
+| RUSSEKST_RN | $181.26 / $192.09 ($14.61) | $78.75 / $85.70 ($8.32) |
+| WIPOPA_3_4 | $36.85 / $49.30 ($16.48) | $30.36 / $37.84 ($9.22) |
+
+AS receipts in the stack fell by 42–47% at every location across these windows. Stack totals fell at every location except CAMWIND_RN, where higher energy revenue offset lower AS. The two periods differ in price source (DA hourly vs RT 15-minute AS), reserve-duration parameters and market conditions, so this describes what changed, not why.
+
+### Benchmark validation
+
+Modo Energy's February 3, 2026 article quotes a **$29.4/kW 2025 fleet nowcast estimate** and $56/kW for 2024. The Houston screen is about 1.83 times the 2025 estimate and 1.82 times the 2024 figure; across the five hubs the 2h, $10/MWh screen is 1.82–2.12× ($53.70–62.25) in 2025 and 1.82–2.00× ($101.88–111.74) in 2024. These are the same order of magnitude, with a substantial explained gap: historical perfect foresight, unconstrained price-taking and assumed qualification differ from fleet operations. The model also omits AS activation energy, mileage, activation degradation, outages and performance penalties. No adjustment was made to force the screen to match the benchmark. This is not a claim that a battery could outperform the fleet by those ratios.
+
+Source: [Modo Energy, Why were ERCOT battery revenues so low in 2025?](https://modoenergy.com/research/why-were-ercot-battery-revenues-so-low-in-2025-weather-energy-arbitrage-builodout). The estimate is not labeled a finalized actual.
+
+Across the five hubs, the same standard 2025 capacity screen ranges from $53.70 to $62.25/kW. Resource-node results are not a fleet benchmark: RHESS2_ESS1 and RUSSEKST_RN reach $191.02 and $187.72/kW, respectively, already earning $179.18 and $175.95/kW from the matched energy-only baseline. Their extreme as-posted energy prices, discussed above, dominate the difference; adding AS does not make those nodes representative of realized fleet revenue.
+
+### Prices, rules and comparison windows
+
+Before Dec 5, 2025 the screen uses hourly DA capacity clearing prices (NP4-188-CD), with awards fixed for each physical UTC hour. From that date it uses settled 15-minute RT capacity prices (NP6-796-ER), without adding DA AS awards or imbalance cash flows. RT AS prices are never silently replaced with DA prices. Pre-RTC regulation/RRS full-hour backing is a conservative screening assumption; ECRS/Non-Spin backing is 2/4 hours. Post-RTC backing is 0.5/0.5/0.5/1/4 hours for RegUp/RegDown/RRS/ECRS/Non-Spin, following NPRR1282 for the changed products. See [the sourced methodology](../docs/ANCILLARY_METHOD.md).
+
+The new Realism chart pairs identical calendar days in Dec 5, 2024–Oct 24, 2025 and Dec 5, 2025–Oct 24, 2026. Houston has 324 pairs. Missing days are removed from both sides, not zero-filled. Both market prices and model duration parameters change across these periods; this is a descriptive comparison, not a causal estimate of RTC+B.
+
+### Numerical validation and runtime
+
+Power and reserve backing are checked at both interval boundaries, including DST days. The AS solver targets a 0.1% MIP gap with a configurable 2-second limit per solve; early cached cases used a longer 10-second limit and/or stricter target. Achieved daily gaps and time limits are recorded. Time-limited feasible values are accompanied by approximate monetary solver ranges in the UI; those ranges exclude forecasting and operational uncertainty. The known feasible energy-only schedule is selected if it improves a bounded AS incumbent, preserving the original dual bound where available.
+
+The complete Houston 2025 2-hour / $10 case took **74.6 seconds** with cached prices in a parallel batch. Each configuration records wall time including checkpoint I/O. Summed configuration times are not elapsed batch time because workers run concurrently; early resumed days with unmeasured time are tagged separately. All raw prices and checkpoints are ignored by Git; only the small manifest and per-selection results are published.
+
+**Full-grid audit** (`python -m scripts.finalize_ancillary`, then `python -m scripts.ancillary_findings`): **180 configurations** (10 locations × 3 years × 1/2/4 h × $0/$10 degradation) covering **61,782 configuration-days**, plus the 50% sensitivity. Every manifest entry matches its file's location, year, duration and degradation; every value is finite; on every day the stack earns at least the matched energy-only solve. 78 incomplete configuration-days are excluded from both strategies: RUSSEKST_RN Jan 1–3, 2024 and Oct 29–30, 2026 at the five nodes (node coverage ends Oct 28; hubs end Oct 24 with no exclusions). 130 daily solves end above the 0.1% target (largest relative gap 1.67%); no day has an unknown bound, and no day needed the energy-only candidate. The widest full-period numerical range is **$0.0154/kW** (CAMWIND_RN 2024, 2h, $0/MWh).
+
+The 180 detail files total **12.2 MiB** (largest 75.6 KiB; manifest 13 KiB). Only the selected file is loaded, or three for the matched RTC+B view. Configuration wall times sum to 32,922 s (median 136 s per configuration) on 6 parallel workers; 354 early resumed days have unmeasured prior time. These are per-configuration measurements, not elapsed batch duration. Software versions and publication time are recorded in the manifests.
 
 ## Not done yet
 - **More nodes:** the 5 detailed nodes are a sample; section 9 covers every node, but only for one configuration and
@@ -398,4 +477,4 @@ Sources:
   (`results/geocoding_review_top50.md` → `scripts/location_overrides.json`).
 - **Mid-year nodes:** 130 nodes that started during 2025 (80 of them batteries) are not in section 9.
 - **Load zones:** excluded because the archive mixes two conflicting series (see README).
-- **Ancillary services:** still not modeled (PLAN.md Phase 8c). They matter most for judging RTC+B.
+- **Ancillary deployment:** section 10 models capacity reservation revenue, but deployment energy, mileage, qualification, outages and penalties remain unmodeled.
