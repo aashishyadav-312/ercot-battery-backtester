@@ -3,6 +3,7 @@ import { Alert, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { Kpi } from '../components/Kpi';
 import { DataQuality } from '../components/DataQuality';
 import { StartBanner } from '../components/StartBanner';
+import { Ancillary } from '../components/Ancillary';
 import { CumulativeCard, DurationCard, HeatmapCard, MonthlyRevenueCard } from '../components/cards';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
@@ -105,6 +106,7 @@ export default function Overview() {
       <PageHeader title="Overview" hero />
       <RunStatus />
       <KpiRow />
+      <Ancillary />
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <MonthlyRevenueCard run={run} />
         <CumulativeCard run={run} />

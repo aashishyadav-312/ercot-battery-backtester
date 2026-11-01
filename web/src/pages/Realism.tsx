@@ -6,6 +6,7 @@ import { useSelectedRun } from '../hooks';
 import { loadRtcb } from '../data/loader';
 import type { Rtcb } from '../data/types';
 import { PageHeader, RunStatus } from './Overview';
+import { Ancillary } from '../components/Ancillary';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -39,6 +40,7 @@ export default function Realism() {
       </Text>
       <RtcbCard sel={sel} rtcb={rtcb} />
       <RtcbAllCard sel={sel} rtcb={rtcb} index={index} />
+      <Ancillary comparison />
 
       <Section title="How to read this page">
         <List size="sm" spacing={8} maw={820}>
@@ -62,7 +64,7 @@ export default function Realism() {
             transmission all changed between the two windows. This model cannot separate RTC+B from those, above all from fleet growth.
           </List.Item>
           <List.Item>
-            <b>Energy only.</b> RTC+B changes how batteries are paid for ancillary services most directly, and those are not modeled here.
+            <b>Energy-only comparison.</b> The original cards above measure arbitrage. The separate energy-and-ancillary card adds a capacity-only screening model.
             A fall in arbitrage revenue says nothing on its own about total battery revenue.
           </List.Item>
           <List.Item>

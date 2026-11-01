@@ -120,6 +120,10 @@
   "tornado": {
    "term": "Sensitivity (tornado) chart",
    "definition": "Each input is moved down and up by a fixed step while the rest stay put, and the bar shows how far NPV moves. Longest bars are the inputs that matter most. It does not show combinations of changes."
+  },
+  "ancillary_services": {
+   "term": "Ancillary services (AS)",
+   "definition": "Capacity held ready to help balance the grid. Regulation Up and Down manage frequency; Responsive Reserve (RRS), ECRS and Non-Spin provide upward reserves. Capacity is paid per MW-hour, separately from energy delivered. This screen reserves shared battery power and energy, but does not simulate actual AS activation."
   }
  }
 }

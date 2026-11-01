@@ -24,7 +24,7 @@ const out = join(here, 'screenshots');
 mkdirSync(out, { recursive: true });
 
 const PORT = Number(arg('port', 4173));
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { cwd: root, stdio: 'ignore' });
+const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.js'), 'preview', '--port', String(PORT), '--strictPort'], { cwd: root, stdio: 'ignore' });
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
@@ -63,6 +63,10 @@ try {
       for (const p of pages) {
         await page.goto(`${base}#/${p}?loc=HB_HOUSTON&dur=2&year=2025&deg=10`);
         await settle(page);
+        if (arg('strategy', 'energy') === 'stacked' && ['overview', 'revenue', 'realism'].includes(p)) {
+          await page.getByText('Energy + AS', { exact: true }).click();
+          await settle(page);
+        }
         await overflow(page, `${tag}/${p}`);
         await page.screenshot({ path: name(p, size, scheme), fullPage: true });
         shots++;
@@ -103,3 +107,4 @@ try {
 }
 console.log(`${shots} screenshots (${suffix}) from ${root}`);
 console.log(problems.length ? `PROBLEMS:\n${problems.join('\n')}` : 'no console errors or horizontal overflow');
+if (problems.length) process.exitCode = 1;

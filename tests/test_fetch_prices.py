@@ -130,10 +130,11 @@ def test_api_throttles_requests(monkeypatch):
     sleeps = []
     monkeypatch.setattr(fp, "API_MIN_INTERVAL_S", 2.1)
     monkeypatch.setattr(fp.time, "sleep", sleeps.append)
-    monkeypatch.setattr(fp, "_last_api_call", fp.time.monotonic())
+    monkeypatch.setattr(fp, "_last_api_call", 100.0)
+    monkeypatch.setattr(fp.time, "monotonic", lambda: 101.0)
     api = MagicMock(hit_ercot_api=MagicMock(return_value=_api_rows("2025-06-01")))
     fp._hit_api(api, "RT15", "2025-06-01", "2025-06-01")
-    assert sleeps and 0 < sleeps[0] <= fp.API_MIN_INTERVAL_S
+    assert sleeps == [pytest.approx(1.1)]
 
 
 def test_api_does_not_retry_other_errors(monkeypatch):
