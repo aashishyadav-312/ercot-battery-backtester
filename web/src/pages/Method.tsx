@@ -4,8 +4,9 @@ import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { IconWarn } from '../components/Icons';
 import { yearLabel } from '../data/format';
+import { locFull, zoneFull } from '../data/site';
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+export function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section">
       <Title order={2} fz={20} mb="sm" style={{ letterSpacing: '-0.014em' }}>{title}</Title>
@@ -51,7 +52,7 @@ export default function Method() {
         </Stack>
         {m && (
           <Text size="xs" c="dimmed">
-            Selected run: {m.location}, {yearLabel(m.year)}, {m.duration_h}h, {m.days_solved} days solved, {m.skipped_days.length} skipped.
+            Selected run: {locFull(m.location)}, {yearLabel(m.year)}, {m.duration_h}h, {m.days_solved} days solved, {m.skipped_days.length} skipped.
           </Text>
         )}
       </Section>
@@ -123,9 +124,9 @@ export default function Method() {
               <Table.Tbody>
                 {nodes.nodes.map((n) => (
                   <Table.Tr key={n.location}>
-                    <Table.Td>{n.location}</Table.Td><Table.Td>{n.group === 'high' ? 'high volatility' : 'typical'}</Table.Td>
+                    <Table.Td>{locFull(n.location)}</Table.Td><Table.Td>{n.group === 'high' ? 'high volatility' : 'typical'}</Table.Td>
                     <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>{n.std.toFixed(1)}</Table.Td>
-                    <Table.Td>{n.load_zone}</Table.Td><Table.Td>{n.nearest_hub}</Table.Td>
+                    <Table.Td>{zoneFull(n.load_zone)}</Table.Td><Table.Td>{locFull(n.nearest_hub)}</Table.Td>
                   </Table.Tr>
                 ))}
               </Table.Tbody>
@@ -134,12 +135,12 @@ export default function Method() {
         )}
         <Text size="sm">
           Node prices come from the ERCOT public API report NP6-905-CD, which holds prices as first posted. Hub prices come from the annual archive,
-          which includes later corrections. At HB_HOUSTON 2024 the difference moves revenue by only 0.1–0.3%, but a corrected spike at a node could
+          which includes later corrections. At {locFull('HB_HOUSTON')} 2024 the difference moves revenue by only 0.1–0.3%, but a corrected spike at a node could
           move that node&rsquo;s result much more. The high-volatility nodes were selected using 2025 data, so their 2025 results are flattered by selection.
         </Text>
         <Text size="sm">
           A <b>data-quality note</b> appears on any run where the single best day is more than 20% of the period&rsquo;s revenue
-          (for example RHESS2_ESS1 in 2025).
+          (for example {locFull('RHESS2_ESS1')} in 2025).
         </Text>
       </Section>
 

@@ -8,12 +8,13 @@ import { findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { TOP_DAY_WARN, hubOf, kw, topDay } from '../data/analytics';
 import { useRuns, useApp } from '../state';
+import { locAxis, locFull } from '../data/site';
 
 const H = 280;
 const tall = (expanded: boolean, h = H) => (expanded ? '70vh' : h);
 const tag = (r: Run) => `${r.meta.location}_${r.meta.year}_${r.meta.duration_h}h_deg${r.meta.deg_cost_per_mwh}`;
 const scenario = (r: Run) =>
-  `${r.meta.location} · ${r.meta.duration_h}h · ${yearLabel(r.meta.year)} · $${r.meta.deg_cost_per_mwh}/MWh degradation`;
+  `${locFull(r.meta.location)} · ${r.meta.duration_h}h · ${yearLabel(r.meta.year)} · $${r.meta.deg_cost_per_mwh}/MWh degradation`;
 
 function Loading({ h = H, variant }: { h?: number | string; variant?: 'bars' | 'grid' | 'block' }) {
   return <ChartSkeleton h={h} variant={variant} />;
@@ -62,7 +63,7 @@ export function MonthlyRevenueCard({ run }: { run?: Run }) {
       rows: monthsCovered(run).map((m) => [MONTHS[m - 1], run.metrics.monthly_revenue_per_kw[String(m)] ?? 0]),
     };
   return (
-    <Card title="Monthly revenue" subtitle={run ? `$ per kW of power capacity, net of degradation · ${scenario(run)}` : undefined} csv={csv}>
+    <Card title="Monthly revenue" terms="degradation_cost" subtitle={run ? `$ per kW of power capacity, net of degradation · ${scenario(run)}` : undefined} csv={csv}>
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Monthly revenue bar chart" /> : <Loading />)}
     </Card>
   );
@@ -204,7 +205,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
   const t10 = run?.metrics.top10_day_share;
   return (
     <Card
-      title="Cumulative revenue"
+      title="Cumulative revenue" terms="top10_day_share"
       subtitle={run ? `Orange dots mark the 10 best days${t10 != null ? `, together ${pct(t10, 0)} of the total` : ''} · ${scenario(run)}` : undefined}
       csv={csv}
     >
@@ -256,7 +257,7 @@ export function TopDaysCard({ run }: { run?: Run }) {
   const csv = (): CsvData | undefined =>
     run && rows && { filename: `top10_days_${tag(run)}.csv`, headers: ['rank', 'date', 'usd_per_kw', 'share_of_total', 'cycles'], rows: rows.map((r) => [r.n, r.date, +r.perKw.toFixed(3), +r.share.toFixed(4), r.cycles]) };
   return (
-    <Card title="Ten best days" subtitle="Share is of the total for the period covered." csv={csv}>
+    <Card title="Ten best days" terms="top10_day_share" subtitle="Share is of the total for the period covered." csv={csv}>
       {() =>
         !rows ? <Loading /> : (
           <div style={{ overflowX: 'auto' }}>
@@ -301,7 +302,7 @@ export function CapturePricesCard({ run }: { run?: Run }) {
     run && m && { filename: `capture_prices_${tag(run)}.csv`, headers: ['metric', 'usd_per_mwh'], rows: [['avg_charge_price', m.avg_charge_price], ['avg_discharge_price', m.avg_discharge_price], ['avg_spread_captured', m.avg_spread_captured]] };
   return (
     <Card
-      title="Prices paid and received"
+      title="Prices paid and received" terms="spread_captured"
       subtitle={m ? `Energy-weighted. Spread captured ${usd(m.avg_spread_captured, 0)}/MWh (sell price minus buy price).` : undefined}
       csv={csv}
     >
@@ -344,8 +345,8 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
     } as CsvData : undefined;
   return (
     <Card
-      title="1h vs 2h vs 4h"
-      subtitle={`${sel.location} · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation${annualized ? ' · annualized year-to-date' : ''}`}
+      title="1h vs 2h vs 4h" terms={['usd_per_kw_yr', 'usd_per_kwh_yr', 'cycles']}
+      subtitle={`${locFull(sel.location)} · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation${annualized ? ' · annualized year-to-date' : ''}`}
       csv={csv}
     >
       {(ex) => (
@@ -424,7 +425,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
     if (!calc) return undefined;
     return (t: ChartTheme) => ({
       grid: { left: 52, right: 12, top: 56, bottom: 28 },
-      legend: { ...legendBase(t), data: names },
+      legend: { ...legendBase(t), data: names.map(locFull) },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (ps: { seriesName: string; value: number; marker: string; dataIndex: number }[]) =>
@@ -433,7 +434,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
       xAxis: { type: 'category', data: YEARS3.map(yearLabel), ...axisBase(t) },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW (matched window)', nameGap: 8 },
       series: names.map((m, mi) => ({
-        name: m, type: 'bar', barMaxWidth: 30,
+        name: locFull(m), type: 'bar', barMaxWidth: 30,
         itemStyle: { color: mi === 0 ? t.baseline : t.series[mi - 1], borderRadius: [4, 4, 0, 0] },
         data: calc.map((c) => c.vals[mi]),
       })),
@@ -452,8 +453,8 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
   else if (members.length < 2) {
     body = (
       <Text size="sm" c="dimmed" py="md">
-        None of the sampled resource nodes sits in {hub}&rsquo;s load zone, so there is no node to compare. Hubs with nodes:
-        HB_WEST (<Anchor component="button" size="sm" onClick={() => go('compare', { location: 'RUSSEKST_RN' })}>RUSSEKST_RN</Anchor>, ANSON1_ALL) and HB_SOUTH (CAMWIND_RN, RHESS2_ESS1, WIPOPA_3_4).
+        None of the sampled resource nodes sits in {hub ? locFull(hub) : 'this hub'}&rsquo;s load zone, so there is no node to compare. Hubs with nodes:{' '}
+        {locFull('HB_WEST')} ({(['RUSSEKST_RN', 'ANSON1_ALL']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('compare', { location: c })}>{locFull(c)}</Anchor></span>)}) and {locFull('HB_SOUTH')} ({(['CAMWIND_RN', 'RHESS2_ESS1', 'WIPOPA_3_4']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('compare', { location: c })}>{locFull(c)}</Anchor></span>)}).
       </Text>
     );
   } else {
@@ -465,7 +466,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
   }
   return (
     <Card
-      title={isHub ? 'Hub vs the nodes near it' : 'Node vs its hub'}
+      title={isHub ? 'Hub vs the nodes near it' : 'Node vs its hub'} terms={['hub', 'resource_node', 'load_zone']}
       subtitle={`Same battery, same days: ${sel.duration}h, $${sel.deg}/MWh degradation. Nodes are matched to the hub of their load zone.`}
       csv={members.length > 1 ? csv : undefined}
       footer={calc && members.length > 1 ? <NodeHubTable members={names} calc={calc} /> : undefined}
@@ -480,7 +481,7 @@ function NodeHubTable({ members, calc }: { members: string[]; calc: { year: numb
     <div style={{ overflowX: 'auto' }}>
       <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
         <Table.Thead>
-          <Table.Tr><Table.Th>Year (days)</Table.Th>{members.map((m, i) => <Table.Th key={m} ta="right">{i === 0 ? `${m} $/kW` : `${m} ×hub`}</Table.Th>)}</Table.Tr>
+          <Table.Tr><Table.Th>Year (days)</Table.Th>{members.map((m, i) => <Table.Th key={m} ta="right">{i === 0 ? `${locFull(m)} $/kW` : `${locFull(m)} ×hub`}</Table.Th>)}</Table.Tr>
         </Table.Thead>
         <Table.Tbody>
           {calc.map((c) => (
@@ -519,16 +520,16 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
     if (!data) return undefined;
     const sorted = [...data].reverse();
     return (t: ChartTheme) => ({
-      grid: { left: 108, right: 56, top: 8, bottom: 24 },
+      grid: { left: 124, right: 56, top: 8, bottom: 24 },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (p: { dataIndex: number }[]) => {
           const d = sorted[p[0].dataIndex];
-          return `<b>${d.r.location}</b><br/>${usd(d.r.revenue_per_kw_year)}/kW-yr<br/>Top day ${pct(d.top?.share, 0)} of revenue`;
+          return `<b>${locFull(d.r.location)}</b><br/>${usd(d.r.revenue_per_kw_year)}/kW-yr<br/>Top day ${pct(d.top?.share, 0)} of revenue`;
         },
       },
       xAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' } },
-      yAxis: { type: 'category', data: sorted.map((d) => d.r.location), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11 } },
+      yAxis: { type: 'category', data: sorted.map((d) => locAxis(d.r.location)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14 } },
       series: [{
         type: 'bar', barMaxWidth: 18,
         label: { show: true, position: 'right', color: t.text, fontSize: 11, formatter: (p: { value: number }) => usd(p.value, 0) },
@@ -548,14 +549,14 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
   const grp = (l: string) => nodes?.nodes.find((n) => n.location === l);
   return (
     <Card
-      title="All locations"
+      title="All locations" terms={['hub', 'resource_node', 'usd_per_kw_yr']}
       subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation. Grey = hub, green = resource node, blue = selected.`}
       csv={csv}
     >
       {(ex) =>
-        !data || !build ? <Loading h={300} /> : (
+        !data || !build ? <Loading h={440} /> : (
           <>
-            <Chart build={build} height={ex ? '50vh' : 300} label="Revenue by location, ranked" />
+            <Chart build={build} height={ex ? '70vh' : 440} label="Revenue by location, ranked" />
             <div style={{ overflowX: 'auto' }}>
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" highlightOnHover>
                 <Table.Thead><Table.Tr><Table.Th>Location</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">Top-10 share</Table.Th><Table.Th ta="right">Top day</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th></Table.Tr></Table.Thead>
@@ -563,7 +564,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
                   {data.map(({ r, top }) => (
                     <Table.Tr key={r.location} fw={r.location === sel.location ? 600 : undefined}>
                       <Table.Td>
-                        <Anchor component="button" size="sm" c="inherit" underline="always" onClick={() => go('compare', { location: r.location })} fw="inherit">{r.location}</Anchor>
+                        <Anchor component="button" size="sm" c="inherit" underline="always" onClick={() => go('compare', { location: r.location })} fw="inherit">{locFull(r.location)}</Anchor>
                         {grp(r.location) && <Badge ml={6} size="xs" variant="light" color={grp(r.location)!.group === 'high' ? 'yellow' : 'gray'}>{grp(r.location)!.group === 'high' ? 'volatile' : 'typical'}</Badge>}
                       </Table.Td>
                       <Table.Td ta="right">{usd(r.revenue_per_kw_year)}</Table.Td>

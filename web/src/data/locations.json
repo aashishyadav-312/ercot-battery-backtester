@@ -1,0 +1,21 @@
+{
+  "_about": "Single source of truth for friendly location names. Keys are ERCOT settlement point codes; every code shown in the UI is rendered next to its label. Node names come from the ERCOT resource name; the region is the area of the node's settlement load zone (results/node_selection.json), not a surveyed site location.",
+  "locations": {
+    "HB_HOUSTON": { "name": "Houston Hub", "region": "Houston area", "type": "hub" },
+    "HB_NORTH": { "name": "North Hub", "region": "North Texas", "type": "hub" },
+    "HB_SOUTH": { "name": "South Hub", "region": "South Texas", "type": "hub" },
+    "HB_WEST": { "name": "West Hub", "region": "West Texas", "type": "hub" },
+    "HB_PAN": { "name": "Panhandle Hub", "region": "Texas Panhandle", "type": "hub" },
+    "RUSSEKST_RN": { "name": "Russek St", "region": "West Texas", "type": "node" },
+    "ANSON1_ALL": { "name": "Anson 1", "region": "West Texas", "type": "node" },
+    "CAMWIND_RN": { "name": "Camwind", "region": "South Texas", "type": "node" },
+    "RHESS2_ESS1": { "name": "Rhess 2 storage", "region": "South Texas", "type": "node" },
+    "WIPOPA_3_4": { "name": "Wipopa 3-4", "region": "South Texas", "type": "node" }
+  },
+  "load_zones": {
+    "LZ_WEST": "West Texas load zone",
+    "LZ_SOUTH": "South Texas load zone",
+    "LZ_NORTH": "North Texas load zone",
+    "LZ_HOUSTON": "Houston load zone"
+  }
+}

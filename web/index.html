@@ -7,10 +7,41 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='9' width='23' height='14' rx='3' fill='none' stroke='%232a78d6' stroke-width='2.5'/%3E%3Crect x='6' y='12' width='11' height='8' rx='1' fill='%232a78d6'/%3E%3Crect x='27' y='13' width='3' height='6' rx='1' fill='%232a78d6'/%3E%3C/svg%3E" />
     <meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f0f0e" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href="https://aashishyadav-312.github.io/ercot-battery-backtester/" />
+    <meta name="author" content="Aashish Yadav" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ERCOT Battery Backtester" />
+    <meta property="og:title" content="ERCOT Battery Backtester" />
+    <meta property="og:description" content="How much could a battery have earned at a given ERCOT location, and what drove that number? Perfect-foresight arbitrage backtests, 2024 to 2026." />
+    <meta property="og:url" content="https://aashishyadav-312.github.io/ercot-battery-backtester/" />
+    <meta property="og:image" content="https://aashishyadav-312.github.io/ercot-battery-backtester/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The Overview page of the ERCOT Battery Backtester: revenue, top-10-day share, cycles and spread captured for a battery at Houston Hub." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ERCOT Battery Backtester" />
+    <meta name="twitter:description" content="How much could a battery have earned at a given ERCOT location, and what drove that number? Perfect-foresight arbitrage backtests, 2024 to 2026." />
+    <meta name="twitter:image" content="https://aashishyadav-312.github.io/ercot-battery-backtester/og-image.png" />
     <title>ERCOT Battery Backtester</title>
     <script>
       // Apply the saved colour scheme before first paint to avoid a flash.
       try { var s = localStorage.getItem('ebb-scheme'); if (s === 'dark' || s === 'light') document.documentElement.setAttribute('data-mantine-color-scheme', s); } catch (e) {}
+    </script>
+    <script>
+      // GoatCounter: privacy-friendly page counts (no cookies, no personal data). Skipped on localhost so dev and
+      // screenshot runs are not counted. Page views are sent per route from src/App.tsx, since routing is hash-based.
+      (function () {
+        var h = location.hostname;
+        if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]') return;
+        window.goatcounter = { no_onload: true };
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://gc.zgo.at/count.js';
+        s.setAttribute('data-goatcounter', 'https://x0aashish.goatcounter.com/count');
+        s.setAttribute('data-goatcounter-settings', JSON.stringify({ no_onload: true }));
+        document.head.appendChild(s);
+      })();
     </script>
   </head>
   <body>

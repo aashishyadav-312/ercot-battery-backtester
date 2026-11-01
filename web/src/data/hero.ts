@@ -1,6 +1,7 @@
 import type { IndexRun, Run, Selection } from './types';
 import { pct, usd } from './format';
 import type { Page } from '../state';
+import { locFull } from './site';
 
 /** A sentence split into plain text and the one figure to emphasise. */
 export type Part = string | { em: string };
@@ -58,7 +59,7 @@ function rank(sel: Selection, index: IndexRun[]): Hero | null {
   const i = rows.findIndex((r) => r.location === sel.location);
   if (i < 0) return null;
   const yr = rows[i].annualized ? `${sel.year} so far` : String(sel.year);
-  return make([`${sel.location} ranks `, { em: ORD(i + 1) }, ` of ${rows.length} locations for a ${sel.duration}-hour battery in ${yr}.`]);
+  return make([`${locFull(sel.location)} ranks `, { em: ORD(i + 1) }, ` of ${rows.length} locations for a ${sel.duration}-hour battery in ${yr}.`]);
 }
 
 function capture(r: Run): Hero | null {
@@ -84,8 +85,8 @@ export function ledeFor(run: Run | undefined, page?: Page): string | null {
   const r = run.metrics;
   if (page === 'realism' && r.da_rt_revenue_per_kw_year != null) {
     const ann = r.annualized ? ' (annualized)' : '';
-    return `A ${m.duration_h}-hour battery at ${m.location} scheduled on day-ahead prices and paid real-time prices would have earned ${usd(r.da_rt_revenue_per_kw_year, 1)}/kW-yr${ann} in ${period(run)}, against ${usd(r.pf_revenue_per_kw_year_matched, 1)} with perfect foresight.`;
+    return `A ${m.duration_h}-hour battery at ${locFull(m.location)} scheduled on day-ahead prices and paid real-time prices would have earned ${usd(r.da_rt_revenue_per_kw_year, 1)}/kW-yr${ann} in ${period(run)}, against ${usd(r.pf_revenue_per_kw_year_matched, 1)} with perfect foresight.`;
   }
   const amount = `${usd(r.revenue_per_kw_year, 1)}/kW-yr${r.annualized ? ' (annualized)' : ''}`;
-  return `A ${m.duration_h}-hour battery at ${m.location} would have earned ${amount} in ${period(run)} arbitraging real-time prices with perfect foresight, net of $${m.deg_cost_per_mwh}/MWh degradation.`;
+  return `A ${m.duration_h}-hour battery at ${locFull(m.location)} would have earned ${amount} in ${period(run)} arbitraging real-time prices with perfect foresight, net of $${m.deg_cost_per_mwh}/MWh degradation.`;
 }

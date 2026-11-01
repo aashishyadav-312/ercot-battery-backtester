@@ -3,6 +3,7 @@ import { useApp } from '../state';
 import { locationGroups } from '../data/analytics';
 import { DEGS, DURATIONS, YEARS } from '../data/loader';
 import { yearLabel } from '../data/format';
+import { locFull } from '../data/site';
 
 /** Top-bar selectors: Location (hubs and nodes grouped), Duration, Year, Degradation. */
 export function Selectors({ fullWidth = false }: { fullWidth?: boolean }) {
@@ -13,10 +14,10 @@ export function Selectors({ fullWidth = false }: { fullWidth?: boolean }) {
   const label = (l: string) => (fullWidth ? l : undefined);
   const location = (
     <Select
-      {...common} w={w(196)} aria-label="Location" label={label('Location')}
+      {...common} w={w(250)} aria-label="Location" label={label('Location')}
       data={[
-        { group: 'Hubs', items: g.hubs },
-        { group: 'Resource nodes', items: g.nodes },
+        { group: 'Hubs', items: g.hubs.map((c) => ({ value: c, label: locFull(c) })) },
+        { group: 'Resource nodes', items: g.nodes.map((c) => ({ value: c, label: locFull(c) })) },
       ]}
       value={sel.location} onChange={(v) => v && setSel({ location: v })} searchable
     />

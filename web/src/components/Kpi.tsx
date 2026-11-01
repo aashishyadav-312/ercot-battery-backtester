@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Info } from './Info';
 import { Badge, Group, Paper, Skeleton, Text } from '@mantine/core';
 
 interface Props {
@@ -7,14 +8,19 @@ interface Props {
   unit?: string;
   hint?: ReactNode;
   badge?: string;
+  /** Glossary key(s) explaining this figure; shows an info icon beside the label. */
+  term?: string | string[];
 }
 
 /** One figure: small label, large tabular number with a quiet unit, one line of context. */
-export function Kpi({ label, value, unit, hint, badge }: Props) {
+export function Kpi({ label, value, unit, hint, badge, term }: Props) {
   return (
     <Paper withBorder p={{ base: 'md', sm: 'lg' }} data-interactive>
       <Group justify="space-between" gap={6} wrap="nowrap" mb={10} mih={20}>
-        <Text size="xs" c="dimmed" fw={560} tt="uppercase" style={{ letterSpacing: '.06em' }}>{label}</Text>
+        <Group gap={2} wrap="nowrap" style={{ minWidth: 0 }}>
+          <Text size="xs" c="dimmed" fw={560} tt="uppercase" style={{ letterSpacing: '.06em' }}>{label}</Text>
+          {term && <Info terms={term} size={14} />}
+        </Group>
         {badge && <Badge size="sm" variant="dot" color="yellow" style={{ flexShrink: 0 }}>{badge}</Badge>}
       </Group>
       {value == null ? (

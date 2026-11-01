@@ -21,3 +21,4 @@ export const IconBattery = () => (
     <rect x="27" y="13" width="3" height="6" rx="1" fill="currentColor" />
   </svg>
 );
+export const IconAbout = mk(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 7.6v.01" /></>);
