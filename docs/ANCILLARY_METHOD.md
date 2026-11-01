@@ -49,7 +49,7 @@ The small manifest points to `results/as_<original-result-file>.json`; the page 
 python -m scripts.run_ancillary --env-file .env --locations HB_HOUSTON --years 2025 --durations 2 --degs 10 --max-as-share 0.5 --workers 1
 ```
 
-This writes a separate sensitivity manifest/detail and caches, without overwriting the base case. Runtime is measured per configuration; `resumed_days_unmeasured` identifies days from an early pre-timing checkpoint so they are not included in claims about total compute time.
+This writes a separate sensitivity manifest/detail and caches, without overwriting the base case. Before publishing, run `python -m scripts.finalize_ancillary` (idempotent: applies the feasible-candidate selection below to every base and sensitivity detail file and stamps software versions) and then `python -m scripts.ancillary_findings` (audit and summary tables). Runtime is measured per configuration; `resumed_days_unmeasured` identifies days from an early pre-timing checkpoint so they are not included in claims about total compute time.
 
 The original energy-only fallback retains its 10-second limit and 0.01% gap target. The AS screen defaults to a 0.1% target with a 2-second MILP limit; use `--mip-time-limit 10 --refresh` for a longer solve. Early cached results used the stricter/longer settings and are retained, with achieved daily gaps and time limits recorded. Time-limited days display approximate monetary solver ranges reconstructed from their relative gaps; these ranges do not include forecasting or operating uncertainty. Valid scheduled-energy/reserve coupling inequalities strengthen the LP relaxation without changing the exclusive-mode feasible set.
 

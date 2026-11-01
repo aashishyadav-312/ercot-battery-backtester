@@ -54,7 +54,7 @@ export function Ancillary({ comparison = false }: { comparison?: boolean }) {
   return (
     <Card title={comparison ? 'RTC+B: energy and ancillary revenue' : 'Energy and ancillary revenue'}
       terms="ancillary_services"
-      subtitle={comparison ? 'Same calendar days one year apart; actual $/kW over each matched window.' : 'Compare strategies on identical API prices and days. KPI tiles and other charts remain energy-only.'}
+      subtitle={comparison ? 'Same calendar days one year apart; actual $/kW over each matched window.' : 'Compare strategies on identical as-posted prices and days. KPI tiles and other charts remain energy-only.'}
       csv={available ? () => ({ filename: `${comparison ? 'rtcb' : sel.year}_${sel.location}_${sel.duration}h_deg${sel.deg}_${strategy}.csv`,
         headers: ['Period', ...STACK_LABELS.map((l) => `${l} ($/kW)`)], rows: buckets.map((b, i) => [b.label, ...values[i]]) }) : undefined}>
       {(expanded) => <Stack gap="md">
@@ -88,7 +88,7 @@ export function Ancillary({ comparison = false }: { comparison?: boolean }) {
               return `${b.label}: ${usd(bound.lower,2)}–${bound.upper == null ? 'unknown upper bound' : usd(bound.upper,2)}/kW`;
             }).join('; ')}. These reflect numerical uncertainty only, not forecast or operating risk.</Text>}
           </>}
-        <Text size="xs" c="dimmed">Capacity-only screening with perfect foresight, shared power and energy backing. No AS deployment energy, mileage, penalties, outages, qualification or market-depth limits. AS prices are system-wide; allocation and earnings depend on the location’s energy opportunity cost. See Method for reserve durations and sources.</Text>
+        <Text size="xs" c="dimmed">Capacity-only screening with perfect foresight, shared power and energy backing. No AS deployment energy, mileage, penalties, outages, qualification or market-depth limits. AS prices are system-wide; allocation and earnings depend on the location’s energy opportunity cost. Original hub charts use corrected energy-price archives, so their baseline may differ. See Method for reserve durations and sources.</Text>
       </Stack>}
     </Card>
   );

@@ -53,6 +53,18 @@ try {
   assert(over <= 1, `phone horizontal overflow: ${over}`);
   assert(requests.size <= 3, 'RTC+B fetched more than three AS detail files');
   console.log('realism: 324 matched days, lazy per-selection data, no phone overflow');
+  const numerical = await browser.newPage({viewport:{width:390,height:844},colorScheme:'dark'});
+  numerical.on('pageerror',(e) => errors.push(e.message));
+  await numerical.goto('http://localhost:4178/#/overview?loc=CAMWIND_RN&year=2024&dur=2&deg=0');
+  const numericalCard = numerical.getByRole('region',{name:'Energy and ancillary revenue',exact:true});
+  await numericalCard.getByText('Energy + AS',{exact:true}).click();
+  await numericalCard.getByText('Approximate solver ranges:',{exact:false}).waitFor();
+  await numericalCard.getByText('displayed days did not reach the 0.1% solver-gap target.',{exact:false}).waitFor();
+  assert(await numerical.evaluate(() => document.documentElement.scrollWidth-innerWidth) <= 1);
+  await numerical.evaluate(() => document.fonts.ready);
+  await numerical.waitForTimeout(1400);
+  await numericalCard.screenshot({path:join(root,'screenshots','ancillary-numerics-phone-dark-after.png')});
+  console.log('numerics: time-limited-day warning and monetary range visible without phone overflow');
   const failure = await browser.newPage();
   await failure.route('**/data/ancillary.json?*', (route) => route.fulfill({status:503,body:'Unavailable'}));
   await failure.goto('http://localhost:4178/#/overview');

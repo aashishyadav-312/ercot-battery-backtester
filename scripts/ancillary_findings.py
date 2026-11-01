@@ -35,6 +35,22 @@ def main():
             assert all(math.isfinite(v) for v in values), name
             assert sum(values[:-1]) >= d['energy_only'] - 1e-6, (name,d['date'],'inferior incumbent')
             assert d['date'] not in r['skipped_days'], name
+    # Every manifest entry must describe its own file, for the base grid and the sensitivity.
+    index = {r['file']:r for r in json.loads(Path('results/index.json').read_text())['runs']}
+    for manifest in ('ancillary.json', 'ancillary_share_0.5.json'):
+        m = json.loads(Path('results', manifest).read_text())
+        for key, detail in m['runs'].items():
+            r = json.loads(Path('results', detail).read_text())
+            assert r['max_as_share'] == m['meta']['max_as_share'], detail
+            for k in ('location','year','duration_h','rte','deg_cost_per_mwh'):
+                assert r['params'][k] == index[key][k], (detail, k)
+            assert all(d['date'] <= index[key]['last_day'] for d in r['daily']), detail
+    print('Manifest entries match location/year/duration/degradation: OK')
+    print('Coverage (first..last covered day) and excluded days, configurations with exclusions:')
+    for name, r in sorted(runs.items()):
+        if r['skipped_days']:
+            print(f"  {name}: {r['daily'][0]['date']}..{r['daily'][-1]['date']}, {len(r['daily'])} days, "
+                  f"{len(r['skipped_days'])} excluded ({r['skipped_days'][0]}..{r['skipped_days'][-1]})")
     print('Artifact KiB:', round(Path('results/ancillary.json').stat().st_size/1024, 1))
     files = [Path('results', v) for v in doc['runs'].values() if isinstance(v,str)]
     print('Detail files MiB / largest KiB:',round(sum(p.stat().st_size for p in files)/1024**2,2),
