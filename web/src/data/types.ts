@@ -53,6 +53,8 @@ export interface RunMetrics {
   avg_charge_price: number;
   avg_discharge_price: number;
   avg_spread_captured: number;
+  /** Days re-solved as a MILP (charge-or-discharge binaries at prices <= 0). */
+  milp_days?: number;
   monthly_revenue_per_kw: Record<string, number>;
   heatmap_net_mw: { months: number[]; hours: number[]; values: number[][] };
   da_rt_revenue_per_kw_year?: number;
