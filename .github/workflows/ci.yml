@@ -38,3 +38,19 @@ jobs:
           npm ci
           npm test
           npm run build
+
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - name: Typecheck and test the live Worker
+        working-directory: worker
+        run: |
+          npm ci
+          npm run typecheck
+          npm test

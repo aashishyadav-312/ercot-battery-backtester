@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 16 done (Live page at `#/live`: today's real-time hub and node prices, the best possible battery so far today, tomorrow's day-ahead plan, spike banner and cached fallback, fed every 5 minutes by a Cloudflare Worker in `worker/`; see "Live page backend" below). Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -44,6 +44,8 @@ data/price_files.py       # compact per-location-year price files (EBP1) for the
 scripts/export_prices.py  # results/prices/*.ebp for the 10 detailed locations (Phase 15)
 scripts/parity_reference.py # Python numbers on those files -> results/parity/reference.json
 web/src/custom/           # highs-js port of the daily LP, year runner, Web Worker, parity test
+web/src/live/             # Live page data: snapshot loader with browser fallback, helpers, main-thread solver
+worker/                   # Cloudflare Worker for the Live page: cron fetch from ERCOT, KV snapshot, /live.json
 results/               # precomputed JSON for the web app
 web/                   # Vite + React + Mantine + ECharts frontend (Phase 5)
 tests/
@@ -129,6 +131,50 @@ cd web && npx vitest run src/custom   # highs-js port + parity test
   figures as a check. A full year at 2 h solves in about 2 s in the browser; $0 degradation at negative-price locations
   is slower because of MILP-fallback days (HB_PAN 2024 1h $0: about 4 minutes), with progress shown per month and a
   Cancel button. The solver (3.5 MB WebAssembly, 1.2 MB gzipped) loads only on this page.
+
+## Live page backend (Phase 16)
+
+The Live page (`#/live`, [web/src/pages/Live.tsx](web/src/pages/Live.tsx)) reads one JSON snapshot from a Cloudflare Worker
+in [worker/](worker/). A Cron Trigger runs every 5 minutes, fetches from ERCOT's public API, and writes the snapshot to one
+Workers KV key; `GET /live.json` serves it with CORS limited to `https://aashishyadav-312.github.io`. The ERCOT username,
+password and subscription key are Worker secrets; nothing secret is in the repository or the page.
+
+- **What it fetches:** today's real-time 15-minute settlement point prices (NP6-905-CD) for the 5 hubs (one call with
+  `settlementPointType=HU`) and the 5 featured resource nodes (one call each), plus today's and tomorrow's day-ahead hourly
+  settlement point prices (NP4-190-CD, one call per location). Today's day-ahead prices are carried over from yesterday's
+  "tomorrow", and tomorrow's are only requested after the day-ahead market closes (10:00 CT): one hub is probed each run
+  until they appear, then all 10 are fetched once. A refresh makes 7 ERCOT calls most of the time and at most 28.
+- **Failures:** anything ERCOT fails to return is carried over from the previous snapshot, and the error is listed in the
+  snapshot (`errors`). The page shows "Prices through" (end of the newest interval) and "Last updated" (the refresh time)
+  separately, flags prices more than 45 minutes old as delayed, and when the Worker can't be reached it shows the last
+  snapshot saved in the browser with its timestamp.
+- **Day-ahead posting time (checked Nov 1, 2026, not assumed):** ERCOT's archive shows NP4-190-CD posted between 12:32 and
+  12:35 CT on 11 of the 13 days Oct 19-31, at 13:15 on Oct 27 and 14:22 on Oct 31. On Nov 1 (the fall-back DST day) it had
+  not posted by 17:41 CT, although the day-ahead LMP and AS reports posted at 12:32. The Worker therefore polls instead of
+  assuming a time, and records `tomorrow.daFirstSeenAt`.
+- **DST:** the snapshot stores each day as elapsed intervals from local midnight (92, 96 or 100 real-time intervals), using
+  ERCOT's `DSTFlag` for the repeated fall-back hour, the same rule as `data/fetch_all_nodes.py`. Tests in
+  [worker/test/live.test.ts](worker/test/live.test.ts).
+- **Cost: $0.** Workers free tier: 100,000 requests/day; the cron is 288 runs/day. Workers KV free tier: 1,000 writes/day
+  (the cron writes once per run, 288/day) and 100,000 reads/day (page reads are cached at the edge for 60 s). Cron
+  subrequests stay under the free limit of 50 per run.
+
+Deploy (from `worker/`, after `npm ci`):
+
+```bash
+npx wrangler login
+npx wrangler kv namespace create LIVE        # once; put the id in wrangler.toml
+npx wrangler secret put ERCOT_API_USERNAME
+npx wrangler secret put ERCOT_API_PASSWORD
+npx wrangler secret put ERCOT_API_SUBSCRIPTION_KEY
+npx wrangler deploy
+```
+
+Check it with `curl https://ercot-live.aashishyadav312.workers.dev/live.json` (the first snapshot appears after the first
+cron run) and watch runs with `npx wrangler tail ercot-live`. `npm test` runs the Worker tests. To develop against
+Cloudflare instead of a local runtime, use `npm run dev` (`wrangler dev --remote`). The site's `npm run dev` and
+`npm run preview` reach the deployed Worker through a Vite proxy (`/live-api`), since CORS only admits the Pages origin;
+set `VITE_LIVE_URL` to point the page at another Worker.
 
 ## Realism: DA-scheduled vs perfect foresight, and RTC+B
 

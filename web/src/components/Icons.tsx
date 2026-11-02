@@ -14,7 +14,8 @@ export const IconDownload = mk(<><path d="M12 4v11M7 11l5 5 5-5" /><path d="M4 2
 export const IconExpand = mk(<><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" /></>);
 export const IconSun = mk(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>);
 export const IconMoon = mk(<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />);
-export const IconWarn = mk(<><path d="M12 3l10 18H2z" /><path d="M12 10v5M12 18h.01" /></>);
+export const IconLive = mk(<><path d="M2 12h4l3-7 4 14 3-7h6" /></>);
+export const IconWarn =mk(<><path d="M12 3l10 18H2z" /><path d="M12 10v5M12 18h.01" /></>);
 export const IconBattery = () => (
   <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
     <rect x="3" y="9" width="23" height="14" rx="3" fill="none" stroke="currentColor" strokeWidth="2.5" />

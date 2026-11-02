@@ -28,7 +28,7 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['start', 'map', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
