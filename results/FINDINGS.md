@@ -470,6 +470,24 @@ The complete Houston 2025 2-hour / $10 case took **74.6 seconds** with cached pr
 
 The 180 detail files total **12.2 MiB** (largest 75.6 KiB; manifest 13 KiB). Only the selected file is loaded, or three for the matched RTC+B view. Configuration wall times sum to 32,922 s (median 136 s per configuration) on 6 parallel workers; 354 early resumed days have unmeasured prior time. These are per-configuration measurements, not elapsed batch duration. Software versions and publication time are recorded in the manifests.
 
+## 11. Context: the battery fleet, the queue, weather and solar/wind share
+
+These series sit beside the results (Revenue "Context", the Map's storage layer, the Dispatch overlay, the ten-best-days weather).
+They are descriptions of things that moved together. This model cannot say what caused what. Sources and limits are in the README
+("Context layers") and `results/context.json`.
+
+- **Fleet and revenue moved in opposite directions.** At Houston Hub (2-hour, $10/MWh), January-September arbitrage revenue was
+  $44.1/kW in 2024, $31.7/kW in 2025 and $24.4/kW in 2026, while installed ERCOT batteries (EIA-860M, Texas, ERCO) rose from about
+  4.4 GW in Jan 2024 to 8.5 GW in Jan 2025, 14.2 GW in Jan 2026 and 19.2 GW in Sep 2026. Revenue fell while fleet MW rose. A larger fleet
+  is one of several things that changed over those years (fuel prices, load growth, solar and wind additions, RTC+B from Dec 5, 2025, weather).
+- **A large pipeline remains.** The September 2026 ERCOT interconnection report lists 846 battery projects of 10 MW or more, 157,044 MW in total,
+  of which 38,138 MW is in projects with a signed interconnection agreement. The largest counties are Harris (6,223 MW), Brazoria (5,721 MW,
+  3,419 MW with an agreement), Bexar (4,973 MW), Wise and Mitchell (about 3,800 MW each). A queued project may never be built, so this is a pipeline, not a forecast.
+- **Solar share at 1 pm in June** was 22.8% of ERCOT generation in 2024, 31.9% in 2025 and 35.5% in 2026; the hours where batteries charge
+  hardest in the dispatch heatmap are the same midday hours where solar share is highest. Wind share in June is highest overnight (about 31-33% at 3 am) and lowest around 1 pm (14-17%).
+- **Weather on the best days.** The ten-best-days table now shows the daily high and low at the hub city (Open-Meteo reanalysis). At Houston Hub in 2025
+  the best day (May 16) was 95/78°F, while the fourth best (Feb 19) was 49/29°F, so the top days are not only hot days.
+
 ## Not done yet
 - **More nodes:** the 5 detailed nodes are a sample; section 9 covers every node, but only for one configuration and
   one year, and with summary metrics only.

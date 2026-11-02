@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Anchor, Badge, Table, Text } from '@mantine/core';
+import { useMemo, useState } from 'react';
+import { Anchor, Badge, Switch, Table, Text } from '@mantine/core';
 import { Card, type CsvData } from './Card';
 import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from './Chart';
 import { ChartSkeleton } from './Skeletons';
@@ -8,6 +8,8 @@ import { findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { TOP_DAY_WARN, hubOf, kw, topDay } from '../data/analytics';
 import { useRuns, useApp } from '../state';
+import { useContextData, useWeather } from '../hooks';
+import { avgShareByHour, type DayWeather } from '../data/context';
 import { locAxis, locFull } from '../data/site';
 
 const H = 280;
@@ -25,6 +27,9 @@ const fade = (hex: string, top = 0.22) => ({
   type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
   colorStops: [{ offset: 0, color: hex + Math.round(top * 255).toString(16).padStart(2, '0') }, { offset: 1, color: hex + '00' }],
 });
+
+/** "High 98°F, low 77°F in Houston" for the tooltip of a top-10 day. */
+const wxLine = (w?: DayWeather) => (w ? `<br/><span style="opacity:.75">Weather: high ${w.hi}°F, low ${w.lo}°F (${w.city})</span>` : '');
 
 /** Months with data (a YTD run has no later months). */
 function monthsCovered(run: Run) {
@@ -71,6 +76,15 @@ export function MonthlyRevenueCard({ run }: { run?: Run }) {
 
 // ---------------------------------------------------------------- dispatch heatmap
 export function HeatmapCard({ run }: { run?: Run }) {
+  const ctx = useContextData().data;
+  const [overlay, setOverlay] = useState(false);
+  // Solar and wind share of ERCOT generation by hour, averaged over the months the run covers.
+  const share = useMemo(() => {
+    const y = run && ctx?.fuel.years[String(run.meta.year)];
+    if (!run || !y) return undefined;
+    const months = monthsCovered(run);
+    return { solar: avgShareByHour(y.solar_pct, months), wind: avgShareByHour(y.wind_pct, months) };
+  }, [run, ctx]);
   const build = useMemo(() => {
     if (!run) return undefined;
     const { values } = run.metrics.heatmap_net_mw;
@@ -81,17 +95,25 @@ export function HeatmapCard({ run }: { run?: Run }) {
     const peak = Math.max(...cells.map((c) => Math.abs(c[2])));
     const cap = Math.max(20, Math.ceil(peak / 10) * 10); // symmetric so blue and orange are comparable
     return (t: ChartTheme) => ({
-      grid: { left: 40, right: 14, top: 10, bottom: 84 },
+      grid: { left: 40, right: overlay && share ? 44 : 14, top: 10, bottom: 84 },
       tooltip: {
         ...tooltipBase(t),
-        formatter: (p: { value: [number, number, number] }) => {
-          const [h, yi, v] = p.value;
+        formatter: (p: { seriesType?: string; seriesName?: string; dataIndex?: number; value: [number, number, number] | number | null }) => {
+          if (p.seriesType === 'line') {
+            const h = p.dataIndex ?? 0;
+            return `<b>${p.seriesName}, ${String(h).padStart(2, '0')}:00–${String((h + 1) % 24).padStart(2, '0')}:00</b><br/>${p.value == null ? '–' : `${p.value}%`} of ERCOT generation<br/><span style="opacity:.7">average over the months shown</span>`;
+          }
+          const [h, yi, v] = p.value as [number, number, number];
           const mode = v > 0.5 ? 'discharging' : v < -0.5 ? 'charging' : 'idle';
           return `<b>${MONTHS[months[yi] - 1]}, ${String(h).padStart(2, '0')}:00–${String((h + 1) % 24).padStart(2, '0')}:00</b><br/>${mode}: ${Math.abs(v).toFixed(0)}% of rated power<br/><span style="opacity:.7">${((v / 100) * pw).toFixed(1)} MW avg net</span>`;
         },
       },
       xAxis: { type: 'category', data: Array.from({ length: 24 }, (_, h) => String(h).padStart(2, '0')), splitArea: { show: false }, ...axisBase(t), splitLine: { show: false }, name: 'Hour of day (Central time)', nameLocation: 'middle', nameGap: 28 },
-      yAxis: { type: 'category', data: months.map((m) => MONTHS[m - 1]), inverse: true, ...axisBase(t), splitLine: { show: false } },
+      yAxis: [
+        { type: 'category', data: months.map((m) => MONTHS[m - 1]), inverse: true, ...axisBase(t), splitLine: { show: false } },
+        // Second axis for the optional solar/wind lines: percent of generation, 0-100, on the right edge.
+        { type: 'value', min: 0, max: 100, show: !!(overlay && share), position: 'right', ...axisBase(t), splitLine: { show: false }, axisLabel: { ...axisBase(t).axisLabel, formatter: '{value}%' } },
+      ],
       visualMap: {
         min: -cap, max: cap, calculable: false, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 160,
         text: ['Discharging', 'Charging'], textStyle: { color: t.muted, fontSize: 11 },
@@ -101,9 +123,17 @@ export function HeatmapCard({ run }: { run?: Run }) {
       series: [{
         type: 'heatmap', data: cells, itemStyle: { borderColor: t.surface, borderWidth: 1.5, borderRadius: 2 },
         emphasis: { itemStyle: { borderColor: t.text, borderWidth: 1.5 } },
-      }],
+      },
+      ...(overlay && share ? [
+        { name: 'Solar share', data: share.solar, color: '#f2c200' },
+        { name: 'Wind share', data: share.wind, color: t.mode === 'light' ? '#1f2937' : '#e5e7eb' },
+      ].map((l) => ({
+        name: l.name, type: 'line', yAxisIndex: 1, data: l.data, showSymbol: false, z: 6,
+        lineStyle: { width: 3, color: l.color, shadowColor: t.surface, shadowBlur: 4 }, itemStyle: { color: l.color },
+      })) : []),
+      ],
     });
-  }, [run]);
+  }, [run, overlay, share]);
   const csv = (): CsvData | undefined =>
     run && {
       filename: `dispatch_heatmap_${tag(run)}.csv`,
@@ -118,7 +148,16 @@ export function HeatmapCard({ run }: { run?: Run }) {
       subtitle={run ? `Average net dispatch as % of rated power; orange = discharging, blue = charging · ${scenario(run)}` : undefined}
       csv={csv}
     >
-      {(ex) => (build ? <Chart build={build} height={ex ? '72vh' : 360} label="Heatmap of average net battery dispatch by hour of day and month" /> : <Loading h={360} variant="grid" />)}
+      {(ex) => (
+        <>
+          <Switch
+            size="sm" mb="xs" checked={overlay} onChange={(e) => setOverlay(e.currentTarget.checked)} disabled={!share}
+            label="Overlay solar and wind share of ERCOT generation"
+            description={share ? `Yellow = solar, dark = wind, as % of generation by hour (right axis); ${run?.meta.year} fuel mix averaged over the months shown. Shown beside the dispatch pattern, not as its cause.` : ctx ? 'No fuel-mix data for this year.' : 'Loading fuel mix…'}
+          />
+          {build ? <Chart build={build} height={ex ? '72vh' : 360} label="Heatmap of average net battery dispatch by hour of day and month" /> : <Loading h={360} variant="grid" />}
+        </>
+      )}
     </Card>
   );
 }
@@ -162,6 +201,7 @@ export function TypicalDayCard({ run }: { run?: Run }) {
 
 // ---------------------------------------------------------------- cumulative revenue
 export function CumulativeCard({ run }: { run?: Run }) {
+  const wx = useWeather(run?.meta.location);
   const calc = useMemo(() => {
     if (!run) return undefined;
     const k = kw(run);
@@ -185,7 +225,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
           const i = run.daily.date.indexOf(date);
           const day = run.daily.revenue[i] / calc.k;
           const isTop = run.metrics.top10_days.includes(date);
-          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.series[1] + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW`;
+          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.series[1] + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW${isTop ? wxLine(wx?.on(date)) : ''}`;
         },
       },
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
@@ -195,7 +235,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
         { name: 'Top-10 days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.series[1], borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
       ],
     });
-  }, [run, calc]);
+  }, [run, calc, wx]);
   const csv = (): CsvData | undefined =>
     run && calc && {
       filename: `cumulative_revenue_${tag(run)}.csv`,
@@ -216,6 +256,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
 
 // ---------------------------------------------------------------- daily revenue
 export function DailyRevenueCard({ run }: { run?: Run }) {
+  const wx = useWeather(run?.meta.location);
   const build = useMemo(() => {
     if (!run) return undefined;
     const k = kw(run);
@@ -225,7 +266,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
       legend: { ...legendBase(t), data: ['Other days', 'Top-10 days'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'line' },
-        formatter: (ps: { value: [string, number] }[]) => `<b>${fmtDate(ps[0].value[0])}</b>${top.has(ps[0].value[0]) ? ' (top-10 day)' : ''}<br/>${usd(ps[0].value[1], 2)} per kW`,
+        formatter: (ps: { value: [string, number] }[]) => `<b>${fmtDate(ps[0].value[0])}</b>${top.has(ps[0].value[0]) ? ' (top-10 day)' : ''}<br/>${usd(ps[0].value[1], 2)} per kW${top.has(ps[0].value[0]) ? wxLine(wx?.on(ps[0].value[0])) : ''}`,
       },
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW per day', nameGap: 8 },
@@ -234,7 +275,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
         { name: 'Top-10 days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.series[1] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
       ],
     });
-  }, [run]);
+  }, [run, wx]);
   const csv = (): CsvData | undefined =>
     run && { filename: `daily_revenue_${tag(run)}.csv`, headers: ['date', 'revenue_usd_per_kw', 'cycles'], rows: run.daily.date.map((d, i) => [d, Math.round((run.daily.revenue[i] / kw(run)) * 1e4) / 1e4, run.daily.cycles[i]]) };
   return (
@@ -245,30 +286,32 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
 }
 
 export function TopDaysCard({ run }: { run?: Run }) {
+  const wx = useWeather(run?.meta.location);
   const rows = useMemo(() => {
     if (!run) return undefined;
     const idx = new Map(run.daily.date.map((d, i) => [d, i]));
     const total = run.daily.revenue.reduce((a, b) => a + b, 0);
     return run.metrics.top10_days.map((d, n) => {
       const r = run.daily.revenue[idx.get(d)!];
-      return { n: n + 1, date: d, perKw: r / kw(run), share: r / total, cycles: run.daily.cycles[idx.get(d)!] };
+      return { n: n + 1, date: d, perKw: r / kw(run), share: r / total, cycles: run.daily.cycles[idx.get(d)!], wx: wx?.on(d) };
     });
-  }, [run]);
+  }, [run, wx]);
   const csv = (): CsvData | undefined =>
-    run && rows && { filename: `top10_days_${tag(run)}.csv`, headers: ['rank', 'date', 'usd_per_kw', 'share_of_total', 'cycles'], rows: rows.map((r) => [r.n, r.date, +r.perKw.toFixed(3), +r.share.toFixed(4), r.cycles]) };
+    run && rows && { filename: `top10_days_${tag(run)}.csv`, headers: ['rank', 'date', 'usd_per_kw', 'share_of_total', 'cycles', 'high_f', 'low_f', 'weather_city'], rows: rows.map((r) => [r.n, r.date, +r.perKw.toFixed(3), +r.share.toFixed(4), r.cycles, r.wx?.hi ?? null, r.wx?.lo ?? null, r.wx?.city ?? null]) };
   return (
-    <Card title="Ten best days" terms="top10_day_share" subtitle="Share is of the total for the period covered." csv={csv}>
+    <Card title="Ten best days" terms="top10_day_share" subtitle={`Share is of the total for the period covered.${wx ? ` Temperatures are the daily high and low in ${wx.city}.` : ''}`} csv={csv}>
       {() =>
         !rows ? <Loading /> : (
           <div style={{ overflowX: 'auto' }}>
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" highlightOnHover>
-              <Table.Thead><Table.Tr><Table.Th>#</Table.Th><Table.Th>Date</Table.Th><Table.Th ta="right">$/kW</Table.Th><Table.Th ta="right">Share</Table.Th></Table.Tr></Table.Thead>
+              <Table.Thead><Table.Tr><Table.Th>#</Table.Th><Table.Th>Date</Table.Th><Table.Th ta="right">$/kW</Table.Th><Table.Th ta="right">Share</Table.Th>{wx && <Table.Th ta="right">High / low</Table.Th>}</Table.Tr></Table.Thead>
               <Table.Tbody>
                 {rows.map((r) => (
                   <Table.Tr key={r.date}>
                     <Table.Td c="dimmed">{r.n}</Table.Td><Table.Td>{fmtDate(r.date)}</Table.Td>
                     <Table.Td ta="right">{usd(r.perKw, 2)}</Table.Td>
                     <Table.Td ta="right">{pct(r.share, 1)}</Table.Td>
+                    {wx && <Table.Td ta="right" className="tnum">{r.wx ? `${r.wx.hi}° / ${r.wx.lo}°F` : '–'}</Table.Td>}
                   </Table.Tr>
                 ))}
               </Table.Tbody>
