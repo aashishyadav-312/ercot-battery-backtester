@@ -5,7 +5,10 @@ Paste this file's "Ground rules" and "Design spec" once at the start of the Clau
 Claude Code never merges; you review and merge, because merging redeploys the public site.
 
 Design source: the "ERCOT Storage App: Home Directions" canvas on claude.ai. In that canvas use Share > Export to save PNGs
-of Chargeline Home (dark and light), Atlas, Studio and Research into `docs/design/` in the repo before Step 1.
+of Chargeline Home (dark and light), Atlas, Studio and Research into `docs/design/` in the repo before Step 1. The committed
+copies are 1440px wide WebP files (`home-dark.webp`, `home-light.webp`, `atlas-dark.webp`, `studio-dark.webp`,
+`research-dark.webp`, about 1 MB in total); they are what a fresh checkout or worktree has. Wherever this document says
+`docs/design/*.png`, read `docs/design/*.webp`.
 
 ---
 
@@ -148,7 +151,7 @@ where norm is the min-max normalised metric; opacity .45 + .55 * norm; halo for 
 | Overview, Revenue, Dispatch, Realism | Research (charts and findings) |
 | Compare | Studio (compare presets) or Research |
 | Custom run | Studio |
-| Economics | Open decision: not designed yet. Keep reachable under Studio or Research until we design it. |
+| Economics | Decided: stays under Studio (`#/studio/economics`) until Step 5, which reports where it lives long term. |
 | Method, About | Research (method) and Guide (about) |
 
 ---
