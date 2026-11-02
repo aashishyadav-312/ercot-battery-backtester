@@ -103,8 +103,10 @@ describe('ViewBar', () => {
     expect(within(nav).getByRole('link', { name: 'Dispatch' }).getAttribute('aria-current')).toBe('page');
   });
 
-  it('renders nothing for a single-page tab with no selectors', () => {
-    const { container } = render(<ViewBar tab="atlas" page="map" sel={sel} />);
-    expect(container.firstChild).toBeNull();
+  it('links the Atlas to its 10-location view, keeping the scenario in the query', () => {
+    render(<ViewBar tab="atlas" page="atlas" sel={sel} />);
+    const nav = screen.getByRole('navigation', { name: 'Atlas pages' });
+    expect(within(nav).getByRole('link', { name: 'All nodes' }).getAttribute('aria-current')).toBe('page');
+    expect(within(nav).getByRole('link', { name: 'Detailed locations' }).getAttribute('href')).toBe('#/atlas/detailed?loc=HB_HOUSTON&dur=2&year=2025&deg=10');
   });
 });

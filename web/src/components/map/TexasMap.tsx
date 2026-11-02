@@ -5,9 +5,9 @@ import { LinesChart } from 'echarts/charts';
 import { GeoComponent } from 'echarts/components';
 import { Chart, tooltipBase, type ChartTheme } from '../Chart';
 import { IconMinus, IconPlus, IconReset } from '../Icons';
-import { captureColor, heatColor, markerSize, queueColor, type Domain } from './scale';
+import { captureColor, markerSize, queueColor, type Domain } from './scale';
 import { countyKey, type QueueCounty } from '../../data/context';
-import type { LocationRec, NodeRec, TexasGeo } from '../../data/types';
+import type { LocationRec, TexasGeo } from '../../data/types';
 import { usd } from '../../data/format';
 
 // Geo pieces are registered here (not in Chart.tsx) so they ship only in the lazily loaded Map page chunk.
@@ -19,14 +19,6 @@ export interface MapPoint {
   loc: LocationRec;
   revenue: number | null;
   capture: number | null;
-}
-
-/** Heat mode (Phase 12): every resource node as a small dot coloured by its $/kW-yr quantile class. */
-export interface HeatLayer {
-  nodes: NodeRec[];
-  breaks: number[];
-  /** Code of the selected all-node dot, if any. */
-  selected: string | null;
 }
 
 /** Planned-storage layer (Phase 17): counties shaded by battery MW in ERCOT's interconnection queue. */
@@ -70,8 +62,6 @@ interface Props {
   focus: Focus | null;
   height: number;
   label: string;
-  /** When set, the map is in heat mode: all nodes underneath, the detailed locations highlighted on top. */
-  heat?: HeatLayer | null;
   /** When set, counties are shaded by planned storage MW (interconnection queue). */
   queue?: QueueLayer | null;
 }
@@ -80,7 +70,7 @@ interface Props {
  * Texas county map drawn with echarts' geo component (no mapping library, no tiles).
  * Marker size = $/kW-yr, colour = capture rate. Hubs are diamonds at a representative city, nodes are circles at their plant.
  */
-export function TexasMap({ geo, points, domain, selected, onSelect, focus, height, label, heat, queue }: Props) {
+export function TexasMap({ geo, points, domain, selected, onSelect, focus, height, label, queue }: Props) {
   ensureMap(geo);
   const mode = useComputedColorScheme('light');
   const chart = useRef<echarts.ECharts | null>(null);
@@ -90,14 +80,7 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
   const build = useCallback(
     (t: ChartTheme) => {
       const item = (p: MapPoint) => {
-        const on = p.loc.code === selected && !heat?.selected;
-        if (heat) {
-          // Detailed locations stay highlighted over the heat layer: same colour scale, larger, with a dark ring and a label.
-          return {
-            name: p.loc.name, code: p.loc.code, value: [p.loc.lon, p.loc.lat, p.revenue, p.capture], symbolSize: on ? 18 : 15, z: on ? 30 : 20,
-            itemStyle: { color: heatColor(p.revenue, heat.breaks, t.mode), borderColor: t.text, borderWidth: on ? 3 : 2, opacity: 1 },
-          };
-        }
+        const on = p.loc.code === selected;
         return {
           name: p.loc.name,
           code: p.loc.code,
@@ -107,23 +90,6 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
           itemStyle: { color: captureColor(p.capture, domain, t.mode), borderColor: on ? t.text : t.surface, borderWidth: on ? 3 : 1.5, opacity: 0.96 },
         };
       };
-      const detailed = new Set(points.map((p) => p.loc.code));
-      const heatSeries = heat ? [{
-        id: 'All nodes', name: 'All nodes', type: 'scatter', coordinateSystem: 'geo', symbol: 'circle', z: 8, cursor: 'pointer',
-        emphasis: { scale: 1.6, focus: 'none' },
-        data: heat.nodes.filter((n) => n.lat != null && n.lon != null && !detailed.has(n.code)).map((n) => {
-          const on = n.code === heat.selected;
-          const c = heatColor(n.rev, heat.breaks, t.mode);
-          // County-level placements are rings: the position is the county, not the site.
-          return n.prec === 'county' ? {
-            name: n.code, code: n.code, county: n.county, value: [n.lon, n.lat, n.rev, n.capture], symbol: 'circle', symbolSize: on ? 14 : 10, z: on ? 30 : 7,
-            itemStyle: { color: 'transparent', borderColor: on ? t.text : c, borderWidth: on ? 2.5 : 2, opacity: 0.95 },
-          } : {
-            name: n.code, code: n.code, value: [n.lon, n.lat, n.rev, n.capture], symbolSize: on ? 13 : 8, z: on ? 30 : 8,
-            itemStyle: { color: c, borderColor: on ? t.text : t.surface, borderWidth: on ? 2.5 : 0.6, opacity: 0.95 },
-          };
-        }),
-      }] : [];
       const series = (id: string, symbol: string, kind: LocationRec['type']) => ({
         id, name: id, type: 'scatter', coordinateSystem: 'geo', symbol,
         data: points.filter((p) => p.loc.geocoded && p.loc.type === kind).map(item),
@@ -139,13 +105,13 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         tooltip: {
           ...tooltipBase(t),
           trigger: 'item',
-          formatter: (p: { componentType?: string; seriesType?: string; name: string; value: (number | null)[]; data?: { county?: string | null } }) => {
+          formatter: (p: { componentType?: string; seriesType?: string; name: string; value: (number | null)[] }) => {
             if (p.componentType === 'geo') {
               const c = queue?.counties.get(countyKey(p.name));
               return c ? `<b>${p.name} County</b><br/>${Math.round(c.mw).toLocaleString('en-US')} MW of storage in the queue<br/>${c.projects} project${c.projects === 1 ? '' : 's'}, ${Math.round(c.mw_ia_signed).toLocaleString('en-US')} MW with a signed agreement` : '';
             }
             return p.seriesType === 'scatter'
-              ? `<b>${p.name}</b><br/>${p.value[2] == null ? '–' : usd(p.value[2], 1)} per kW-yr${p.data?.county ? `<br/><i>County-level: somewhere in ${p.data.county} County</i>` : ''}`
+              ? `<b>${p.name}</b><br/>${p.value[2] == null ? '–' : usd(p.value[2], 1)} per kW-yr`
               : '';
           },
         },
@@ -163,13 +129,12 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
             id: 'outline', name: 'outline', type: 'lines', coordinateSystem: 'geo', polyline: true, silent: true, z: 5,
             data: rings.map((coords) => ({ coords })), lineStyle: { color: t.baseline, width: 1.3, opacity: 0.9 },
           },
-          ...heatSeries,
           series('Hubs', 'diamond', 'hub'),
           series('Resource nodes', 'circle', 'node'),
         ],
       };
     },
-    [points, domain, selected, rings, heat, queue, geo],
+    [points, domain, selected, rings, queue, geo],
   );
 
   const zoom = (f: number) => {
@@ -182,9 +147,7 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
   useEffect(() => {
     if (!focus) return;
     const p = points.find((x) => x.loc.code === focus.code);
-    const n = heat?.nodes.find((x) => x.code === focus.code);
     if (p?.loc.geocoded) chart.current?.setOption({ geo: { center: [p.loc.lon, p.loc.lat], zoom: 4 } });
-    else if (n?.lat != null) chart.current?.setOption({ geo: { center: [n.lon, n.lat], zoom: 4 } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus]);
 

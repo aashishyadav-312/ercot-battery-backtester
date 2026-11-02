@@ -66,15 +66,12 @@ export function queueColor(mw: number, breaks: number[], mode: 'light' | 'dark')
 }
 export const queueSwatch = (i: number, mode: 'light' | 'dark') => QUEUE_RAMP[mode][i];
 
-// ------------------------------------------------------------ heat mode (Phase 12)
-/** Number of equal-count colour classes in heat mode. */
-export const HEAT_CLASSES = 7;
-
+// ------------------------------------------------------------ equal-count classes
 /**
- * Quantile class breaks: HEAT_CLASSES - 1 interior cut points so each colour holds about the same number of nodes.
- * A quantile scale keeps the many ordinary nodes from collapsing into one colour next to a handful of extreme ones.
+ * Quantile class breaks: k - 1 interior cut points so each colour holds about the same number of counties.
+ * A quantile scale keeps the many ordinary values from collapsing into one colour next to a handful of extreme ones.
  */
-export function quantileBreaks(values: number[], k = HEAT_CLASSES): number[] {
+export function quantileBreaks(values: number[], k = QUEUE_CLASSES): number[] {
   const v = [...values].sort((a, b) => a - b);
   if (!v.length) return [];
   return Array.from({ length: k - 1 }, (_, i) => {
@@ -82,17 +79,4 @@ export function quantileBreaks(values: number[], k = HEAT_CLASSES): number[] {
     const lo = Math.floor(pos);
     return v[lo] + (v[Math.min(lo + 1, v.length - 1)] - v[lo]) * (pos - lo);
   });
-}
-
-/** Class index 0..breaks.length for a value. */
-export function heatClass(v: number, breaks: number[]): number {
-  let i = 0;
-  while (i < breaks.length && v > breaks[i]) i++;
-  return i;
-}
-
-/** Discrete heat colour for a $/kW-yr value (same blue ramp as capture rate: light mode darker = higher). */
-export function heatColor(v: number | null | undefined, breaks: number[], mode: 'light' | 'dark'): string {
-  if (v == null) return NO_DATA[mode];
-  return rampAt(heatClass(v, breaks) / breaks.length, mode);
 }

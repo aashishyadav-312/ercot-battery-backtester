@@ -10,6 +10,7 @@ import { useScheme } from './components/shell/SchemeProvider';
 import { TABS } from './shell/route';
 import Start from './pages/Start';
 import Home from './pages/Home';
+const Atlas = lazy(() => import('./pages/Atlas'));
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
@@ -25,10 +26,10 @@ import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['home', 'method', 'about', 'start', 'custom', 'live'];
+const OWN_INPUTS: Page[] = ['home', 'atlas', 'method', 'about', 'start', 'custom', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare,
+  home: Home, atlas: Atlas, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare,
   realism: Realism, economics: Economics, custom: Custom, live: Live, method: Method, about: About,
 };
 

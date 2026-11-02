@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, pathOf, resolveHash, tabOf, tabPath, type Page } from './route';
 
 /** Where every route from before the redesign now lives (docs/REDESIGN.md, "Old to new routes"). */
-const OLD_TO_NEW: Record<Exclude<Page, 'home'>, string> = {
+const OLD_TO_NEW: Record<Exclude<Page, 'home' | 'atlas'>, string> = {
   start: '#/guide/start',
   map: '#/atlas',
   live: '#/home/live',
@@ -25,7 +25,8 @@ describe('old routes redirect to their new home', () => {
   it.each(OLD_PAGES)('#/%s resolves to its new home and asks for the URL to be rewritten', (page) => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
-    expect(r.page).toBe(page);
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page); // the Map page was replaced by the Atlas
+
     expect(r.redirected).toBe(true);
   });
 
@@ -82,6 +83,15 @@ describe('new routes', () => {
     expect(r.tab).toBe('home');
     expect(r.redirected).toBe(true);
     expect(r.canonical).toBe('#/home?loc=HB_PAN');
+  });
+
+  it('opens the all-node Atlas for old #/map links, and keeps the 10-location view at #/atlas/detailed', () => {
+    expect(resolveHash('#/map?view=heat').page).toBe('atlas');
+    expect(resolveHash('#/atlas').page).toBe('atlas');
+    expect(resolveHash('#/atlas').redirected).toBe(false);
+    const d = resolveHash('#/atlas/detailed?loc=HB_WEST&dur=4');
+    expect([d.page, d.tab, d.redirected]).toEqual(['map', 'atlas', false]);
+    expect(buildHash('map', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/atlas/detailed?loc=HB_WEST&dur=4&year=2025&deg=10');
   });
 
   it("serves Home at #/home and today's prices at #/home/live, without a redirect", () => {

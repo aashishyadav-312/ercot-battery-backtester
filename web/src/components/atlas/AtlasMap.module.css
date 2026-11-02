@@ -1,0 +1,22 @@
+.map { display: block; width: 100%; max-width: 620px; height: auto; margin: 0 auto; overflow: visible; }
+.land { fill: var(--land); stroke: var(--land-stroke); stroke-width: 1.2; stroke-linejoin: round; }
+
+.node { cursor: pointer; }
+.dot, .county, .halo { transition: fill 420ms var(--ease), stroke 420ms var(--ease), opacity 420ms var(--ease); }
+.county { fill: none; stroke-width: 1.4; }
+.halo { opacity: 0.16; }
+.hit { fill: transparent; }
+.node:hover .dot { stroke: var(--text); stroke-width: 1; }
+.node:hover .county { stroke-width: 2.2; }
+
+/* Outside the zone filter: present for context, clearly behind. */
+.node[data-out] .dot, .node[data-out] .county { opacity: 0.14 !important; }
+.node[data-out] { cursor: default; }
+
+/* Selected node: two rings, in the text colour so they read on every metric colour. */
+.selected circle { fill: none; stroke: var(--text); stroke-width: 1.8; }
+.selected .outer { stroke: var(--amber); stroke-width: 1.2; opacity: 0.8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot, .county, .halo { transition: none; }
+}

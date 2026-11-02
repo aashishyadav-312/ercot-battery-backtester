@@ -14,8 +14,8 @@ export interface Marker {
 }
 
 /** Fill for a dot: the metric's colour for the top tenth, a mix for the upper half, the neutral grey below. */
-const METRIC_VAR: Record<Metric, string> = { rev: 'var(--amber)', capture: 'var(--mint)', top10: 'var(--bone)' };
-function fill(d: MapDot, metric: Metric) {
+export const METRIC_VAR: Record<Metric, string> = { rev: 'var(--amber)', capture: 'var(--mint)', top10: 'var(--bone)' };
+export function fill(d: MapDot, metric: Metric) {
   const c = METRIC_VAR[metric];
   return d.tier === 'top' ? c : d.tier === 'mid' ? `color-mix(in srgb, ${c} 60%, var(--dot-low))` : 'var(--dot-low)';
 }
