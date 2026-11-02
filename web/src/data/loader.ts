@@ -21,10 +21,28 @@ function getJson<T>(file: string): Promise<T> {
   return p as Promise<T>;
 }
 
+function getText(file: string): Promise<string> {
+  const key = `text:${file}`;
+  let p = cache.get(key);
+  if (!p) {
+    p = fetch(`${BASE}${file}?v=${DATA_VERSION}`).then((r) => {
+      if (!r.ok) throw new Error(`${file}: HTTP ${r.status}`);
+      return r.text();
+    });
+    p.catch(() => cache.delete(key));
+    cache.set(key, p);
+  }
+  return p as Promise<string>;
+}
+
 export const loadIndex = () => getJson<{ runs: IndexRun[] }>('index.json').then((d) => d.runs);
 export const loadNodeSelection = () => getJson<NodeSelection>('node_selection.json');
 export const loadRtcb = () => getJson<Rtcb>('rtcb.json');
 export const loadAncillary = () => getJson<AncillaryFile>('ancillary.json');
+/** The 50%-of-rated-power award cap sensitivity (Houston 2025, 2 h, $10/MWh): same shape as ancillary.json. */
+export const loadAncillaryCapped = () => getJson<AncillaryFile>('ancillary_share_0.5.json');
+/** results/FINDINGS.md as written: the Research page renders each finding from it. */
+export const loadFindings = () => getText('findings.md');
 export const loadAncillaryRun = (file: string) => getJson<StackRun>(file);
 /** Fleet, interconnection queue, weather and solar/wind share (Phase 17). Loaded on first use by the cards and layers that need it. */
 export const loadContext = () => getJson<ContextFile>('context.json');

@@ -28,10 +28,10 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['home', 'start', 'map', 'detailed', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['home', 'research', 'start', 'map', 'detailed', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  home: 'home', start: 'guide/start', map: 'atlas', detailed: 'atlas/detailed', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
+  home: 'home', research: 'research', start: 'guide', map: 'atlas', detailed: 'atlas/detailed', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
   realism: 'research/realism', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;
@@ -88,6 +88,8 @@ try {
         ]),
         // A resource node selected in the Atlas (an old #/map?loc= link opens on that node).
         ...(!only || pages.includes('map') ? [['map-node', 'atlas?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
+        // One finding opened from the Research list (design step 5), rendered from results/FINDINGS.md.
+        ...(!only || pages.includes('research') ? [['finding-8', 'research?f=8']] : []),
         ...(!only || pages.includes('custom') ? [['custom-solved', 'studio/custom?loc=HB_WEST&mw=250&dur=1.5&rte=90&deg=5&soc=20&from=2025-06-01&to=2025-08-31&strat=da', /days solved in|Solved in your browser/]] : []),
       ]) {
         await page.goto(`${base}#/${url}`);

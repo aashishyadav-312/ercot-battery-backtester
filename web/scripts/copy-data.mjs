@@ -26,6 +26,11 @@ for (const f of readdirSync(src).sort()) {
     n++;
   }
 }
+// The written findings (results/FINDINGS.md) ship beside the numbers: the Research page renders each finding from this file,
+// so the text on screen is the text in the repository.
+cpSync(join(src, 'FINDINGS.md'), join(dst, 'findings.md'));
+hash.update('findings.md').update(readFileSync(join(src, 'FINDINGS.md')));
+n++;
 // Price files for the in-browser custom run (results/prices/*.ebp + index.json, Phase 15).
 const prices = join(src, 'prices');
 let priceBytes = 0;

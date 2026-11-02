@@ -36,7 +36,7 @@ The model, the data and the results are open in the repository: every figure on 
 - Claims stay descriptive, not causal. The RTC+B comparison shows what changed, not why. Results are illustrative models, not a forecast or investment advice.
 - Numbers on screen come from loaded results or computed values. Literals are limited to labels, units and copy.
 - Old URLs keep working: every earlier hash route redirects to its new home.
-- Undecided: where the Economics page lives long term (it stays under Studio until the Research and Guide step); the social preview image (still the old one until the release check).
+- Decided in step 5: Economics lives under Studio for good (`#/studio/economics`). It is a what-if on the visitor's own battery (capex, discount rate), which is what Studio is for; Research reports what the replay found. Undecided: the social preview image (still the old one until the release check).
 
 ## Brand Commitments
 

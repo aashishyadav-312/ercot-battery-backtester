@@ -26,7 +26,7 @@ export function Footer({ index, sel }: { index: IndexRun[] | null; sel: Selectio
           <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a> ·{' '}
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{' '}
           <a href={SITE.issues} target="_blank" rel="noopener noreferrer">Report an issue</a> ·{' '}
-          <a href={buildHash('about', sel)}>About</a>
+          <a href={`${buildHash('guide', sel)}&s=about`}>About</a>
         </p>
         <p className={classes.small}>
           An independent project, not affiliated with ERCOT or any company. Prices are ERCOT public data. Results are illustrative models.

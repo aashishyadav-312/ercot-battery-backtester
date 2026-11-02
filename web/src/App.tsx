@@ -8,7 +8,7 @@ import { ViewBar } from './components/shell/ViewBar';
 import { Footer } from './components/shell/Footer';
 import { useScheme } from './components/shell/SchemeProvider';
 import { TABS } from './shell/route';
-import Start from './pages/Start';
+import Guide from './pages/Guide';
 import Home from './pages/Home';
 const Atlas = lazy(() => import('./pages/Atlas'));
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
@@ -20,16 +20,16 @@ import Economics from './pages/Economics';
 const Studio = lazy(() => import('./pages/Studio')); // the solver and worker load only when someone opens this page
 const Live = lazy(() => import('./pages/Live')); // likewise the solver, and the live fetch runs only on this page
 import Method from './pages/Method';
-import About from './pages/About';
+const Research = lazy(() => import('./pages/Research')); // the findings text and the hub run files load only when someone opens this page
 import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'method', 'about', 'start', 'live'];
+const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'guide', 'method', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, atlas: Atlas, studio: Studio, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
-  realism: Realism, economics: Economics, live: Live, method: Method, about: About,
+  home: Home, atlas: Atlas, studio: Studio, research: Research, guide: Guide, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
+  realism: Realism, economics: Economics, live: Live, method: Method,
 };
 
 export default function App() {
@@ -71,7 +71,7 @@ export default function App() {
         {selectors && <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>}
         {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
         <div key={page} className="app-enter">
-          {error ? <Text c="red">Could not load results: {error}</Text> : !index && (page === 'method' || page === 'about') ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><Page /></Suspense>}
+          {error ? <Text c="red">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><Page /></Suspense>}
         </div>
       </main>
       <Footer index={index} sel={sel} />
