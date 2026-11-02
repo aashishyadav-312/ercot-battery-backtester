@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { VIEW_H, VIEW_W, calloutWidth, type MapDot, type Metric } from '../../data/home';
 import classes from './HomeMap.module.css';
 
@@ -34,14 +35,15 @@ export function HomeMap({ outline, dots, metric, markers, selected, onSelect, la
   onSelect: (n: number) => void;
   label: string;
 }) {
-  const breathing = new Set(dots.slice(-3).map((d) => d.code)); // the three largest values breathe
+  const top3 = dots.slice(-3).map((d) => d.code); // the three largest values breathe, each a third of a cycle behind the last
+  const breathing = new Set(top3);
   const on = markers.find((m) => m.n === selected);
   return (
     <svg className={classes.map} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} role="img" aria-label={label} data-metric={metric}>
       <path d={outline} className={classes.land} />
       <g>
         {dots.map((d) => (
-          <g key={d.code} className={breathing.has(d.code) ? classes.breathe : undefined}>
+          <g key={d.code} className={breathing.has(d.code) ? classes.breathe : undefined} style={breathing.has(d.code) ? ({ '--n': top3.indexOf(d.code) } as CSSProperties) : undefined}>
             {d.halo && <circle cx={d.x} cy={d.y} r={d.haloR} className={classes.halo} style={{ fill: fill(d, metric) }} />}
             {breathing.has(d.code) && <circle cx={d.x} cy={d.y} r={d.r} className={classes.ring} style={{ stroke: fill(d, metric) }} />}
             <circle

@@ -74,7 +74,7 @@
   font-family: var(--mantine-font-family-monospace);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 420ms var(--ease), color 420ms var(--ease), border-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .choice:hover { color: var(--text); border-color: var(--text); }
 .choice[aria-pressed='true'] { background: var(--text); border-color: var(--text); color: var(--bg); }
@@ -143,8 +143,8 @@
 .progress { margin-top: 16px; }
 .progressHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; font-size: 14px; color: var(--text); }
 .track { position: relative; height: 10px; margin-top: 8px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
-.progressFill { height: 100%; background: var(--amber); transform-origin: left; transition: transform 420ms var(--ease); }
-.track[data-indeterminate] .progressFill { width: 30%; transform: none !important; animation: slide 1.2s var(--ease) infinite; }
+.progressFill { height: 100%; background: var(--amber); transform-origin: left; transition: transform 240ms var(--ease); }
+.track[data-indeterminate] .progressFill { width: 30%; transform: none !important; animation: slide 1.2s var(--ease-in-out) infinite; }
 @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
 
 /* ------------------------------------------------ totals */
@@ -169,7 +169,7 @@
 .hbarHead [data-tone='amber'] { color: var(--amber-text); }
 .hbarHead [data-tone='grey'] { color: var(--text); }
 .barTrack { height: 14px; margin-top: 8px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
-.fill { height: 100%; border-radius: var(--r-pill); animation: grow-x 700ms var(--ease) both; transition: width 420ms var(--ease); }
+.fill { height: 100%; border-radius: var(--r-pill); animation: grow-x 700ms var(--ease) both; }
 .fill[data-tone='mint'] { background: var(--mint); }
 .fill[data-tone='amber'] { background: var(--amber); }
 .fill[data-tone='grey'] { background: var(--dot-low); }

@@ -106,7 +106,7 @@ export function Chart({ build, height, label, onChartReady, onClick }: Props) {
         animation: !reduce,
         animationDuration: 700,
         animationEasing: 'cubicOut',
-        animationDurationUpdate: 520,
+        animationDurationUpdate: 320,
         animationEasingUpdate: 'cubicInOut',
         textStyle: { fontFamily: CHART_FONT },
         ...opt,
