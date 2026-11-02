@@ -9,6 +9,7 @@ import { Footer } from './components/shell/Footer';
 import { useScheme } from './components/shell/SchemeProvider';
 import { TABS } from './shell/route';
 import Start from './pages/Start';
+import Home from './pages/Home';
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
@@ -24,10 +25,10 @@ import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['method', 'about', 'start', 'custom', 'live'];
+const OWN_INPUTS: Page[] = ['home', 'method', 'about', 'start', 'custom', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare,
+  home: Home, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare,
   realism: Realism, economics: Economics, custom: Custom, live: Live, method: Method, about: About,
 };
 
@@ -39,7 +40,7 @@ export default function App() {
 
   const tabLabel = TABS.find((t) => t.tab === tab)!;
   const viewLabel = tabLabel.views.find((v) => v.page === page)!.label;
-  const title = tabLabel.views.length > 1 ? `${viewLabel} · ${tabLabel.label}` : tabLabel.label;
+  const title = tabLabel.views.length > 1 && page !== 'home' ? `${viewLabel} · ${tabLabel.label}` : tabLabel.label;
 
   useEffect(() => {
     document.title = `${title} · Chargeline`;
@@ -61,9 +62,12 @@ export default function App() {
       <Ticker />
       <Header active={tab} sel={sel} scheme={scheme} onToggleScheme={toggle} />
       <main id="main" ref={main} tabIndex={-1} className={classes.main}>
-        <ViewBar tab={tab} page={page} sel={sel}>
-          {selectors && <Group visibleFrom="md"><Selectors /></Group>}
-        </ViewBar>
+        {/* Home is the landing page: no sub-navigation above the hero. Its "Today in ERCOT" view links back to it. */}
+        {page !== 'home' && (
+          <ViewBar tab={tab} page={page} sel={sel}>
+            {selectors && <Group visibleFrom="md"><Selectors /></Group>}
+          </ViewBar>
+        )}
         {selectors && <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>}
         {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
         <div key={page} className="app-enter">

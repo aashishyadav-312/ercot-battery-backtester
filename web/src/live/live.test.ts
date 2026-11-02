@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { filledSoFar, intervalStart, latest, liveUrl, loadLive, pricesThrough, spikes, type LiveState } from './live';
+import { filledSoFar, intervalStart, latest, liveUrl, loadLive, moveDir, pricesThrough, spikes, type LiveState } from './live';
 
 function state(rt: Record<string, (number | null)[]>): LiveState {
   return {
@@ -61,5 +61,15 @@ describe('loadLive', () => {
 
   it("reports the Worker's error when there is nothing saved", async () => {
     expect(await loadLive(respond(503, { error: 'No snapshot yet' }), '/x')).toEqual({ source: 'none', reason: 'No snapshot yet' });
+  });
+});
+
+describe('moveDir (shared by the ticker and the hub tiles)', () => {
+  it('reads the change at the cent level both print', () => {
+    expect(moveDir(0.5)).toBe('up');
+    expect(moveDir(-0.4)).toBe('down');
+    expect(moveDir(0.004)).toBe('flat'); // prints as +0.00, so it is not coloured as a rise
+    expect(moveDir(-0.004)).toBe('flat');
+    expect(moveDir(0)).toBe('flat');
   });
 });

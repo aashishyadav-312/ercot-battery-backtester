@@ -37,6 +37,12 @@
   --tick-up: #0B6A4A;
   --tick-down: #A3331A;
 
+  /* Price moves on the page (hub tiles). Same hue rule as the ticker: green up, red down. On the dark page these are
+     the values the ticker uses on its own dark strip (light theme), and the other way round, so a rise looks the same
+     on any dark surface and on any light one. */
+  --up: #7FE0B0;
+  --down: #FFB09C;
+
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
   --container: 1200px;
   --gutter: 32px;
@@ -78,6 +84,9 @@
   --tick-dot: #FF6A4A;
   --tick-up: #7FE0B0;
   --tick-down: #FFB09C;
+
+  --up: #0B6A4A;
+  --down: #A3331A;
 }
 
 @media (max-width: 640px) {

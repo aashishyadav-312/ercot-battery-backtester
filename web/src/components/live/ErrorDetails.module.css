@@ -1,0 +1,15 @@
+.details { margin-top: 4px; font-size: 13px; color: var(--muted); }
+.summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  border-radius: 6px;
+}
+.list { margin: 0 0 4px; padding: 0; list-style: none; display: grid; gap: 6px; }
+/* Raw text can be one long URL or stack line: wrap it inside the panel instead of widening the page. */
+.raw { display: block; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; padding: 6px 8px; }

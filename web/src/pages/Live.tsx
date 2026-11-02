@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Anchor, Badge, Group, Paper, SegmentedControl, Select, SimpleGrid, Stack, Text, UnstyledButton } from '@mantine/core';
+import { Alert, Anchor, Badge, Group, SegmentedControl, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 import { Card } from '../components/Card';
 import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from '../components/Chart';
 import { Info } from '../components/Info';
 import { IconWarn } from '../components/Icons';
+import { HubTiles } from '../components/live/HubTiles';
+import { ErrorDetails } from '../components/live/ErrorDetails';
 import { PageHeader } from './Overview';
 import { locFull, locName } from '../data/site';
 import { usd } from '../data/format';
 import type { DayResult } from '../custom/dispatch';
 import {
-  RT_MIN, SPIKE_THRESHOLD, STALE_MIN, ago, ctDay, ctTime, filledSoFar, intervalStart, isComplete, latest, loadLive, pricesThrough, spikes,
+  RT_MIN, SPIKE_THRESHOLD, STALE_MIN, ago, ctDay, ctTime, filledSoFar, intervalStart, isComplete, loadLive, pricesThrough, spikes,
   type LiveDay, type LiveLoad, type LiveState,
 } from '../live/live';
 import { LIVE_RTE, solveDay } from '../live/solver';
@@ -19,7 +21,6 @@ const HOUR = 3_600_000;
 const DURATIONS = ['1', '2', '4'];
 
 const money = (v: number | null | undefined, d = 2) => (v == null ? '–' : usd(v, d));
-const signed = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : '±'}${usd(Math.abs(v), 2)}`;
 
 function useLive() {
   const [load, setLoad] = useState<LiveLoad | null>(null);
@@ -61,32 +62,6 @@ function Freshness({ load, now }: { load: Extract<LiveLoad, { state: LiveState }
         Last updated {ctTime(s.checkedAt)} CT ({ago(Date.parse(s.checkedAt), now)}).
       </Text>
     </Group>
-  );
-}
-
-function HubTiles({ s, selected, onSelect }: { s: LiveState; selected: string; onSelect: (loc: string) => void }) {
-  return (
-    <SimpleGrid cols={{ base: 2, sm: 3, lg: 5 }} spacing={{ base: 'sm', sm: 'md' }}>
-      {s.hubs.map((loc) => {
-        const l = latest(s.today.rt[loc] ?? []);
-        const up = l?.change != null && l.change > 0;
-        const down = l?.change != null && l.change < 0;
-        return (
-          <UnstyledButton key={loc} onClick={() => onSelect(loc)} aria-pressed={selected === loc} aria-label={`Show ${locFull(loc)} in the charts`}>
-            <Paper withBorder p="md" data-interactive style={selected === loc ? { borderColor: 'var(--mantine-primary-color-filled)' } : undefined}>
-              <Text size="xs" c="dimmed" fw={560} tt="uppercase" style={{ letterSpacing: '.06em' }} truncate>{locName(loc)}</Text>
-              <Text className="tnum" fz={{ base: 24, sm: 28 }} fw={640} lh={1.1} mt={6} c="bright">
-                {l ? usd(l.price, 2) : '–'}
-                <Text span fz="xs" c="dimmed" fw={500} ml={4}>/MWh</Text>
-              </Text>
-              <Text size="xs" mt={6} className="tnum" c={up ? 'red' : down ? 'teal' : 'dimmed'}>
-                {l?.change == null ? 'No earlier interval to compare' : `${up ? '▲' : down ? '▼' : '•'} ${signed(l.change)} vs previous 15 min`}
-              </Text>
-            </Paper>
-          </UnstyledButton>
-        );
-      })}
-    </SimpleGrid>
   );
 }
 
@@ -302,8 +277,9 @@ export default function Live() {
       <Stack gap="lg">
         {header}
         <Alert color="gray" icon={<IconWarn />} title="Live prices are unavailable right now">
-          The page could not load live prices ({load.reason}) and has no saved copy in this browser yet. Try again in a few minutes;
+          The page could not load live prices and has no saved copy in this browser yet. Try again in a few minutes;
           the historical pages work as usual.
+          <ErrorDetails items={[load.reason]} />
         </Alert>
       </Stack>
     );
@@ -318,8 +294,9 @@ export default function Live() {
       <Freshness load={load} now={now} />
       {load.source === 'cache' && (
         <Alert color="yellow" icon={<IconWarn />} title="Showing the last saved prices">
-          New prices could not be loaded ({load.reason}). This is the copy saved in this browser, last updated
+          New prices could not be loaded. This is the copy saved in this browser, last updated
           {' '}{ctTime(s.checkedAt)} CT on {ctDay(s.today.date)}. The page will try again every 5 minutes.
+          <ErrorDetails items={[load.reason]} />
         </Alert>
       )}
       {hot.length > 0 && (
@@ -329,9 +306,12 @@ export default function Live() {
         </Alert>
       )}
       {s.errors.length > 0 && load.source === 'worker' && (
-        <Text size="xs" c="dimmed">
-          The last update could not fetch everything from ERCOT, so some figures carry over from earlier: {s.errors.join('; ')}.
-        </Text>
+        <div>
+          <Text size="xs" c="dimmed">
+            The last update could not fetch everything from ERCOT, so some figures carry over from earlier.
+          </Text>
+          <ErrorDetails items={s.errors} />
+        </div>
       )}
 
       <HubTiles s={s} selected={loc} onSelect={setLoc} />

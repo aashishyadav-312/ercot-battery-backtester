@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLiveFeed } from '../../live/useLiveFeed';
 import { tickerModel, type TickerModel } from '../../shell/ticker';
+import { MoveArrow } from '../live/MoveArrow';
 import classes from './Ticker.module.css';
 
 /** Presentational strip. Takes a model so the states (live, delayed, saved, unavailable) can be rendered and tested without a network. */
@@ -13,7 +14,7 @@ export function TickerView({ model }: { model: TickerModel }) {
         <li key={it.loc} className={classes.item}>
           <span className={classes.sym}>{it.loc}</span>
           <span className={classes.px}>{it.price}</span>
-          {it.change !== null && <span className={classes.chg} data-dir={it.dir}>{it.change}</span>}
+          {it.change !== null && <span className={classes.chg} data-dir={it.dir}><MoveArrow dir={it.dir} />{it.change}</span>}
         </li>
       ))}
     </ul>

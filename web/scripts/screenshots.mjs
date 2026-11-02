@@ -28,10 +28,10 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['home', 'start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  start: 'guide/start', map: 'atlas', live: 'home', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
+  home: 'home', start: 'guide/start', map: 'atlas', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
   realism: 'research/realism', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;

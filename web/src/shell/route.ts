@@ -1,13 +1,15 @@
 // Routing for the five-tab shell. Pure functions only (no window access), so the redirect table is testable.
 //
-// A "page" is still one of the twelve original views; each now lives under one of five tabs. Hash URLs are
+// A "page" is one of the twelve original views, or a page the redesign added (Home); each lives under one of five tabs. Hash URLs are
 // `#/<tab>[/<view>]?<query>`. Every URL from before the redesign (`#/overview?loc=...`) resolves to its new home
 // with the query kept as written, so shared links and bookmarks keep working.
 
 import type { Selection } from '../data/types';
 
-export type Page = 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'economics' | 'custom' | 'method' | 'about';
-export const PAGES: Page[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
+export type Page = 'home' | 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'economics' | 'custom' | 'method' | 'about';
+/** The pages from before the redesign. Their bare hash (`#/live`) is an old route that redirects to its new home. */
+export const OLD_PAGES: Page[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
+export const PAGES: Page[] = ['home', ...OLD_PAGES];
 
 export type Tab = 'home' | 'atlas' | 'studio' | 'research' | 'guide';
 
@@ -15,7 +17,7 @@ interface View { page: Page; slug: string; label: string }
 
 /** Tabs in navigation order. The first view of a tab is its default; `slug` is empty for a tab with one view. */
 export const TABS: { tab: Tab; label: string; views: View[] }[] = [
-  { tab: 'home', label: 'Home', views: [{ page: 'live', slug: '', label: 'Live' }] },
+  { tab: 'home', label: 'Home', views: [{ page: 'home', slug: '', label: 'Overview' }, { page: 'live', slug: 'live', label: 'Today in ERCOT' }] },
   { tab: 'atlas', label: 'Atlas', views: [{ page: 'map', slug: '', label: 'Map' }] },
   {
     tab: 'studio', label: 'Studio',
@@ -86,13 +88,12 @@ export function resolveHash(hash: string): ResolvedRoute {
     const views = viewsOf(first as Tab);
     const hit = views.find((v) => v.slug === second);
     page = (hit ?? views[0]).page;
-    redirected = second !== '' ? !hit : views.length > 1;
-    if (second === '' && views.length === 1) redirected = false;
-  } else if ((PAGES as string[]).includes(first)) {
+    redirected = !hit; // an unknown view, or a bare tab whose first view has its own slug (#/studio)
+  } else if ((OLD_PAGES as string[]).includes(first)) {
     page = first as Page; // an old route: its page keeps its content, in its new home
     redirected = true;
   } else {
-    page = 'live';
+    page = 'home';
     redirected = raw !== '';
   }
   return { tab: tabOf(page), page, query, canonical: withQuery(page), redirected };
