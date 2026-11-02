@@ -29,7 +29,7 @@ const pts = (v: number | null | undefined) => (v == null ? '–' : `${v >= 0 ? '
 function Change({ v, kind = 'pct' }: { v: number | null | undefined; kind?: 'pct' | 'pts' }) {
   if (v == null) return null;
   return (
-    <Text span fz="xs" fw={560} ml={6} c={v >= 0 ? 'teal.7' : 'red.7'} style={{ ...tnum, whiteSpace: 'nowrap' }}>
+    <Text span fz="xs" fw={560} ml={6} c={v >= 0 ? 'var(--up)' : 'var(--down)'} style={{ ...tnum, whiteSpace: 'nowrap' }}>
       {kind === 'pct' ? signed(v) : pts(v)}
     </Text>
   );
@@ -127,7 +127,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
           <>
             <Split>
             <Chart build={build} height={ex ? '75vh' : 520} label="Capture rate by location for 1, 2 and 4 hour batteries" />
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Capture rate by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={460} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -289,7 +289,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
             />
             <Chart build={build} height={ex ? '50vh' : 300} label="Monthly revenue before and after RTC+B" />
             </div>
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Monthly revenue before and after table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
                 <Table.Thead><Table.Tr><Table.Th>{run.days} matched days</Table.Th><Table.Th ta="right">Before</Table.Th><Table.Th ta="right">After</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody style={tnum}>
@@ -367,7 +367,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
           <>
             <Split>
             <Chart build={build} height={ex ? '70vh' : 460} label="Percent change in revenue after RTC+B by location" />
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Change by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={560} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>

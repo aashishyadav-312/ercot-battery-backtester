@@ -302,7 +302,7 @@ export function TopDaysCard({ run }: { run?: Run }) {
     <Card title="Ten best days" terms="top10_day_share" subtitle={`Share is of the total for the period covered.${wx ? ` Temperatures are the daily high and low in ${wx.city}.` : ''}`} csv={csv}>
       {() =>
         !rows ? <Loading /> : (
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Best days table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" highlightOnHover>
               <Table.Thead><Table.Tr><Table.Th>#</Table.Th><Table.Th>Date</Table.Th><Table.Th ta="right">$/kW</Table.Th><Table.Th ta="right">Share</Table.Th>{wx && <Table.Th ta="right">High / low</Table.Th>}</Table.Tr></Table.Thead>
               <Table.Tbody>
@@ -358,7 +358,7 @@ export function CapturePricesCard({ run }: { run?: Run }) {
 function Delta({ now, prev }: { now: number; prev?: number }) {
   if (prev == null || !prev) return null;
   const d = now / prev - 1;
-  return <Text span fz="xs" c={d >= 0 ? 'teal.7' : 'red.7'} fw={560} ml={6}>{d >= 0 ? '+' : ''}{(d * 100).toFixed(0)}%</Text>;
+  return <Text span fz="xs" c={d >= 0 ? 'var(--up)' : 'var(--down)'} fw={560} ml={6}>{d >= 0 ? '+' : ''}{(d * 100).toFixed(0)}%</Text>;
 }
 
 export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[] | null }) {
@@ -395,7 +395,7 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
       {(ex) => (
         <>
           {build ? <Chart build={build} height={tall(ex, 220)} label="Revenue by battery duration" /> : <Loading h={220} />}
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Duration table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
               <Table.Thead>
                 <Table.Tr><Table.Th>Duration</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">$/kWh-yr</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th><Table.Th ta="right">Top-10 share</Table.Th></Table.Tr>
@@ -521,7 +521,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
 
 function NodeHubTable({ members, calc }: { members: string[]; calc: { year: number; vals: (number | null)[]; days: number; first: string; last: string }[] }) {
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Node and hub table, scrolls sideways when it does not fit">
       <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
         <Table.Thead>
           <Table.Tr><Table.Th>Year (days)</Table.Th>{members.map((m, i) => <Table.Th key={m} ta="right">{i === 0 ? `${locFull(m)} $/kW` : `${locFull(m)} ×hub`}</Table.Th>)}</Table.Tr>
@@ -600,7 +600,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
         !data || !build ? <Loading h={440} /> : (
           <>
             <Chart build={build} height={ex ? '70vh' : 440} label="Revenue by location, ranked" />
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Revenue by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" highlightOnHover>
                 <Table.Thead><Table.Tr><Table.Th>Location</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">Top-10 share</Table.Th><Table.Th ta="right">Top day</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody>

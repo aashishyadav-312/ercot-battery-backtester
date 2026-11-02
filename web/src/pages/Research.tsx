@@ -242,7 +242,7 @@ function Overview({ data, sections, head }: { data: ResearchData; sections: Map<
           </article>
         </div>
 
-        <aside className={classes.leaves} aria-labelledby="leaves-title">
+        <div className={classes.leaves} role="group" aria-labelledby="leaves-title">
           <div>
             <h3 id="leaves-title" className={classes.panelTitle}>What this model leaves out</h3>
             <p className={classes.panelText}>
@@ -251,7 +251,7 @@ function Overview({ data, sections, head }: { data: ResearchData; sections: Map<
             </p>
           </div>
           <a className={classes.secondary} href="#/research/method">Full method <span aria-hidden="true">→</span></a>
-        </aside>
+        </div>
       </section>
 
       <section className={classes.section} aria-labelledby="explore-title">

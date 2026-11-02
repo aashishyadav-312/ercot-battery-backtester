@@ -238,7 +238,7 @@ function Stray({ file }: { file: NodesFile }) {
         <article className={classes.card}>
           <h3 className={classes.cardTitle}>Revenue percentiles</h3>
           <p className={classes.meta}>$/kW-year, and as a multiple of own hub</p>
-          <div className={classes.tableBox}>
+          <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Revenue percentiles table, scrolls sideways when it does not fit">
             <table className={classes.table} data-testid="percentiles">
               <thead><tr><th scope="col">Percentile</th><th scope="col" className={classes.num}>$/kW-yr</th><th scope="col" className={classes.num}>vs hub</th></tr></thead>
               <tbody>
@@ -340,7 +340,7 @@ function NodeTable({ file, hubs, zone, selected, onSelect }: {
           <button type="button" className={classes.ghost} onClick={csv}>Download CSV</button>
         </div>
       </div>
-      <div className={classes.tableBox}>
+      <div className={classes.tableBox} tabIndex={0} role="region" aria-label="All located nodes table, scrolls sideways when it does not fit">
         <table className={`${classes.table} ${classes.wide}`} data-testid="node-table">
           <thead>
             <tr>

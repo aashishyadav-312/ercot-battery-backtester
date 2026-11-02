@@ -313,7 +313,7 @@ function HubTable({ m }: { m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Hub revenue, ranked</h3>
       <p className={classes.meta}>{m.year} · {m.durationH}-hour battery · {usd(m.deg, 0)}/MWh degradation · $/kW-year</p>
-      <div className={classes.tableBox}>
+      <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Hub revenue table, scrolls sideways when it does not fit">
         <table className={classes.table}>
           <thead>
             <tr><th scope="col">Hub</th><th scope="col" className={classes.num}>Perfect foresight</th><th scope="col" className={classes.num}>Day-ahead</th><th scope="col" className={classes.num}>Kept</th></tr>

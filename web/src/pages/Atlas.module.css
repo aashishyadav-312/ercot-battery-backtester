@@ -157,7 +157,7 @@
 .table tr[data-on] .rowBtn .mono { color: var(--amber-text); font-weight: 600; }
 .thInner { display: inline-flex; align-items: center; gap: 2px; }
 .num .thInner { justify-content: flex-end; }
-.sortBtn, .rowBtn { min-height: var(--tap); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.sortBtn, .rowBtn { min-width: 24px; min-height: var(--tap); padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 .sortBtn:hover, .rowBtn:hover .mono { text-decoration: underline; text-underline-offset: 3px; }
 .rowBtn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-height: var(--tap); justify-content: center; text-align: left; }
 

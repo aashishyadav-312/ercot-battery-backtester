@@ -40,16 +40,16 @@ export default function Method() {
 
       <Section title="Energy-only assumptions">
         <Stack gap="md" component="dl" my={0}>
-            <div key="0"><Text size="sm" fw={600}>Market and prices</Text><Text size="sm" c="dimmed">ERCOT real-time 15-minute settlement point prices. The Realism page also uses day-ahead hourly prices, as a forecast to schedule on.</Text></div>
-            <div key="1"><Text size="sm" fw={600}>Optimizer</Text><Text size="sm" c="dimmed">One linear program per Central-time day (96 intervals), solved with PuLP and HiGHS. Charge and discharge are bounded by rated power; state of charge is bounded by energy capacity.</Text></div>
-            <div key="2"><Text size="sm" fw={600}>Daily boundary</Text><Text size="sm" c="dimmed">The battery starts and ends each day empty, so no energy is carried overnight and no day borrows from another.</Text></div>
-            <div key="3"><Text size="sm" fw={600}>Efficiency</Text><Text size="sm" c="dimmed">85% round trip, split as √0.85 on charge and √0.85 on discharge.</Text></div>
-            <div key="4"><Text size="sm" fw={600}>Degradation</Text><Text size="sm" c="dimmed">Two settings: $0 and $10 per MWh discharged. Revenue shown is net of this cost. A full cycle of a 2-hour, 100 MW battery therefore costs $2,000.</Text></div>
-            <div key="5"><Text size="sm" fw={600}>Size</Text><Text size="sm" c="dimmed">Modeled as 100 MW; results are quoted per kW of power capacity, so size does not matter. Durations 1, 2 and 4 hours.</Text></div>
-            <div key="6"><Text size="sm" fw={600}>Partial years</Text><Text size="sm" c="dimmed">2026 runs to Oct 24 (hubs) or Oct 30 (nodes). $/kW-yr and cycles/yr are scaled to 365 days and labeled <Badge size="sm" variant="dot" color="yellow">Annualized YTD</Badge>. Seasonality is not adjusted for, so the scaled figure is indicative only. Where exact comparisons matter, pages use matched windows of identical days.</Text></div>
-            <div key="7"><Text size="sm" fw={600}>Excluded</Text><Text size="sm" c="dimmed">Ancillary services, forecast error (except on the Realism page, which schedules on day-ahead prices), transmission and interconnection costs, state-of-charge limits from market rules, and any revenue from capacity or other programs.</Text></div>
-            <div key="8"><Text size="sm" fw={600}>Cycles</Text><Text size="sm" c="dimmed">MWh discharged divided by MWh of energy capacity, summed over the year.</Text></div>
-            <div key="9"><Text size="sm" fw={600}>Custom runs</Text><Text size="sm" c="dimmed">The Custom run page solves the same daily model in your browser (HiGHS 1.15.1 compiled to WebAssembly, the version the Python pipeline uses), including the MILP re-solve, on published price files for the 10 detailed locations. A parity test holds it within 0.5% of the Python results. A range shorter than a calendar year is scaled to 365 days and labeled <Badge size="sm" variant="dot" color="yellow">Annualized</Badge>. Energy arbitrage only.</Text></div>
+            <div key="0"><Text component="dt" size="sm" fw={600}>Market and prices</Text><Text component="dd" size="sm" c="dimmed" m={0}>ERCOT real-time 15-minute settlement point prices. The Realism page also uses day-ahead hourly prices, as a forecast to schedule on.</Text></div>
+            <div key="1"><Text component="dt" size="sm" fw={600}>Optimizer</Text><Text component="dd" size="sm" c="dimmed" m={0}>One linear program per Central-time day (96 intervals), solved with PuLP and HiGHS. Charge and discharge are bounded by rated power; state of charge is bounded by energy capacity.</Text></div>
+            <div key="2"><Text component="dt" size="sm" fw={600}>Daily boundary</Text><Text component="dd" size="sm" c="dimmed" m={0}>The battery starts and ends each day empty, so no energy is carried overnight and no day borrows from another.</Text></div>
+            <div key="3"><Text component="dt" size="sm" fw={600}>Efficiency</Text><Text component="dd" size="sm" c="dimmed" m={0}>85% round trip, split as √0.85 on charge and √0.85 on discharge.</Text></div>
+            <div key="4"><Text component="dt" size="sm" fw={600}>Degradation</Text><Text component="dd" size="sm" c="dimmed" m={0}>Two settings: $0 and $10 per MWh discharged. Revenue shown is net of this cost. A full cycle of a 2-hour, 100 MW battery therefore costs $2,000.</Text></div>
+            <div key="5"><Text component="dt" size="sm" fw={600}>Size</Text><Text component="dd" size="sm" c="dimmed" m={0}>Modeled as 100 MW; results are quoted per kW of power capacity, so size does not matter. Durations 1, 2 and 4 hours.</Text></div>
+            <div key="6"><Text component="dt" size="sm" fw={600}>Partial years</Text><Text component="dd" size="sm" c="dimmed" m={0}>2026 runs to Oct 24 (hubs) or Oct 30 (nodes). $/kW-yr and cycles/yr are scaled to 365 days and labeled <Badge size="sm" variant="dot" color="yellow">Annualized YTD</Badge>. Seasonality is not adjusted for, so the scaled figure is indicative only. Where exact comparisons matter, pages use matched windows of identical days.</Text></div>
+            <div key="7"><Text component="dt" size="sm" fw={600}>Excluded</Text><Text component="dd" size="sm" c="dimmed" m={0}>Ancillary services, forecast error (except on the Realism page, which schedules on day-ahead prices), transmission and interconnection costs, state-of-charge limits from market rules, and any revenue from capacity or other programs.</Text></div>
+            <div key="8"><Text component="dt" size="sm" fw={600}>Cycles</Text><Text component="dd" size="sm" c="dimmed" m={0}>MWh discharged divided by MWh of energy capacity, summed over the year.</Text></div>
+            <div key="9"><Text component="dt" size="sm" fw={600}>Custom runs</Text><Text component="dd" size="sm" c="dimmed" m={0}>The Custom run page solves the same daily model in your browser (HiGHS 1.15.1 compiled to WebAssembly, the version the Python pipeline uses), including the MILP re-solve, on published price files for the 10 detailed locations. A parity test holds it within 0.5% of the Python results. A range shorter than a calendar year is scaled to 365 days and labeled <Badge size="sm" variant="dot" color="yellow">Annualized</Badge>. Energy arbitrage only.</Text></div>
         </Stack>
         {m && (
           <Text size="xs" c="dimmed">
@@ -61,7 +61,7 @@ export default function Method() {
       <Section title="Energy plus ancillary services">
         <Text size="sm">The separate strategy comparison on Overview, Revenue and Realism co-optimizes energy with Regulation Up, Regulation Down, Responsive Reserve (RRS), ECRS and Non-Spin. The existing KPI tiles and other charts remain energy-only. Both strategies in the new card use exactly the same covered days and energy price series; missing ancillary prices exclude a day rather than becoming zero revenue.</Text>
         <Text size="sm">The new screen uses as-posted real-time energy prices from ERCOT public API NP6-905-CD for hubs and nodes. Its baseline is re-solved on those prices; the original hub charts use corrected annual archives and may differ. Before December 5, 2025, the model uses hourly day-ahead capacity clearing prices from ERCOT NP4-188-CD. Awards are fixed within each physical UTC hour, including repeated DST hours. From December 5 it uses the settled 15-minute real-time capacity prices in NP6-796-ER. Post-RTC+B results represent an all-real-time capacity position, with no day-ahead AS award or imbalance settlement added. The pre-RTC combination of real-time energy foresight and day-ahead capacity foresight is a screening scenario, not an executable bidding strategy.</Text>
-        <Table.ScrollContainer minWidth={480}><Table withTableBorder>
+        <Table.ScrollContainer minWidth={480} scrollAreaProps={{ viewportProps: { tabIndex: 0, role: 'region', 'aria-label': 'Reserve backing table, scrolls sideways when it does not fit' } }}><Table withTableBorder>
           <Table.Thead><Table.Tr><Table.Th>Reserve backing (hours)</Table.Th><Table.Th>Before RTC+B</Table.Th><Table.Th>From Dec 5, 2025</Table.Th></Table.Tr></Table.Thead>
           <Table.Tbody>{[['Regulation Up / Down', '1', '0.5'], ['Responsive Reserve', '1', '0.5'], ['ECRS', '2', '1'], ['Non-Spin', '4', '4']].map(([p,b,a]) => <Table.Tr key={p}><Table.Td>{p}</Table.Td><Table.Td>{b}</Table.Td><Table.Td>{a}</Table.Td></Table.Tr>)}</Table.Tbody>
         </Table></Table.ScrollContainer>
@@ -90,7 +90,7 @@ export default function Method() {
           Modo Energy&rsquo;s ERCOT BESS index measures what real batteries earned from <i>all</i> sources, without perfect foresight. A perfect-foresight,
           arbitrage-only result should land above the arbitrage part of that figure, and it does in both years.
         </Text>
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Model against Modo fleet table, scrolls sideways when it does not fit">
           <Table verticalSpacing={6} fz="sm" withTableBorder withColumnBorders miw={560}>
             <Table.Thead><Table.Tr><Table.Th>Year</Table.Th><Table.Th>Real fleet average (Modo)</Table.Th><Table.Th>This model, 2h hubs</Table.Th><Table.Th>Check</Table.Th></Table.Tr></Table.Thead>
             <Table.Tbody>
@@ -143,7 +143,7 @@ export default function Method() {
           &ldquo;Hub near the node&rdquo; is the hub of the node&rsquo;s settlement load zone.
         </Text>
         {nodes && (
-          <div style={{ overflowX: 'auto' }}>
+          <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Node comparison table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} fz="sm" withTableBorder miw={560}>
               <Table.Thead><Table.Tr><Table.Th>Node</Table.Th><Table.Th>Group</Table.Th><Table.Th ta="right">Aug 2025 std ($/MWh)</Table.Th><Table.Th>Load zone</Table.Th><Table.Th>Hub</Table.Th></Table.Tr></Table.Thead>
               <Table.Tbody>

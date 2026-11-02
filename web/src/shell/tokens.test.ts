@@ -43,6 +43,13 @@ describe.each([['dark', dark], ['light', light]] as const)('%s tokens', (_name, 
     expect(contrast(t[fg], t[bg])).toBeGreaterThanOrEqual(4.5);
   });
 
+  // Mantine's light alerts and badges tint the panel with 10-25% of their colour; the token text must still read on that.
+  const mix = (a: string, b: string, k: number) =>
+    '#' + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * k + parseInt(b.slice(i, i + 2), 16) * (1 - k)).toString(16).padStart(2, '0')).join('');
+  it.each([['amber-text', 'amber'], ['mint-text', 'mint']])('%s reads on a 25%% tint of %s over the panel', (fg, fill) => {
+    expect(contrast(t[fg], mix(t[fill], t.panel, 0.25))).toBeGreaterThanOrEqual(4.5);
+  });
+
   it('keeps the focus ring (amber-text) at 3:1 against the page and panels', () => {
     for (const bg of ['bg', 'panel']) expect(contrast(t['amber-text'], t[bg])).toBeGreaterThanOrEqual(3);
   });

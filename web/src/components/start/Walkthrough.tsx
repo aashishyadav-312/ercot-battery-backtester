@@ -208,18 +208,24 @@ export function Walkthrough({ data, error }: { data?: WalkData; error?: string }
       </Card>
 
       <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label="Step-through explanation">
-        <Group justify="space-between" align="center" mb={6} wrap="nowrap" gap="sm">
+        <Group justify="space-between" align="center" mb={6} wrap="wrap" gap="xs">
           <Text size="sm" fw={600} c="var(--app-accent-text)" className="tnum">Step {Math.min(step, last) + 1} of {plan.steps.length}</Text>
-          <Group gap={6} wrap="nowrap" role="group" aria-label="Jump to step">
+          <Group gap={0} wrap="nowrap" role="group" aria-label="Jump to step">
             {plan.steps.map((s, i) => (
+              // The button is the 24px target (WCAG 2.5.8); the dot inside it is what is drawn.
               <button
                 key={i} type="button" onClick={() => setStep(i)} aria-label={`Go to step ${i + 1}: ${s.title}`} aria-current={i === step ? 'step' : undefined}
-                style={{
-                  width: i === step ? 22 : 8, height: 8, borderRadius: 4, border: 0, padding: 0, cursor: 'pointer', flexShrink: 0,
-                  background: i === step ? 'var(--mantine-primary-color-filled)' : 'var(--app-hairline-strong)',
-                  transition: 'background-color 160ms var(--app-ease)',
-                }}
-              />
+                style={{ display: 'grid', placeItems: 'center', width: 24, height: 24, border: 0, padding: 0, background: 'none', cursor: 'pointer', flexShrink: 0 }}
+              >
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: i === step ? 22 : 8, height: 8, borderRadius: 4,
+                    background: i === step ? 'var(--mantine-primary-color-filled)' : 'var(--app-hairline-strong)',
+                    transition: 'background-color 160ms var(--app-ease)',
+                  }}
+                />
+              </button>
             ))}
           </Group>
         </Group>

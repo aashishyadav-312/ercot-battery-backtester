@@ -606,7 +606,7 @@ function CompareSection({ index, nodes, form, onPick }: { index: IndexRun[]; nod
         {usd(deg, 0)}/MWh degradation · {PRECOMPUTED.rtePct}% round trip. Ranked by perfect foresight, $/kW-year. Pick a location to load it.
       </p>
       <div className={classes.card}>
-        <div className={classes.tableBox}>
+        <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Every-location comparison table, scrolls sideways when it does not fit">
           <table className={classes.table} data-testid="compare-table">
             <thead>
               <tr>
