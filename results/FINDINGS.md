@@ -235,8 +235,8 @@ HB_HOUSTON), because the bulk files are prices as posted while the detailed hub 
 includes later corrections (27 of 35,040 HB_HOUSTON intervals differ). Ratios below use the bulk hub figures so node and
 hub are on identical data.
 
-**Every ratio in this section uses bulk hub prices.** Each node-vs-hub ratio here, in the Map page's Top nodes table and in
-its all-node side panel divides by hub revenue from the same bulk files and the same pipeline as the node (checked in
+**Every ratio in this section uses bulk hub prices.** Each node-vs-hub ratio here, in the Atlas's top-12 list and in
+its selected-node card divides by hub revenue from the same bulk files and the same pipeline as the node (checked in
 `scripts/run_all_nodes.py`, `scripts/node_findings.py` and the web code), so none of the numbers below change. One place
 did mix sources: in heat mode, clicking one of the 5 detailed nodes opened the detailed panel, which divides by the
 archive-based hub runs (RHESS2_ESS1 showed 4.5× there against 4.46× in the table). Heat mode now uses the all-node panel
@@ -458,7 +458,7 @@ Across the five hubs, the same standard 2025 capacity screen ranges from $53.70 
 
 Before Dec 5, 2025 the screen uses hourly DA capacity clearing prices (NP4-188-CD), with awards fixed for each physical UTC hour. From that date it uses settled 15-minute RT capacity prices (NP6-796-ER), without adding DA AS awards or imbalance cash flows. RT AS prices are never silently replaced with DA prices. Pre-RTC regulation/RRS full-hour backing is a conservative screening assumption; ECRS/Non-Spin backing is 2/4 hours. Post-RTC backing is 0.5/0.5/0.5/1/4 hours for RegUp/RegDown/RRS/ECRS/Non-Spin, following NPRR1282 for the changed products. See [the sourced methodology](../docs/ANCILLARY_METHOD.md).
 
-The new Realism chart pairs identical calendar days in Dec 5, 2024–Oct 24, 2025 and Dec 5, 2025–Oct 24, 2026. Houston has 324 pairs. Missing days are removed from both sides, not zero-filled. Both market prices and model duration parameters change across these periods; this is a descriptive comparison, not a causal estimate of RTC+B.
+The Realism chart (Research > Realism) pairs identical calendar days in Dec 5, 2024–Oct 24, 2025 and Dec 5, 2025–Oct 24, 2026. Houston has 324 pairs. Missing days are removed from both sides, not zero-filled. Both market prices and model duration parameters change across these periods; this is a descriptive comparison, not a causal estimate of RTC+B.
 
 ### Numerical validation and runtime
 
@@ -472,7 +472,7 @@ The 180 detail files total **12.2 MiB** (largest 75.6 KiB; manifest 13 KiB). Onl
 
 ## 11. Context: the battery fleet, the queue, weather and solar/wind share
 
-These series sit beside the results (Revenue "Context", the Map's storage layer, the Dispatch overlay, the ten-best-days weather).
+These series sit beside the results (Research > Revenue "Context", the Atlas storage layer, the Dispatch overlay, the ten-best-days weather).
 They are descriptions of things that moved together. This model cannot say what caused what. Sources and limits are in the README
 ("Context layers") and `results/context.json`.
 

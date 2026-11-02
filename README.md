@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 17 done (context layers: ERCOT battery fleet MW against monthly revenue on Revenue, a planned-storage-by-county layer on the Map, daily high/low temperature on the ten best days, and a solar/wind share overlay on the Dispatch heatmap; built by `scripts/build_context.py` into `results/context.json`; see "Context layers" below). Phase 16 done (Live page at `#/live`: today's real-time hub and node prices, the best possible battery so far today, tomorrow's day-ahead plan, spike banner and cached fallback, fed every 5 minutes by a Cloudflare Worker in `worker/`; see "Live page backend" below). Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Redesign done (Chargeline: five tabs, Home, Atlas, Studio, Research and Guide, in dark and light; design handoff in [docs/REDESIGN.md](docs/REDESIGN.md)). Pages named in the phase notes below were renamed: Map is now Atlas (`#/atlas`; the 10-location map is `#/atlas/detailed`), Live is `#/home/live`, Custom run and Compare are Studio (`#/studio`), Economics is `#/studio/economics`, Start here and About are the Guide (`#/guide`, About at `?s=about`), and Overview, Revenue, Dispatch, Realism and Method sit under Research (`#/research/overview`, `/revenue`, `/dispatch`, `/realism`, `/method`). Old links still redirect. Phase 17 done (context layers: ERCOT battery fleet MW against monthly revenue on Revenue, a planned-storage-by-county layer on the Map, daily high/low temperature on the ten best days, and a solar/wind share overlay on the Dispatch heatmap; built by `scripts/build_context.py` into `results/context.json`; see "Context layers" below). Phase 16 done (Live page at `#/live`: today's real-time hub and node prices, the best possible battery so far today, tomorrow's day-ahead plan, spike banner and cached fallback, fed every 5 minutes by a Cloudflare Worker in `worker/`; see "Live page backend" below). Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -26,7 +26,7 @@ data/fetch_ancillary.py # cached hourly DA and settled 15-minute RT AS prices
 model/run_year.py      # loops days, saves results
 model/metrics.py       # $/kW-yr, top-10-day share, heatmap
 model/forecast.py      # schedule on DA prices, settle at RT (capture rate)
-scripts/build_locations.py  # results/locations.json + geocoding_log.md for the Map page (ERCOT settlement points + EIA-860 plant coordinates)
+scripts/build_locations.py  # results/locations.json + geocoding_log.md for the Atlas (ERCOT settlement points + EIA-860 plant coordinates)
 scripts/run_grid.py    # batch run over locations x durations x years (PF + DA-scheduled)
 scripts/run_ancillary.py # separate strategy grid, checkpoints and AS-exposure sensitivity
 scripts/finalize_ancillary.py # normalize published AS detail files, stamp manifest metadata
@@ -35,7 +35,7 @@ scripts/add_da_schedule.py # add DA-scheduled fields to existing results without
 scripts/rtcb.py        # before vs after RTC+B over matched windows -> results/rtcb.json
 scripts/rank_nodes.py  # pick resource nodes by RT price volatility
 scripts/compare_nodes.py # node vs its hub over matched days
-scripts/build_walkthrough.py # 15-min prices + schedule for featured days -> results/walkthrough.json (Start here page)
+scripts/build_walkthrough.py # 15-min prices + schedule for featured days -> results/walkthrough.json (Guide page)
 data/fetch_all_nodes.py   # every settlement point at once from ERCOT's archive files -> data/raw/{RT15,DA}_ALLSP_{year}-{month}.parquet
 scripts/run_all_nodes.py  # daily LP at every resource node, summary only -> results/nodes_{year}_{hours}h.json (Map heat mode)
 scripts/node_findings.py  # prints the FINDINGS section 9 tables from the all-node results
@@ -45,8 +45,8 @@ data/price_files.py       # compact per-location-year price files (EBP1) for the
 scripts/export_prices.py  # results/prices/*.ebp for the 10 detailed locations (Phase 15)
 scripts/parity_reference.py # Python numbers on those files -> results/parity/reference.json
 web/src/custom/           # highs-js port of the daily LP, year runner, Web Worker, parity test
-web/src/live/             # Live page data: snapshot loader with browser fallback, helpers, main-thread solver
-worker/                   # Cloudflare Worker for the Live page: cron fetch from ERCOT, KV snapshot, /live.json
+web/src/live/             # Today in ERCOT data: snapshot loader with browser fallback, helpers, main-thread solver
+worker/                   # Cloudflare Worker for the Today in ERCOT page: cron fetch from ERCOT, KV snapshot, /live.json
 results/               # precomputed JSON for the web app
 web/                   # Vite + React + Mantine + ECharts frontend (Phase 5)
 tests/
@@ -102,7 +102,7 @@ Then point `ALL_NODES_FILE` in `web/src/data/loader.ts` at the new year, update 
   county's Census Gazetteer internal point and shown as a ring). Placements that conflict with the queue by more than
   100 km are dropped. `results/geocoding_review_top50.md` lists the highest-earning unplaced nodes for hand review into
   `scripts/location_overrides.json`.
-- The web app loads `nodes_2025_2h.json` only when the Map page is switched to "All nodes (heat)".
+- The web app loads `nodes_2025_2h.json` by the Atlas (every resource node).
 
 ## Custom runs in the browser (Phase 15)
 
@@ -124,11 +124,11 @@ cd web && npx vitest run src/custom   # highs-js port + parity test
 - **Parity:** [parity.test.ts](web/src/custom/parity.test.ts) runs three full years (HB_HOUSTON 2025 2h $10/MWh;
   HB_PAN 2024 1h $0, the run with the most MILP-fallback days; RUSSEKST_RN 2025 4h $10) plus a MILP-fallback day and both
   2025 DST days (92 and 100 intervals), and requires every metric within 0.5% of Python on the same files.
-- **Page:** `#/custom` ([web/src/pages/Custom.tsx](web/src/pages/Custom.tsx)). Inputs: location (the 10 detailed locations),
+- **Page:** Studio, `#/studio` ([web/src/pages/Studio.tsx](web/src/pages/Studio.tsx)). Inputs: location (the 10 detailed locations),
   power 1-2,000 MW, duration 0.5-8 h, round-trip efficiency 50-100%, degradation $0-200/MWh, a date range within one
   year, and the strategy shown (perfect foresight or DA-scheduled; both are always solved). The URL holds every input
-  (`#/custom?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&from=2025-06-01&to=2025-08-31&strat=da`), so a run can be shared;
-  opening a link runs it. Results use the Overview cards. When the inputs match a precomputed run, the page prints both
+  (`#/studio?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&from=2025-06-01&to=2025-08-31&strat=da`), so a run can be shared;
+  opening a link runs it. Results use the Run overview cards. When the inputs match a precomputed run, the page prints both
   figures as a check. A full year at 2 h solves in about 2 s in the browser; $0 degradation at negative-price locations
   is slower because of MILP-fallback days (HB_PAN 2024 1h $0: about 4 minutes), with progress shown per month and a
   Cancel button. The solver (3.5 MB WebAssembly, 1.2 MB gzipped) loads only on this page.
@@ -150,7 +150,7 @@ hourly solar and wind reports it wraps keep only the last few days. ERCOT's annu
 
 ## Live page backend (Phase 16)
 
-The Live page (`#/live`, [web/src/pages/Live.tsx](web/src/pages/Live.tsx)) reads one JSON snapshot from a Cloudflare Worker
+The Today in ERCOT page (`#/home/live`, [web/src/pages/Live.tsx](web/src/pages/Live.tsx)) reads one JSON snapshot from a Cloudflare Worker
 in [worker/](worker/). A Cron Trigger runs every 5 minutes, fetches from ERCOT's public API, and writes the snapshot to one
 Workers KV key; `GET /live.json` serves it with CORS limited to `https://aashishyadav-312.github.io`. The ERCOT username,
 password and subscription key are Worker secrets; nothing secret is in the repository or the page.
