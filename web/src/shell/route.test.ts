@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, pathOf, resolveHash, tabOf, tabPath, type OldRoute } from './route';
+import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveHash, tabOf, tabPath, type OldRoute } from './route';
 
 /** Where every route from before the redesign now lives (docs/REDESIGN.md, "Old to new routes"). */
 const OLD_TO_NEW: Record<OldRoute, string> = {
-  start: '#/guide/start',
+  start: '#/guide',
   map: '#/atlas',
   live: '#/home/live',
   overview: '#/research/overview',
@@ -14,7 +14,7 @@ const OLD_TO_NEW: Record<OldRoute, string> = {
   custom: '#/studio',
   economics: '#/studio/economics',
   method: '#/research/method',
-  about: '#/guide/about',
+  about: '#/guide?s=about',
 };
 
 describe('old routes redirect to their new home', () => {
@@ -25,8 +25,8 @@ describe('old routes redirect to their new home', () => {
   it.each(OLD_PAGES)('#/%s resolves to its new home and asks for the URL to be rewritten', (page) => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
-    // The Map page was replaced by the Atlas; Custom run and Compare by Studio.
-    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : page);
+    // The Map page was replaced by the Atlas; Custom run and Compare by Studio; Start here and About by the Guide.
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : page === 'start' || page === 'about' ? 'guide' : page);
 
     expect(r.redirected).toBe(true);
   });
@@ -35,7 +35,9 @@ describe('old routes redirect to their new home', () => {
     const q = 'loc=HB_WEST&dur=4&year=2025&deg=10&mw=100&from=2025-06-01&view=heat';
     const r = resolveHash(`#/${page}?${q}`);
     expect(r.query).toBe(q);
-    expect(r.canonical).toBe(`${OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]}?${q}`);
+    const to = OLD_TO_NEW[page as keyof typeof OLD_TO_NEW];
+    // An old link that now lands on a section of its replacement names the section first, then keeps the query as written.
+    expect(r.canonical).toBe(to.includes('?') ? `${to}&${q}` : `${to}?${q}`);
   });
 
   it('accepts the hash with or without the slash', () => {
@@ -62,18 +64,33 @@ describe('new routes', () => {
     expect([...all].sort()).toEqual([...PAGES].sort());
   });
 
-  it('opens a multi-view tab on its first view, and says to rewrite the URL', () => {
-    const r = resolveHash('#/research?loc=HB_PAN');
-    expect(r.page).toBe('overview');
-    expect(r.canonical).toBe('#/research/overview?loc=HB_PAN');
-    expect(r.redirected).toBe(true);
+  it('serves the Research findings at #/research, with the run pages under it', () => {
+    const r = resolveHash('#/research?f=4');
+    expect([r.page, r.tab, r.redirected, r.canonical]).toEqual(['research', 'research', false, '#/research?f=4']);
+    expect(tabPath('research')).toBe('research');
     expect(tabPath('studio')).toBe('studio');
+    expect(resolveHash('#/research/revenue').page).toBe('revenue');
+    expect(hashParam('#/research?loc=HB_WEST&f=11', 'f')).toBe('11');
+    expect(hashParam('#/research', 'f')).toBeNull();
+    // An old link still being redirected already answers with the section it will land on.
+    expect(hashParam('#/about', 's')).toBe('about');
+    expect(hashParam('#/guide/start', 's')).toBeNull();
   });
 
   it('falls back to the default view of a tab for an unknown view', () => {
     const r = resolveHash('#/guide/nonsense');
-    expect(r.canonical).toBe('#/guide/start');
+    expect(r.canonical).toBe('#/guide');
     expect(r.redirected).toBe(true);
+    expect(resolveHash('#/research/nonsense?loc=HB_PAN').canonical).toBe('#/research?loc=HB_PAN');
+  });
+
+  it('serves the merged Guide at #/guide, and sends the step 1-4 Guide URLs there', () => {
+    expect([resolveHash('#/guide').page, resolveHash('#/guide').redirected]).toEqual(['guide', false]);
+    expect(resolveHash('#/guide/start?loc=HB_WEST').canonical).toBe('#/guide?loc=HB_WEST');
+    expect(resolveHash('#/guide/about?loc=HB_WEST').canonical).toBe('#/guide?s=about&loc=HB_WEST');
+    // A link that already names a section keeps it.
+    expect(resolveHash('#/about?s=glossary').canonical).toBe('#/guide?s=glossary');
+    expect(buildHash('guide', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/guide?loc=HB_WEST&dur=4&year=2025&deg=10');
   });
 
   it('opens Home for an empty or unknown hash', () => {

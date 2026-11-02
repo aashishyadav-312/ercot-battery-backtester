@@ -209,7 +209,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
             Perfect foresight times every charge and discharge with hindsight, so it is an upper bound. A day-ahead schedule commits the
             plan the day before and settles at real-time prices.
           </p>
-          <a className={classes.textLink} href="#/guide/start">What each number means <span aria-hidden="true">→</span></a>
+          <a className={classes.textLink} href="#/guide">What each number means <span aria-hidden="true">→</span></a>
         </div>
       </section>
 
@@ -242,8 +242,8 @@ export function HomeView({ index, nodes, locs, geo, live }: {
           {[
             { n: '01', title: 'Atlas', href: '#/atlas', cta: 'Open Atlas', text: `Every node on the map. Revenue, capture rate and spike dependence across ${m.nNodes} ERCOT resource nodes.` },
             { n: '02', title: 'Studio', href: '#/studio/custom', cta: 'Open Studio', text: 'Run your own battery. Choose a location, duration and efficiency, and the model solves it in your browser.' },
-            { n: '03', title: 'Research', href: '#/research/overview', cta: 'Read Research', text: 'Findings and method: perfect foresight vs day-ahead, ancillary services, the real-time co-optimization change, economics.' },
-            { n: '04', title: 'Guide', href: '#/guide/start', cta: 'Start with Guide', text: 'New here? Start here. What each number means, how to read it, and where the model stops being realistic.' },
+            { n: '03', title: 'Research', href: '#/research', cta: 'Read Research', text: 'Findings and method: perfect foresight vs day-ahead, ancillary services, and the real-time co-optimization change.' },
+            { n: '04', title: 'Guide', href: '#/guide', cta: 'Start with Guide', text: 'New here? Start here. What each number means, how to read it, and where the model stops being realistic.' },
           ].map((w) => (
             <li key={w.title} className={classes.way}>
               <span className={classes.wayNum} aria-hidden="true">{w.n}</span>

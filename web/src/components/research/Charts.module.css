@@ -1,0 +1,60 @@
+/* The three featured charts on Research. Tokens only. Series differ by lightness and by label, not by hue alone. */
+.figure { margin: 0; padding: 24px; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); }
+.title { margin: 0; max-width: 22em; font-family: var(--mantine-font-family-headings); font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; color: var(--text); text-wrap: balance; }
+.figure[data-wide] .title { max-width: 30em; }
+.meta { margin: 8px 0 0; font-family: var(--mantine-font-family-monospace); font-size: 12px; letter-spacing: 0.02em; color: var(--faint); }
+.note { margin: 16px 0 0; max-width: 38em; text-wrap: pretty; font-size: 14px; line-height: 1.55; color: var(--muted); }
+
+/* grouped vertical bars */
+.groups { display: flex; gap: 12px; align-items: flex-end; height: 240px; margin: 28px 0 0; padding: 0 0 26px; list-style: none; position: relative; }
+.group { position: relative; flex: 1 1 0; min-width: 0; height: 100%; }
+.bars { display: flex; align-items: flex-end; justify-content: center; gap: 4px; height: 100%; border-bottom: 1px solid var(--line-2); }
+.bar { position: relative; flex: 1 1 0; max-width: 56px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; }
+.val { margin-bottom: 4px; text-align: center; font-family: var(--mantine-font-family-monospace); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fill { display: block; border-radius: 5px 5px 1px 1px; animation: grow-y 700ms var(--ease) both; }
+.bar[data-tone='dot'] .fill { background: var(--dot-low); }
+.bar[data-tone='mint'] .fill { background: var(--mint); }
+.bar[data-tone='amber'] .fill { background: var(--amber); }
+.bar[data-tone='amber'] .val { color: var(--amber-text); }
+.bar[data-tone='mint'] .val { color: var(--mint-text); }
+.glabel { position: absolute; left: 0; right: 0; bottom: -26px; text-align: center; font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 16px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
+.legend li { display: inline-flex; align-items: center; gap: 8px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--dot-low); }
+.swatch[data-tone='mint'] { background: var(--mint); }
+.swatch[data-tone='amber'] { background: var(--amber); }
+
+/* capture: two horizontal bars per hub */
+.hrows { display: flex; flex-direction: column; gap: 14px; margin: 24px 0 0; padding: 0; list-style: none; }
+.hhead { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--muted); }
+.hval { font-variant-numeric: tabular-nums; }
+.hval b { font-weight: 500; color: var(--amber-text); }
+.track { height: 8px; margin-top: 5px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
+.hfill { display: block; height: 100%; border-radius: var(--r-pill); animation: grow-x 700ms var(--ease) both; }
+.hfill[data-tone='dot'] { background: var(--dot-low); }
+.hfill[data-tone='amber'] { background: var(--amber); }
+
+/* numbers as a table */
+.details { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.details summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--text); text-decoration: underline; text-underline-offset: 3px; border-radius: 6px; }
+.tableBox { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-input); }
+.table { width: 100%; min-width: 320px; border-collapse: collapse; font-size: 13px; }
+.table th, .table td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; font-weight: 400; }
+.table thead th { font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.06em; color: var(--faint); }
+.table tbody th { color: var(--text); font-family: var(--mantine-font-family-monospace); font-size: 12px; }
+.table tbody tr:last-child > * { border-bottom: 0; }
+.num { text-align: right !important; font-variant-numeric: tabular-nums; font-family: var(--mantine-font-family-monospace); }
+
+@keyframes grow-x { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes grow-y { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+
+@media (max-width: 480px) {
+  .figure { padding: 18px; }
+  .groups { gap: 6px; }
+  .bars { gap: 2px; }
+  .val { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fill, .hfill { animation: none; }
+}

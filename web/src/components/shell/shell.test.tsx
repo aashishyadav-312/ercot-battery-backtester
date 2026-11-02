@@ -76,8 +76,8 @@ describe('Header', () => {
       '#/home?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/atlas?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/studio?loc=HB_WEST&dur=4&year=2025&deg=10',
-      '#/research/overview?loc=HB_WEST&dur=4&year=2025&deg=10',
-      '#/guide/start?loc=HB_WEST&dur=4&year=2025&deg=10',
+      '#/research?loc=HB_WEST&dur=4&year=2025&deg=10',
+      '#/guide?loc=HB_WEST&dur=4&year=2025&deg=10',
     ]);
     expect(links.filter((l) => l.getAttribute('aria-current') === 'page').map((l) => l.textContent)).toEqual(['Research']);
   });

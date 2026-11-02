@@ -145,14 +145,15 @@ where norm is the min-max normalised metric; opacity .45 + .55 * norm; halo for 
 
 | Old | New |
 |---|---|
-| Start here | Guide |
+| Start here | Guide (`#/guide`; `#/start` and `#/guide/start` redirect there) |
 | Map | Atlas |
 | Live | Home (ticker and hub tiles) |
 | Overview, Revenue, Dispatch, Realism | Research (charts and findings) |
 | Compare | Studio (compare presets) or Research |
 | Custom run | Studio |
-| Economics | Decided: stays under Studio (`#/studio/economics`) until Step 5, which reports where it lives long term. |
-| Method, About | Research (method) and Guide (about) |
+| Economics | Decided in Step 5: stays under Studio for good (`#/studio/economics`). It is a what-if on the visitor's own battery, so it belongs with Studio, not with the findings. |
+| Method, About | Research (a short method list on `#/research`, the full page stays at `#/research/method`) and Guide (About is its last section; `#/about` opens it at `?s=about`) |
+| Research | `#/research` is the findings page; the old run pages stay beside it as `#/research/overview` (labelled Run overview), `revenue`, `dispatch`, `realism`. A finding opens at `#/research?f=<n>`, rendered from `results/FINDINGS.md`. |
 
 ---
 

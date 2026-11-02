@@ -1,0 +1,114 @@
+/* Research (docs/design/research-dark.webp). Tokens only; sizes follow docs/REDESIGN.md "Type" and "Shape". */
+.page { display: flex; flex-direction: column; }
+.loading { min-height: 60vh; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber-text);
+}
+.meta { margin: 6px 0 0; font-family: var(--mantine-font-family-monospace); font-size: 12px; letter-spacing: 0.02em; color: var(--faint); }
+
+.hero { padding: 40px 0 48px; background: var(--hero-glow); background-repeat: no-repeat; background-position: 100% 0; }
+.h1 { margin: 0; max-width: 14em; font-family: var(--mantine-font-family-headings); font-size: clamp(38px, 4.4vw, 60px); font-weight: 800; line-height: 1.04; letter-spacing: -0.025em; color: var(--text); text-wrap: balance; }
+.lede { margin: 24px 0 0; max-width: 34em; text-wrap: pretty; font-size: 16px; line-height: 1.6; color: var(--muted); }
+.sub { margin: 0 0 20px; max-width: 34em; text-wrap: pretty; font-size: 15px; line-height: 1.55; color: var(--muted); }
+
+.section { padding: 48px 0 0; }
+.section > .eyebrow { margin-bottom: 20px; }
+.page > .section:last-child { padding-bottom: 24px; }
+.h2 { margin: 0; font-family: var(--mantine-font-family-headings); font-size: clamp(28px, 3vw, 40px); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; color: var(--text); }
+.h2:focus, .h1Reader:focus { outline: none; }
+.h2:focus-visible, .h1Reader:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; border-radius: 6px; }
+
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.wide { margin-top: 16px; }
+.pending { min-height: 200px; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); color: var(--muted); font-size: 14px; }
+
+/* ------------------------------------------------ findings */
+.findingsHead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 24px; margin-bottom: 20px; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill {
+  min-height: var(--tap);
+  padding: 0 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 420ms var(--ease), color 420ms var(--ease), border-color 420ms var(--ease), transform 160ms var(--ease);
+}
+.pill:hover { color: var(--text); }
+.pill:active { transform: scale(0.97); }
+.pill[aria-pressed='true'] { background: var(--text); border-color: var(--text); color: var(--bg); }
+
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.card { display: flex; flex-direction: column; min-width: 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); }
+.cardTop { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mantine-font-family-monospace); font-size: 12px; }
+.num { color: var(--amber-text); }
+.topic { color: var(--faint); }
+.cardTitle { margin: 14px 0 0; font-family: var(--mantine-font-family-headings); font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; color: var(--text); text-wrap: balance; }
+.teaser { flex: 1; text-wrap: pretty; margin: 12px 0 0; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.read { display: inline-flex; align-items: center; align-self: flex-start; min-height: var(--tap); margin-top: 8px; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; }
+.read:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ------------------------------------------------ method and validation */
+.panel { min-width: 0; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); }
+.panelTitle { margin: 0; font-family: var(--mantine-font-family-headings); font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; color: var(--text); }
+.panelText { margin: 16px 0 0; max-width: 38em; text-wrap: pretty; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.panelText a, .sources a { color: var(--text); text-underline-offset: 3px; }
+.method { display: flex; flex-direction: column; gap: 16px; margin: 20px 0 0; padding: 0; list-style: none; }
+.method li { display: flex; gap: 14px; align-items: flex-start; }
+.method p { margin: 0; text-wrap: pretty; font-size: 14px; line-height: 1.55; color: var(--muted); }
+.method strong { color: var(--text); font-weight: 600; }
+.step { display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; margin-top: 1px; border: 1px solid var(--text); border-radius: 50%; font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--text); }
+
+.tableBox { max-width: 100%; margin-top: 16px; overflow-x: auto; }
+.table { width: 100%; min-width: 440px; border-collapse: collapse; font-size: 14px; }
+.table th, .table td { padding: 12px 8px; border-bottom: 1px solid var(--line); text-align: left; font-weight: 400; vertical-align: top; }
+.table thead th { font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.table tbody th { color: var(--text); font-weight: 600; }
+.table td { font-family: var(--mantine-font-family-monospace); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text); }
+.table th.right, .table td.right { text-align: right; }
+.sources { margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; }
+.sources li { padding: 6px 0; }
+.panel .eyebrow { margin: 20px 0 6px; font-size: 12px; }
+
+.leaves { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 32px; margin-top: 16px; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); }
+.leaves > div { flex: 1 1 360px; min-width: 0; }
+.secondary { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding: 0 22px; border: 1px solid var(--line-2); border-radius: var(--r-pill); color: var(--text); font-size: 15px; font-weight: 600; text-decoration: none; transition: transform 160ms var(--ease), border-color 160ms var(--ease); }
+.secondary:hover { border-color: var(--text); }
+.secondary:active { transform: scale(0.97); }
+
+.explore { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.explore a { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 18px; border: 1px solid var(--line-2); border-radius: var(--r-pill); color: var(--text); font-size: 14px; text-decoration: none; }
+.explore a:hover { border-color: var(--text); }
+
+/* ------------------------------------------------ one finding */
+.readerTop { padding: 32px 0 24px; }
+.back { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); margin-bottom: 16px; color: var(--text); font-size: 14px; font-weight: 600; text-decoration: none; }
+.back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.h1Reader { margin: 0; max-width: 20em; font-family: var(--mantine-font-family-headings); font-size: clamp(32px, 3.6vw, 48px); font-weight: 800; line-height: 1.08; letter-spacing: -0.025em; color: var(--text); text-wrap: balance; }
+.pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); }
+.pager a { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); color: var(--text); font-size: 14px; font-weight: 600; text-underline-offset: 3px; }
+
+@media (max-width: 1000px) {
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pair { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .hero { padding-top: 16px; }
+  .panel, .leaves { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill, .secondary { transition: none; }
+  .pill:active, .secondary:active { transform: none; }
+}

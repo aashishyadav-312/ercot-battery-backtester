@@ -2,7 +2,7 @@ export const STACK_KEYS = ['energy', 'REGUP', 'REGDN', 'RRS', 'ECRS', 'NSPIN'] a
 export const STACK_LABELS = ['Energy (net)', 'Regulation Up', 'Regulation Down', 'Responsive Reserve', 'ECRS', 'Non-Spin'];
 export type StackDay = Record<typeof STACK_KEYS[number], number> & { date: string; energy_only: number; market: 'DA' | 'RT'; solver_gap?: number | null };
 export interface StackRun { daily: StackDay[]; skipped_days: string[]; runtime_s: number; }
-export interface AncillaryFile { runs: Record<string, string>; }
+export interface AncillaryFile { runs: Record<string, string>; meta?: { max_as_share?: number } }
 
 export function sumStack(rows: StackDay[], stacked: boolean): number[] {
   return STACK_KEYS.map((k) => rows.reduce((s, r) => s + (stacked ? r[k] : k === 'energy' ? r.energy_only : 0), 0));

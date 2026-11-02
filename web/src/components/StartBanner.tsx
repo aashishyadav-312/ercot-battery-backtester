@@ -21,7 +21,7 @@ export function markStartSeen() {
   }
 }
 
-/** One-time banner on Overview pointing first-time visitors to the Start-here page. Dismissal is remembered in localStorage. */
+/** One-time banner on Overview pointing first-time visitors to the Guide. Dismissal is remembered in localStorage. */
 export function StartBanner() {
   const { go } = useApp();
   const [open, setOpen] = useState(() => !wasSeen());
@@ -38,10 +38,10 @@ export function StartBanner() {
           <Text size="sm" c="dimmed" lh={1.5}>
             A short guide explains the market, walks through one real day of a battery trading, and shows how to read each page.{' '}
             <Anchor
-              href="#/guide/start" fw={600} size="sm"
-              onClick={(e) => { e.preventDefault(); markStartSeen(); go('start'); }}
+              href="#/guide" fw={600} size="sm"
+              onClick={(e) => { e.preventDefault(); markStartSeen(); go('guide'); }}
             >
-              Start here {'→'}
+              Open the Guide {'→'}
             </Anchor>
           </Text>
         </div>

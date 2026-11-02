@@ -1,29 +1,33 @@
 // Routing for the five-tab shell. Pure functions only (no window access), so the redirect table is testable.
 //
-// A "page" is one of the original views, or a page the redesign added (Home, Atlas, Studio); each lives under one of five tabs. Hash URLs are
+// A "page" is one of the original views, or a page the redesign added (Home, Atlas, Studio, Research, Guide); each lives under one of five tabs. Hash URLs are
 // `#/<tab>[/<view>]?<query>`. Every URL from before the redesign (`#/overview?loc=...`) resolves to its new home
 // with the query kept as written, so shared links and bookmarks keep working.
 
 import type { Selection } from '../data/types';
 
-export type Page = 'home' | 'atlas' | 'studio' | 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method' | 'about';
-/** Pages from before the redesign that no longer exist on their own: Studio replaced both. */
-type Retired = 'custom' | 'compare';
-export type OldRoute = Exclude<Page, 'home' | 'atlas' | 'studio'> | Retired;
+export type Page = 'home' | 'atlas' | 'studio' | 'research' | 'guide' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
+/** Pages from before the redesign that no longer exist on their own: Studio replaced Custom run and Compare, Guide replaced Start here and About. */
+type Retired = 'custom' | 'compare' | 'start' | 'about';
+export type OldRoute = Exclude<Page, 'home' | 'atlas' | 'studio' | 'research' | 'guide'> | Retired;
 /** The pages from before the redesign. Their bare hash (`#/live`) is an old route that redirects to its new home. */
 export const OLD_PAGES: OldRoute[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
-export const PAGES: Page[] = ['home', 'atlas', 'studio', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => p !== 'custom' && p !== 'compare')];
+export const PAGES: Page[] = ['home', 'atlas', 'studio', 'research', 'guide', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => !['custom', 'compare', 'start', 'about'].includes(p))];
 /**
  * Old routes whose content the redesign replaced: they open the new page, not the old one. The old Map page became the
  * Atlas (all nodes); its 10-location view lives on as Atlas > Detailed locations (`#/atlas/detailed`). Custom run and
  * Compare became Studio, which keeps their inputs from the query (`loc`, `dur`, `year`, `deg`, `mw`, ...).
  */
-const REPLACED: Partial<Record<OldRoute, Page>> = { map: 'atlas', custom: 'studio', compare: 'studio' };
+const REPLACED: Partial<Record<OldRoute, Page>> = { map: 'atlas', custom: 'studio', compare: 'studio', start: 'guide', about: 'guide' };
+/** Old routes that land on one section of a page that absorbed them: `#/about` opens the Guide at its About section (`?s=about`). */
+const SECTION: Partial<Record<OldRoute, string>> = { about: 'about' };
 /**
  * Views of a tab that were removed: `#/studio/custom` and `#/studio/compare` were Studio's canonical URLs from step 1
- * to step 3 of the redesign, so links to them open Studio with their query.
+ * to step 3 of the redesign, and `#/guide/start` and `#/guide/about` Guide's until step 5, so links to them open the
+ * page that replaced them with their query. `#/guide/about` opens the Guide at its About section.
  */
-const RETIRED_VIEWS: Partial<Record<Tab, Record<string, Page>>> = { studio: { custom: 'studio', compare: 'studio' } };
+const RETIRED_VIEWS: Partial<Record<Tab, Record<string, Page>>> = { studio: { custom: 'studio', compare: 'studio' }, guide: { start: 'guide', about: 'guide' } };
+const RETIRED_SECTION: Partial<Record<Tab, Record<string, string>>> = { guide: { about: 'about' } };
 
 export type Tab = 'home' | 'atlas' | 'studio' | 'research' | 'guide';
 
@@ -43,14 +47,15 @@ export const TABS: { tab: Tab; label: string; views: View[] }[] = [
   {
     tab: 'research', label: 'Research',
     views: [
-      { page: 'overview', slug: 'overview', label: 'Overview' },
+      { page: 'research', slug: '', label: 'Findings' },
+      { page: 'overview', slug: 'overview', label: 'Run overview' },
       { page: 'revenue', slug: 'revenue', label: 'Revenue' },
       { page: 'dispatch', slug: 'dispatch', label: 'Dispatch' },
       { page: 'realism', slug: 'realism', label: 'Realism' },
       { page: 'method', slug: 'method', label: 'Method' },
     ],
   },
-  { tab: 'guide', label: 'Guide', views: [{ page: 'start', slug: 'start', label: 'Start here' }, { page: 'about', slug: 'about', label: 'About' }] },
+  { tab: 'guide', label: 'Guide', views: [{ page: 'guide', slug: '', label: 'Guide' }] },
 ];
 
 export const TAB_IDS: Tab[] = TABS.map((t) => t.tab);
@@ -93,7 +98,13 @@ export function resolveHash(hash: string): ResolvedRoute {
   const path = qi < 0 ? raw : raw.slice(0, qi);
   const query = qi < 0 ? '' : raw.slice(qi + 1);
   const [first = '', second = ''] = path.replace(/\/+$/, '').split('/');
-  const withQuery = (page: Page) => `#/${pathOf(page)}${query ? `?${query}` : ''}`;
+  // A retired route that now lands on a section of its replacement adds `s=<section>` unless the link already names one.
+  const q = query;
+  const withQuery = (page: Page, section?: string) => {
+    const qs = section && !new URLSearchParams(q).has('s') ? `s=${section}${q ? `&${q}` : ''}` : q;
+    return `#/${pathOf(page)}${qs ? `?${qs}` : ''}`;
+  };
+  let section: string | undefined;
 
   let page: Page;
   let redirected: boolean;
@@ -102,15 +113,27 @@ export function resolveHash(hash: string): ResolvedRoute {
     const hit = views.find((v) => v.slug === second);
     // An unknown view, or a bare tab whose first view has its own slug (#/research), opens the tab's first view.
     page = hit?.page ?? RETIRED_VIEWS[first as Tab]?.[second] ?? views[0].page;
+    section = hit ? undefined : RETIRED_SECTION[first as Tab]?.[second];
     redirected = !hit;
   } else if ((OLD_PAGES as string[]).includes(first)) {
     page = REPLACED[first as OldRoute] ?? (first as Page); // an old route: its content, in its new home
+    section = SECTION[first as OldRoute];
     redirected = true;
   } else {
     page = 'home';
     redirected = raw !== '';
   }
-  return { tab: tabOf(page), page, query, canonical: withQuery(page), redirected };
+  return { tab: tabOf(page), page, query, canonical: withQuery(page, section), redirected };
+}
+
+/**
+ * One value from a hash's query string (`#/research?f=4` gives "4"), or null. Read from where the hash will be rewritten to,
+ * so an old link that is still being redirected (`#/about` is `#/guide?s=about`) already answers.
+ */
+export function hashParam(hash: string, key: string): string | null {
+  const c = resolveHash(hash).canonical;
+  const qi = c.indexOf('?');
+  return qi < 0 ? null : new URLSearchParams(c.slice(qi + 1)).get(key);
 }
 
 /** Hash for a page with the scenario selection in the query: `#/research/revenue?loc=HB_WEST&dur=2&year=2025&deg=10`. */
