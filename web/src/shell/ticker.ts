@@ -1,13 +1,13 @@
 // The ticker's content, derived from the live snapshot the Phase 16 Worker serves (src/live/live.ts).
 // Nothing here invents a price: with no snapshot the model says so and carries no items.
-import { STALE_MIN, ago, ctTime, latest, pricesThrough, type LiveLoad } from '../live/live';
+import { STALE_MIN, ago, ctTime, latest, moveDir, pricesThrough, type LiveLoad, type MoveDir } from '../live/live';
 
 export interface TickerItem {
   loc: string;
   price: string;
   /** Change from the previous 15-minute interval, signed, or null when that interval is missing. */
   change: string | null;
-  dir: 'up' | 'down' | 'flat';
+  dir: MoveDir;
 }
 
 export type TickerStatus = 'loading' | 'live' | 'delayed' | 'cached' | 'empty' | 'unavailable';
@@ -34,7 +34,7 @@ function itemsOf(load: Extract<LiveLoad, { state: unknown }>): TickerItem[] {
       loc,
       price: money(l.price),
       change: l.change === null ? null : signed(Math.round(l.change * 100) / 100),
-      dir: l.change === null || Math.round(l.change * 100) === 0 ? 'flat' : l.change > 0 ? 'up' : 'down',
+      dir: l.change === null ? 'flat' : moveDir(l.change),
     });
   }
   return out;

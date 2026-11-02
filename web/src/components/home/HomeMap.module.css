@@ -1,0 +1,29 @@
+.map { display: block; width: 100%; height: auto; overflow: visible; }
+.land { fill: var(--land); stroke: var(--land-stroke); stroke-width: 1.2; stroke-linejoin: round; }
+
+/* Metric changes recolour and fade the dots; size follows from the new r at once (attributes do not transition). */
+.dot, .county, .halo { transition: fill 420ms var(--ease), stroke 420ms var(--ease), opacity 420ms var(--ease); }
+.county { fill: none; stroke-width: 1.4; }
+.halo { opacity: 0.16; }
+
+.marker { cursor: pointer; }
+.markerDisc { fill: var(--bg); stroke: var(--text); stroke-width: 1.6; transition: stroke 420ms var(--ease), fill 420ms var(--ease); }
+.markerNum { fill: var(--text); font-family: var(--mantine-font-family-monospace); font-size: 12px; font-weight: 500; pointer-events: none; }
+.marker[data-on] .markerDisc { fill: var(--amber); stroke: var(--amber); }
+.marker[data-on] .markerNum { fill: var(--on-accent); }
+
+.callout rect { fill: var(--glass); stroke: var(--line-2); stroke-width: 1; }
+.callout text { fill: var(--text); font-family: var(--mantine-font-family-monospace); font-size: 11px; }
+.callout .calloutNote { fill: var(--amber-text); }
+
+/* The three highest values breathe and send out a ring every 3s (spec: 4.5s breath). Transform and opacity only. */
+.breathe .halo { transform-box: fill-box; transform-origin: center; animation: breathe 4.5s var(--ease) infinite; }
+.ring { fill: none; stroke-width: 1.2; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ring 3s var(--ease) infinite; }
+@keyframes breathe { 0%, 100% { opacity: 0.12; transform: scale(0.9); } 50% { opacity: 0.26; transform: scale(1.08); } }
+@keyframes ring { 0% { opacity: 0.55; transform: scale(1); } 100% { opacity: 0; transform: scale(3.2); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dot, .county, .halo, .markerDisc { transition: none; }
+  .breathe .halo { animation: none; }
+  .ring { display: none; }
+}

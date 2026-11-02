@@ -8,6 +8,7 @@
     "predev": "npm run prepare-data",
     "dev": "vite",
     "prebuild": "npm run prepare-data",
+    "pretest": "npm run prepare-data",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "screenshots": "node scripts/screenshots.mjs",

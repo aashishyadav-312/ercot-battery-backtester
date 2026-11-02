@@ -80,6 +80,17 @@ export function latest(v: (number | null)[]) {
   return { index: i, price: v[i]!, change: prev === null ? null : v[i]! - prev };
 }
 
+export type MoveDir = 'up' | 'down' | 'flat';
+
+/**
+ * Direction of a price change at the cent level both the ticker and the hub tiles print, so a move shown as
+ * "+0.00" is never coloured as a rise. One rule, one colour pair (--up and --down in tokens.css) everywhere.
+ */
+export function moveDir(change: number): MoveDir {
+  const cents = Math.round(change * 100);
+  return cents > 0 ? 'up' : cents < 0 ? 'down' : 'flat';
+}
+
 /** Start time (ms) of interval i of a day split into `minutes`-long steps. */
 export function intervalStart(day: LiveDay, i: number, minutes = RT_MIN): number {
   return Date.parse(day.startUtc) + i * minutes * 60_000;

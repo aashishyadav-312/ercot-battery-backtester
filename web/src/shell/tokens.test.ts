@@ -32,6 +32,7 @@ const TEXT_PAIRS: [string, string][] = [
   ['amber-text', 'bg'], ['amber-text', 'panel'], ['amber-text', 'panel-hi'],
   ['mint-text', 'bg'], ['mint-text', 'panel'], ['mint-text', 'panel-hi'],
   ['on-accent', 'amber'], ['on-accent', 'mint'],
+  ['up', 'bg'], ['up', 'panel'], ['up', 'panel-hi'], ['down', 'bg'], ['down', 'panel'], ['down', 'panel-hi'],
   ['tick-text', 'tick-bg'], ['tick-muted', 'tick-bg'], ['tick-up', 'tick-bg'], ['tick-down', 'tick-bg'],
 ];
 
@@ -44,5 +45,15 @@ describe.each([['dark', dark], ['light', light]] as const)('%s tokens', (_name, 
 
   it('keeps the focus ring (amber-text) at 3:1 against the page and panels', () => {
     for (const bg of ['bg', 'panel']) expect(contrast(t['amber-text'], t[bg])).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('price move colours', () => {
+  it('use the same pair on the page as the ticker uses on a surface of the same lightness', () => {
+    // The ticker inverts: its strip is light on the dark page, so the dark page's --up is the light theme's --tick-up.
+    expect(dark.up).toBe(light['tick-up']);
+    expect(dark.down).toBe(light['tick-down']);
+    expect(light.up).toBe(dark['tick-up']);
+    expect(light.down).toBe(dark['tick-down']);
   });
 });
