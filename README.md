@@ -6,7 +6,7 @@ How much could a battery have earned at a given ERCOT location, and what drove t
 
 [![Deploy to GitHub Pages](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml/badge.svg)](https://github.com/aashishyadav-312/ercot-battery-backtester/actions/workflows/deploy.yml)
 
-Status: Phase 16 done (Live page at `#/live`: today's real-time hub and node prices, the best possible battery so far today, tomorrow's day-ahead plan, spike banner and cached fallback, fed every 5 minutes by a Cloudflare Worker in `worker/`; see "Live page backend" below). Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
+Status: Phase 17 done (context layers: ERCOT battery fleet MW against monthly revenue on Revenue, a planned-storage-by-county layer on the Map, daily high/low temperature on the ten best days, and a solar/wind share overlay on the Dispatch heatmap; built by `scripts/build_context.py` into `results/context.json`; see "Context layers" below). Phase 16 done (Live page at `#/live`: today's real-time hub and node prices, the best possible battery so far today, tomorrow's day-ahead plan, spike banner and cached fallback, fed every 5 minutes by a Cloudflare Worker in `worker/`; see "Live page backend" below). Phase 15 done (Custom run page at `#/custom`: your own power, duration, efficiency, degradation and dates at the 10 detailed locations, both strategies, solved in the browser by a highs-js port of the daily LP and MILP fallback in a Web Worker; inputs saved in the URL; parity with Python within 0.5%; energy only). Phase 14 done (separate energy + ancillary capacity screen on Overview, Revenue and Realism for all 180 configurations, plus a 50% AS-cap sensitivity; findings in section 10 of [results/FINDINGS.md](results/FINDINGS.md); methodology, reproduction and limits in [docs/ANCILLARY_METHOD.md](docs/ANCILLARY_METHOD.md)). Phase 13 done (Economics page at `#/economics`: NPV, IRR, payback, LCOS, breakeven capex and a sensitivity tornado; all math in `web/src/data/economics.ts`, tested with `npm test` in `web/`). Phase 11 done (Map page at `#/map`: Texas county map with clickable markers, `results/locations.json` built by `scripts/build_locations.py`, geocoding log in [results/geocoding_log.md](results/geocoding_log.md)). Phase 9 done (friendly location names in `web/src/data/locations.json`, glossary tooltips from `web/src/data/glossary.json`, "Data through" badge, About page and footer, Open Graph/Twitter cards, GoatCounter page counts). Phase 8a done (DA-schedule / RT-settle capture rates and a before/after RTC+B comparison, on the new Realism page; findings 7 and 8 in [results/FINDINGS.md](results/FINDINGS.md)). Phase 7 done (deployed to GitHub Pages). Phase 4 done (5 hubs + 5 resource nodes, benchmark check, findings in [results/FINDINGS.md](results/FINDINGS.md)). See [PLAN.md](PLAN.md) for the build plan.
 
 ## Setup
 
@@ -39,6 +39,7 @@ scripts/build_walkthrough.py # 15-min prices + schedule for featured days -> res
 data/fetch_all_nodes.py   # every settlement point at once from ERCOT's archive files -> data/raw/{RT15,DA}_ALLSP_{year}-{month}.parquet
 scripts/run_all_nodes.py  # daily LP at every resource node, summary only -> results/nodes_{year}_{hours}h.json (Map heat mode)
 scripts/node_findings.py  # prints the FINDINGS section 9 tables from the all-node results
+scripts/build_context.py  # results/context.json: battery fleet (EIA-860M), planned storage (ERCOT GIS queue), weather (Open-Meteo), solar/wind share (ERCOT fuel mix)
 scripts/geocode_extra.py  # EIA-860M and ERCOT GIS queue (county-level) geocoding stages
 data/price_files.py       # compact per-location-year price files (EBP1) for the in-browser custom run
 scripts/export_prices.py  # results/prices/*.ebp for the 10 detailed locations (Phase 15)
@@ -131,6 +132,21 @@ cd web && npx vitest run src/custom   # highs-js port + parity test
   figures as a check. A full year at 2 h solves in about 2 s in the browser; $0 degradation at negative-price locations
   is slower because of MILP-fallback days (HB_PAN 2024 1h $0: about 4 minutes), with progress shown per month and a
   Cancel button. The solver (3.5 MB WebAssembly, 1.2 MB gzipped) loads only on this page.
+
+## Context layers (Phase 17)
+
+`python -m scripts.build_context` writes `results/context.json` (about 60 KB; downloads are cached in `data/raw/context/`, add `--refresh`
+to refetch, `--only fleet|queue|weather|fuel` to rebuild one part). None of it feeds the optimizer, and the page text only describes what moved together.
+
+| Layer | Source | Notes |
+|---|---|---|
+| Battery fleet MW by month | EIA-860M monthly generator workbook (Operating + Retired sheets) | Texas, balancing authority ERCO, technology Batteries, nameplate MW. Rebuilt from each unit's start and retirement month in the latest edition. The workbook is the same data as the EIA API and needs no key. |
+| Planned storage by county | ERCOT Generator Interconnection Status report (monthly), "Project Details - Large Gen", technology BA | Projects of 10 MW or more. A queued project may never be built. "Signed agreement" = interconnection agreement signed. |
+| Weather | Open-Meteo historical (ERA5 reanalysis), daily high/low 2 m temperature, deg F | At the five hub cities (a node uses its nearest one). Not a station reading. |
+| Solar and wind share by hour | ERCOT Fuel Mix Report (`IntGenbyFuel{year}.xlsx`, settled 15-minute generation by fuel) | Share = solar (or wind) over total generation excluding storage charging, by month and hour, Central time. |
+
+Deviation from the plan: the plan named the gridstatus library for the fuel mix, but `Ercot.get_fuel_mix` only serves today and yesterday, and the
+hourly solar and wind reports it wraps keep only the last few days. ERCOT's annual Fuel Mix Report files are the same series with full history, so they are used directly.
 
 ## Live page backend (Phase 16)
 

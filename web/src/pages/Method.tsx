@@ -4,7 +4,7 @@ import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { IconWarn } from '../components/Icons';
 import { yearLabel } from '../data/format';
-import { locFull, zoneFull } from '../data/site';
+import { SITE, locFull, zoneFull } from '../data/site';
 
 export function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -123,6 +123,16 @@ export default function Method() {
         <Text size="sm">
           The <Anchor component="button" size="sm" onClick={() => go('realism')}>Realism page</Anchor> compares matched windows before and after
           Dec 5, 2025 for perfect foresight and a day-ahead-scheduled strategy, with the same caution.
+        </Text>
+      </Section>
+
+      <Section title="Context layers">
+        <Text size="sm">
+          Revenue (fleet capacity), Map (planned storage), Dispatch (solar and wind share) and the ten best days (weather) show public data beside the results.
+          They come from EIA-860M, ERCOT&rsquo;s interconnection queue report, Open-Meteo and ERCOT&rsquo;s Fuel Mix Report; none of it enters the optimizer.
+          The wording describes what moved together (&ldquo;revenue fell while fleet capacity rose&rdquo;) and never says one caused the other.
+          Queued projects may never be built, and weather is reanalysis at a hub city, not at the node. Sources and limits are in the{' '}
+          <Anchor href={`${SITE.repo}#context-layers-phase-17`} target="_blank" rel="noreferrer">README</Anchor>.
         </Text>
       </Section>
 

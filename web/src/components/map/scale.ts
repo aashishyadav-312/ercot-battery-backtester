@@ -50,6 +50,22 @@ export function markerSize(rev: number | null | undefined, d: Domain): number {
   return SIZE_MIN + (SIZE_MAX - SIZE_MIN) * Math.sqrt(Math.min(1, rev / d.revMax));
 }
 
+// ------------------------------------------------------------ planned-storage layer (Phase 17)
+/** Purple ramp for the interconnection-queue layer, so it never reads as the blue revenue scale. */
+const QUEUE_RAMP = {
+  light: ['#efe3f6', '#d6b4e8', '#b27fd2', '#8749b0', '#5b2784'],
+  dark: ['#3a2a4b', '#5b3f7b', '#7f59a8', '#aa8cd2', '#dac8ef'],
+};
+export const QUEUE_CLASSES = 5;
+
+/** Colour class 0..QUEUE_CLASSES-1 of a county's queued MW; breaks come from quantileBreaks over counties that have any. */
+export function queueColor(mw: number, breaks: number[], mode: 'light' | 'dark'): string {
+  let i = 0;
+  while (i < breaks.length && mw > breaks[i]) i++;
+  return QUEUE_RAMP[mode][i];
+}
+export const queueSwatch = (i: number, mode: 'light' | 'dark') => QUEUE_RAMP[mode][i];
+
 // ------------------------------------------------------------ heat mode (Phase 12)
 /** Number of equal-count colour classes in heat mode. */
 export const HEAT_CLASSES = 7;

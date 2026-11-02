@@ -5,7 +5,8 @@ import { LinesChart } from 'echarts/charts';
 import { GeoComponent } from 'echarts/components';
 import { Chart, tooltipBase, type ChartTheme } from '../Chart';
 import { IconMinus, IconPlus, IconReset } from '../Icons';
-import { captureColor, heatColor, markerSize, type Domain } from './scale';
+import { captureColor, heatColor, markerSize, queueColor, type Domain } from './scale';
+import { countyKey, type QueueCounty } from '../../data/context';
 import type { LocationRec, NodeRec, TexasGeo } from '../../data/types';
 import { usd } from '../../data/format';
 
@@ -26,6 +27,12 @@ export interface HeatLayer {
   breaks: number[];
   /** Code of the selected all-node dot, if any. */
   selected: string | null;
+}
+
+/** Planned-storage layer (Phase 17): counties shaded by battery MW in ERCOT's interconnection queue. */
+export interface QueueLayer {
+  counties: Map<string, QueueCounty & { name: string }>;
+  breaks: number[];
 }
 
 /** Fly-to request from the search box; `n` changes on every request so the same node can be chosen twice. */
@@ -65,13 +72,15 @@ interface Props {
   label: string;
   /** When set, the map is in heat mode: all nodes underneath, the detailed locations highlighted on top. */
   heat?: HeatLayer | null;
+  /** When set, counties are shaded by planned storage MW (interconnection queue). */
+  queue?: QueueLayer | null;
 }
 
 /**
  * Texas county map drawn with echarts' geo component (no mapping library, no tiles).
  * Marker size = $/kW-yr, colour = capture rate. Hubs are diamonds at a representative city, nodes are circles at their plant.
  */
-export function TexasMap({ geo, points, domain, selected, onSelect, focus, height, label, heat }: Props) {
+export function TexasMap({ geo, points, domain, selected, onSelect, focus, height, label, heat, queue }: Props) {
   ensureMap(geo);
   const mode = useComputedColorScheme('light');
   const chart = useRef<echarts.ECharts | null>(null);
@@ -130,15 +139,24 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         tooltip: {
           ...tooltipBase(t),
           trigger: 'item',
-          formatter: (p: { seriesType?: string; name: string; value: (number | null)[]; data?: { county?: string | null } }) =>
-            p.seriesType === 'scatter'
+          formatter: (p: { componentType?: string; seriesType?: string; name: string; value: (number | null)[]; data?: { county?: string | null } }) => {
+            if (p.componentType === 'geo') {
+              const c = queue?.counties.get(countyKey(p.name));
+              return c ? `<b>${p.name} County</b><br/>${Math.round(c.mw).toLocaleString('en-US')} MW of storage in the queue<br/>${c.projects} project${c.projects === 1 ? '' : 's'}, ${Math.round(c.mw_ia_signed).toLocaleString('en-US')} MW with a signed agreement` : '';
+            }
+            return p.seriesType === 'scatter'
               ? `<b>${p.name}</b><br/>${p.value[2] == null ? '–' : usd(p.value[2], 1)} per kW-yr${p.data?.county ? `<br/><i>County-level: somewhere in ${p.data.county} County</i>` : ''}`
-              : '',
+              : '';
+          },
         },
         geo: {
-          map: MAP_NAME, roam: true, silent: true, scaleLimit: { min: 1, max: 14 }, aspectScale: 0.86, layoutCenter: ['50%', '52%'], layoutSize: '104%',
+          map: MAP_NAME, roam: true, silent: !queue, scaleLimit: { min: 1, max: 14 }, aspectScale: 0.86, layoutCenter: ['50%', '52%'], layoutSize: '104%',
           itemStyle: { areaColor: t.mode === 'light' ? '#eeede9' : '#242423', borderColor: t.mode === 'light' ? '#d9d8d2' : '#3a3a37', borderWidth: 0.5 },
           emphasis: { disabled: true }, select: { disabled: true }, label: { show: false },
+          regions: queue ? geo.counties.features.flatMap((f) => {
+            const c = queue.counties.get(countyKey(f.properties.name));
+            return c && c.mw > 0 ? [{ name: f.properties.name, itemStyle: { areaColor: queueColor(c.mw, queue.breaks, t.mode) } }] : [];
+          }) : [],
         },
         series: [
           {
@@ -151,7 +169,7 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         ],
       };
     },
-    [points, domain, selected, rings, heat],
+    [points, domain, selected, rings, heat, queue, geo],
   );
 
   const zoom = (f: number) => {

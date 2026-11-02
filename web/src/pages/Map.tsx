@@ -1,15 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Anchor, Group, Paper, SegmentedControl, Select, Skeleton, Stack, Table, Text, UnstyledButton } from '@mantine/core';
+import { Alert, Anchor, Group, Paper, SegmentedControl, Select, Skeleton, Stack, Switch, Table, Text, UnstyledButton } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { PageHeader } from './Overview';
-import { TexasMap, type Focus, type HeatLayer, type MapPoint } from '../components/map/TexasMap';
+import { TexasMap, type Focus, type HeatLayer, type MapPoint, type QueueLayer } from '../components/map/TexasMap';
+import { QueueLegend, QueuePanel } from '../components/map/queue';
 import { HeatLegend, NodePanel, TopNodesTable, heatScenario } from '../components/map/heat';
 import { MapLegend } from '../components/map/MapLegend';
 import { MapPanel } from '../components/map/MapPanel';
-import { domainOf, quantileBreaks } from '../components/map/scale';
+import { QUEUE_CLASSES, domainOf, quantileBreaks } from '../components/map/scale';
 import { Info } from '../components/Info';
 import { useApp } from '../state';
-import { useLocations, useTexas } from '../hooks';
+import { useContextData, useLocations, useTexas } from '../hooks';
+import { queueByKey } from '../data/context';
 import type { NodesFile } from '../data/types';
 import { findRun, loadNodes } from '../data/loader';
 import { pct, usd, yearLabel } from '../data/format';
@@ -36,6 +38,9 @@ export default function MapPage() {
   const [all, setAll] = useState<{ data: NodesFile | null; error?: string }>({ data: null });
   const [heatSel, setHeatSel] = useState<string | null>(null);
   const heatOn = mode === 'heat';
+  // Planned-storage layer (Phase 17); context.json is fetched only once the layer is switched on.
+  const [queueOn, setQueueOn] = useState(false);
+  const context = useContextData();
   // The all-node file is fetched only once heat mode is switched on (and then cached by the loader).
   useEffect(() => {
     if (!heatOn || all.data) return;
@@ -64,6 +69,11 @@ export default function MapPage() {
     }) : []),
     [list, index, sel, heatOn, all.data],
   );
+  const queue: QueueLayer | null = useMemo(() => {
+    if (!queueOn || !context.data) return null;
+    const counties = queueByKey(context.data.queue.counties);
+    return { counties, breaks: quantileBreaks([...counties.values()].map((c) => c.mw), QUEUE_CLASSES) };
+  }, [queueOn, context.data]);
   const heat: HeatLayer | null = heatOn && all.data ? { nodes: all.data.nodes, breaks, selected: heatSel } : null;
 
   const choose = (code: string | null) => {
@@ -118,6 +128,12 @@ export default function MapPage() {
               />
             </Group>
           </Group>
+          <Switch
+            size="sm" mb="xs" checked={queueOn} onChange={(e) => setQueueOn(e.currentTarget.checked)}
+            label="Layer: planned battery storage by county"
+            description="Shades each county by the battery MW in ERCOT’s interconnection queue. Queued projects may never be built; this is a pipeline, not capacity."
+          />
+          {queueOn && context.error && <Alert color="red" mb="xs" title="Could not load the queue data">{context.error}</Alert>}
           {heatOn && (
             <Text size="xs" c="dimmed" mb="xs">The top-bar selectors don’t change this view: the all-node run uses one standard configuration. Switch to “10 locations” for the full grid of sizes, years and degradation costs.</Text>
           )}
@@ -125,12 +141,13 @@ export default function MapPage() {
             <>
               <TexasMap
                 geo={geo} points={points} domain={domain} selected={sel.location} onSelect={choose} focus={focus} heat={heat}
-                height={phone ? 400 : 520}
+                height={phone ? 400 : 520} queue={queue}
                 label={heat && all.data
                   ? `Map of Texas showing ${all.data.meta.n_nodes_geocoded} resource nodes coloured by revenue per kW-year in ${breaks.length + 1} equal-count classes, with the 10 detailed locations outlined. The Top nodes table below lists every node.`
                   : `Map of Texas showing ${list.filter((l) => l.geocoded).length} locations sized by revenue and coloured by capture rate. A table of the same figures follows.`}
               />
               {heat && all.data ? <HeatLegend breaks={breaks} meta={all.data.meta} /> : <MapLegend domain={domain} />}
+              {queue && context.data && <QueueLegend breaks={queue.breaks} queue={context.data.queue} />}
             </>
           ) : (
             <Skeleton h={phone ? 400 : 520} radius="md" aria-hidden />
@@ -140,6 +157,8 @@ export default function MapPage() {
           <NodePanel node={heatNode} data={all.data} onDetailed={(c) => choose(c)} detailed={list?.some((l) => l.code === heatNode.code)} />
         ) : ready && selected ? <MapPanel loc={selected} locations={list} index={index} /> : <Skeleton h={phone ? 300 : 560} radius="lg" aria-hidden />}
       </div>
+
+      {queue && context.data && <QueuePanel queue={context.data.queue} />}
 
       {ready && heatOn && all.data && (
         <TopNodesTable data={all.data} breaks={breaks} selected={heatSel ?? sel.location} onSelect={choose} />
