@@ -26,6 +26,13 @@ code {
   outline: 2px solid var(--amber-text);
   outline-offset: 2px;
 }
+/* Mantine's own rules would otherwise win: its focus class draws the bright fill amber (under 3:1 on the light page), and
+   its text inputs, date fields and native selects drop the outline and only tint a 1px border. */
+:root .mantine-focus-auto:focus-visible,
+:root .mantine-Input-input:focus-visible {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
 
 /* Scrollbars follow the tokens where the browser lets them. */
 * { scrollbar-color: var(--line-2) transparent; }

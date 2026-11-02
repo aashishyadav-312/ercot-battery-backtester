@@ -15,10 +15,9 @@ const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo comp
 import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
-import Compare from './pages/Compare';
 import Realism from './pages/Realism';
 import Economics from './pages/Economics';
-const Custom = lazy(() => import('./pages/Custom')); // the solver and worker load only when someone opens this page
+const Studio = lazy(() => import('./pages/Studio')); // the solver and worker load only when someone opens this page
 const Live = lazy(() => import('./pages/Live')); // likewise the solver, and the live fetch runs only on this page
 import Method from './pages/Method';
 import About from './pages/About';
@@ -26,11 +25,11 @@ import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['home', 'atlas', 'method', 'about', 'start', 'custom', 'live'];
+const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'method', 'about', 'start', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, atlas: Atlas, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare,
-  realism: Realism, economics: Economics, custom: Custom, live: Live, method: Method, about: About,
+  home: Home, atlas: Atlas, studio: Studio, start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
+  realism: Realism, economics: Economics, live: Live, method: Method, about: About,
 };
 
 export default function App() {

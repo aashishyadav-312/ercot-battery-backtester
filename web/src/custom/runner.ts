@@ -33,6 +33,8 @@ export interface CustomParams {
   durationH: number;
   rte: number;
   degCost: number;
+  /** State of charge at the start and end of every day, as a share of energy. Defaults to SOC0_FRAC, as in the model. */
+  soc0Frac?: number;
 }
 
 export interface DayRow {
@@ -84,7 +86,7 @@ function daScheduleDay(highs: Highs, s: DaySlice, p: CustomParams, rtPrices: Flo
   const daPrices = filledDay(file.da, daDay);
   if (!daPrices) return null;
   const energy = p.powerMw * p.durationH;
-  const da = optimizeDay(highs, daPrices, DA_DT, p.powerMw, energy, p.rte, p.degCost, SOC0_FRAC);
+  const da = optimizeDay(highs, daPrices, DA_DT, p.powerMw, energy, p.rte, p.degCost, p.soc0Frac ?? SOC0_FRAC);
   let gross = 0;
   let discharged = 0;
   for (let i = 0; i < rtPrices.length; i++) {
@@ -141,7 +143,7 @@ export function runCustom(
     const prices = missing > MAX_GAP_INTERVALS ? null : filledDay(rt, rtDay);
     if (!prices) skippedDays.push(rtDay.date);
     else {
-      const r = optimizeDay(highs, prices, RT_DT, p.powerMw, energy, p.rte, p.degCost, SOC0_FRAC);
+      const r = optimizeDay(highs, prices, RT_DT, p.powerMw, energy, p.rte, p.degCost, p.soc0Frac ?? SOC0_FRAC);
       for (let i = 0; i < prices.length; i++) {
         const c = r.charge[i];
         const d = r.discharge[i];
@@ -253,7 +255,7 @@ export function runCustom(
       method: 'perfect-foresight energy arbitrage, solved one operating day at a time (in your browser, HiGHS WebAssembly)',
       price_series: 'ERCOT real-time 15-min settlement point price',
       efficiency_split: 'sqrt(rte) on charge and on discharge',
-      soc_start_end_frac: SOC0_FRAC,
+      soc_start_end_frac: p.soc0Frac ?? SOC0_FRAC,
       degradation: 'cost per MWh discharged',
       excludes: ['ancillary services', 'forecast error', 'transmission/interconnection costs', 'capacity fade'],
       first_day: first,

@@ -149,7 +149,7 @@ export function MapPanel({ loc, locations, index }: { loc: LocationRec; location
 
         <Stack gap="xs">
           <Button variant="filled" onClick={() => go('overview', { location: loc.code })}>Open in Overview</Button>
-          <Button variant="default" onClick={() => go('compare', { location: loc.code })}>
+          <Button variant="default" onClick={() => go('studio', { location: loc.code })}>
             {loc.type === 'node' ? 'Compare with hub' : 'Compare locations'}
           </Button>
         </Stack>

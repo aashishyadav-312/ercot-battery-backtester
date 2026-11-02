@@ -119,7 +119,7 @@ function GuideTile({ card }: { card: GuideCard }) {
         style={{ display: 'block', borderBottom: '1px solid var(--app-hairline)', background: 'var(--app-canvas)' }}
       >
         <img
-          src={`${import.meta.env.BASE_URL}thumbs/${card.page}-${scheme}.webp`} alt={card.alt} width={640} height={400}
+          src={`${import.meta.env.BASE_URL}thumbs/${card.thumb ?? card.page}-${scheme}.webp`} alt={card.alt} width={640} height={400}
           style={{ display: 'block', width: '100%', height: 'auto' }}
         />
       </a>

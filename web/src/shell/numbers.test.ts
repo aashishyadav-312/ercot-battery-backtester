@@ -10,6 +10,7 @@ const REBUILT = [
   'components/home/HomeMap.tsx',
   'pages/Atlas.tsx',
   'components/atlas/AtlasMap.tsx',
+  'pages/Studio.tsx',
   'components/live/HubTiles.tsx',
   'components/live/ErrorDetails.tsx',
   'components/live/MoveArrow.tsx',

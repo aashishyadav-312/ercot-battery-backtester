@@ -1,20 +1,29 @@
 // Routing for the five-tab shell. Pure functions only (no window access), so the redirect table is testable.
 //
-// A "page" is one of the twelve original views, or a page the redesign added (Home, Atlas); each lives under one of five tabs. Hash URLs are
+// A "page" is one of the original views, or a page the redesign added (Home, Atlas, Studio); each lives under one of five tabs. Hash URLs are
 // `#/<tab>[/<view>]?<query>`. Every URL from before the redesign (`#/overview?loc=...`) resolves to its new home
 // with the query kept as written, so shared links and bookmarks keep working.
 
 import type { Selection } from '../data/types';
 
-export type Page = 'home' | 'atlas' | 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'economics' | 'custom' | 'method' | 'about';
+export type Page = 'home' | 'atlas' | 'studio' | 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method' | 'about';
+/** Pages from before the redesign that no longer exist on their own: Studio replaced both. */
+type Retired = 'custom' | 'compare';
+export type OldRoute = Exclude<Page, 'home' | 'atlas' | 'studio'> | Retired;
 /** The pages from before the redesign. Their bare hash (`#/live`) is an old route that redirects to its new home. */
-export const OLD_PAGES: Page[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
-export const PAGES: Page[] = ['home', 'atlas', ...OLD_PAGES];
+export const OLD_PAGES: OldRoute[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
+export const PAGES: Page[] = ['home', 'atlas', 'studio', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => p !== 'custom' && p !== 'compare')];
 /**
  * Old routes whose content the redesign replaced: they open the new page, not the old one. The old Map page became the
- * Atlas (all nodes); its 10-location view lives on as Atlas > Detailed locations (`#/atlas/detailed`).
+ * Atlas (all nodes); its 10-location view lives on as Atlas > Detailed locations (`#/atlas/detailed`). Custom run and
+ * Compare became Studio, which keeps their inputs from the query (`loc`, `dur`, `year`, `deg`, `mw`, ...).
  */
-const REPLACED: Partial<Record<Page, Page>> = { map: 'atlas' };
+const REPLACED: Partial<Record<OldRoute, Page>> = { map: 'atlas', custom: 'studio', compare: 'studio' };
+/**
+ * Views of a tab that were removed: `#/studio/custom` and `#/studio/compare` were Studio's canonical URLs from step 1
+ * to step 3 of the redesign, so links to them open Studio with their query.
+ */
+const RETIRED_VIEWS: Partial<Record<Tab, Record<string, Page>>> = { studio: { custom: 'studio', compare: 'studio' } };
 
 export type Tab = 'home' | 'atlas' | 'studio' | 'research' | 'guide';
 
@@ -27,8 +36,7 @@ export const TABS: { tab: Tab; label: string; views: View[] }[] = [
   {
     tab: 'studio', label: 'Studio',
     views: [
-      { page: 'custom', slug: 'custom', label: 'Custom run' },
-      { page: 'compare', slug: 'compare', label: 'Compare' },
+      { page: 'studio', slug: '', label: 'Your battery' },
       { page: 'economics', slug: 'economics', label: 'Economics' },
     ],
   },
@@ -92,10 +100,11 @@ export function resolveHash(hash: string): ResolvedRoute {
   if ((TAB_IDS as string[]).includes(first)) {
     const views = viewsOf(first as Tab);
     const hit = views.find((v) => v.slug === second);
-    page = (hit ?? views[0]).page;
-    redirected = !hit; // an unknown view, or a bare tab whose first view has its own slug (#/studio)
+    // An unknown view, or a bare tab whose first view has its own slug (#/research), opens the tab's first view.
+    page = hit?.page ?? RETIRED_VIEWS[first as Tab]?.[second] ?? views[0].page;
+    redirected = !hit;
   } else if ((OLD_PAGES as string[]).includes(first)) {
-    page = REPLACED[first as Page] ?? (first as Page); // an old route: its content, in its new home
+    page = REPLACED[first as OldRoute] ?? (first as Page); // an old route: its content, in its new home
     redirected = true;
   } else {
     page = 'home';

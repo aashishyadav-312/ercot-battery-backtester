@@ -9,7 +9,7 @@ const coverage: Coverage[] = [2024, 2025, 2026].flatMap((year) =>
 
 describe('custom-run URL parameters', () => {
   it('round-trips every input through the URL', () => {
-    const f = { location: 'RUSSEKST_RN', powerMw: 50, durationH: 1.5, rtePct: 88.5, degCost: 7.25, startDate: '2024-06-01', endDate: '2024-08-31', strategy: 'da' as const };
+    const f = { location: 'RUSSEKST_RN', powerMw: 50, durationH: 1.5, rtePct: 88.5, degCost: 7.25, socPct: 50, startDate: '2024-06-01', endDate: '2024-08-31', strategy: 'da' as const };
     expect(parseForm(formQuery(f), coverage)).toEqual(f);
   });
 
@@ -19,8 +19,8 @@ describe('custom-run URL parameters', () => {
   });
 
   it('clamps out-of-range numbers', () => {
-    const f = parseForm('mw=0&dur=20&rte=120&deg=-5', coverage);
-    expect([f.powerMw, f.durationH, f.rtePct, f.degCost]).toEqual([1, 8, 100, 0]);
+    const f = parseForm('mw=0&dur=20&rte=120&deg=-5&soc=140', coverage);
+    expect([f.powerMw, f.durationH, f.rtePct, f.degCost, f.socPct]).toEqual([1, 8, 100, 0, 100]);
   });
 
   it('opens the full year when a top-bar link carries only `year`', () => {
@@ -37,11 +37,19 @@ describe('custom-run URL parameters', () => {
 
   it('converts percent to a fraction for the solver', () => {
     expect(toParams({ ...FORM_DEFAULTS, rtePct: 90 }).rte).toBeCloseTo(0.9, 12);
+    expect(toParams({ ...FORM_DEFAULTS, socPct: 25 }).soc0Frac).toBeCloseTo(0.25, 12);
+  });
+
+  it('opens links from before the start-charge input with an empty battery, as the model runs', () => {
+    expect(parseForm('loc=HB_HOUSTON&mw=100&dur=2&rte=85&deg=10', coverage).socPct).toBe(0);
   });
 
   it('recognizes inputs that match a precomputed result', () => {
     expect(precomputedKey(FORM_DEFAULTS)).toMatchObject({ location: 'HB_HOUSTON', year: 2025, duration: 2, deg: 10 });
+    expect(precomputedKey({ ...FORM_DEFAULTS, powerMw: 250 })).toMatchObject({ duration: 2 }); // power only scales totals
     expect(precomputedKey({ ...FORM_DEFAULTS, durationH: 1.5 })).toBeNull();
-    expect(precomputedKey({ ...FORM_DEFAULTS, startDate: '2025-02-01' })).toBeNull();
+    expect(precomputedKey({ ...FORM_DEFAULTS, rtePct: 90 })).toBeNull();
+    expect(precomputedKey({ ...FORM_DEFAULTS, socPct: 50 })).toBeNull();
+    expect(precomputedKey({ ...FORM_DEFAULTS, degCost: 5 })).toBeNull();
   });
 });
