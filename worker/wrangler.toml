@@ -1,0 +1,20 @@
+# Deploy steps and costs: see "Live page backend" in the repository README.
+name = "ercot-live"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+# Every 5 minutes: one KV write per run, 288/day (free tier allows 1,000).
+[triggers]
+crons = ["*/5 * * * *"]
+
+# Holds one key, "live": the latest snapshot. The id is not a secret.
+[[kv_namespaces]]
+binding = "LIVE"
+id = "4384e2b01cf24feb9aeb3a5955212f79"
+
+[vars]
+ALLOWED_ORIGIN = "https://aashishyadav-312.github.io"
+
+# Secrets (set with `npx wrangler secret put <NAME>`, never committed):
+#   ERCOT_API_USERNAME, ERCOT_API_PASSWORD, ERCOT_API_SUBSCRIPTION_KEY

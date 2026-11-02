@@ -5,7 +5,7 @@ import {
 import { useDisclosure, useWindowScroll } from '@mantine/hooks';
 import { useApp, type Page } from './state';
 import { Selectors } from './components/Selectors';
-import { IconAbout, IconBattery, IconCompare, IconCustom, IconDispatch, IconEconomics, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
+import { IconAbout, IconBattery, IconCompare, IconCustom, IconDispatch, IconEconomics, IconLive, IconMap, IconMethod, IconMoon, IconOverview, IconRealism, IconRevenue, IconStart, IconSun } from './components/Icons';
 import Start from './pages/Start';
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Overview from './pages/Overview';
@@ -15,6 +15,7 @@ import Compare from './pages/Compare';
 import Realism from './pages/Realism';
 import Economics from './pages/Economics';
 const Custom = lazy(() => import('./pages/Custom')); // the solver and worker load only when someone opens this page
+const Live = lazy(() => import('./pages/Live')); // likewise the solver, and the live fetch runs only on this page
 import Method from './pages/Method';
 import About from './pages/About';
 import { SiteFooter } from './components/SiteFooter';
@@ -23,11 +24,12 @@ import { fmtDate } from './data/format';
 
 
 /** Pages without the top-bar scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['method', 'about', 'start', 'custom'];
+const OWN_INPUTS: Page[] = ['method', 'about', 'start', 'custom', 'live'];
 
 const NAV: { page: Page; label: string; icon: () => React.JSX.Element }[] = [
   { page: 'start', label: 'Start here', icon: IconStart },
   { page: 'map', label: 'Map', icon: IconMap },
+  { page: 'live', label: 'Live', icon: IconLive },
   { page: 'overview', label: 'Overview', icon: IconOverview },
   { page: 'revenue', label: 'Revenue', icon: IconRevenue },
   { page: 'dispatch', label: 'Dispatch', icon: IconDispatch },
@@ -82,7 +84,7 @@ export default function App() {
     try { (window as unknown as { goatcounter?: { count: (o: object) => void } }).goatcounter?.count({ path: `/${page}`, title: document.title }); } catch { /* blocked */ }
   }, [page]);
 
-  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, economics: Economics, custom: Custom, method: Method, about: About }[page];
+  const Page = { start: Start, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch, compare: Compare, realism: Realism, economics: Economics, custom: Custom, live: Live, method: Method, about: About }[page];
   return (
     <AppShell
       header={{ height: 60 }}
