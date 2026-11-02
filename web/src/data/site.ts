@@ -29,6 +29,8 @@ export function locFull(code: string): string {
 export const locName = (code: string): string => LOCS[code]?.name ?? code;
 /** Two-line label for chart axes: name over code. */
 export const locAxis = (code: string): string => (LOCS[code] ? `${LOCS[code].name}\n${code}` : code);
+/** True for the 10 detailed locations (5 hubs, 5 resource nodes) that have full runs for every year, size and degradation cost. */
+export const isDetailed = (code: string): boolean => code in LOCS;
 /** Region for a code, e.g. "West Texas". */
 export const locRegion = (code: string): string | undefined => LOCS[code]?.region;
 /** "West Texas load zone (LZ_WEST)". */

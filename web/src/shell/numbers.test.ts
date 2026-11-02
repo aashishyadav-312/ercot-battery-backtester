@@ -8,6 +8,8 @@ import { describe, expect, it } from 'vitest';
 const REBUILT = [
   'pages/Home.tsx',
   'components/home/HomeMap.tsx',
+  'pages/Atlas.tsx',
+  'components/atlas/AtlasMap.tsx',
   'components/live/HubTiles.tsx',
   'components/live/ErrorDetails.tsx',
   'components/live/MoveArrow.tsx',

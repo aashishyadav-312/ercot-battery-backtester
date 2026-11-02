@@ -28,10 +28,10 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['home', 'start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['home', 'start', 'map', 'detailed', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  home: 'home', start: 'guide/start', map: 'atlas', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
+  home: 'home', start: 'guide/start', map: 'atlas', detailed: 'atlas/detailed', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
   realism: 'research/realism', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;
@@ -86,10 +86,8 @@ try {
           ['data-quality', 'research/overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
           ['compare-node', 'studio/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
         ]),
-        // A resource node selected on the map (side panel showing a node vs its hub).
+        // A resource node selected in the Atlas (an old #/map?loc= link opens on that node).
         ...(!only || pages.includes('map') ? [['map-node', 'atlas?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
-        // Heat mode: every resource node (Phase 12). Runs last because the mode is remembered in localStorage.
-        ...(!only || pages.includes('map') ? [['map-heat', 'atlas?view=heat&loc=HB_HOUSTON&dur=2&year=2025&deg=10']] : []),
       ]) {
         await page.goto(`${base}#/${url}`);
         await settle(page);
