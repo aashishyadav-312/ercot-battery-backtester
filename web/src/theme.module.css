@@ -113,9 +113,11 @@
 .anchor {
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  text-decoration-color: color-mix(in srgb, currentColor 28%, transparent);
+  text-decoration-color: color-mix(in srgb, currentColor 60%, transparent);
   transition: text-decoration-color 140ms var(--app-ease), color 140ms var(--app-ease);
 }
+.anchor { min-height: 24px; } /* a link standing alone in a flex column or table cell is a 24px target (2.5.8); inline links are exempt */
+.anchor:where(button) { display: inline-block; padding-block: 2px; }
 .anchor:hover { text-decoration-color: currentColor; }
 
 .table { --table-border-color: var(--app-hairline); --table-hover-color: var(--mantine-color-default-hover); }

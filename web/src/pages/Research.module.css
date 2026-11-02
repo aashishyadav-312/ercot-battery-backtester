@@ -64,6 +64,7 @@
 .panelTitle { margin: 0; font-family: var(--mantine-font-family-headings); font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -0.015em; color: var(--text); }
 .panelText { margin: 16px 0 0; max-width: 38em; text-wrap: pretty; font-size: 14px; line-height: 1.55; color: var(--muted); }
 .panelText a, .sources a { color: var(--text); text-underline-offset: 3px; }
+.sources a { display: inline-block; padding-block: 3px; }
 .method { display: flex; flex-direction: column; gap: 16px; margin: 20px 0 0; padding: 0; list-style: none; }
 .method li { display: flex; gap: 14px; align-items: flex-start; }
 .method p { margin: 0; text-wrap: pretty; font-size: 14px; line-height: 1.55; color: var(--muted); }
@@ -78,7 +79,7 @@
 .table td { font-family: var(--mantine-font-family-monospace); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--text); }
 .table th.right, .table td.right { text-align: right; }
 .sources { margin: 0; padding: 0; list-style: none; font-size: 14px; line-height: 1.5; }
-.sources li { padding: 6px 0; }
+.sources li { padding: 3px 0; }
 .panel .eyebrow { margin: 20px 0 6px; font-size: 12px; }
 
 .leaves { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px 32px; margin-top: 16px; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-card); }

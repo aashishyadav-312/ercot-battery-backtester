@@ -28,7 +28,7 @@ function Frame({ label, w, h, children }: { label: string; w: number; h: number;
   );
 }
 
-const FS = 11.5;
+const FS = 13;
 
 /** Arrow from (x1,y1) to (x2,y2) with a small head. */
 function Arrow({ x1, y1, x2, y2, color }: { x1: number; y1: number; x2: number; y2: number; color: string }) {
@@ -59,18 +59,18 @@ export function ErcotDiagram() {
           <rect x={4} y={s.y} width={92} height={28} rx={8} fill={k.tint} stroke={k.line} />
           <circle cx={19} cy={s.y + 14} r={5} fill={s.c} />
           <text x={30} y={s.y + 18} fontSize={FS} fill={k.text}>{s.t}</text>
-          <Arrow x1={96} y1={s.y + 14} x2={122} y2={85} color={k.base} />
+          <Arrow x1={96} y1={s.y + 14} x2={116} y2={85} color={k.base} />
         </g>
       ))}
-      <rect x={124} y={50} width={118} height={70} rx={12} fill="none" stroke={k.blue} strokeWidth={2} />
-      <text x={183} y={76} fontSize={14} fontWeight={650} textAnchor="middle" fill={k.text}>ERCOT</text>
-      <text x={183} y={93} fontSize={10.5} textAnchor="middle" fill={k.muted}>balances supply</text>
-      <text x={183} y={107} fontSize={10.5} textAnchor="middle" fill={k.muted}>and runs the markets</text>
-      <Arrow x1={242} y1={85} x2={266} y2={85} color={k.base} />
+      <rect x={118} y={50} width={132} height={70} rx={12} fill="none" stroke={k.blue} strokeWidth={2} />
+      <text x={184} y={76} fontSize={14} fontWeight={650} textAnchor="middle" fill={k.text}>ERCOT</text>
+      <text x={184} y={93} fontSize={12} textAnchor="middle" fill={k.muted}>balances supply</text>
+      <text x={184} y={107} fontSize={12} textAnchor="middle" fill={k.muted}>and runs the markets</text>
+      <Arrow x1={250} y1={85} x2={266} y2={85} color={k.base} />
       <rect x={268} y={52} width={88} height={66} rx={12} fill={k.tint} stroke={k.line} />
       <text x={312} y={82} fontSize={FS} textAnchor="middle" fill={k.text}>Homes and</text>
       <text x={312} y={97} fontSize={FS} textAnchor="middle" fill={k.text}>businesses</text>
-      <text x={180} y={158} fontSize={10.5} textAnchor="middle" fill={k.muted}>Schematic</text>
+      <text x={180} y={158} fontSize={12} textAnchor="middle" fill={k.muted}>Schematic</text>
     </Frame>
   );
 }
@@ -84,17 +84,20 @@ export function LocationsDiagram() {
       <rect x={2} y={0} width={132} height={96} rx={12} fill="none" stroke={k.line} strokeDasharray="4 4" />
       {dots.map(([x, y], i) => <circle key={i} cx={x + 4} cy={y + 6} r={7} fill={i === 3 ? k.orange : k.blue} />)}
       <text x={68} y={118} fontSize={FS} textAnchor="middle" fontWeight={600} fill={k.text}>Resource nodes</text>
-      <text x={68} y={133} fontSize={10.5} textAnchor="middle" fill={k.muted}>one plant or battery each;</text>
-      <text x={68} y={146} fontSize={10.5} textAnchor="middle" fill={k.muted}>price includes local congestion</text>
+      <text x={68} y={133} fontSize={12} textAnchor="middle" fill={k.muted}>one plant or battery each;</text>
+      <text x={68} y={146} fontSize={12} textAnchor="middle" fill={k.muted}>price includes local</text>
+      <text x={68} y={159} fontSize={12} textAnchor="middle" fill={k.muted}>congestion</text>
       <Arrow x1={136} y1={34} x2={206} y2={34} color={k.base} />
       <Arrow x1={136} y1={64} x2={206} y2={110} color={k.base} />
-      <rect x={208} y={10} width={148} height={46} rx={10} fill={k.tint} stroke={k.line} />
+      <rect x={208} y={10} width={148} height={56} rx={10} fill={k.tint} stroke={k.line} />
       <text x={282} y={30} fontSize={FS} textAnchor="middle" fontWeight={600} fill={k.text}>Load zone</text>
-      <text x={282} y={45} fontSize={10.5} textAnchor="middle" fill={k.muted}>one averaged price for customers</text>
-      <rect x={208} y={88} width={148} height={46} rx={10} fill={k.tint} stroke={k.line} />
+      <text x={282} y={45} fontSize={12} textAnchor="middle" fill={k.muted}>one averaged price</text>
+      <text x={282} y={58} fontSize={12} textAnchor="middle" fill={k.muted}>for customers</text>
+      <rect x={208} y={88} width={148} height={56} rx={10} fill={k.tint} stroke={k.line} />
       <text x={282} y={108} fontSize={FS} textAnchor="middle" fontWeight={600} fill={k.text}>Hub</text>
-      <text x={282} y={123} fontSize={10.5} textAnchor="middle" fill={k.muted}>regional average, a smooth reference</text>
-      <text x={282} y={158} fontSize={10.5} textAnchor="middle" fill={k.muted}>Schematic</text>
+      <text x={282} y={123} fontSize={12} textAnchor="middle" fill={k.muted}>regional average,</text>
+      <text x={282} y={136} fontSize={12} textAnchor="middle" fill={k.muted}>a smooth reference</text>
+      <text x={282} y={163} fontSize={12} textAnchor="middle" fill={k.muted}>Schematic</text>
     </Frame>
   );
 }
@@ -120,16 +123,16 @@ export function DaRtDiagram({ day, where }: { day?: WalkDay; where: string }) {
     >
       <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} stroke={k.line} />
       {[0, 24, 48, 72, 96].map((i) => (
-        <text key={i} x={x(i)} y={Hh - B + 14} fontSize={10.5} textAnchor={i === 0 ? 'start' : i === 96 ? 'end' : 'middle'} fill={k.muted}>
+        <text key={i} x={x(i)} y={Hh - B + 14} fontSize={12} textAnchor={i === 0 ? 'start' : i === 96 ? 'end' : 'middle'} fill={k.muted}>
           {i === 96 ? '12am' : clock(i).replace(':00 ', '')}
         </text>
       ))}
       {da && <path d={stepPath(da)} fill="none" stroke={k.base} strokeWidth={1.6} strokeDasharray="4 3" />}
       <path d={stepPath(rt)} fill="none" stroke={k.text} strokeWidth={1.5} strokeLinejoin="round" />
-      <text x={Math.min(Math.max(x(peak), 70), W - 70)} y={T - 3} fontSize={10.5} textAnchor="middle" fill={k.text} fontWeight={600}>
+      <text x={Math.min(Math.max(x(peak), 70), W - 70)} y={T - 3} fontSize={12} textAnchor="middle" fill={k.text} fontWeight={600}>
         ${Math.round(hi).toLocaleString('en-US')}/MWh
       </text>
-      <g fontSize={10.5}>
+      <g fontSize={12}>
         <line x1={L} x2={L + 18} y1={Hh - 8} y2={Hh - 8} stroke={k.text} strokeWidth={1.5} />
         <text x={L + 24} y={Hh - 4} fill={k.muted}>Real-time (15 min)</text>
         {da && (
@@ -169,20 +172,20 @@ export function SpikeDiagram() {
       {rects.map((r, i) => <rect key={i} x={r.x + 0.5} y={Bt - r.h} width={r.w - 1} height={r.h} fill={r.c} opacity={0.5} rx={2} />)}
       <line x1={L} x2={R} y1={Bt} y2={Bt} stroke={k.line} />
       <line x1={L} x2={L} y1={T} y2={Bt} stroke={k.line} />
-      <text x={L - 6} y={T + 6} fontSize={10.5} textAnchor="end" fill={k.muted} transform={`rotate(-90 ${L - 6} ${T + 6})`} dy={-2}>Price</text>
+      <text x={L - 6} y={T + 6} fontSize={12} textAnchor="end" fill={k.muted} transform={`rotate(-90 ${L - 6} ${T + 6})`} dy={-2}>Price</text>
       {[[d1, 'Normal evening', k.blue], [d2, 'Hot, calm evening', k.orange]].map(([d, t, c]) => {
         const xx = L + (d as number) * wd;
         return (
           <g key={t as string}>
             <line x1={xx} x2={xx} y1={yAt(d as number) - 4} y2={Bt} stroke={c as string} strokeWidth={2} />
             <circle cx={xx} cy={yAt(d as number) - 4} r={4} fill={c as string} />
-            <text x={xx} y={Bt + 15} fontSize={10.5} textAnchor="middle" fill={c as string} fontWeight={600}>{t as string}</text>
+            <text x={xx} y={Bt + 15} fontSize={11.5} textAnchor="middle" fill={c as string} fontWeight={600}>{t as string}</text>
           </g>
         );
       })}
-      <text x={L + 0.17 * wd} y={Bt - 4} fontSize={10} textAnchor="middle" fill={k.text}>cheap</text>
-      <text x={L + 0.96 * wd} y={T + 8} fontSize={10} textAnchor="end" fill={k.text} dx={4}>scarce</text>
-      <text x={(L + R) / 2} y={162} fontSize={10.5} textAnchor="middle" fill={k.muted}>Schematic: sources from cheapest to dearest, left to right</text>
+      <text x={L + 0.17 * wd} y={Bt - 4} fontSize={12} textAnchor="middle" fill={k.text}>cheap</text>
+      <text x={L + 0.96 * wd} y={T + 8} fontSize={12} textAnchor="end" fill={k.text} dx={4}>scarce</text>
+      <text x={(L + R) / 2} y={162} fontSize={12} textAnchor="middle" fill={k.muted}>Schematic: sources from cheapest to dearest, left to right</text>
     </Frame>
   );
 }

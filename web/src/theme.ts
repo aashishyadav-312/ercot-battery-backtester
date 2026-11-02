@@ -95,7 +95,7 @@ export const theme = createTheme({
       classNames: { content: classes.modalContent, header: classes.modalHeader, title: classes.modalTitle },
     }),
     Table: Table.extend({ defaultProps: { tabularNums: true, verticalSpacing: 7, horizontalSpacing: 'sm', fz: 'sm' }, classNames: { table: classes.table, th: classes.th, tr: classes.tr } }),
-    Anchor: Anchor.extend({ classNames: { root: classes.anchor } }),
+    Anchor: Anchor.extend({ defaultProps: { underline: 'always' }, classNames: { root: classes.anchor } }),
     Badge: Badge.extend({ defaultProps: { radius: 'sm' }, classNames: { root: classes.badge } }),
     Alert: Alert.extend({ defaultProps: { radius: 'lg', variant: 'light' }, classNames: { root: classes.alert, title: classes.alertTitle } }),
     Skeleton: Skeleton.extend({ classNames: { root: classes.skeleton } }),
@@ -144,9 +144,18 @@ export const cssVariablesResolver: CSSVariablesResolver = () => {
     '--mantine-color-accent-outline-hover': 'color-mix(in srgb, var(--amber) 16%, transparent)',
     '--mantine-color-accent-text': 'var(--amber-text)',
   };
+  // Mantine's light-variant text colours (alert titles, badge labels) are its mid shades, which miss 4.5:1 on the cream page.
+  // On the light page they take the token text colours instead; on dark Mantine's own tints already pass.
+  const lightText = {
+    '--mantine-color-yellow-light-color': 'var(--amber-text)',
+    '--mantine-color-orange-light-color': 'var(--amber-text)',
+    '--mantine-color-red-light-color': 'var(--down)',
+    '--mantine-color-green-light-color': 'var(--mint-text)',
+    '--mantine-color-teal-light-color': 'var(--mint-text)',
+  };
   return {
     variables: { '--app-ease': 'var(--ease)', '--app-ease-inout': 'cubic-bezier(0.65, 0, 0.35, 1)' },
-    light: both,
+    light: { ...both, ...lightText },
     dark: both,
   };
 };

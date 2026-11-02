@@ -34,7 +34,7 @@ export function QueuePanel({ queue }: { queue: ContextFile['queue'] }) {
       <Text size="sm" c="dimmed" mb="sm">
         {num(queue.total_mw)} MW across {num(queue.total_projects)} battery projects in the queue ({queue.published}). The twelve largest counties:
       </Text>
-      <Table.ScrollContainer minWidth={480}>
+      <Table.ScrollContainer minWidth={480} scrollAreaProps={{ viewportProps: { tabIndex: 0, role: 'region', 'aria-label': 'Queue by county table, scrolls sideways when it does not fit' } }}>
         <Table verticalSpacing={4} fz="sm">
           <Table.Thead>
             <Table.Tr><Table.Th>County</Table.Th><Table.Th ta="right">Queued MW</Table.Th><Table.Th ta="right">Projects</Table.Th><Table.Th ta="right">MW with signed agreement</Table.Th></Table.Tr>

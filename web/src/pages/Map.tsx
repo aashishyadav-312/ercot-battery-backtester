@@ -106,7 +106,7 @@ export default function MapPage() {
         <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label="All locations">
           <Text component="h2" fw={620} size="md" c="bright" m={0} mb={2}>All locations</Text>
           <Text size="sm" c="dimmed" mb="sm">The same figures as the map, for keyboard use and for nodes without a marker. Select a name to open its panel.</Text>
-          <Table.ScrollContainer minWidth={560}>
+          <Table.ScrollContainer minWidth={560} scrollAreaProps={{ viewportProps: { tabIndex: 0, role: 'region', 'aria-label': 'All locations table, scrolls sideways when it does not fit' } }}>
             <Table>
               <Table.Thead>
                 <Table.Tr>

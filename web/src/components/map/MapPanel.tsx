@@ -87,7 +87,7 @@ export function MapPanel({ loc, locations, index }: { loc: LocationRec; location
   const tracked = locations.filter((l) => l.type === 'node' && l.nearest_hub === loc.code);
 
   return (
-    <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="aside" aria-label={`Details for ${locName(loc.code)}`} aria-live="polite">
+    <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label={`Details for ${locName(loc.code)}`} aria-live="polite">
       <Stack gap="md">
         <div>
           <Title order={3} fz={22} lh={1.2}>{loc.name}</Title>

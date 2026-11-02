@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef } from 'react';
 import { Group, Skeleton, Text } from '@mantine/core';
 import { useApp } from './state';
 import { Selectors } from './components/Selectors';
+import { CardHeadingLevel } from './components/Card';
 import { Ticker } from './components/shell/Ticker';
 import { Header } from './components/shell/Header';
 import { ViewBar } from './components/shell/ViewBar';
@@ -26,6 +27,9 @@ import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
 const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'guide', 'method', 'live'];
+
+/** Run pages whose cards sit directly under the h1. */
+const FLAT_HEADINGS: Page[] = ['overview', 'revenue', 'dispatch', 'realism', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
   home: Home, atlas: Atlas, studio: Studio, research: Research, guide: Guide, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
@@ -71,7 +75,7 @@ export default function App() {
         {selectors && <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>}
         {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
         <div key={page} className="app-enter">
-          {error ? <Text c="red">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><Page /></Suspense>}
+          {error ? <Text c="var(--down)">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><CardHeadingLevel.Provider value={FLAT_HEADINGS.includes(page) ? 2 : 3}><Page /></CardHeadingLevel.Provider></Suspense>}
         </div>
       </main>
       <Footer index={index} sel={sel} />

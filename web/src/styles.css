@@ -1,5 +1,5 @@
 /* Global base only. Tokens are in styles/tokens.css; Mantine's mapping is in theme.ts and theme.module.css. */
-html { background: var(--bg); }
+html { background: var(--bg); scroll-padding-top: calc(var(--app-header-h) + 16px); } /* keyboard focus scrolls clear of the sticky header (WCAG 2.4.11) */
 body {
   background: var(--bg);
   color: var(--text);
@@ -33,6 +33,12 @@ code {
   outline: 2px solid var(--amber-text);
   outline-offset: 2px;
 }
+
+/* Reading measure: running text stops at about 75 characters, and a last line is not left with one word. Zero specificity,
+   so a component that sets its own width keeps it. */
+:where(main p, footer p) { max-width: 75ch; text-wrap: pretty; }
+/* Input hints under a label: 13px at a readable leading (Mantine's default is 11px at 1.2). */
+:root .mantine-InputWrapper-description, :root .mantine-Select-description, :root .mantine-NumberInput-description { font-size: 13px; line-height: 1.45; }
 
 /* Scrollbars follow the tokens where the browser lets them. */
 * { scrollbar-color: var(--line-2) transparent; }

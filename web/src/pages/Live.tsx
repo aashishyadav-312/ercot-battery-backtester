@@ -196,7 +196,7 @@ function SoFarCard({ s, loc, durationH }: { s: LiveState; loc: string; durationH
       {(ex) => so.prices.length < 2 ? (
         <Text size="sm" c="dimmed">Too few real-time prices yet today. The first ones post a few minutes after 12:15 AM CT.</Text>
       ) : solved?.error ? (
-        <Text size="sm" c="red">Could not solve: {solved.error}</Text>
+        <Text size="sm" c="var(--down)">Could not solve: {solved.error}</Text>
       ) : !r ? (
         <Text size="sm" c="dimmed">Solving…</Text>
       ) : (
@@ -300,7 +300,7 @@ export default function Live() {
         </Alert>
       )}
       {hot.length > 0 && (
-        <Alert color="red" variant="filled" icon={<IconWarn />} title="Price spike">
+        <Alert color="red" icon={<IconWarn />} title="Price spike">
           {hot.map((h) => `${locFull(h.loc)} ${usd(h.last.price, 2)}/MWh at ${ctTime(intervalStart(s.today, h.last.index))} CT`).join(' · ')}
           {' '}(threshold {usd(SPIKE_THRESHOLD, 0)}/MWh).
         </Alert>

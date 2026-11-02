@@ -211,6 +211,10 @@ A thin strip above the header in inverted colors (light on a dark page, dark on 
 - **Do** keep text at 4.5:1 or better against its surface in both themes (a test reads `tokens.css` and checks the pairs).
 - **Do** use tabular numerals for figures and the mono face for labels and tickers.
 - **Do** label upper bounds, illustrative values and unavailable data in words.
+- **Do** keep every pointer target at 24px or more (a link inside a sentence is exempt), underline links in text, and give keyboard focus room under the sticky header (`scroll-padding-top` in `styles.css`).
+- **Do** give every scrolling table box `tabindex="0"`, `role="region"` and its own label; give every chart a name and its numbers as a table.
+- **Do** use a card heading one level below its section (`CardHeadingLevel` lets a page that has only an h1 use h2).
+- **Do** take status colors for text from `--up`, `--down`, `--amber-text` and `--mint-text`; Mantine's own light-variant shades are overridden on the light page for that reason.
 - **Do** make every moving element removable under `prefers-reduced-motion`, and animate transform or opacity rather than width, height or layout.
 
 ### Don't:

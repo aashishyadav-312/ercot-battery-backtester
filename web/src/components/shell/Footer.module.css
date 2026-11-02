@@ -2,5 +2,5 @@
 .inner { max-width: var(--container); margin: 0 auto; padding: 32px var(--gutter) 40px; box-sizing: content-box; }
 .lead { margin: 0 0 12px; max-width: 70ch; color: var(--muted); font-size: 15px; line-height: 1.55; }
 .small { margin: 0 0 6px; max-width: 80ch; color: var(--faint); font-size: 13px; line-height: 1.6; }
-.small a { color: var(--text); text-underline-offset: 3px; }
+.small a { display: inline-block; padding-block: 4px; color: var(--text); text-underline-offset: 3px; } /* 24px target, 2.5.8 */
 .small a:hover { color: var(--amber-text); }

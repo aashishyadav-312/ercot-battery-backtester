@@ -24,7 +24,7 @@ export function Info({ terms, size = 16 }: { terms: string | string[]; size?: nu
       }
     >
       <ActionIcon
-        variant="transparent" color="gray" size={size + 4} radius="xl" aria-label={`What does this mean: ${names}`}
+        variant="transparent" color="gray" size={Math.max(size + 4, 24)} radius="xl" aria-label={`What does this mean: ${names}`}
         style={{ flexShrink: 0, verticalAlign: 'middle' }}
       >
         <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
