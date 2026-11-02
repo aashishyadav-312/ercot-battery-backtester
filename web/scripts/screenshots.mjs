@@ -68,8 +68,8 @@ try {
 
       for (const p of pages) {
         await page.goto(`${base}#/${route(p)}?loc=HB_HOUSTON&dur=2&year=2025&deg=10`);
-        // The custom run solves in the browser after load; wait for its results.
-        if (p === 'custom') await page.getByText(/days solved in/).waitFor({ timeout: 120_000 });
+        // The custom run solves in the browser after load; wait for its results. Studio (design step 4) opens a preset.
+        if (p === 'custom') await page.getByText(/days solved in|Precomputed ·|Solved in your browser/).first().waitFor({ timeout: 120_000 });
         await settle(page);
         if (arg('strategy', 'energy') === 'stacked' && ['overview', 'revenue', 'realism'].includes(p)) {
           await page.getByText('Energy + AS', { exact: true }).click();
@@ -80,16 +80,18 @@ try {
         shots++;
       }
 
-      // Data-quality note on a volatile node, and node-vs-hub on Compare.
-      for (const [file, url] of [
+      // Data-quality note on a volatile node, node-vs-hub on Compare (Studio since step 4), and inputs Studio has to solve.
+      for (const [file, url, ready] of [
         ...(only ? [] : [
           ['data-quality', 'research/overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
           ['compare-node', 'studio/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
         ]),
         // A resource node selected in the Atlas (an old #/map?loc= link opens on that node).
         ...(!only || pages.includes('map') ? [['map-node', 'atlas?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
+        ...(!only || pages.includes('custom') ? [['custom-solved', 'studio/custom?loc=HB_WEST&mw=250&dur=1.5&rte=90&deg=5&soc=20&from=2025-06-01&to=2025-08-31&strat=da', /days solved in|Solved in your browser/]] : []),
       ]) {
         await page.goto(`${base}#/${url}`);
+        if (ready) await page.getByText(ready).first().waitFor({ timeout: 120_000 });
         await settle(page);
         await overflow(page, `${tag}/${file}`);
         await page.screenshot({ path: name(file, size, scheme), fullPage: true });

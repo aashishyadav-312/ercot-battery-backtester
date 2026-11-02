@@ -497,7 +497,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
     body = (
       <Text size="sm" c="dimmed" py="md">
         None of the sampled resource nodes sits in {hub ? locFull(hub) : 'this hub'}&rsquo;s load zone, so there is no node to compare. Hubs with nodes:{' '}
-        {locFull('HB_WEST')} ({(['RUSSEKST_RN', 'ANSON1_ALL']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('compare', { location: c })}>{locFull(c)}</Anchor></span>)}) and {locFull('HB_SOUTH')} ({(['CAMWIND_RN', 'RHESS2_ESS1', 'WIPOPA_3_4']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('compare', { location: c })}>{locFull(c)}</Anchor></span>)}).
+        {locFull('HB_WEST')} ({(['RUSSEKST_RN', 'ANSON1_ALL']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('studio', { location: c })}>{locFull(c)}</Anchor></span>)}) and {locFull('HB_SOUTH')} ({(['CAMWIND_RN', 'RHESS2_ESS1', 'WIPOPA_3_4']).map((c, i) => <span key={c}>{i > 0 && ', '}<Anchor component="button" size="sm" onClick={() => go('studio', { location: c })}>{locFull(c)}</Anchor></span>)}).
       </Text>
     );
   } else {
@@ -607,7 +607,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
                   {data.map(({ r, top }) => (
                     <Table.Tr key={r.location} fw={r.location === sel.location ? 600 : undefined}>
                       <Table.Td>
-                        <Anchor component="button" size="sm" c="inherit" underline="always" onClick={() => go('compare', { location: r.location })} fw="inherit">{locFull(r.location)}</Anchor>
+                        <Anchor component="button" size="sm" c="inherit" underline="always" onClick={() => go('studio', { location: r.location })} fw="inherit">{locFull(r.location)}</Anchor>
                         {grp(r.location) && <Badge ml={6} size="xs" variant="light" color={grp(r.location)!.group === 'high' ? 'yellow' : 'gray'}>{grp(r.location)!.group === 'high' ? 'volatile' : 'typical'}</Badge>}
                       </Table.Td>
                       <Table.Td ta="right">{usd(r.revenue_per_kw_year)}</Table.Td>

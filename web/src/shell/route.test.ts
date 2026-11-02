@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, pathOf, resolveHash, tabOf, tabPath, type Page } from './route';
+import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, pathOf, resolveHash, tabOf, tabPath, type OldRoute } from './route';
 
 /** Where every route from before the redesign now lives (docs/REDESIGN.md, "Old to new routes"). */
-const OLD_TO_NEW: Record<Exclude<Page, 'home' | 'atlas'>, string> = {
+const OLD_TO_NEW: Record<OldRoute, string> = {
   start: '#/guide/start',
   map: '#/atlas',
   live: '#/home/live',
@@ -10,8 +10,8 @@ const OLD_TO_NEW: Record<Exclude<Page, 'home' | 'atlas'>, string> = {
   revenue: '#/research/revenue',
   dispatch: '#/research/dispatch',
   realism: '#/research/realism',
-  compare: '#/studio/compare',
-  custom: '#/studio/custom',
+  compare: '#/studio',
+  custom: '#/studio',
   economics: '#/studio/economics',
   method: '#/research/method',
   about: '#/guide/about',
@@ -25,7 +25,8 @@ describe('old routes redirect to their new home', () => {
   it.each(OLD_PAGES)('#/%s resolves to its new home and asks for the URL to be rewritten', (page) => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
-    expect(r.page).toBe(page === 'map' ? 'atlas' : page); // the Map page was replaced by the Atlas
+    // The Map page was replaced by the Atlas; Custom run and Compare by Studio.
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : page);
 
     expect(r.redirected).toBe(true);
   });
@@ -66,7 +67,7 @@ describe('new routes', () => {
     expect(r.page).toBe('overview');
     expect(r.canonical).toBe('#/research/overview?loc=HB_PAN');
     expect(r.redirected).toBe(true);
-    expect(tabPath('studio')).toBe('studio/custom');
+    expect(tabPath('studio')).toBe('studio');
   });
 
   it('falls back to the default view of a tab for an unknown view', () => {
@@ -92,6 +93,17 @@ describe('new routes', () => {
     const d = resolveHash('#/atlas/detailed?loc=HB_WEST&dur=4');
     expect([d.page, d.tab, d.redirected]).toEqual(['map', 'atlas', false]);
     expect(buildHash('map', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/atlas/detailed?loc=HB_WEST&dur=4&year=2025&deg=10');
+  });
+
+  it('serves Studio at #/studio, and sends the step 1-3 Studio URLs there with their inputs', () => {
+    expect([resolveHash('#/studio').page, resolveHash('#/studio').redirected]).toEqual(['studio', false]);
+    const q = 'loc=HB_WEST&mw=250&dur=1.5&rte=90&deg=5&soc=20&from=2025-06-01&to=2025-08-31&strat=da';
+    for (const old of ['#/studio/custom', '#/studio/compare', '#/custom', '#/compare']) {
+      const r = resolveHash(`${old}?${q}`);
+      expect([r.page, r.tab, r.redirected, r.canonical]).toEqual(['studio', 'studio', true, `#/studio?${q}`]);
+    }
+    expect(resolveHash('#/studio/economics').page).toBe('economics');
+    expect(buildHash('studio', { location: 'RUSSEKST_RN', duration: 4, year: 2024, deg: 0 })).toBe('#/studio?loc=RUSSEKST_RN&dur=4&year=2024&deg=0');
   });
 
   it("serves Home at #/home and today's prices at #/home/live, without a redirect", () => {

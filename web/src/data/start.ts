@@ -17,6 +17,8 @@ export interface GuideCard {
   cta: string;
   /** Alt text for the thumbnail. */
   alt: string;
+  /** Thumbnail name in public/thumbs/ when it is not the page's own (a page that replaced the pictured one). */
+  thumb?: string;
 }
 
 export const GUIDE: GuideCard[] = [
@@ -42,11 +44,11 @@ export const GUIDE: GuideCard[] = [
     alt: 'Thumbnail of the Dispatch page: an hour-by-month heatmap in blue and orange.',
   },
   {
-    page: 'compare', title: 'Compare',
+    page: 'studio', thumb: 'compare', title: 'Studio',
     question: 'Does location or battery length change the answer?',
-    shows: 'The same battery at a resource node against its hub, 1 vs 2 vs 4 hours, and all ten locations ranked.',
-    open: { location: 'RUSSEKST_RN' }, cta: 'Open Compare for a West Texas node',
-    alt: 'Thumbnail of the Compare page: a resource node against its hub, and a ranking of all locations.',
+    shows: 'Your own battery on real prices: 1 vs 2 vs 4 hours, a resource node against its hub, and all ten locations ranked.',
+    open: { location: 'RUSSEKST_RN' }, cta: 'Open Studio for a West Texas node',
+    alt: 'Thumbnail of the former Compare page, now part of Studio: a resource node against its hub, and a ranking of all locations.',
   },
   {
     page: 'realism', title: 'Realism',

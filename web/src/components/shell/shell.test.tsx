@@ -75,7 +75,7 @@ describe('Header', () => {
     expect(links.map((l) => l.getAttribute('href'))).toEqual([
       '#/home?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/atlas?loc=HB_WEST&dur=4&year=2025&deg=10',
-      '#/studio/custom?loc=HB_WEST&dur=4&year=2025&deg=10',
+      '#/studio?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/research/overview?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/guide/start?loc=HB_WEST&dur=4&year=2025&deg=10',
     ]);

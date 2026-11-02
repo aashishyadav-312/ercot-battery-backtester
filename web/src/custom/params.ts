@@ -1,4 +1,4 @@
-// Custom-run inputs <-> URL query (#/custom?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&from=2025-06-01&to=2025-08-31&strat=da).
+// Studio inputs <-> URL query (#/studio?loc=HB_WEST&mw=100&dur=1.5&rte=88&deg=5&soc=0&from=2025-06-01&to=2025-08-31&strat=da).
 // Values outside the allowed ranges are clamped; anything unreadable falls back to the default,
 // so a hand-edited or old link always opens a valid run.
 import type { CustomParams } from './runner';
@@ -12,6 +12,8 @@ export interface CustomForm {
   /** Percent, as typed. */
   rtePct: number;
   degCost: number;
+  /** Start (and end) state of charge of each day, percent of energy, as typed. */
+  socPct: number;
   startDate: string;
   endDate: string;
   strategy: Strategy;
@@ -22,6 +24,7 @@ export const LIMITS = {
   durationH: { min: 0.5, max: 8 },
   rtePct: { min: 50, max: 100 },
   degCost: { min: 0, max: 200 },
+  socPct: { min: 0, max: 100 },
 } as const;
 
 export const FORM_DEFAULTS: CustomForm = {
@@ -30,6 +33,7 @@ export const FORM_DEFAULTS: CustomForm = {
   durationH: 2,
   rtePct: 85,
   degCost: 10,
+  socPct: 0,
   startDate: '2025-01-01',
   endDate: '2025-12-31',
   strategy: 'pf',
@@ -85,6 +89,7 @@ export function parseForm(query: string, coverage: Coverage[]): CustomForm {
     durationH: numberParam(q, 'dur', FORM_DEFAULTS.durationH, LIMITS.durationH),
     rtePct: numberParam(q, 'rte', FORM_DEFAULTS.rtePct, LIMITS.rtePct),
     degCost: numberParam(q, 'deg', FORM_DEFAULTS.degCost, LIMITS.degCost),
+    socPct: numberParam(q, 'soc', FORM_DEFAULTS.socPct, LIMITS.socPct),
     ...fitRange(location, from, to, coverage),
     strategy: q.get('strat') === 'da' ? 'da' : 'pf',
   };
@@ -98,6 +103,7 @@ export function formQuery(f: CustomForm): string {
     dur: String(f.durationH),
     rte: String(f.rtePct),
     deg: String(f.degCost),
+    soc: String(f.socPct),
     year: f.startDate.slice(0, 4),
     from: f.startDate,
     to: f.endDate,
@@ -114,13 +120,21 @@ export function toParams(f: CustomForm): CustomParams {
     durationH: f.durationH,
     rte: f.rtePct / 100,
     degCost: f.degCost,
+    soc0Frac: f.socPct / 100,
   };
 }
 
-/** The same inputs as one of the precomputed results (100 MW, 85%, a full year), if any. */
+/** Battery settings the precomputed results were run with: 85% round trip, empty at the start and end of each day. */
+export const PRECOMPUTED = { rtePct: 85, socPct: 0, durations: [1, 2, 4], degs: [0, 10] } as const;
+
+/**
+ * The precomputed result these inputs ask for, if the battery settings are ones that were precomputed. Power is not
+ * checked: revenue per kW does not depend on it (every constraint scales with power), so power only scales dollar
+ * totals. Dates are not checked either; the caller compares them with the run's own first and last day.
+ */
 export function precomputedKey(f: CustomForm) {
-  const year = Number(f.startDate.slice(0, 4));
-  const fullYear = f.startDate === `${year}-01-01`;
-  if (!fullYear || f.powerMw !== 100 || f.rtePct !== 85 || ![1, 2, 4].includes(f.durationH) || ![0, 10].includes(f.degCost)) return null;
-  return { location: f.location, year, duration: f.durationH, deg: f.degCost, endDate: f.endDate };
+  const P = PRECOMPUTED;
+  if (f.rtePct !== P.rtePct || f.socPct !== P.socPct) return null;
+  if (!(P.durations as readonly number[]).includes(f.durationH) || !(P.degs as readonly number[]).includes(f.degCost)) return null;
+  return { location: f.location, year: Number(f.startDate.slice(0, 4)), duration: f.durationH, deg: f.degCost };
 }

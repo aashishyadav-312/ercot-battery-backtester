@@ -11,11 +11,6 @@ export interface Hero {
   plain: string;
 }
 
-const ORD = (n: number) => {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return `${n}${s[(v - 20) % 10] || s[v] || s[0]}`;
-};
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const period = (r: Run) => (r.metrics.annualized ? `${r.meta.year} year-to-date` : String(r.meta.year));
 const hour = (h: number) => `${String(h).padStart(2, '0')}:00`;
@@ -52,16 +47,6 @@ function dispatchShape(r: Run): Hero | null {
   return make(['On a typical day this battery charged hardest at ', { em: hour(lo) }, ' and discharged hardest at ', { em: hour(hi) }, '.']);
 }
 
-function rank(sel: Selection, index: IndexRun[]): Hero | null {
-  const rows = index
-    .filter((r) => r.year === sel.year && r.duration_h === sel.duration && r.deg_cost_per_mwh === sel.deg)
-    .sort((a, b) => b.revenue_per_kw_year - a.revenue_per_kw_year);
-  const i = rows.findIndex((r) => r.location === sel.location);
-  if (i < 0) return null;
-  const yr = rows[i].annualized ? `${sel.year} so far` : String(sel.year);
-  return make([`${locFull(sel.location)} ranks `, { em: ORD(i + 1) }, ` of ${rows.length} locations for a ${sel.duration}-hour battery in ${yr}.`]);
-}
-
 function capture(r: Run): Hero | null {
   const c = r.metrics.capture_rate;
   if (c == null) return null;
@@ -82,7 +67,6 @@ function mapSpread(sel: Selection, index: IndexRun[]): Hero | null {
 
 export function heroFor(page: Page, run: Run | undefined, sel: Selection, index: IndexRun[] | null): Hero | null {
   if (page === 'map') return index ? mapSpread(sel, index) : null;
-  if (page === 'compare') return index ? rank(sel, index) : null;
   if (!run) return null;
   if (page === 'realism') return capture(run) ?? concentration(run);
   if (page === 'revenue') return bestMonth(run) ?? concentration(run);
