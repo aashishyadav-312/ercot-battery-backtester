@@ -37,7 +37,7 @@ export default function About() {
             Apache ECharts.
           </List.Item>
           <List.Item>
-            <b>Published benchmarks</b> used for the sanity check on the <Anchor size="sm" href="#/method">Method</Anchor> page are cited there.
+            <b>Published benchmarks</b> used for the sanity check on the <Anchor size="sm" href="#/research/method">Method</Anchor> page are cited there.
           </List.Item>
         </List>
       </Section>

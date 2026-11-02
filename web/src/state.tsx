@@ -1,23 +1,28 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { IndexRun, NodeSelection, Run, Selection } from './data/types';
 import { DEGS, DURATIONS, YEARS, loadIndex, loadNodeSelection, loadRun } from './data/loader';
+import { buildHash, resolveHash, type Page, type Tab } from './shell/route';
 
-export type Page = 'start' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'compare' | 'realism' | 'economics' | 'custom' | 'method' | 'about';
-export const PAGES: Page[] = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
+export { PAGES, buildHash } from './shell/route';
+export type { Page, Tab } from './shell/route';
 
 const DEFAULT: Selection = { location: 'HB_HOUSTON', duration: 2, year: 2025, deg: 10 };
 
-/** State lives in the URL hash (#/revenue?loc=HB_WEST&dur=4&year=2025&deg=10) so views are shareable on static hosting. */
-function parseHash(): { page: Page; sel: Selection } {
-  const h = window.location.hash.replace(/^#\/?/, '');
-  const [path, query = ''] = h.split('?');
-  const page = (PAGES as string[]).includes(path) ? (path as Page) : 'overview';
-  const q = new URLSearchParams(query);
+/**
+ * State lives in the URL hash (#/research/revenue?loc=HB_WEST&dur=4&year=2025&deg=10) so views are shareable on static hosting.
+ * Routes from before the redesign (#/revenue?...) resolve to their new home; `redirected` tells the provider to rewrite the URL.
+ */
+function parseHash(): { page: Page; tab: Tab; redirected: boolean; canonical: string; sel: Selection } {
+  const r = resolveHash(window.location.hash);
+  const q = new URLSearchParams(r.query);
   const dur = Number(q.get('dur'));
   const year = Number(q.get('year'));
   const deg = Number(q.get('deg'));
   return {
-    page,
+    page: r.page,
+    tab: r.tab,
+    redirected: r.redirected,
+    canonical: r.canonical,
     sel: {
       location: q.get('loc') || DEFAULT.location,
       duration: DURATIONS.includes(dur) ? dur : DEFAULT.duration,
@@ -27,13 +32,9 @@ function parseHash(): { page: Page; sel: Selection } {
   };
 }
 
-export function buildHash(page: Page, s: Selection) {
-  const q = new URLSearchParams({ loc: s.location, dur: String(s.duration), year: String(s.year), deg: String(s.deg) });
-  return `#/${page}?${q}`;
-}
-
 interface Ctx {
   page: Page;
+  tab: Tab;
   sel: Selection;
   setSel: (patch: Partial<Selection>) => void;
   go: (page: Page, patch?: Partial<Selection>) => void;
@@ -49,6 +50,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [index, setIndex] = useState<IndexRun[] | null>(null);
   const [nodes, setNodes] = useState<NodeSelection | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // An old or unknown URL is rewritten in place (no new history entry), so Back does not return to the old route.
+  useEffect(() => {
+    if (route.redirected) window.history.replaceState(null, '', route.canonical);
+  }, [route]);
 
   useEffect(() => {
     const on = () => setRoute(parseHash());
@@ -76,7 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ page: route.page, sel: route.sel, setSel, go, index, nodes, error }),
+    () => ({ page: route.page, tab: route.tab, sel: route.sel, setSel, go, index, nodes, error }),
     [route, setSel, go, index, nodes, error],
   );
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

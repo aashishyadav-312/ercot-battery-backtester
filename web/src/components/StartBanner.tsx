@@ -38,7 +38,7 @@ export function StartBanner() {
           <Text size="sm" c="dimmed" lh={1.5}>
             A short guide explains the market, walks through one real day of a battery trading, and shows how to read each page.{' '}
             <Anchor
-              href="#/start" fw={600} size="sm"
+              href="#/guide/start" fw={600} size="sm"
               onClick={(e) => { e.preventDefault(); markStartSeen(); go('start'); }}
             >
               Start here {'→'}

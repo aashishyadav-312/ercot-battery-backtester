@@ -3,46 +3,7 @@
  * backdrop materials and keyframes. Wired to components via `classNames` in theme.ts only.
  */
 
-/* ------------------------------------------------------------------ shell */
-.shell {
-  --app-shell-border-color: var(--app-hairline);
-}
-
-/* Translucent sticky bar: content scrolls under a blurred, saturated layer. The hairline
-   only appears once something is underneath it (data-scrolled), like a scroll-edge effect. */
-.header {
-  background-color: var(--app-glass);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid transparent;
-  transition: border-color 240ms var(--app-ease), background-color 240ms var(--app-ease);
-}
-.header[data-scrolled] {
-  border-bottom-color: var(--app-hairline);
-}
-
-.navbar {
-  background-color: var(--app-canvas);
-  border-right: 1px solid var(--app-hairline);
-}
-
-.main {
-  background-color: var(--app-canvas);
-  min-height: 100dvh;
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .header {
-    background-color: var(--app-canvas);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    border-bottom-color: var(--app-hairline);
-  }
-}
-@media (prefers-contrast: more) {
-  .header { background-color: var(--app-canvas); border-bottom-color: var(--app-hairline-strong); }
-  .paper[data-with-border] { border-color: var(--app-hairline-strong); }
-}
+/* The page shell (ticker, header, footer) is styled in src/components/shell/. */
 
 /* ------------------------------------------------------------------ type */
 /* Tracking is size-specific: tighten as type grows, open slightly as it shrinks. */
@@ -94,15 +55,20 @@
 .navSection { transition: color 160ms var(--app-ease); }
 
 /* ------------------------------------------------------------------ controls */
+/* Pill buttons with a 44px touch target (compact sizes stay compact). Feedback on press, not release. */
+.button { min-height: 44px; font-weight: 600; transition: background-color 160ms var(--app-ease), border-color 160ms var(--app-ease), transform 160ms var(--app-ease); }
+.button[data-size^='compact'] { min-height: 0; }
+.button:active:not(:disabled):not([data-disabled]) { transform: scale(0.97); }
 .actionIcon {
-  transition: background-color 140ms var(--app-ease), color 140ms var(--app-ease), transform 100ms var(--app-ease);
+  transition: background-color 140ms var(--app-ease), color 140ms var(--app-ease), transform 160ms var(--app-ease);
 }
 .actionIcon:where([data-variant='subtle']) { color: var(--mantine-color-dimmed); }
 .actionIcon:where([data-variant='subtle']):hover { color: var(--mantine-color-text); }
 /* Feedback on press, not release. */
-.actionIcon:active:not(:disabled) { transform: scale(0.94); }
+.actionIcon:active:not(:disabled) { transform: scale(0.97); }
 
 .selectInput {
+  min-height: 44px;
   font-weight: 520;
   font-variant-numeric: tabular-nums;
   background-color: var(--mantine-color-default-hover);
@@ -194,5 +160,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .skeleton[data-animate]::after { animation: none; }
-  .actionIcon:active:not(:disabled), .navLink:active { transform: none; }
+  .actionIcon:active:not(:disabled), .navLink:active, .button:active:not(:disabled):not([data-disabled]) { transform: none; }
+}
+
+@media (prefers-contrast: more) {
+  .paper[data-with-border] { border-color: var(--app-hairline-strong); }
 }

@@ -1,0 +1,19 @@
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; }
+.views { display: flex; flex-wrap: wrap; gap: 8px; }
+.view {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 18px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  transition: background-color 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
+}
+.view:hover { color: var(--text); background: var(--track); }
+.view:active { transform: scale(0.97); }
+.view[aria-current='page'] { color: var(--on-accent); background: var(--amber); border-color: var(--amber); }
+@media (prefers-reduced-motion: reduce) { .view:active { transform: none; } }

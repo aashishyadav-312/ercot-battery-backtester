@@ -1,0 +1,95 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
+  backdrop-filter: saturate(160%) blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 24px;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 8px var(--gutter);
+  box-sizing: content-box;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+  border-radius: var(--r-input);
+}
+.logo { color: var(--amber-text); flex: none; }
+.name {
+  font-family: var(--mantine-font-family-headings);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.nav { display: flex; justify-content: flex-end; gap: 4px; }
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding: 0 14px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: var(--r-pill);
+  transition: color 160ms var(--ease);
+}
+.tab::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transition: transform 420ms var(--ease);
+}
+.tab:hover { color: var(--text); }
+.tab[aria-current='page'] { color: var(--text); }
+.tab[aria-current='page']::after { transform: scaleX(1); }
+.toggle {
+  display: inline-grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: background-color 160ms var(--ease), transform 160ms var(--ease);
+}
+.toggle:hover { background: var(--track); }
+.toggle:active { transform: scale(0.97); }
+
+/* Phone: brand and toggle on the first row, the five tabs on a second row of their own. */
+@media (max-width: 760px) {
+  .inner { grid-template-columns: 1fr auto; row-gap: 0; padding-bottom: 0; }
+  .nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; margin-inline: -8px; overflow-x: auto; scrollbar-width: none; }
+  .tab { padding: 0 10px; flex: none; }
+  .tab::after { left: 10px; right: 10px; bottom: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab::after { transition: none; }
+  .toggle:active { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .header { background: var(--bg); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}

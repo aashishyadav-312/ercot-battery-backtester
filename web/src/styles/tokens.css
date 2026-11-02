@@ -1,0 +1,88 @@
+/*
+ * Chargeline design tokens (docs/REDESIGN.md). Dark is the default; [data-theme='light'] overrides it.
+ * The theme attribute is set before first paint (index.html) and kept in step by src/shell/scheme.ts.
+ * Mantine reads these through the variable resolver in src/theme.ts. Contrast of every text pair is
+ * asserted in src/shell/tokens.test.ts, so change a value there and the test says if it still passes.
+ */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0F1113;
+  --panel: #171A1D;
+  --panel-hi: #1C2024;
+  --line: #262B30;
+  --line-2: #3A4046;
+  --track: #242A2F;
+  --text: #E8E6E1;
+  --muted: #B8BDC2;
+  --faint: #A3A9AF;
+  --amber: #F2A93B;
+  --amber-text: #F2A93B;
+  --mint: #5FD6A4;
+  --mint-text: #5FD6A4;
+  --bone: #E8E6E1;
+  --on-accent: #0F1113;
+  --land: #1A1E22;
+  --land-stroke: #4A5259;
+  --dot-low: #8B949B;
+  --glass: rgba(23, 26, 29, 0.72);
+  --hero-glow: radial-gradient(900px 620px at 72% 52%, rgba(242, 169, 59, 0.12), rgba(95, 214, 164, 0.04) 45%, transparent 75%);
+
+  /* The ticker inverts against the page: a light strip on a dark page. */
+  --tick-bg: #ECEBE7;
+  --tick-text: #121212;
+  --tick-muted: #4A4741;
+  --tick-border: #7A766D;
+  --tick-dot: #D6451F;
+  --tick-up: #0B6A4A;
+  --tick-down: #A3331A;
+
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --container: 1200px;
+  --gutter: 32px;
+  --r-panel: 20px;
+  --r-card: 16px;
+  --r-input: 12px;
+  --r-pill: 999px;
+  --tap: 44px;
+  --app-header-h: 61px; /* sticky header height: one row on desktop */
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #F2F1ED;
+  --panel: #FAF9F6;
+  --panel-hi: #FFFFFF;
+  --line: #DAD7CF;
+  --line-2: #B4B0A5;
+  --track: #E4E1D9;
+  --text: #15171A;
+  --muted: #3F4348;
+  --faint: #55595E;
+  --amber: #F2A93B;
+  --amber-text: #8F5200;
+  --mint: #1E9A70;
+  --mint-text: #0B6A4A;
+  --bone: #15171A;
+  --on-accent: #15171A;
+  --land: #E4E2DB;
+  --land-stroke: #6E6A60;
+  --dot-low: #8A8E8A;
+  --glass: rgba(250, 249, 246, 0.82);
+  --hero-glow: radial-gradient(900px 620px at 72% 52%, rgba(242, 169, 59, 0.20), rgba(95, 214, 164, 0.06) 45%, transparent 75%);
+
+  --tick-bg: #121212;
+  --tick-text: #ECEBE7;
+  --tick-muted: #C9C6BF;
+  --tick-border: #8D8A83;
+  --tick-dot: #FF6A4A;
+  --tick-up: #7FE0B0;
+  --tick-down: #FFB09C;
+}
+
+@media (max-width: 640px) {
+  :root { --gutter: 16px; }
+}
+@media (max-width: 760px) {
+  :root { --app-header-h: 97px; } /* two rows: brand and toggle, then the tabs */
+}

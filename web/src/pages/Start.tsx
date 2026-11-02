@@ -199,7 +199,7 @@ export default function Start() {
           ))}
           <Text size="md" lh={1.55} maw={760}>
             The model is also a price taker: it assumes the battery does not move prices. A large fleet does, and that is what has been narrowing spreads.{' '}
-            <Anchor href="#/method" onClick={(e) => { e.preventDefault(); go('method'); }} fw={600}>Read the full list on the Method page {'→'}</Anchor>
+            <Anchor href="#/research/method" onClick={(e) => { e.preventDefault(); go('method'); }} fw={600}>Read the full list on the Method page {'→'}</Anchor>
           </Text>
         </Stack>
       </StartSection>

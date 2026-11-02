@@ -1,0 +1,80 @@
+/* The strip inverts against the page (see --tick-* in tokens.css). Motion is a plain horizontal slide of one track:
+   transform only, 56s linear, paused by the button, by hover and by keyboard focus, and off under reduced motion. */
+.ticker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 36px;
+  /* the strip spans the page; its content lines up with the header's */
+  padding: 0 max(var(--gutter), calc((100% - var(--container)) / 2));
+  background: var(--tick-bg);
+  color: var(--tick-text);
+  border-bottom: 1px solid var(--tick-border);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 12px;
+  line-height: 1;
+}
+.lead, .tail { display: flex; align-items: center; gap: 8px; flex: none; }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: 2px solid var(--tick-dot); box-sizing: border-box; }
+.dot[data-live] { background: var(--tick-dot); }
+.title { font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.badge {
+  padding: 3px 6px;
+  border: 1px solid var(--tick-text);
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.viewport { flex: 1; min-width: 0; overflow: hidden; align-self: stretch; display: flex; align-items: center; }
+.track { display: flex; width: max-content; animation: tick-slide 56s linear infinite; }
+.list { display: flex; align-items: center; justify-content: space-around; gap: 40px; margin: 0; padding: 0 20px; list-style: none; min-width: 100vw; }
+.item { display: inline-flex; gap: 8px; align-items: baseline; white-space: nowrap; }
+.sym { color: var(--tick-muted); }
+.px { font-weight: 500; font-variant-numeric: tabular-nums; }
+.chg { font-variant-numeric: tabular-nums; }
+.chg[data-dir='up'] { color: var(--tick-up); }
+.chg[data-dir='down'] { color: var(--tick-down); }
+.chg[data-dir='flat'] { color: var(--tick-muted); }
+.note { margin: 0; color: var(--tick-text); letter-spacing: 0.02em; }
+.unit { color: var(--tick-muted); }
+
+.pause {
+  min-height: 24px;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  color: var(--tick-text);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* The strip is 36px tall; the pointer target is padded out to 44px without growing it. */
+.pause { position: relative; }
+.pause::after { content: ''; position: absolute; inset: -10px -8px; }
+.pause:focus-visible { outline: 2px solid var(--tick-text); outline-offset: 2px; }
+
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.ticker[data-paused] .track,
+.viewport:hover .track,
+.viewport:focus-within .track { animation-play-state: paused; }
+
+@keyframes tick-slide { to { transform: translateX(-50%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .track { animation: none; width: auto; flex-wrap: wrap; }
+  .list { min-width: 0; flex-wrap: wrap; gap: 8px 24px; padding: 8px 0; justify-content: flex-start; }
+  .list[data-copy='dup'], .pause { display: none; }
+  .ticker { padding-block: 4px; }
+}
+
+/* Phone: the title and unit stay, the strip scrolls between them. */
+@media (max-width: 640px) {
+  .ticker { gap: 10px; }
+  .title { display: none; }
+}

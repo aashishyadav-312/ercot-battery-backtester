@@ -1,11 +1,11 @@
-/* Global base only. Component styling lives in the Mantine theme (theme.ts + theme.module.css). */
-html { background: var(--app-canvas); }
+/* Global base only. Tokens are in styles/tokens.css; Mantine's mapping is in theme.ts and theme.module.css. */
+html { background: var(--bg); }
 body {
-  background: var(--app-canvas);
+  background: var(--bg);
+  color: var(--text);
   font-optical-sizing: auto;
-  /* Running prose keeps proportional figures (tabular also widens the hyphen in this face).
-     Every displayed figure is tabular: tables, KPI values, selectors, charts and tooltips
-     opt in through the theme and the .tnum utility below. */
+  /* Running prose keeps proportional figures. Every displayed figure is tabular: tables, KPI values,
+     selectors, charts and tooltips opt in through the theme and the .tnum utility below. */
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -13,16 +13,28 @@ body {
 input, button, select, textarea { font-variant-numeric: inherit; }
 .tnum { font-variant-numeric: tabular-nums; }
 code {
+  font-family: var(--mantine-font-family-monospace);
   font-size: .88em; padding: 1px 5px; border-radius: 5px;
-  background: var(--mantine-color-default-hover); border: 1px solid var(--app-hairline);
+  background: var(--track); border: 1px solid var(--line);
 }
-::selection { background: color-mix(in srgb, var(--mantine-primary-color-filled) 24%, transparent); }
+::selection { background: color-mix(in srgb, var(--amber) 34%, transparent); color: var(--text); }
+
+/* One visible focus ring everywhere: amber on dark, the darker amber on light (3:1 or better on both pages). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible,
+[data-mantine-focus='auto']:focus-visible,
+[data-mantine-focus='always'] {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+
+/* Scrollbars follow the tokens where the browser lets them. */
+* { scrollbar-color: var(--line-2) transparent; }
 
 /* Content arrives: a short rise + fade. Reduced motion keeps only the fade. */
-@keyframes app-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes app-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes app-fade { from { opacity: 0; } to { opacity: 1; } }
-.app-enter { animation: app-enter 420ms var(--app-ease) both; }
-.app-fade { animation: app-fade 320ms var(--app-ease) both; }
+.app-enter { animation: app-enter 420ms var(--ease) both; }
+.app-fade { animation: app-fade 320ms var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .app-enter { animation-name: app-fade; animation-duration: 200ms; }
