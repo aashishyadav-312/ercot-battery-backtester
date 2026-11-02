@@ -29,6 +29,12 @@ await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
 const ALL_PAGES = ['start', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+// Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
+const ROUTES = {
+  start: 'guide/start', map: 'atlas', live: 'home', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
+  realism: 'research/realism', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
+};
+const route = (p) => ROUTES[p] ?? p;
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
@@ -61,7 +67,7 @@ try {
       page.on('pageerror', (e) => problems.push(`${tag} pageerror: ${e.message}`));
 
       for (const p of pages) {
-        await page.goto(`${base}#/${p}?loc=HB_HOUSTON&dur=2&year=2025&deg=10`);
+        await page.goto(`${base}#/${route(p)}?loc=HB_HOUSTON&dur=2&year=2025&deg=10`);
         // The custom run solves in the browser after load; wait for its results.
         if (p === 'custom') await page.getByText(/days solved in/).waitFor({ timeout: 120_000 });
         await settle(page);
@@ -77,13 +83,13 @@ try {
       // Data-quality note on a volatile node, and node-vs-hub on Compare.
       for (const [file, url] of [
         ...(only ? [] : [
-          ['data-quality', 'overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
-          ['compare-node', 'compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
+          ['data-quality', 'research/overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
+          ['compare-node', 'studio/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
         ]),
         // A resource node selected on the map (side panel showing a node vs its hub).
-        ...(!only || pages.includes('map') ? [['map-node', 'map?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
+        ...(!only || pages.includes('map') ? [['map-node', 'atlas?loc=RUSSEKST_RN&dur=2&year=2025&deg=10']] : []),
         // Heat mode: every resource node (Phase 12). Runs last because the mode is remembered in localStorage.
-        ...(!only || pages.includes('map') ? [['map-heat', 'map?view=heat&loc=HB_HOUSTON&dur=2&year=2025&deg=10']] : []),
+        ...(!only || pages.includes('map') ? [['map-heat', 'atlas?view=heat&loc=HB_HOUSTON&dur=2&year=2025&deg=10']] : []),
       ]) {
         await page.goto(`${base}#/${url}`);
         await settle(page);
@@ -93,7 +99,7 @@ try {
       }
 
       if (size === 'desktop' && !only) {
-        await page.goto(`${base}#/overview?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
+        await page.goto(`${base}#/research/overview?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
         await settle(page);
         await page.getByRole('button', { name: /Expand Dispatch pattern/ }).click();
         await page.waitForTimeout(1400);

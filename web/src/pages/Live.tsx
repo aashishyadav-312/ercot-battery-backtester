@@ -360,7 +360,7 @@ export default function Live() {
       <Text size="xs" c="dimmed" lh={1.6}>
         Source: ERCOT public API (real-time settlement point prices, NP6-905-CD; day-ahead settlement point prices, NP4-190-CD),
         fetched every 5 minutes by a small Cloudflare Worker that keeps the API key off this page. Prices are as first posted and can
-        be corrected later. Times are US Central. <Anchor href="#/method" size="xs">How the model works</Anchor>.
+        be corrected later. Times are US Central. <Anchor href="#/research/method" size="xs">How the model works</Anchor>.
       </Text>
     </Stack>
   );

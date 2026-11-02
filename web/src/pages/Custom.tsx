@@ -168,7 +168,7 @@ export default function Custom() {
   useEffect(() => {
     if (!coverage) return;
     const on = () => {
-      if (!window.location.hash.startsWith('#/custom')) return;
+      if (!window.location.hash.startsWith('#/studio/custom')) return;
       autoRan.current = false;
       setFormState(parseForm(hashQuery(), coverage));
     };
@@ -183,7 +183,7 @@ export default function Custom() {
       // Keep the dates inside one year this location has prices for.
       const next = { ...merged, ...fitRange(merged.location, merged.startDate, merged.endDate, coverage) };
       // replaceState keeps typing out of the browser history and doesn't fire hashchange.
-      history.replaceState(null, '', `#/custom?${formQuery(next)}`);
+      history.replaceState(null, '', `#/studio/custom?${formQuery(next)}`);
       return next;
     });
   }, [coverage]);
@@ -209,7 +209,7 @@ export default function Custom() {
   useEffect(() => {
     if (form && !autoRan.current) {
       autoRan.current = true;
-      history.replaceState(null, '', `#/custom?${formQuery(form)}`);
+      history.replaceState(null, '', `#/studio/custom?${formQuery(form)}`);
       run();
     }
   }, [form, run]);
