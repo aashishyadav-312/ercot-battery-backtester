@@ -44,7 +44,7 @@
   background: transparent;
   color: var(--muted);
   cursor: pointer;
-  transition: background-color 420ms var(--ease), color 420ms var(--ease), border-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .pill { border-radius: var(--r-pill); font-family: var(--mantine-font-family-monospace); font-size: 13px; }
 .zone { border-radius: var(--r-input); font: inherit; font-size: 14px; }
@@ -107,7 +107,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 420ms var(--ease), background-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: border-color 200ms var(--ease), background-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .topBtn:hover { background: var(--panel-hi); }
 .topBtn[aria-pressed='true'] { border-color: var(--amber); background: var(--panel-hi); }

@@ -105,6 +105,25 @@ Density is moderate and the measure is short. Figures are large where they are t
 - Rounded but not soft: pills for actions, 12/16/20px for inputs, cards and panels.
 - Motion is short, purposeful and fully removable.
 
+## Motion
+
+Easing is `--ease`, a strong ease-out (`cubic-bezier(.23,1,.32,1)`), for everything that enters, presses or recolors; `--ease-in-out` only for loops that have no start or end (the indeterminate progress bar and the map's breathing). No `ease-in`, no `transition: all`, nothing animates width, height, margin, padding or position. A test (`src/shell/motion.test.ts`) enforces this.
+
+| Interaction | Motion | Why |
+|---|---|---|
+| Page arrives | Top-level sections rise 8px and fade, 420ms, 40ms apart (0 to 190ms ceiling) | Marks a page change; nothing waits on it |
+| Bars (hub, duration, month, finding charts) | Reveal by `clip-path`, 700ms, once when they mount | Explains magnitude on first sight; no replay on re-render |
+| Press | scale .97, 160ms | Confirms the control heard the press |
+| Pill tabs, chips, selects | Color and border, 200ms | A click should feel answered, not replayed |
+| Header tab underline | scaleX, 240ms | Navigation, used all the time |
+| Map dots on a metric change | Fill, stroke and opacity, 420ms | Shows that the same places changed value; the one place a longer fade explains something. Dot size snaps (SVG attributes do not transition) |
+| Map top three | Halo breathes 4.5s, a ring leaves every 3s, each node a step behind the last | Points at the highest values; transform and opacity only |
+| Chart update (ECharts) | 320ms morph, 700ms first draw | Series move from where they were |
+| Ticker | 56s linear slide, Pause button, pauses on hover and focus | Constant motion is linear and must be stoppable |
+| Solver progress | scaleX, 240ms; indeterminate bar loops 1.2s | Retargets when the next month reports |
+
+Under `prefers-reduced-motion: reduce` a global rule in `styles.css` cuts every animation and transition to one frame (`0.01ms`) and stops loops, which also covers Mantine and inline styles. The ticker then lists its prices still, and the map's rings are hidden.
+
 ## Colors
 
 Warm near-black and warm paper neutrals with amber and mint accents. All values below are in the frontmatter; roles are described here.
@@ -165,7 +184,7 @@ Inputs and chips 12px, cards 16px, panels 20px, buttons and tabs fully round (99
 - **Shape:** pill (999px), 44px minimum height.
 - **Primary:** amber fill with dark text; the label states the action.
 - **Hover / Focus:** a slightly darker fill; focus is a 2px outline in amber (`amber-text` on light pages) with a 2px offset, on every interactive element.
-- **Press:** scale 0.97 over 160ms, off under reduced motion.
+- **Press:** scale 0.97 over 160ms on every pressable control, header tabs included; off under reduced motion.
 - **Secondary:** transparent with a `line-2` border.
 
 ### Tabs and view bars

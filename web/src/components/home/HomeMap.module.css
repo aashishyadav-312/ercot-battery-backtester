@@ -17,8 +17,8 @@
 .callout .calloutNote { fill: var(--amber-text); }
 
 /* The three highest values breathe and send out a ring every 3s (spec: 4.5s breath). Transform and opacity only. */
-.breathe .halo { transform-box: fill-box; transform-origin: center; animation: breathe 4.5s var(--ease) infinite; }
-.ring { fill: none; stroke-width: 1.2; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ring 3s var(--ease) infinite; }
+.breathe .halo { transform-box: fill-box; transform-origin: center; animation: breathe 4.5s var(--ease-in-out) calc(var(--n, 0) * -1.5s) infinite; }
+.ring { fill: none; stroke-width: 1.2; opacity: 0; transform-box: fill-box; transform-origin: center; animation: ring 3s var(--ease) calc(var(--n, 0) * -1s) infinite; }
 @keyframes breathe { 0%, 100% { opacity: 0.12; transform: scale(0.9); } 50% { opacity: 0.26; transform: scale(1.08); } }
 @keyframes ring { 0% { opacity: 0.55; transform: scale(1); } 100% { opacity: 0; transform: scale(3.2); } }
 

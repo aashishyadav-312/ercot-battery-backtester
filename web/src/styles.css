@@ -37,13 +37,33 @@ code {
 /* Scrollbars follow the tokens where the browser lets them. */
 * { scrollbar-color: var(--line-2) transparent; }
 
-/* Content arrives: a short rise + fade. Reduced motion keeps only the fade. */
+/* Content arrives: the page's top-level sections rise and fade in, 40ms apart, the sixth and later together with
+   the fifth (a 190ms ceiling). Transform and opacity only; nothing waits on it, every control works from the first
+   frame. A fragment page staggers its own children; a page with one root element staggers that root's children. */
 @keyframes app-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes app-fade { from { opacity: 0; } to { opacity: 1; } }
-.app-enter { animation: app-enter 420ms var(--ease) both; }
+.app-enter > :not(:only-child),
+.app-enter > :only-child > * { animation: app-enter 420ms var(--ease) both; }
+.app-enter > :nth-child(n + 2),
+.app-enter > :only-child > :nth-child(n + 2) { animation-delay: 40ms; }
+.app-enter > :nth-child(n + 3),
+.app-enter > :only-child > :nth-child(n + 3) { animation-delay: 80ms; }
+.app-enter > :nth-child(n + 4),
+.app-enter > :only-child > :nth-child(n + 4) { animation-delay: 120ms; }
+.app-enter > :nth-child(n + 5),
+.app-enter > :only-child > :nth-child(n + 5) { animation-delay: 190ms; }
 .app-fade { animation: app-fade 320ms var(--ease) both; }
 
+/* Reduced motion: nothing moves, nothing fades, nothing loops. Every animation and transition in the app is cut to
+   a single frame here, which also covers Mantine internals and inline styles. Components keep their own rules where
+   a still layout needs more (the ticker lists its prices instead of sliding them). */
 @media (prefers-reduced-motion: reduce) {
-  .app-enter { animation-name: app-fade; animation-duration: 200ms; }
-  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
 }

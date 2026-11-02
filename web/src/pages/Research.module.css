@@ -43,7 +43,7 @@
   font-family: var(--mantine-font-family-monospace);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 420ms var(--ease), color 420ms var(--ease), border-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .pill:hover { color: var(--text); }
 .pill:active { transform: scale(0.97); }

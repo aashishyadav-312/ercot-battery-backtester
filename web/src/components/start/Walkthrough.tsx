@@ -217,7 +217,7 @@ export function Walkthrough({ data, error }: { data?: WalkData; error?: string }
                 style={{
                   width: i === step ? 22 : 8, height: 8, borderRadius: 4, border: 0, padding: 0, cursor: 'pointer', flexShrink: 0,
                   background: i === step ? 'var(--mantine-primary-color-filled)' : 'var(--app-hairline-strong)',
-                  transition: 'width 220ms var(--app-ease), background 220ms',
+                  transition: 'background-color 160ms var(--app-ease)',
                 }}
               />
             ))}

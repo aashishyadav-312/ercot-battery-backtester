@@ -88,7 +88,7 @@
   font-family: var(--mantine-font-family-monospace);
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 420ms var(--ease), color 420ms var(--ease), border-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), border-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .metricBtn:hover { color: var(--text); }
 .metricBtn[aria-pressed='true'] { background: var(--text); border-color: var(--text); color: var(--bg); }
@@ -107,7 +107,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 420ms var(--ease), transform 160ms var(--ease);
+  transition: border-color 200ms var(--ease), transform 160ms var(--ease);
 }
 .chip[aria-pressed='true'] { border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); }
 .chipNum {

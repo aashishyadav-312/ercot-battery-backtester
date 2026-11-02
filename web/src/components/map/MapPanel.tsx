@@ -59,7 +59,7 @@ function Bars({ rows }: { rows: { label: string; value: number | null; strong?: 
             <Text size="xs" className="tnum" c="bright" fw={600}>{r.value == null ? '–' : usd(r.value, 1)}</Text>
           </Group>
           <div style={{ height: 6, borderRadius: 3, background: 'var(--app-hairline)', marginTop: 3 }}>
-            <div style={{ height: '100%', borderRadius: 3, width: `${Math.max(0, ((r.value ?? 0) / max) * 100)}%`, background: r.strong ? 'var(--mantine-color-accent-filled)' : 'var(--mantine-color-gray-5)', transition: 'width 420ms var(--app-ease)' }} />
+            <div style={{ height: '100%', borderRadius: 3, clipPath: `inset(0 ${100 - Math.min(100, Math.max(0, ((r.value ?? 0) / max) * 100))}% 0 0 round 3px)`, background: r.strong ? 'var(--mantine-color-accent-filled)' : 'var(--mantine-color-gray-5)', transition: 'clip-path 240ms var(--app-ease)' }} />
           </div>
         </div>
       ))}
