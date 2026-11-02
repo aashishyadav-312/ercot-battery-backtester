@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp, useRun } from './state';
-import { findRun, loadLocations, loadTexas, loadWalkthrough } from './data/loader';
+import { findRun, loadContext, loadLocations, loadTexas, loadWalkthrough } from './data/loader';
+import { weatherCity, weatherOn } from './data/context';
 import type { Walkthrough } from './data/types';
 
 /** The run (index row + full JSON) for the current top-bar selection. While a new run loads, the previous one is kept (`stale`). */
@@ -46,3 +47,17 @@ function useLoaded<T>(load: () => Promise<T>) {
 export const useLocations = () => useLoaded(loadLocations);
 /** Texas outline and counties for the Map page; only fetched when the Map page opens. */
 export const useTexas = () => useLoaded(loadTexas);
+
+/** Fleet, queue, weather and fuel-mix context (results/context.json). Cached by the loader; a failure only hides the context layers. */
+export const useContextData = () => useLoaded(loadContext);
+
+/** Day lookup for the weather at a location's hub city (or, for a node, the nearest hub city); undefined while loading or when unavailable. */
+export function useWeather(location: string | undefined) {
+  const ctx = useContextData().data;
+  const locs = useLocations().data?.locations;
+  return useMemo(() => {
+    if (!ctx || !location) return undefined;
+    const city = weatherCity(location, ctx, locs);
+    return city ? { city, on: (date: string) => weatherOn(ctx, city, date) } : undefined;
+  }, [ctx, locs, location]);
+}
