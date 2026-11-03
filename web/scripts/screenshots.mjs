@@ -61,6 +61,8 @@ try {
       const ctx = await browser.newContext({
         viewport, colorScheme: scheme, deviceScaleFactor: size === 'phone' ? 2 : 1, hasTouch: size === 'phone', isMobile: size === 'phone',
       });
+      // The first-visit tour would sit on top of Home; mark it seen (the tour has its own shots).
+      await ctx.addInitScript(() => { try { localStorage.setItem('chargeline-tour-seen', '1'); } catch { /* storage blocked */ } });
       const page = await ctx.newPage();
       const tag = `${size}/${scheme}`;
       page.on('console', (m) => m.type() === 'error' && problems.push(`${tag} console: ${m.text()}`));

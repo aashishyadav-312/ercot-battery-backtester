@@ -1,0 +1,55 @@
+.tour {
+  position: fixed;
+  z-index: 30;
+  box-sizing: border-box;
+  width: min(340px, calc(100vw - 24px));
+  padding: 16px 18px 12px;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.28);
+  outline: none; /* the dialog itself takes focus so it is announced; it is not a control */
+}
+/* On a phone it docks to the bottom edge and points at nothing. */
+.tour[data-phone] { left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; transform-origin: 50% 100%; }
+
+.tour[data-animate] { animation: tour-in 200ms var(--ease) both; }
+@keyframes tour-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .tour[data-animate] { animation-name: tour-fade; }
+  @keyframes tour-fade { from { opacity: 0; } to { opacity: 1; } }
+}
+
+.pointer {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin-left: -5px;
+  background: var(--panel);
+  transform: rotate(45deg);
+}
+.pointerTop { top: -6px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); }
+.pointerBottom { bottom: -6px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+.count { margin: 0 0 4px; color: var(--faint); font-size: 13px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.title { margin: 0 0 6px; font-size: 18px; line-height: 1.3; letter-spacing: -0.01em; }
+.body { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
+
+.actions { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.spacer { flex: 1; }
+.skip, .btn {
+  min-height: var(--tap);
+  padding: 0 14px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--r-input);
+  cursor: pointer;
+}
+.skip { padding: 0 8px; color: var(--muted); background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; }
+.skip:hover { color: var(--text); }
+.btn { color: var(--text); background: none; border: 1px solid var(--line); }
+.btn:hover { border-color: var(--faint); }
+.primary { color: #15171A; background: var(--amber); border-color: var(--amber); }
+.primary:hover { filter: brightness(1.06); border-color: var(--amber); }

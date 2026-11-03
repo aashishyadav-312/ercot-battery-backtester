@@ -4,3 +4,5 @@
 .small { margin: 0 0 6px; max-width: 80ch; color: var(--faint); font-size: 13px; line-height: 1.6; }
 .small a { display: inline-block; padding-block: 4px; color: var(--text); text-underline-offset: 3px; } /* 24px target, 2.5.8 */
 .small a:hover { color: var(--amber-text); }
+.link { display: inline-block; padding: 4px 0; font: inherit; color: var(--text); background: none; border: 0; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.link:hover { color: var(--amber-text); }

@@ -123,7 +123,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
     <div className={classes.page}>
       {/* ------------------------------------------------ hero */}
       <section className={classes.hero} aria-labelledby="home-title">
-        <div className={classes.heroText}>
+        <div className={classes.heroText} data-tour="hero">
           <p className={classes.eyebrow} data-testid="hero-eyebrow">
             Live ERCOT prices · {m.nNodes + m.hubs.length} locations{years && <> · {years[0]}–{years[1]}</>}
           </p>

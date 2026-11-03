@@ -7,6 +7,7 @@ import { Ticker } from './components/shell/Ticker';
 import { Header } from './components/shell/Header';
 import { ViewBar } from './components/shell/ViewBar';
 import { Footer } from './components/shell/Footer';
+import { Tour } from './components/tour/Tour';
 import { useScheme } from './components/shell/SchemeProvider';
 import { TABS } from './shell/route';
 import Guide from './pages/Guide';
@@ -79,6 +80,7 @@ export default function App() {
         </div>
       </main>
       <Footer index={index} sel={sel} />
+      <Tour />
     </div>
   );
 }
