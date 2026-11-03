@@ -12,6 +12,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "screenshots": "node scripts/screenshots.mjs",
+    "site-guide-images": "node scripts/make-site-guide-images.mjs",
     "test": "vitest run"
   },
   "dependencies": {

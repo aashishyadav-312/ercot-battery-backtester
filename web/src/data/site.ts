@@ -9,10 +9,8 @@ export const SITE = {
   role: 'Duke Grad Student - Energy',
   linkedin: 'https://www.linkedin.com/in/x0aashish/',
   email: 'aashish.yadav@duke.edu',
-  repo: 'https://github.com/aashishyadav-312/ercot-battery-backtester',
-  issues: 'https://github.com/aashishyadav-312/ercot-battery-backtester/issues',
-  /** Opens the feature-request form (.github/ISSUE_TEMPLATE/feature_request.yml; live once merged to main). */
-  featureRequest: 'https://github.com/aashishyadav-312/ercot-battery-backtester/issues/new?template=feature_request.yml',
+  /** Where "Report an issue" goes. The site links nowhere on GitHub. */
+  feedback: 'mailto:aashish.yadav@duke.edu?subject=Chargeline%20feedback',
 };
 
 // ------------------------------------------------------------ friendly location names
@@ -40,11 +38,20 @@ export const zoneFull = (code: string): string => (ZONES[code] ? `${ZONES[code]}
 // ------------------------------------------------------------ glossary
 export type TermId = keyof typeof glossary.terms;
 export const GLOSSARY = glossary.terms as Record<string, { term: string; definition: string }>;
-// The labels of the shared terms come from copy/terms.ts; the longer definitions stay in glossary.json until Learn is rebuilt.
-for (const [id, key] of [
+// The labels of the shared terms come from copy/terms.ts; the longer definitions stay in glossary.json for the info icons.
+const SHARED = [
   ['perfect_foresight', 'perfectForesight'], ['capture_rate', 'captureRate'], ['top10_day_share', 'top10DayShare'], ['usd_per_kw_yr', 'revenueUnit'],
   ['degradation_cost', 'degradationCost'], ['hub', 'hub'], ['resource_node', 'node'],
-] as const) GLOSSARY[id] = { ...GLOSSARY[id], term: TERMS[key].label };
+] as const;
+for (const [id, key] of SHARED) GLOSSARY[id] = { ...GLOSSARY[id], term: TERMS[key].label };
+
+/** The Glossary page: every term A to Z, with the short definition from copy/terms.ts where the term is shared. */
+export function glossaryEntries(): { id: string; term: string; definition: string }[] {
+  const short = new Map<string, string>(SHARED.map(([id, key]) => [id, TERMS[key].definition]));
+  return Object.entries(GLOSSARY)
+    .map(([id, g]) => ({ id, term: g.term, definition: short.get(id) ?? g.definition }))
+    .sort((x, y) => x.term.localeCompare(y.term, 'en', { sensitivity: 'base' }));
+}
 
 // ------------------------------------------------------------ data freshness
 /** Latest day covered by any run in results/index.json, plus the latest per location type. */

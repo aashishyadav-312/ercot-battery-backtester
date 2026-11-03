@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import type { Block, Inline } from '../data/markdown';
-import { SITE } from '../data/site';
 import classes from './Markdown.module.css';
 
-/** Relative links in FINDINGS.md ("../docs/X.md") point into the repository; on the site they open it on GitHub. */
-export function resolveHref(href: string): { href: string; external: boolean } {
+/**
+ * Links in FINDINGS.md. Web and mailto links and in-page anchors stay links. A relative one ("../docs/X.md") points into
+ * the repository, and the site links nowhere on GitHub, so it renders as plain text.
+ */
+export function resolveHref(href: string): { href: string; external: boolean } | null {
   if (/^https?:\/\//.test(href) || href.startsWith('mailto:')) return { href, external: true };
   if (href.startsWith('#')) return { href, external: false };
-  const path = href.replace(/^(\.\.\/|\.\/)+/, '').replace(/^\//, '');
-  return { href: `${SITE.repo}/blob/main/${path.startsWith('docs/') || path.startsWith('results/') ? path : `results/${path}`}`, external: true };
+  return null;
 }
 
 function Inlines({ nodes }: { nodes: Inline[] }): ReactNode {
@@ -19,6 +20,7 @@ function Inlines({ nodes }: { nodes: Inline[] }): ReactNode {
       case 'code': return <code key={i}>{n.v}</code>;
       case 'a': {
         const r = resolveHref(n.href);
+        if (!r) return <Inlines key={i} nodes={n.c} />;
         return (
           <a key={i} href={r.href} {...(r.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
             <Inlines nodes={n.c} />

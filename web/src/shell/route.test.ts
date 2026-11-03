@@ -15,7 +15,7 @@ const OLD_TO_NEW: Record<OldRoute, string> = {
   custom: '#/studio',
   economics: '#/studio/economics',
   method: '#/research/method',
-  about: '#/learn?s=about',
+  about: '#/learn/about',
 };
 
 describe('old routes redirect to their new home', () => {
@@ -27,7 +27,7 @@ describe('old routes redirect to their new home', () => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
     // The Map page was replaced by the Atlas; Custom run and Compare by Studio; Start here, Guide and About by Learn.
-    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : ['start', 'guide', 'about'].includes(page) ? 'learn' : page === 'overview' ? 'revenue' : page);
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : ['start', 'guide'].includes(page) ? 'learn' : page === 'about' ? 'author' : page === 'overview' ? 'revenue' : page);
 
     expect(r.redirected).toBe(true);
   });
@@ -37,8 +37,7 @@ describe('old routes redirect to their new home', () => {
     const r = resolveHash(`#/${page}?${q}`);
     expect(r.query).toBe(q);
     const to = OLD_TO_NEW[page as keyof typeof OLD_TO_NEW];
-    // An old link that now lands on a section of its replacement names the section first, then keeps the query as written.
-    expect(r.canonical).toBe(to.includes('?') ? `${to}&${q}` : `${to}?${q}`);
+    expect(r.canonical).toBe(`${to}?${q}`);
   });
 
   it('accepts the hash with or without the slash', () => {
@@ -73,10 +72,10 @@ describe('new routes', () => {
     expect(resolveHash('#/research/revenue').page).toBe('revenue');
     expect(hashParam('#/research?loc=HB_WEST&f=11', 'f')).toBe('11');
     expect(hashParam('#/research', 'f')).toBeNull();
-    // An old link still being redirected already answers with the section it will land on.
-    expect(hashParam('#/about', 's')).toBe('about');
+    // An old link still being redirected already answers with the query it will land on.
+    expect(hashParam('#/guide?s=ercot', 's')).toBe('ercot');
     expect(hashParam('#/guide/start', 's')).toBeNull();
-    expect(hashParam('#/guide/about', 's')).toBe('about');
+    expect(hashParam('#/about', 's')).toBeNull();
   });
 
   it('falls back to the default view of a tab for an unknown view', () => {
@@ -88,14 +87,34 @@ describe('new routes', () => {
 
   it('serves Learn at #/learn, and sends every Guide URL there with its query', () => {
     expect([resolveHash('#/learn').page, resolveHash('#/learn').redirected]).toEqual(['learn', false]);
-    expect(resolveHash('#/guide?loc=HB_WEST&s=glossary').canonical).toBe('#/learn?loc=HB_WEST&s=glossary');
     expect(resolveHash('#/guide').redirected).toBe(true);
+    expect(resolveHash('#/guide?loc=HB_WEST&s=ercot').canonical).toBe('#/learn?loc=HB_WEST&s=ercot');
     expect(resolveHash('#/guide/start?loc=HB_WEST').canonical).toBe('#/learn?loc=HB_WEST');
-    expect(resolveHash('#/guide/about?loc=HB_WEST').canonical).toBe('#/learn?s=about&loc=HB_WEST');
     expect(resolveHash('#/learn/start?loc=HB_WEST').canonical).toBe('#/learn?loc=HB_WEST');
-    // A link that already names a section keeps it.
-    expect(resolveHash('#/about?s=glossary').canonical).toBe('#/learn?s=glossary');
     expect(buildHash('learn', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/learn?loc=HB_WEST&dur=4&year=2025&deg=10');
+  });
+
+  it('has Learn sub-pages, and opens them from the old section links and Guide URLs', () => {
+    expect(TABS.find((t) => t.tab === 'learn')!.views.map((v) => v.label)).toEqual(['Basics', 'Site guide', 'Limits', 'Glossary', 'About']);
+    const q = 'loc=HB_WEST&dur=4';
+    for (const [old, now, page] of [
+      ['#/learn/basics', '#/learn', 'learn'],
+      ['#/learn?s=read', '#/learn/site-guide', 'siteguide'],
+      ['#/learn?s=left-out', '#/learn/limits', 'limits'],
+      ['#/learn?s=glossary', '#/learn/glossary', 'glossary'],
+      ['#/learn?s=about', '#/learn/about', 'author'],
+      ['#/guide?s=glossary', '#/learn/glossary', 'glossary'],
+      ['#/guide/about', '#/learn/about', 'author'],
+      ['#/about', '#/learn/about', 'author'],
+    ] as const) {
+      const joiner = old.includes('?') ? '&' : '?';
+      const r = resolveHash(`${old}${joiner}${q}`);
+      expect([r.page, r.redirected, r.canonical], old).toEqual([page, true, `${now}?${q}`]);
+      const fresh = resolveHash(`${now}?${q}`);
+      expect([fresh.page, fresh.redirected], now).toEqual([page, false]);
+    }
+    // A section that stayed on Basics keeps its link.
+    expect(resolveHash('#/learn?s=money').canonical).toBe('#/learn?s=money');
   });
 
   it('opens the renamed Research and Atlas views from their old slugs, keeping the query', () => {
