@@ -17,7 +17,7 @@ id = "4384e2b01cf24feb9aeb3a5955212f79"
 # Create it and paste the id here (docs/support-setup.md).
 [[kv_namespaces]]
 binding = "SUPPORT_KV"
-id = "REPLACE_WITH_SUPPORT_KV_ID"
+id = "ab79e3a100be41ec9ea7798880af5a4b"
 
 [vars]
 ALLOWED_ORIGIN = "https://aashishyadav-312.github.io"

@@ -16,7 +16,7 @@
 }
 .trigger:hover { background: var(--track); }
 .trigger:active { transform: scale(0.97); }
-.heart { flex: none; color: var(--amber); }
+.heart { flex: none; color: var(--text); }
 
 .drop { padding: 20px; background: var(--panel); border: 1px solid var(--line-2); }
 .drop:focus { outline: none; }
