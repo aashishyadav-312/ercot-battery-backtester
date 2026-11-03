@@ -13,7 +13,7 @@ import { useContextData, useLocations, useTexas } from '../hooks';
 import { queueByKey } from '../data/context';
 import { findRun } from '../data/loader';
 import { pct, usd, yearLabel } from '../data/format';
-import { SITE, locFull, zoneFull } from '../data/site';
+import { locFull, zoneFull } from '../data/site';
 import { TERMS } from '../copy/terms';
 
 /**
@@ -143,8 +143,7 @@ export default function MapPage() {
         <Text size="xs" c="dimmed" lh={1.6} maw={900}>
           <b>Notes.</b> {locs.data.meta.hub_footnote} Resource-node markers sit at the plant’s location in the EIA-860 {locs.data.meta.eia_year} survey, matched to the ERCOT node by name,
           so they show roughly where the node is, not its exact electrical bus. {locs.data.meta.n_nodes_geocoded} of {locs.data.meta.n_nodes} nodes could be placed; unplaced nodes are never guessed.
-          Texas outline and counties: US Census boundaries via us-atlas. Every match and its evidence is in the{' '}
-          <Anchor size="xs" href={`${SITE.repo}/blob/main/results/geocoding_log.md`} target="_blank" rel="noreferrer">geocoding log</Anchor>.
+          Texas outline and counties: US Census boundaries via us-atlas. Every match is kept with its evidence in the geocoding log.
         </Text>
       )}
     </Stack>

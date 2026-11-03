@@ -4,7 +4,7 @@ import { useApp } from '../state';
 import { buildHash } from '../shell/route';
 import { loadNodes, loadTexas } from '../data/loader';
 import { MONTHS, downloadCsv, num, pct, usd } from '../data/format';
-import { SITE, isDetailed } from '../data/site';
+import { isDetailed } from '../data/site';
 import {
   BUCKETS, METRICS, TAIL_RATIO, TOP_N, geoNote, hubRevenue, mapDots, metricValue, outlinePath, percentileRows, placed, placement,
   ratioBuckets, ratioOf, strayStory, topNodes, zoneShort, zonesOf, type Metric,
@@ -277,7 +277,6 @@ function Unplaced({ file, where }: { file: NodesFile; where: ReturnType<typeof p
           {' '}Every node is in the table below, placed or not. Nodes that started, retired or had data gaps in {file.meta.year} ({num(file.meta.n_nodes_in_data - file.meta.n_nodes)} of {num(file.meta.n_nodes_in_data)}) are left out of the run.
         </p>
       </div>
-      <a className={classes.ghost} href={`${SITE.repo}/blob/main/results/geocoding_log_all_nodes.md`} target="_blank" rel="noreferrer">How nodes are located <span aria-hidden="true">→</span></a>
     </section>
   );
 }

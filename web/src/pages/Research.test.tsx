@@ -140,11 +140,12 @@ describe('one finding, rendered from FINDINGS.md', () => {
     expect(within(reader).getAllByRole('region', { name: /scrolls sideways/ }).length).toBe(tables.length);
   });
 
-  it('opens a repository link from the text on GitHub, in a new tab', () => {
+  it('shows a repository link from the text as plain words, since the site links nowhere on GitHub', () => {
     view(DATA, 10);
-    const link = within(screen.getByTestId('reader')).getByRole('link', { name: 'the sourced methodology' });
-    expect(link.getAttribute('href')).toBe('https://github.com/aashishyadav-312/ercot-battery-backtester/blob/main/docs/ANCILLARY_METHOD.md');
-    expect(link.getAttribute('target')).toBe('_blank');
+    const reader = screen.getByTestId('reader');
+    expect(within(reader).queryByRole('link', { name: 'the sourced methodology' })).toBeNull();
+    expect(reader.textContent).toContain('the sourced methodology');
+    expect([...reader.querySelectorAll('a')].filter((a) => /github\.com/.test(a.getAttribute('href') ?? ''))).toEqual([]);
   });
 
   it('has no previous link on the first finding and no next link on the last', () => {

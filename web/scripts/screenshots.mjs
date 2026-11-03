@@ -28,10 +28,10 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['home', 'research', 'start', 'map', 'detailed', 'live', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['home', 'research', 'start', 'siteguide', 'limits', 'glossary', 'about', 'map', 'detailed', 'live', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  home: 'home', research: 'research', start: 'learn', map: 'atlas', detailed: 'atlas/sites', live: 'home/live', revenue: 'research/revenue', dispatch: 'research/charging',
+  home: 'home', research: 'research', start: 'learn', siteguide: 'learn/site-guide', limits: 'learn/limits', glossary: 'learn/glossary', about: 'learn/about', map: 'atlas', detailed: 'atlas/sites', live: 'home/live', revenue: 'research/revenue', dispatch: 'research/charging',
   realism: 'research/reality', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;
@@ -65,7 +65,7 @@ try {
         viewport, colorScheme: scheme, deviceScaleFactor: size === 'phone' ? 2 : 1, hasTouch: size === 'phone', isMobile: size === 'phone',
       });
       // The first-visit tour would sit on top of Home; mark it seen (the tour has its own shots).
-      await ctx.addInitScript(() => { try { localStorage.setItem('chargeline-tour-seen', '1'); } catch { /* storage blocked */ } });
+      await ctx.addInitScript(() => { try { localStorage.setItem('chargeline-tour-done', '1'); } catch { /* storage blocked */ } });
       const page = await ctx.newPage();
       const tag = `${size}/${scheme}`;
       page.on('console', (m) => m.type() === 'error' && problems.push(`${tag} console: ${m.text()}`));

@@ -26,8 +26,8 @@ export function Footer({ index, sel }: { index: IndexRun[] | null; sel: Selectio
           Built by <b>{SITE.author}</b>, {SITE.role}.{' '}
           <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a> ·{' '}
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{' '}
-          <a href={SITE.issues} target="_blank" rel="noopener noreferrer">Report an issue</a> ·{' '}
-          <a href={`${buildHash('learn', sel)}&s=about`}>About</a> ·{' '}
+          <a href={SITE.feedback}>Report an issue</a> ·{' '}
+          <a href={buildHash('author', sel)}>About the author</a> ·{' '}
           <button type="button" className={classes.link} onClick={requestTour}>Take the tour</button>
         </p>
         <p className={classes.small}>
