@@ -11,7 +11,7 @@
   box-shadow: 0 12px 40px rgb(0 0 0 / 0.28);
   outline: none; /* the dialog itself takes focus so it is announced; it is not a control */
 }
-/* On a phone it docks to the bottom edge and points at nothing. */
+/* The first step on a phone docks to the bottom edge and points at nothing. */
 .tour[data-phone] { left: 12px; right: 12px; bottom: 12px; top: auto; width: auto; transform-origin: 50% 100%; }
 
 .tour[data-animate] { animation: tour-in 200ms var(--ease) both; }

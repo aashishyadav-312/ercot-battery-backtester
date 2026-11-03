@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Tour } from './Tour';
-import { PHONE_MAX, SEEN_KEY, TOUR_STEPS, placePopover, requestTour, resetTourSession, shouldAutoStart } from './steps';
+import { PHONE_MAX, DONE_KEY, SHOWN_KEY, TOUR_STEPS, placePopover, requestTour, resetTourSession, shouldAutoStart } from './steps';
 
 let page = 'home';
 const go = vi.fn((p: string) => { page = p; });
@@ -14,6 +14,7 @@ beforeEach(() => {
   go.mockClear();
   resetTourSession();
   localStorage.clear();
+  sessionStorage.clear();
   window.location.hash = '';
   document.body.innerHTML = '';
   const hero = document.createElement('section');
@@ -27,6 +28,7 @@ beforeEach(() => {
     document.body.append(a);
   }
   window.innerWidth = 1280;
+  window.scrollTo = vi.fn() as never;
 });
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 
@@ -36,21 +38,21 @@ const mount = async () => {
 };
 
 describe('tour rules', () => {
-  it('opens by itself only on Home, without a query, and only if not seen', () => {
-    expect(shouldAutoStart('home', '', '')).toBe(true);
-    expect(shouldAutoStart('home', '#/home', '')).toBe(true);
-    expect(shouldAutoStart('home', '#/home?loc=HB_WEST&dur=2', '')).toBe(false);
-    expect(shouldAutoStart('home', '', '?utm=x')).toBe(false);
-    expect(shouldAutoStart('atlas', '#/atlas', '')).toBe(false);
-    localStorage.setItem(SEEN_KEY, '1');
-    expect(shouldAutoStart('home', '', '')).toBe(false);
+  it('opens by itself on Home, with or without a query, until it has been seen', () => {
+    expect(shouldAutoStart('home')).toBe(true);
+    expect(shouldAutoStart('atlas')).toBe(false);
+    sessionStorage.setItem(SHOWN_KEY, '1');
+    expect(shouldAutoStart('home')).toBe(false);
+    sessionStorage.clear();
+    localStorage.setItem(DONE_KEY, '1');
+    expect(shouldAutoStart('home')).toBe(false);
   });
 
   it('does not show again this session when storage fails', async () => {
     const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
     await mount();
     fireEvent.click(screen.getByRole('button', { name: 'Skip tour' }));
-    expect(shouldAutoStart('home', '', '')).toBe(false);
+    expect(shouldAutoStart('home')).toBe(false);
     set.mockRestore();
   });
 
@@ -86,21 +88,27 @@ describe('Tour', () => {
     expect(document.activeElement).toBe(d);
     fireEvent.click(screen.getByRole('button', { name: 'Skip tour' }));
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(localStorage.getItem(SEEN_KEY)).toBe('1');
+    expect(sessionStorage.getItem(SHOWN_KEY)).toBe('1');
+    expect(localStorage.getItem(DONE_KEY)).toBeNull(); // skipping is not finishing
+    cleanup();
+    resetTourSession(); // a refresh: same tab, so the session flag still holds
+    await mount();
+    expect(screen.queryByRole('dialog')).toBeNull();
     cleanup();
     resetTourSession();
+    sessionStorage.clear(); // the browser was closed and reopened: it shows again
     await mount();
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('dialog')).toBeTruthy();
   });
 
-  it('does not show on a deep link', async () => {
+  it('shows on Home even when the URL has a query', async () => {
     window.location.hash = '#/home?loc=HB_WEST&dur=2&year=2025&deg=10';
     await mount();
-    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('dialog')).toBeTruthy();
   });
 
-  it('does not show when already seen', async () => {
-    localStorage.setItem(SEEN_KEY, '1');
+  it('does not show when already seen this session', async () => {
+    sessionStorage.setItem(SHOWN_KEY, '1');
     await mount();
     expect(screen.queryByRole('dialog')).toBeNull();
   });
@@ -123,6 +131,7 @@ describe('Tour', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(document.activeElement).toBe(outside);
+    expect(localStorage.getItem(DONE_KEY)).toBe('1'); // finishing is remembered for good
     expect(document.querySelector('[data-tour-active]')).toBeNull();
   });
 
@@ -130,11 +139,11 @@ describe('Tour', () => {
     await mount();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(localStorage.getItem(SEEN_KEY)).toBe('1');
+    expect(sessionStorage.getItem(SHOWN_KEY)).toBe('1');
   });
 
   it('a replay request opens it again from step 1, and goes to Home first when needed', async () => {
-    localStorage.setItem(SEEN_KEY, '1');
+    sessionStorage.setItem(SHOWN_KEY, '1');
     page = 'learn';
     const { rerender } = render(<Tour />);
     act(() => requestTour());
@@ -142,5 +151,6 @@ describe('Tour', () => {
     rerender(<Tour />); // page is now home
     await act(async () => { await vi.advanceTimersByTimeAsync(400); });
     expect(screen.getByRole('dialog', { name: 'Welcome to Chargeline' })).toBeTruthy();
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0 });
   });
 });
