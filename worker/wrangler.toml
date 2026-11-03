@@ -13,8 +13,16 @@ crons = ["*/5 * * * *"]
 binding = "LIVE"
 id = "4384e2b01cf24feb9aeb3a5955212f79"
 
+# Support bar: don:<id> per Ko-fi payment, manual:<date>-<label> added by hand.
+# Create it and paste the id here (docs/support-setup.md).
+[[kv_namespaces]]
+binding = "SUPPORT_KV"
+id = "REPLACE_WITH_SUPPORT_KV_ID"
+
 [vars]
 ALLOWED_ORIGIN = "https://aashishyadav-312.github.io"
+GOAL_USD = "210"
 
 # Secrets (set with `npx wrangler secret put <NAME>`, never committed):
 #   ERCOT_API_USERNAME, ERCOT_API_PASSWORD, ERCOT_API_SUBSCRIPTION_KEY
+#   KOFI_VERIFY_TOKEN, ZELLE_NUMBER

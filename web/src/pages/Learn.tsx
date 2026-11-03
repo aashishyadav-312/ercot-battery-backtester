@@ -9,6 +9,7 @@ import { glossaryEntries, SITE } from '../data/site';
 import { START_DEFAULTS } from '../data/start';
 import { TERMS } from '../copy/terms';
 import { requestTour } from '../components/tour/steps';
+import { requestSupport } from '../support/api';
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
@@ -177,6 +178,12 @@ export function About() {
           <Group gap="xs" mt={4}>
             <Button component="a" href={SITE.linkedin} {...ext} variant="light" size="sm">LinkedIn</Button>
             <Button component="a" href={`mailto:${SITE.email}`} variant="light" size="sm">{SITE.email}</Button>
+          </Group>
+          <Text size="md" lh={1.6} mt="xs">
+            Chargeline is free, with no ads and no sign-up. If it helped you, you can chip in toward what it cost to build.
+          </Text>
+          <Group gap="xs">
+            <Button variant="light" size="sm" onClick={requestSupport}>Support</Button>
           </Group>
         </Stack>
       </Group>
