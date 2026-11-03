@@ -237,7 +237,7 @@ function Stray({ file }: { file: NodesFile }) {
               </li>
             ))}
           </ul>
-          <p className={classes.small}>Each class includes its lower edge. Mint is a premium over the hub; amber is the tail at {BUCKETS[3].lo} times and above.</p>
+          <p className={classes.small}>Each class includes its lower edge. Green is a premium over the hub; orange is the tail at {BUCKETS[3].lo} times and above.</p>
         </article>
         <article className={classes.card}>
           <h3 className={classes.cardTitle}>Revenue percentiles</h3>

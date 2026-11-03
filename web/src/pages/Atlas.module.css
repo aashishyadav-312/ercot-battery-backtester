@@ -85,7 +85,7 @@
 
 .months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; align-items: end; height: 96px; margin: 10px 0 0; padding: 0; list-style: none; }
 .months li { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; }
-.monthBar { width: 100%; min-height: 2px; border-radius: 3px 3px 1px 1px; background: var(--amber); animation: grow-y 700ms var(--ease) both; }
+.monthBar { width: 100%; min-height: 2px; border-radius: 3px 3px 1px 1px; background: var(--chart-blue); animation: grow-y 700ms var(--ease) both; }
 .monthLabel { font-family: var(--mantine-font-family-monospace); font-size: 11px; color: var(--faint); }
 .links { display: flex; flex-direction: column; margin-top: 8px; }
 
@@ -139,8 +139,8 @@
 .bucketLabel { font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--muted); }
 .bucketTrack { height: 14px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
 .bucketFill { display: block; height: 100%; min-width: 3px; border-radius: var(--r-pill); background: var(--dot-low); animation: grow-x 700ms var(--ease) both; }
-.bucketFill[data-tone='premium'] { background: var(--mint); }
-.bucketFill[data-tone='tail'] { background: var(--amber); }
+.bucketFill[data-tone='premium'] { background: var(--chart-green); }
+.bucketFill[data-tone='tail'] { background: var(--chart-orange); }
 .bucketCount { font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--text); text-align: right; font-variant-numeric: tabular-nums; }
 
 @keyframes grow-x { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }

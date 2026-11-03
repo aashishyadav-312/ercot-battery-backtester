@@ -51,7 +51,7 @@ export function FleetRevenueCard() {
         { type: 'value', ...axisBase(t), splitLine: { show: false }, axisLabel: { ...axisBase(t).axisLabel, formatter: '{value}' }, name: 'GW', nameGap: 8 },
       ],
       series: [
-        { name: 'Monthly revenue ($/kW)', type: 'bar', barMaxWidth: 16, data: points.map((p) => p.revenue), itemStyle: { color: t.amber, borderRadius: [3, 3, 0, 0] } },
+        { name: 'Monthly revenue ($/kW)', type: 'bar', barMaxWidth: 16, data: points.map((p) => p.revenue), itemStyle: { color: t.blue, borderRadius: [3, 3, 0, 0] } },
         { name: 'ERCOT battery fleet (GW)', type: 'line', yAxisIndex: 1, showSymbol: false, smooth: false, lineStyle: { width: 2.5, color: t.text }, itemStyle: { color: t.text }, data: points.map((p) => Math.round(p.fleetMw / 100) / 10) },
       ],
     });
@@ -62,7 +62,7 @@ export function FleetRevenueCard() {
     <Card
       title="Revenue and the battery fleet"
       subtitle={`Bars: monthly arbitrage revenue, ${locFull(sel.location)}, ${sel.duration}h, $${sel.deg}/MWh degradation. Line: batteries installed in ERCOT at month end.`}
-      look="Amber bars are monthly revenue. The line is the battery fleet, read on the right axis."
+      look="Blue bars are monthly revenue. The line is the battery fleet, read on the right axis."
       csv={csv}
       footer={
         <Stack gap={4} mt="sm">

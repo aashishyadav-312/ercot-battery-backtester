@@ -80,7 +80,7 @@ export function GroupedBars({ id, chart, wide }: { id: string; chart: GroupedCha
 
 /** Before and after capture rate, two bars per hub. */
 export function CaptureBars({ id, chart }: { id: string; chart: CaptureChart }) {
-  const series = [{ name: chart.before, tone: 'dot' }, { name: chart.after, tone: 'amber' }];
+  const series = [{ name: chart.before, tone: 'dot' }, { name: chart.after, tone: 'blue' }];
   const summary = `${chart.title} ${chart.rows.map((r) => `${r.code}: ${pct(r.before)} before, ${pct(r.after)} after.`).join(' ')}`;
   return (
     <Frame
@@ -103,7 +103,7 @@ export function CaptureBars({ id, chart }: { id: string; chart: CaptureChart }) 
           <li key={r.code} className={classes.hrow}>
             <div className={classes.hhead}><span>{r.code}</span><span className={classes.hval}>{pct(r.before)} to <b>{pct(r.after)}</b></span></div>
             <div className={classes.track}><span className={classes.hfill} data-tone="dot" style={{ width: `${r.before * 100}%` }} /></div>
-            <div className={classes.track}><span className={classes.hfill} data-tone="amber" style={{ width: `${r.after * 100}%` }} /></div>
+            <div className={classes.track}><span className={classes.hfill} data-tone="blue" style={{ width: `${r.after * 100}%` }} /></div>
           </li>
         ))}
       </ul>

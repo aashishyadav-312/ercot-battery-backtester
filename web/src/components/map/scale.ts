@@ -18,11 +18,11 @@ export function domainOf(index: IndexRun[]): Domain {
 }
 
 /**
- * Capture rate runs from the faintest chart grey (low) to mint (high), both tokens. `mix` blends the two in sRGB; the
+ * Capture rate runs from the faintest chart grey (low) to green (high), both tokens. `mix` blends the two in sRGB; the
  * DOM legend draws the same ramp with CSS (MapLegend), so map and legend match in both themes.
  */
 export function rampAt(x: number, t: ChartTheme): string {
-  return mix(t.mint, t.grey[2], Math.min(1, Math.max(0, x)));
+  return mix(t.green, t.grey[2], Math.min(1, Math.max(0, x)));
 }
 
 export function captureColor(c: number | null | undefined, d: Domain, t: ChartTheme): string {
@@ -40,7 +40,7 @@ export function markerSize(rev: number | null | undefined, d: Domain): number {
 
 // ------------------------------------------------------------ planned-storage layer (Phase 17)
 /**
- * Queue layer: county shades from the land colour toward the text colour, so they never read as the mint capture scale.
+ * Queue layer: county shades from the land colour toward the text colour, so they never read as the green capture scale.
  * Class i is QUEUE_MIX[i] percent text over land; QueueLegend draws the same steps with CSS color-mix.
  */
 export const QUEUE_MIX = [14, 28, 42, 56, 70];

@@ -1,9 +1,10 @@
 // Chart colours, read from the design tokens in styles/tokens.css so charts follow the theme with no colour values of
 // their own. Chart components take every colour from here; a test (chartColors.test.ts) fails if one hardcodes a hex.
 //
-// Mapping (docs/PLAN_V3_POLISH.md, step 4): perfect foresight and charging are mint, the day-ahead plan and discharging
-// are amber; before RTC+B, earlier years and unselected durations are grey steps; after RTC+B, the latest or selected
-// year and the selected duration are amber. The --chart-* tokens are the mark colours: each passes 3:1 on the panel.
+// Charts use their own six hues, not the amber UI accent. Mapping: charging and perfect foresight are green, discharging
+// is orange, the day-ahead plan and single revenue series are blue; before RTC+B, hubs and unselected durations are grey,
+// after RTC+B and the selected duration are blue; the ten best days are orange. Stacked products take one hue each.
+// The --chart-* tokens are the mark colours: each passes 3:1 on the panel.
 
 export type ChartMode = 'light' | 'dark';
 
@@ -16,10 +17,12 @@ export interface ChartTheme {
   axis: string;
   tooltipBg: string;
   tooltipBorder: string;
-  amber: string;
-  mint: string;
-  /** Second mint step (regulation down next to regulation up). */
-  mint2: string;
+  blue: string;
+  green: string;
+  cyan: string;
+  violet: string;
+  orange: string;
+  rose: string;
   /** Grey marks, strongest first. */
   grey: [string, string, string];
   /** Thin context lines (other hubs): quiet on purpose. */
@@ -35,6 +38,8 @@ export interface ChartTheme {
   before: string;
   after: string;
   selected: string;
+  /** Marks picked out from the rest (the ten best days). */
+  highlight: string;
 }
 
 const TOOLTIP = {
@@ -52,8 +57,9 @@ const read = (name: string) => {
 
 /** Chart colours for the theme on <html> now. `mode` must match it (SchemeProvider sets both in a layout effect). */
 export function chartColors(mode: ChartMode): ChartTheme {
-  const amber = read('chart-amber');
-  const mint = read('chart-mint');
+  const blue = read('chart-blue');
+  const green = read('chart-green');
+  const orange = read('chart-orange');
   const grey = [read('chart-grey-1'), read('chart-grey-2'), read('chart-grey-3')] as [string, string, string];
   return {
     mode,
@@ -64,21 +70,25 @@ export function chartColors(mode: ChartMode): ChartTheme {
     axis: read('line-2'),
     tooltipBg: TOOLTIP[mode].bg,
     tooltipBorder: TOOLTIP[mode].border,
-    amber,
-    mint,
-    mint2: read('chart-mint-2'),
+    blue,
+    green,
+    cyan: read('chart-cyan'),
+    violet: read('chart-violet'),
+    orange,
+    rose: read('chart-rose'),
     grey,
     line2: read('line-2'),
     noData: read('dot-low'),
     land: read('land'),
     landStroke: read('land-stroke'),
-    foresight: mint,
-    plan: amber,
-    charge: mint,
-    discharge: amber,
+    foresight: green,
+    plan: blue,
+    charge: green,
+    discharge: orange,
     before: grey[1],
-    after: amber,
-    selected: amber,
+    after: blue,
+    selected: blue,
+    highlight: orange,
   };
 }
 
@@ -106,8 +116,3 @@ export const fade = (c: string, top = 0.22) => ({
   type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
   colorStops: [{ offset: 0, color: alpha(c, top) }, { offset: 1, color: alpha(c, 0) }],
 });
-
-/** `n` grey-to-amber steps for an ordered series (years): earlier entries grey, the last amber. */
-export function steps(t: ChartTheme, n: number): string[] {
-  return Array.from({ length: n }, (_, i) => (i === n - 1 ? t.amber : t.grey[Math.min(2, n - 2 - i)]));
-}

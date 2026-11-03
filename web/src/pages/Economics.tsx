@@ -92,9 +92,9 @@ function TornadoCard({ rows, base, scenario }: { rows: ReturnType<typeof tornado
       },
       yAxis: { type: 'category', data: ordered.map((r) => r.label), ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, margin: 8, color: t.text } },
       series: [
-        { name: 'NPV falls', type: 'bar', stack: 'swing', data: lo, barMaxWidth: 20, itemStyle: { color: t.amber } },
+        { name: 'NPV falls', type: 'bar', stack: 'swing', data: lo, barMaxWidth: 20, itemStyle: { color: t.orange } },
         {
-          name: 'NPV rises', type: 'bar', stack: 'swing', data: hi, barMaxWidth: 20, itemStyle: { color: t.mint },
+          name: 'NPV rises', type: 'bar', stack: 'swing', data: hi, barMaxWidth: 20, itemStyle: { color: t.green },
           markLine: { silent: true, symbol: 'none', label: { show: false }, lineStyle: { color: t.grey[1], type: 'solid', width: 1 }, data: [{ xAxis: 0 }] },
         },
       ],

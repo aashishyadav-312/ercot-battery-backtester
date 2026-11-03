@@ -13,7 +13,7 @@ function useInk() {
   const scheme = useComputedColorScheme('light');
   return {
     text: 'var(--text)', muted: 'var(--muted)', line: 'var(--line-2)', grid: 'var(--line)', surface: 'var(--panel)',
-    mint: 'var(--chart-mint)', amber: 'var(--chart-amber)', mint2: 'var(--chart-mint-2)', grey: 'var(--chart-grey-1)', base: 'var(--chart-grey-2)',
+    green: 'var(--chart-green)', orange: 'var(--chart-orange)', blue: 'var(--chart-blue)', violet: 'var(--chart-violet)', grey: 'var(--chart-grey-1)', base: 'var(--chart-grey-2)',
     tint: scheme === 'dark' ? 'rgb(240 239 236 / 0.06)' : 'rgb(22 22 21 / 0.04)',
   };
 }
@@ -45,10 +45,10 @@ function Arrow({ x1, y1, x2, y2, color }: { x1: number; y1: number; x2: number; 
 export function ErcotDiagram() {
   const k = useInk();
   const src = [
-    { y: 14, t: 'Wind', c: k.mint2 },
-    { y: 50, t: 'Solar', c: k.amber },
+    { y: 14, t: 'Wind', c: k.green },
+    { y: 50, t: 'Solar', c: k.orange },
     { y: 86, t: 'Gas, coal', c: k.base },
-    { y: 122, t: 'Batteries', c: k.mint },
+    { y: 122, t: 'Batteries', c: k.blue },
   ];
   return (
     <Frame label="Diagram: power plants and batteries feed the Texas grid, ERCOT balances supply and demand and runs the markets, and the power reaches homes and businesses." w={360} h={170}>
@@ -60,7 +60,7 @@ export function ErcotDiagram() {
           <Arrow x1={96} y1={s.y + 14} x2={116} y2={85} color={k.base} />
         </g>
       ))}
-      <rect x={118} y={50} width={132} height={70} rx={12} fill="none" stroke={k.mint} strokeWidth={2} />
+      <rect x={118} y={50} width={132} height={70} rx={12} fill="none" stroke={k.blue} strokeWidth={2} />
       <text x={184} y={76} fontSize={14} fontWeight={650} textAnchor="middle" fill={k.text}>ERCOT</text>
       <text x={184} y={93} fontSize={12} textAnchor="middle" fill={k.muted}>balances supply</text>
       <text x={184} y={107} fontSize={12} textAnchor="middle" fill={k.muted}>and runs the markets</text>
@@ -80,7 +80,7 @@ export function LocationsDiagram() {
   return (
     <Frame label="Diagram: many resource nodes, each one plant or battery, are averaged into a load zone price that customers pay and a hub price used as a reference." w={360} h={170}>
       <rect x={2} y={0} width={132} height={96} rx={12} fill="none" stroke={k.line} strokeDasharray="4 4" />
-      {dots.map(([x, y], i) => <circle key={i} cx={x + 4} cy={y + 6} r={7} fill={i === 3 ? k.amber : k.mint} />)}
+      {dots.map(([x, y], i) => <circle key={i} cx={x + 4} cy={y + 6} r={7} fill={i === 3 ? k.orange : k.blue} />)}
       <text x={68} y={118} fontSize={FS} textAnchor="middle" fontWeight={600} fill={k.text}>Resource nodes</text>
       <text x={68} y={133} fontSize={12} textAnchor="middle" fill={k.muted}>one plant or battery each;</text>
       <text x={68} y={146} fontSize={12} textAnchor="middle" fill={k.muted}>price includes local</text>
@@ -151,11 +151,11 @@ export function SpikeDiagram() {
   const wd = R - L;
   // Cost steps (x as a share of supply, height as a share of the plot). Deliberately schematic: no price scale.
   const steps: { to: number; h: number; c: string; t: string }[] = [
-    { to: 0.34, h: 0.1, c: k.mint2, t: 'Wind, solar' },
-    { to: 0.58, h: 0.18, c: k.grey, t: 'Nuclear, coal' },
+    { to: 0.34, h: 0.1, c: k.green, t: 'Wind, solar' },
+    { to: 0.58, h: 0.18, c: k.violet, t: 'Nuclear, coal' },
     { to: 0.80, h: 0.34, c: k.base, t: 'Gas' },
     { to: 0.92, h: 0.62, c: k.base, t: 'Peakers' },
-    { to: 1.0, h: 1.0, c: k.amber, t: '' },
+    { to: 1.0, h: 1.0, c: k.orange, t: '' },
   ];
   let from = 0;
   const rects = steps.map((s) => {
@@ -171,7 +171,7 @@ export function SpikeDiagram() {
       <line x1={L} x2={R} y1={Bt} y2={Bt} stroke={k.line} />
       <line x1={L} x2={L} y1={T} y2={Bt} stroke={k.line} />
       <text x={L - 6} y={T + 6} fontSize={12} textAnchor="end" fill={k.muted} transform={`rotate(-90 ${L - 6} ${T + 6})`} dy={-2}>Price</text>
-      {[[d1, 'Normal evening', k.mint], [d2, 'Hot, calm evening', k.amber]].map(([d, t, c]) => {
+      {[[d1, 'Normal evening', k.blue], [d2, 'Hot, calm evening', k.orange]].map(([d, t, c]) => {
         const xx = L + (d as number) * wd;
         return (
           <g key={t as string}>

@@ -451,7 +451,7 @@ function Progress({ progress: p }: { progress?: RunProgress }) {
 
 /* ------------------------------------------------------------------ result cards */
 
-function Bar({ label, value, share, tone, testId }: { label: string; value: string; share: number; tone: 'mint' | 'amber' | 'grey'; testId?: string }) {
+function Bar({ label, value, share, tone, testId }: { label: string; value: string; share: number; tone: 'green' | 'blue' | 'grey'; testId?: string }) {
   return (
     <div className={classes.hbar}>
       <div className={classes.hbarHead}><span>{label}</span><span className={classes.mono} data-tone={tone} data-testid={testId}>{value}</span></div>
@@ -475,19 +475,19 @@ function TotalsCard({ run, powerMw }: { run: Run; powerMw: number }) {
       <div className={classes.totals}>
         <div>
           <p className={classes.eyebrowMuted}>{TERMS.perfectForesight.label}, {periodLabel(run)}</p>
-          <p className={classes.money} data-tone="mint" data-testid="total-pf">{money(t.pf)}</p>
+          <p className={classes.money} data-tone="green" data-testid="total-pf">{money(t.pf)}</p>
           <p className={classes.monoSmall}>{usd(t.pfYear, 1)} {PER_KW_PER_YEAR}{ann}</p>
           <p className={classes.small}>An upper bound no operator can reach.</p>
         </div>
         <div>
           <p className={classes.eyebrowMuted}>{TERMS.dayAheadPlan.label}, {periodLabel(run)}</p>
-          <p className={classes.money} data-tone="amber" data-testid="total-da">{money(t.da)}</p>
+          <p className={classes.money} data-tone="blue" data-testid="total-da">{money(t.da)}</p>
           <p className={classes.monoSmall}>{usd(t.daYear, 1)} {PER_KW_PER_YEAR}{ann}{t.kept != null && <> · <span data-testid="kept">{pct(t.kept)}</span> {TERMS.captureRate.label.toLowerCase()}</>}</p>
           <p className={classes.small}>Planned the day before on day-ahead prices, settled in real time.</p>
         </div>
       </div>
-      <Bar label={`${TERMS.perfectForesight.label}, ${TERMS.revenueUnit.label}`} value={usd(t.pfYear, 1)} share={max > 0 ? t.pfYear / max : 0} tone="mint" />
-      {t.daYear != null && <Bar label={`${TERMS.dayAheadPlan.label}, ${TERMS.revenueUnit.label}`} value={usd(t.daYear, 1)} share={max > 0 ? t.daYear / max : 0} tone="amber" />}
+      <Bar label={`${TERMS.perfectForesight.label}, ${TERMS.revenueUnit.label}`} value={usd(t.pfYear, 1)} share={max > 0 ? t.pfYear / max : 0} tone="green" />
+      {t.daYear != null && <Bar label={`${TERMS.dayAheadPlan.label}, ${TERMS.revenueUnit.label}`} value={usd(t.daYear, 1)} share={max > 0 ? t.daYear / max : 0} tone="blue" />}
       {t.kept != null && (
         <p className={classes.small}>{TERMS.captureRate.label} compares the two on the {num(run.metrics.da_days_matched ?? run.meta.days_solved)} days both strategies solved.</p>
       )}
@@ -519,7 +519,7 @@ function MonthlyCard({ run, strategy, onStrategy }: { run: Run; strategy: 'pf' |
             <li key={b.month} className={classes.vbar}>
               <span className={classes.vcol} aria-hidden="true">
                 <span
-                  className={classes.vfill} data-neg={v < 0 || undefined} data-tone={strategy === 'pf' ? 'mint' : 'amber'}
+                  className={classes.vfill} data-neg={v < 0 || undefined} data-tone={strategy === 'pf' ? 'green' : 'blue'}
                   style={{ height: `${(Math.abs(v) / span) * 100}%`, bottom: `${((Math.min(0, v) - min) / span) * 100}%` }}
                 />
                 <span className={classes.vval} style={{ bottom: `${((Math.max(0, v) - min) / span) * 100}%` }}>{b.value == null ? '–' : num(v, 1)}</span>
@@ -552,7 +552,7 @@ function DurationCard({ index, form, onPick }: { index: IndexRun[]; form: Custom
             <button type="button" className={classes.durRow} aria-pressed={r.hours === form.durationH} onClick={() => onPick(r.hours)} data-testid={`dur-row-${r.hours}`}>
               <Bar
                 label={`${r.hours} hour${r.hours === 1 ? '' : 's'}`} value={`${usd(r.pf, 1)} · ${usd(r.perKwh, 1)}/kWh`}
-                share={r.pf / max} tone={r.hours === form.durationH ? 'amber' : 'grey'}
+                share={r.pf / max} tone={r.hours === form.durationH ? 'blue' : 'grey'}
               />
             </button>
           </li>

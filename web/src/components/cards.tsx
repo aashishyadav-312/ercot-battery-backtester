@@ -53,7 +53,7 @@ export function MonthlyRevenueCard({ run }: { run?: Run }) {
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [{
         type: 'bar', data: vals, barMaxWidth: 26,
-        itemStyle: { color: t.amber, borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: t.blue, borderRadius: [4, 4, 0, 0] },
         emphasis: { itemStyle: { opacity: 0.85 } },
       }],
     });
@@ -95,7 +95,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
     const cells: [number, number, number][] = [];
     months.forEach((m, yi) => values[m - 1].forEach((v, h) => cells.push([h, yi, Math.round((v / pw) * 1000) / 10])));
     const peak = Math.max(...cells.map((c) => Math.abs(c[2])));
-    const cap = Math.max(20, Math.ceil(peak / 10) * 10); // symmetric so mint and amber are comparable
+    const cap = Math.max(20, Math.ceil(peak / 10) * 10); // symmetric so green and orange are comparable
     return (t: ChartTheme) => ({
       grid: { left: 40, right: overlay && share ? 44 : 14, top: 10, bottom: 84 },
       tooltip: {
@@ -148,7 +148,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
     <Card
       title="Charging pattern by hour and month"
       subtitle={run ? `Average net dispatch as % of rated power · ${scenario(run)}` : undefined}
-      look="Mint cells charge, amber cells discharge. Read across a row for one month's day."
+      look="Green cells charge, orange cells discharge. Read across a row for one month's day."
       csv={csv}
     >
       {(ex) => (
@@ -198,7 +198,7 @@ export function TypicalDayCard({ run }: { run?: Run }) {
   return (
     <Card
       title="Typical day" subtitle="Average net dispatch by hour across the months covered." csv={csv}
-      look="Mint bars below zero are charging hours. Amber bars above zero are discharging hours."
+      look="Green bars below zero are charging hours. Orange bars above zero are discharging hours."
     >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Average hourly net dispatch profile" /> : <Loading />)}
     </Card>
@@ -231,14 +231,14 @@ export function CumulativeCard({ run }: { run?: Run }) {
           const i = run.daily.date.indexOf(date);
           const day = run.daily.revenue[i] / calc.k;
           const isTop = run.metrics.top10_days.includes(date);
-          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.amber + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW${isTop ? wxLine(wx?.on(date)) : ''}`;
+          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.highlight + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW${isTop ? wxLine(wx?.on(date)) : ''}`;
         },
       },
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.grey[0] }, itemStyle: { color: t.grey[0] }, areaStyle: { color: fade(t.grey[0], t.mode === 'dark' ? 0.22 : 0.16) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
-        { name: '10 best days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.amber, borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
+        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.blue }, itemStyle: { color: t.blue }, areaStyle: { color: fade(t.blue, t.mode === 'dark' ? 0.28 : 0.18) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
+        { name: '10 best days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.highlight, borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
       ],
     });
   }, [run, calc, wx]);
@@ -252,7 +252,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
   return (
     <Card
       title="Cumulative revenue" terms="top10_day_share"
-      subtitle={run ? `Amber dots mark the 10 best days${t10 != null ? `, together ${pct(t10, 0)} of the total` : ''} · ${scenario(run)}` : undefined}
+      subtitle={run ? `Orange dots mark the 10 best days${t10 != null ? `, together ${pct(t10, 0)} of the total` : ''} · ${scenario(run)}` : undefined}
       look="Steep steps are the best days. Flat stretches earned little."
       csv={csv}
     >
@@ -278,8 +278,8 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW per day', nameGap: 8 },
       series: [
-        { name: 'Other days', type: 'bar', barMaxWidth: 4, itemStyle: { color: t.grey[1] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, 0] : [d, run.daily.revenue[i] / k])), large: true },
-        { name: '10 best days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.amber }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
+        { name: 'Other days', type: 'bar', barMaxWidth: 4, itemStyle: { color: t.blue }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, 0] : [d, run.daily.revenue[i] / k])), large: true },
+        { name: '10 best days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.highlight }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
       ],
     });
   }, [run, wx]);
@@ -288,7 +288,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
   return (
     <Card
       title="Daily revenue" subtitle="Each bar is one operating day, solved independently." csv={csv}
-      look="Amber bars are the ten best days. Grey bars are every other day."
+      look="Orange bars are the ten best days. Blue bars are every other day."
     >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Daily revenue bar chart" /> : <Loading />)}
     </Card>
@@ -357,7 +357,7 @@ export function CapturePricesCard({ run }: { run?: Run }) {
     <Card
       title="Prices paid and received" terms="spread_captured"
       subtitle={m ? `Energy-weighted. Spread captured ${usd(m.avg_spread_captured, 0)}/MWh (sell price minus buy price).` : undefined}
-      look="Mint is the average price paid to charge, amber the price received. The gap is the spread."
+      look="Green is the average price paid to charge, orange the price received. The gap is the spread."
       csv={csv}
     >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Average charge versus discharge price" /> : <Loading />)}
@@ -402,7 +402,7 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
     <Card
       title="1h vs 2h vs 4h" terms={['usd_per_kw_yr', 'usd_per_kwh_yr', 'cycles']}
       subtitle={`${locFull(sel.location)} · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation${annualized ? ' · annualized year-to-date' : ''}`}
-      look={bestDur ? `Amber is the ${sel.duration}-hour battery you picked. The ${bestDur}-hour earned the most per kW.` : undefined}
+      look={bestDur ? `Blue is the ${sel.duration}-hour battery you picked. The ${bestDur}-hour earned the most per kW.` : undefined}
       csv={csv}
     >
       {(ex) => (
@@ -491,7 +491,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW (matched window)', nameGap: 8 },
       series: names.map((m, mi) => ({
         name: locFull(m), type: 'bar', barMaxWidth: 30,
-        itemStyle: { color: mi === 0 ? t.grey[1] : m === sel.location ? t.selected : [t.mint, t.mint2, t.grey[0]][(mi - 1) % 3], borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: mi === 0 ? t.grey[1] : m === sel.location ? t.selected : [t.green, t.violet, t.cyan, t.rose][(mi - 1) % 4], borderRadius: [4, 4, 0, 0] },
         data: calc.map((c) => c.vals[mi]),
       })),
     });
@@ -592,7 +592,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
         label: { show: true, position: 'right', color: t.text, fontSize: 11, formatter: (p: { value: number }) => usd(p.value, 0) },
         data: sorted.map((d) => ({
           value: d.r.revenue_per_kw_year,
-          itemStyle: { color: d.r.location === sel.location ? t.selected : d.r.location_type === 'hub' ? t.grey[1] : t.mint, borderRadius: [0, 4, 4, 0] },
+          itemStyle: { color: d.r.location === sel.location ? t.selected : d.r.location_type === 'hub' ? t.grey[1] : t.green, borderRadius: [0, 4, 4, 0] },
         })),
       }],
     });
@@ -608,7 +608,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
     <Card
       title="All locations" terms={['hub', 'resource_node', 'usd_per_kw_yr']}
       subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
-      look="Longer bars earned more. Amber is your pick, grey bars are hubs, mint bars are nodes."
+      look="Longer bars earned more. Blue is your pick, grey bars are hubs, green bars are nodes."
       csv={csv}
     >
       {(ex) =>

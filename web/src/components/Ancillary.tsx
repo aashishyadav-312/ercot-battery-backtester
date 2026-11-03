@@ -7,8 +7,8 @@ import { loadAncillary, loadAncillaryRun, findRun } from '../data/loader';
 import { pairedStack, sumStack, stackBounds, STACK_LABELS, type AncillaryFile, type StackDay, type StackRun } from '../data/ancillary';
 import { usd } from '../data/format';
 
-/** Energy amber; regulation up and down mint at two steps; RRS, ECRS and Non-Spin grey at three steps (STACK_LABELS order). */
-const stackColors = (t: ChartTheme) => [t.amber, t.mint, t.mint2, t.grey[0], t.grey[1], t.grey[2]];
+/** One hue per product, in STACK_LABELS order: energy blue, regulation up green, regulation down cyan, RRS violet, ECRS orange, Non-Spin rose. */
+const stackColors = (t: ChartTheme) => [t.blue, t.green, t.cyan, t.violet, t.orange, t.rose];
 
 export function Ancillary({ comparison = false }: { comparison?: boolean }) {
   const { index, sel } = useApp();
@@ -56,9 +56,9 @@ export function Ancillary({ comparison = false }: { comparison?: boolean }) {
   // Only products with revenue on screen get a series and a legend entry ("Energy only" shows one).
   const shown = STACK_LABELS.map((_, j) => j).filter((j) => values.some((v) => Math.abs(v[j]) > 1e-9));
   const look = comparison
-    ? 'Left bar is before RTC+B, right bar after. Each layer is one product; amber is energy.'
+    ? 'Left bar is before RTC+B, right bar after. Each colour is one product; blue is energy.'
     : stacked
-      ? 'Each bar is one month. Amber is energy; mint and grey layers are ancillary services.'
+      ? 'Each bar is one month. Blue is energy; each other colour is one ancillary service.'
       : 'Each bar is one month of energy arbitrage. Switch to Energy + AS to add reserves.';
   const uncertainDays = displayedRows.filter((r) => r.solver_gap === null || (r.solver_gap ?? 0) > 1e-3 + 1e-8).length;
   return (

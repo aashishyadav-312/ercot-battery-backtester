@@ -124,7 +124,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
     <Card
       title="Capture rate by location and duration" terms={['capture_rate', 'perfect_foresight', 'da']}
       subtitle={`Day-ahead plan revenue as a share of perfect foresight · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
-      look={`Longer bars kept more of perfect foresight. Amber is the ${sel.duration}-hour battery.`}
+      look={`Longer bars kept more of perfect foresight. Blue is the ${sel.duration}-hour battery.`}
       csv={csv}
     >
       {(ex) =>
@@ -218,7 +218,7 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
     <Card
       title="Month by month: perfect foresight vs Day-ahead plan" terms={['perfect_foresight', 'da', 'capture_rate']}
       subtitle={run ? `$ per kW, net of degradation · ${locFull(run.meta.location)} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
-      look="Amber is the day-ahead plan, mint is perfect foresight. The gap is the price of not knowing."
+      look="Blue is the day-ahead plan, green is perfect foresight. The gap is the price of not knowing."
       csv={csv}
     >
       {(ex) =>
@@ -283,7 +283,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
     <Card
       title={`Before vs after RTC+B · ${locFull(sel.location)}`} terms="rtcb"
       subtitle={w ? `${durLabel(sel.duration)} battery, $${sel.deg}/MWh degradation. ${fmtDate(w.before.start)} – ${fmtDate(w.before.end)} vs ${fmtDate(w.after.start)} – ${fmtDate(w.after.end)}, same calendar days. Ignores the year selector.` : undefined}
-      look="Grey is before RTC+B, amber is after. Same calendar months, one year apart."
+      look="Grey is before RTC+B, blue is after. Same calendar months, one year apart."
       csv={csv}
     >
       {(ex) =>

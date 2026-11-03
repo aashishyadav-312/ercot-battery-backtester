@@ -50,7 +50,7 @@ describe.each([['dark', dark], ['light', light]] as const)('%s tokens', (_name, 
     expect(contrast(t[fg], mix(t[fill], t.panel, 0.25))).toBeGreaterThanOrEqual(4.5);
   });
 
-  it.each(['chart-amber', 'chart-mint', 'chart-mint-2', 'chart-grey-1', 'chart-grey-2', 'chart-grey-3'])('chart mark %s is at least 3:1 on the panel', (k) => {
+  it.each(['chart-blue', 'chart-green', 'chart-cyan', 'chart-violet', 'chart-orange', 'chart-rose', 'chart-grey-1', 'chart-grey-2', 'chart-grey-3'])('chart mark %s is at least 3:1 on the panel', (k) => {
     expect(t[k], `--${k} missing`).toBeDefined();
     expect(contrast(t[k], t.panel)).toBeGreaterThanOrEqual(3);
   });

@@ -271,7 +271,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
   );
 }
 
-function Bar({ label, value, share, tone }: { label: string; value: string; share: number; tone: 'mint' | 'amber' }) {
+function Bar({ label, value, share, tone }: { label: string; value: string; share: number; tone: 'green' | 'blue' }) {
   return (
     <div className={classes.hbar}>
       <div className={classes.hbarHead}><span>{label}</span><span className={classes.mono} data-tone={tone}>{value}</span></div>
@@ -285,9 +285,9 @@ function GapCard({ h, m }: { h: HubRow; m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>The gap that matters</h3>
       <p className={classes.meta}>Houston hub · {m.year} · {m.durationH}-hour battery · {TERMS.revenueUnit.label}</p>
-      <p className={classes.look}>The amber bar is what a real schedule keeps. The gap is the cost of not knowing prices in advance.</p>
-      <Bar label={`${TERMS.perfectForesight.label} (upper bound)`} value={num(h.pf, 1)} share={1} tone="mint" />
-      {h.da != null && <Bar label={`${TERMS.dayAheadPlan.label}, real-time settled`} value={num(h.da, 1)} share={h.da / h.pf} tone="amber" />}
+      <p className={classes.look}>The blue bar is what a real schedule keeps. The gap is the cost of not knowing prices in advance.</p>
+      <Bar label={`${TERMS.perfectForesight.label} (upper bound)`} value={num(h.pf, 1)} share={1} tone="green" />
+      {h.da != null && <Bar label={`${TERMS.dayAheadPlan.label}, real-time settled`} value={num(h.da, 1)} share={h.da / h.pf} tone="blue" />}
       {h.gap != null && <p className={classes.meta} data-testid="gap">{num(h.gap, 1)} {TERMS.revenueUnit.label} left on the table</p>}
       <p className={classes.cardText}>
         {h.kept != null && <>The day-ahead plan keeps {pct(h.kept)} of what perfect foresight would earn. </>}
@@ -304,7 +304,7 @@ function DurationCard({ m }: { m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Longer earns more per kW</h3>
       <p className={classes.meta}>Houston hub · {m.year} · {TERMS.revenueUnit.label}</p>
-      <p className={classes.look}>Each bar is one battery length. The amber bar is the {m.durationH}-hour battery used across this page.</p>
+      <p className={classes.look}>Each bar is one battery length. The blue bar is the {m.durationH}-hour battery used across this page.</p>
       <ol className={classes.vbars} aria-label="Perfect-foresight revenue by battery duration">
         {m.durations.map((d) => (
           <li key={d.h} className={classes.vbar}>

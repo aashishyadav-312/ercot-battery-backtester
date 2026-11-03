@@ -91,7 +91,7 @@ function PriceCard({ s, loc }: { s: LiveState; loc: string }) {
         id: `o-${h}`, name: 'Other hubs', type: 'line', showSymbol: false, symbol: 'none', silent: true, z: 1,
         lineStyle: { width: 1, color: t.line2 }, itemStyle: { color: t.line2 }, data: rtData(h),
       })),
-      { id: 'da', name: 'Day-ahead', type: 'line', step: 'end', showSymbol: false, symbol: 'none', z: 2, lineStyle: { width: 1.5, type: 'dashed', color: t.amber }, itemStyle: { color: t.amber }, data: daData },
+      { id: 'da', name: 'Day-ahead', type: 'line', step: 'end', showSymbol: false, symbol: 'none', z: 2, lineStyle: { width: 1.5, type: 'dashed', color: t.blue }, itemStyle: { color: t.blue }, data: daData },
       { id: 'rt', name: locName(loc), type: 'line', showSymbol: false, symbol: 'none', z: 3, lineStyle: { width: 2.2, color: t.text }, itemStyle: { color: t.text }, data: rtData(loc) },
     ],
   });

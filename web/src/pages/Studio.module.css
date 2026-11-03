@@ -160,18 +160,18 @@
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
-.money[data-tone='amber'] { color: var(--amber-text); }
-.money[data-tone='mint'] { color: var(--mint-text); }
+.money[data-tone='blue'] { color: var(--chart-blue); }
+.money[data-tone='green'] { color: var(--mint-text); }
 
 .hbar { margin-top: 16px; }
 .hbarHead { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--muted); }
-.hbarHead [data-tone='mint'] { color: var(--mint-text); }
-.hbarHead [data-tone='amber'] { color: var(--amber-text); }
+.hbarHead [data-tone='green'] { color: var(--mint-text); }
+.hbarHead [data-tone='blue'] { color: var(--chart-blue); }
 .hbarHead [data-tone='grey'] { color: var(--text); }
 .barTrack { height: 14px; margin-top: 8px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
 .fill { height: 100%; border-radius: var(--r-pill); animation: grow-x 700ms var(--ease) both; }
-.fill[data-tone='mint'] { background: var(--mint); }
-.fill[data-tone='amber'] { background: var(--amber); }
+.fill[data-tone='green'] { background: var(--chart-green); }
+.fill[data-tone='blue'] { background: var(--chart-blue); }
 .fill[data-tone='grey'] { background: var(--dot-low); }
 
 /* ------------------------------------------------ monthly bars */
@@ -180,8 +180,8 @@
 .vval { position: absolute; left: 0; right: 0; margin-bottom: 4px; text-align: center; font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .vcol { position: relative; flex: 1; width: 100%; }
 .vfill { position: absolute; left: 0; right: 0; border-radius: 4px 4px 2px 2px; animation: grow-y 700ms var(--ease) both; }
-.vfill[data-tone='amber'] { background: var(--amber); }
-.vfill[data-tone='mint'] { background: var(--mint); }
+.vfill[data-tone='blue'] { background: var(--chart-blue); }
+.vfill[data-tone='green'] { background: var(--chart-green); }
 .vfill[data-neg] { background: var(--down); border-radius: 2px 2px 4px 4px; }
 .vlabel { font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--faint); }
 

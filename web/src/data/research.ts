@@ -98,7 +98,7 @@ export function windowEnd(index: IndexRun[], std: { durationH: number; deg: numb
 
 // ------------------------------------------------------------ the three featured charts
 
-export interface Series { name: string; tone: 'dot' | 'mint' | 'amber' }
+export interface Series { name: string; tone: 'dot' | 'green' | 'blue' }
 export interface BarGroup { label: string; values: (number | null)[] }
 export interface GroupedChart {
   title: string;
@@ -121,7 +121,7 @@ export function ancillaryChart(d: ResearchData): GroupedChart | null {
   return {
     title: lifts.length ? `Adding ancillary services lifts Houston revenue ${lifts.length > 1 ? `${lifts.slice(0, -1).join(', ')} and ${lifts.at(-1)}` : lifts[0]}.` : 'Houston revenue with and without ancillary services.',
     meta: `${locName('HB_HOUSTON')} · ${durationH}-hour battery · ${usd(deg, 0)}/MWh degradation · $/kW over the period`,
-    series: [{ name: 'Energy only', tone: 'dot' }, { name: 'Energy plus ancillary', tone: 'amber' }],
+    series: [{ name: 'Energy only', tone: 'dot' }, { name: 'Energy plus ancillary', tone: 'blue' }],
     groups: d.stack.map((s) => ({
       label: s.last.endsWith('-12-31') ? String(s.year) : `${s.year} to ${fmtDate(s.last).replace(/, \d+$/, '')}`,
       values: [s.energy, s.stack],
@@ -187,7 +187,7 @@ export function fallChart(d: ResearchData): FallChart | null {
     change: mean(hubs.map((h) => w.byHub[h][y] / w.byHub[h][w.years[i]] - 1)),
   }));
   const falling = hubs.every((h) => w.years.every((y, i) => i === 0 || w.byHub[h][y] < w.byHub[h][w.years[i - 1]]));
-  const tones: Series['tone'][] = ['dot', 'mint', 'amber'];
+  const tones: Series['tone'][] = ['dot', 'green', 'blue'];
   // The first year-to-year fall is already visible before RTC+B when that year's window ended before it went live.
   const startedBefore = steps.length > 0 && `${steps[0].to}-${w.end}` < d.rtcb.meta.after.start;
   return {

@@ -7,9 +7,9 @@ import { TERMS } from '../../copy/terms';
 /** Legend for the map: what size, colour and shape mean. */
 export function MapLegend({ domain }: { domain: Domain }) {
   // Same ramp as scale.ts rampAt, drawn from the tokens so it switches with the theme.
-  const stops = 'var(--chart-grey-3), var(--chart-mint)';
+  const stops = 'var(--chart-grey-3), var(--chart-green)';
   const sizes = [domain.revMax * 0.25, domain.revMax * 0.6, domain.revMax].map((v) => Math.round(v / 10) * 10);
-  const fill = 'color-mix(in srgb, var(--chart-mint) 55%, var(--chart-grey-3))';
+  const fill = 'color-mix(in srgb, var(--chart-green) 55%, var(--chart-grey-3))';
   const outline = 'var(--mantine-color-default-border)';
   return (
     <Group gap="xl" align="flex-start" role="group" aria-label="Map legend" mt="sm" wrap="wrap">
