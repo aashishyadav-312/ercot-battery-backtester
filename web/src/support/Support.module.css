@@ -15,6 +15,12 @@
   transition: background-color 160ms var(--ease), transform 160ms var(--ease);
 }
 .trigger:hover { background: var(--track); }
+/* A soft amber glow that breathes every few seconds, so the button is noticed without shouting. Stops once open. */
+.trigger:not([aria-expanded='true']) { animation: support-glow 3.2s ease-in-out infinite; }
+@keyframes support-glow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 0%, transparent); border-color: var(--line-2); }
+  50% { box-shadow: 0 0 14px 2px color-mix(in srgb, var(--amber) 38%, transparent); border-color: color-mix(in srgb, var(--amber) 70%, var(--line-2)); }
+}
 .trigger:active { transform: scale(0.97); }
 .heart { flex: none; color: var(--text); }
 
@@ -86,5 +92,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .fill { transition: none; }
+  .trigger { animation: none !important; }
   .trigger:active { transform: none; }
 }

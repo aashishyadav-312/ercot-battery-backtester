@@ -12,7 +12,7 @@ const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 function Heart() {
   return (
     <svg className={classes.heart} width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="var(--amber)" d="M12 11.5s-4.2-2.6-5.2-5.1C6.1 4.6 7.3 2.6 9.2 2.6c1.1 0 2 .6 2.8 1.6.7-1 1.7-1.6 2.8-1.6 1.9 0 3.1 2 2.4 3.8-1 2.5-5.2 5.1-5.2 5.1z" />
+      <path fill="var(--amber)" transform="translate(12 6.9) scale(1.3) translate(-12 -6.9)" d="M12 11.5s-4.2-2.6-5.2-5.1C6.1 4.6 7.3 2.6 9.2 2.6c1.1 0 2 .6 2.8 1.6.7-1 1.7-1.6 2.8-1.6 1.9 0 3.1 2 2.4 3.8-1 2.5-5.2 5.1-5.2 5.1z" />
       <rect x="1.5" y="14" width="2.6" height="8" rx="0.6" fill="currentColor" />
       <path fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
         d="M4.1 15.2h4.6c1 0 1.8.7 1.8 1.6s-.8 1.6-1.8 1.6H7M4.1 21h9.4c1 0 2-.4 2.7-1.1l4.9-4.5c.7-.7.6-1.7-.2-2.2-.6-.4-1.4-.3-2 .1l-3.4 2.9h-5" />
@@ -180,7 +180,7 @@ export function SupportButton() {
       transitionProps={{ transition: reduce ? 'fade' : scaleIn, duration: 200, timingFunction: 'cubic-bezier(.23,1,.32,1)' }}
     >
       <Popover.Target>
-        <button type="button" className={classes.trigger} onClick={() => (opened ? close() : open())} aria-label="Support Chargeline">
+        <button type="button" className={classes.trigger} data-tour="support" onClick={() => (opened ? close() : open())} aria-label="Support Chargeline">
           <Heart />
           <span className={classes.triggerText}>Support</span>
         </button>

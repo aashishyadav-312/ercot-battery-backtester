@@ -27,6 +27,9 @@ beforeEach(() => {
     a.setAttribute('data-tour', `tab-${t}`);
     document.body.append(a);
   }
+  const support = document.createElement('button');
+  support.setAttribute('data-tour', 'support');
+  document.body.append(support);
   window.innerWidth = 1280;
   window.scrollTo = vi.fn() as never;
 });
@@ -56,8 +59,8 @@ describe('tour rules', () => {
     set.mockRestore();
   });
 
-  it('copy: five steps with the exact titles', () => {
-    expect(TOUR_STEPS.map((s) => s.title)).toEqual(['Welcome to Chargeline', 'Atlas', 'Studio', 'Research', 'Learn']);
+  it('copy: six steps with the exact titles', () => {
+    expect(TOUR_STEPS.map((s) => s.title)).toEqual(['Welcome to Chargeline', 'Atlas', 'Studio', 'Research', 'Learn', 'Support']);
     expect(PHONE_MAX).toBe(640);
   });
 
@@ -84,7 +87,7 @@ describe('Tour', () => {
     await mount();
     const d = screen.getByRole('dialog', { name: 'Welcome to Chargeline' });
     expect(d.getAttribute('aria-modal')).toBeNull();
-    expect(screen.getByText('1 of 5')).toBeTruthy();
+    expect(screen.getByText('1 of 6')).toBeTruthy();
     expect(document.activeElement).toBe(d);
     fireEvent.click(screen.getByRole('button', { name: 'Skip tour' }));
     expect(screen.queryByRole('dialog')).toBeNull();
@@ -121,12 +124,12 @@ describe('Tour', () => {
     expect(screen.queryByRole('button', { name: 'Back' })).toBeNull();
     fireEvent.click(next(), { detail: 0 }); // a keyboard activation has detail 0
     expect(screen.getByRole('dialog', { name: 'Atlas' }).hasAttribute('data-animate')).toBe(false);
-    expect(screen.getByText('2 of 5')).toBeTruthy();
+    expect(screen.getByText('2 of 6')).toBeTruthy();
     expect(document.querySelector('[data-tour="tab-atlas"]')!.hasAttribute('data-tour-active')).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Back' }), { detail: 0 });
     expect(screen.getByRole('dialog', { name: 'Welcome to Chargeline' })).toBeTruthy();
-    for (let i = 0; i < 4; i++) fireEvent.click(next(), { detail: 0 });
-    expect(screen.getByRole('dialog', { name: 'Learn' })).toBeTruthy();
+    for (let i = 0; i < 5; i++) fireEvent.click(next(), { detail: 0 });
+    expect(screen.getByRole('dialog', { name: 'Support' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Next' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
     expect(screen.queryByRole('dialog')).toBeNull();
