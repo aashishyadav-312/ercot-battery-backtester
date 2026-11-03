@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Alert, Group, SegmentedControl, Stack, Text } from '@mantine/core';
 import { Card } from './Card';
-import { Chart, axisBase, legendBase, tooltipBase } from './Chart';
+import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from './Chart';
 import { useApp } from '../state';
 import { loadAncillary, loadAncillaryRun, findRun } from '../data/loader';
 import { pairedStack, sumStack, stackBounds, STACK_LABELS, type AncillaryFile, type StackDay, type StackRun } from '../data/ancillary';
 import { usd } from '../data/format';
+
+/** One hue per product, in STACK_LABELS order: energy blue, regulation up green, regulation down cyan, RRS violet, ECRS orange, Non-Spin rose. */
+const stackColors = (t: ChartTheme) => [t.blue, t.green, t.cyan, t.violet, t.orange, t.rose];
 
 export function Ancillary({ comparison = false }: { comparison?: boolean }) {
   const { index, sel } = useApp();
@@ -50,10 +53,17 @@ export function Ancillary({ comparison = false }: { comparison?: boolean }) {
   const total = sumStack(rows, stacked).reduce((s, v) => s + v, 0);
   const baseline = sumStack(rows, false)[0];
   const displayedRows = comparison ? [...pairs.before, ...pairs.after] : rows;
+  // Only products with revenue on screen get a series and a legend entry ("Energy only" shows one).
+  const shown = STACK_LABELS.map((_, j) => j).filter((j) => values.some((v) => Math.abs(v[j]) > 1e-9));
+  const look = comparison
+    ? 'Left bar is before RTC+B, right bar after. Each colour is one product; blue is energy.'
+    : stacked
+      ? 'Each bar is one month. Blue is energy; each other colour is one ancillary service.'
+      : 'Each bar is one month of energy arbitrage. Switch to Energy + AS to add reserves.';
   const uncertainDays = displayedRows.filter((r) => r.solver_gap === null || (r.solver_gap ?? 0) > 1e-3 + 1e-8).length;
   return (
     <Card title={comparison ? 'RTC+B: energy and ancillary revenue' : 'Energy and ancillary revenue'}
-      terms="ancillary_services"
+      terms="ancillary_services" look={available ? look : undefined}
       subtitle={comparison ? 'Same calendar days one year apart; actual $/kW over each matched window.' : 'Compare strategies on identical as-posted prices and days. KPI tiles and other charts remain energy-only.'}
       csv={available ? () => ({ filename: `${comparison ? 'rtcb' : sel.year}_${sel.location}_${sel.duration}h_deg${sel.deg}_${strategy}.csv`,
         headers: ['Period', ...STACK_LABELS.map((l) => `${l} ($/kW)`)], rows: buckets.map((b, i) => [b.label, ...values[i]]) }) : undefined}>
@@ -69,13 +79,12 @@ export function Ancillary({ comparison = false }: { comparison?: boolean }) {
           : <>
             <Chart height={expanded ? '65vh' : 340} label="Revenue by energy and ancillary product"
               build={(t) => ({
-                color: ['#3182ce', '#2f9e7a', '#79b86a', '#9566bb', '#d79740', '#bd6173'],
                 tooltip: { ...tooltipBase(t), trigger: 'axis', valueFormatter: (v: number) => usd(v, 3) },
-                legend: { ...legendBase(t), type: 'scroll' },
-                grid: { left: 55, right: 16, top: 70, bottom: 55 },
+                legend: { ...legendBase(t), type: 'scroll', show: shown.length > 1, data: shown.map((j) => STACK_LABELS[j]) },
+                grid: { left: 55, right: 16, top: shown.length > 1 ? 70 : 24, bottom: 55 },
                 xAxis: { ...axisBase(t), type: 'category', data: buckets.map((b) => b.label), axisLabel: { color: t.muted, rotate: comparison ? 0 : 45 } },
                 yAxis: { ...axisBase(t), type: 'value', name: '$/kW', nameGap: 14 },
-                series: STACK_LABELS.map((name, j) => ({ name, type: 'bar', stack: 'revenue',
+                series: shown.map((j) => ({ name: STACK_LABELS[j], type: 'bar', stack: 'revenue', itemStyle: { color: stackColors(t)[j] },
                   data: values.map((v) => v[j]), barMaxWidth: comparison ? 90 : 32 })),
               })} />
             <Text size="sm" c="dimmed">

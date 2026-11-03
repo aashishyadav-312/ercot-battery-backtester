@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react';
 import { readStoredScheme, resolveScheme, storeScheme, systemScheme, type Scheme } from '../../shell/scheme';
 
 interface Ctx { scheme: Scheme; toggle: () => void }
@@ -22,7 +22,8 @@ export function SchemeProvider({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener('change', on);
   }, []);
 
-  useEffect(() => { document.documentElement.setAttribute('data-theme', scheme); }, [scheme]);
+  // A layout effect, so the tokens have switched before any chart's effect reads them (src/theme/chartColors.ts).
+  useLayoutEffect(() => { document.documentElement.setAttribute('data-theme', scheme); }, [scheme]);
 
   const toggle = useCallback(() => {
     const next: Scheme = scheme === 'dark' ? 'light' : 'dark';

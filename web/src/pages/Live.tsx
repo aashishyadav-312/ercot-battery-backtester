@@ -6,7 +6,7 @@ import { Info } from '../components/Info';
 import { IconWarn } from '../components/Icons';
 import { HubTiles } from '../components/live/HubTiles';
 import { ErrorDetails } from '../components/live/ErrorDetails';
-import { PageHeader } from './Overview';
+import { PageHeader } from './RunHeader';
 import { locFull, locName } from '../data/site';
 import { usd } from '../data/format';
 import type { DayResult } from '../custom/dispatch';
@@ -53,7 +53,7 @@ function Freshness({ load, now }: { load: Extract<LiveLoad, { state: LiveState }
   const s = load.state;
   const through = pricesThrough(s);
   const late = through !== null && now - through > STALE_MIN * 60_000;
-  const [label, color] = load.source === 'cache' ? ['Saved copy', 'gray'] : late ? ['Delayed', 'yellow'] : ['Live', 'green'];
+  const [label, color] = load.source === 'cache' ? ['Saved copy', 'gray'] : late ? ['Delayed', 'yellow'] : ['Live', 'teal'];
   return (
     <Group gap="xs" wrap="wrap">
       <Badge variant="dot" color={color} size="lg" radius="sm" style={{ textTransform: 'none' }}>{label}</Badge>
@@ -89,10 +89,10 @@ function PriceCard({ s, loc }: { s: LiveState; loc: string }) {
     series: [
       ...others.map((h) => ({
         id: `o-${h}`, name: 'Other hubs', type: 'line', showSymbol: false, symbol: 'none', silent: true, z: 1,
-        lineStyle: { width: 1, color: t.baseline, opacity: 0.55 }, itemStyle: { color: t.baseline }, data: rtData(h),
+        lineStyle: { width: 1, color: t.line2 }, itemStyle: { color: t.line2 }, data: rtData(h),
       })),
-      { id: 'da', name: 'Day-ahead', type: 'line', step: 'end', showSymbol: false, symbol: 'none', z: 2, lineStyle: { width: 1.5, type: 'dashed', color: t.series[1] }, itemStyle: { color: t.series[1] }, data: daData },
-      { id: 'rt', name: locName(loc), type: 'line', showSymbol: false, symbol: 'none', z: 3, lineStyle: { width: 2.2, color: t.series[0] }, itemStyle: { color: t.series[0] }, data: rtData(loc) },
+      { id: 'da', name: 'Day-ahead', type: 'line', step: 'end', showSymbol: false, symbol: 'none', z: 2, lineStyle: { width: 1.5, type: 'dashed', color: t.blue }, itemStyle: { color: t.blue }, data: daData },
+      { id: 'rt', name: locName(loc), type: 'line', showSymbol: false, symbol: 'none', z: 3, lineStyle: { width: 2.2, color: t.text }, itemStyle: { color: t.text }, data: rtData(loc) },
     ],
   });
   return (

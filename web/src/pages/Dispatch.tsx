@@ -1,7 +1,7 @@
 import { SimpleGrid, Stack } from '@mantine/core';
 import { CapturePricesCard, HeatmapCard, TypicalDayCard } from '../components/cards';
 import { useSelectedRun } from '../hooks';
-import { KpiRow, PageHeader, RunStatus } from './Overview';
+import { KpiRow, PageHeader, RunStatus } from './RunHeader';
 
 export default function Dispatch() {
   const { run } = useSelectedRun();

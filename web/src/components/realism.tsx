@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Anchor, Badge, Grid, SegmentedControl, SimpleGrid, Table, Text } from '@mantine/core';
+import { Anchor, Badge, Grid, SegmentedControl, SimpleGrid, Stack, Table, Text } from '@mantine/core';
 import { Card, type CsvData } from './Card';
 import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from './Chart';
 import { ChartSkeleton } from './Skeletons';
+import { ScrollBox } from './ScrollBox';
 import { Kpi } from './Kpi';
 import type { IndexRun, Rtcb, RtcbPrices, Run, Selection } from '../data/types';
 import { DURATIONS, findRun } from '../data/loader';
@@ -15,8 +16,12 @@ import { TERMS } from '../copy/terms';
 const tnum = { fontVariantNumeric: 'tabular-nums' } as const;
 /** Signed dollars with a true minus sign: −$1.4. */
 const usdS = (v: number, d = 1) => (v < 0 ? `−${usd(-v, d)}` : usd(v, d));
-/** Chart and its table side by side on wide screens, stacked on narrow ones. */
-function Split({ children }: { children: [React.ReactNode, React.ReactNode] }) {
+/**
+ * Chart and its table side by side on wide screens, stacked on narrow ones. `stack` keeps a wide table under its chart at
+ * every width, so it has the card's full width and does not need to scroll on desktop.
+ */
+function Split({ children, stack = false }: { children: [React.ReactNode, React.ReactNode]; stack?: boolean }) {
+  if (stack) return <Stack gap="sm">{children[0]}{children[1]}</Stack>;
   return (
     <Grid gap={{ base: 'sm', lg: 'xl' }}>
       <Grid.Col span={{ base: 12, lg: 5 }}>{children[0]}</Grid.Col>
@@ -103,11 +108,11 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
       yAxis: { type: 'category', data: rev.map((r) => locAxis(r.loc)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14, fontWeight: (v: string) => (v === locAxis(sel.location) ? 600 : 400) } },
       series: DURATIONS.map((d, i) => ({
         name: `${durLabel(d)} battery`, type: 'bar', barMaxWidth: 8, barGap: '25%',
-        itemStyle: { color: t.series[i], borderRadius: [0, 3, 3, 0] },
+        itemStyle: { color: d === sel.duration ? t.selected : [t.grey[0], t.grey[2]][DURATIONS.filter((x) => x !== sel.duration).indexOf(d)], borderRadius: [0, 3, 3, 0] },
         data: rev.map((r) => r.byDur[i]?.capture_rate ?? null),
       })),
     });
-  }, [rows, sel.location]);
+  }, [rows, sel.location, sel.duration]);
   const csv = (): CsvData | undefined =>
     rows && {
       filename: `capture_rate_${sel.year}_deg${sel.deg}.csv`,
@@ -119,6 +124,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
     <Card
       title="Capture rate by location and duration" terms={['capture_rate', 'perfect_foresight', 'da']}
       subtitle={`Day-ahead plan revenue as a share of perfect foresight · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
+      look={`Longer bars kept more of perfect foresight. Blue is the ${sel.duration}-hour battery.`}
       csv={csv}
     >
       {(ex) =>
@@ -126,9 +132,9 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
           <Text size="sm" c="dimmed" py="md">No day-ahead results for {yearLabel(sel.year)} yet. Try reloading the page.</Text>
         ) : (
           <>
-            <Split>
+            <Split stack>
             <Chart build={build} height={ex ? '75vh' : 520} label="Capture rate by location for 1, 2 and 4 hour batteries" />
-            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Capture rate by location table, scrolls sideways when it does not fit">
+            <ScrollBox label="Capture rate by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={460} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -155,7 +161,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
                 </Table.Tbody>
               </Table>
               <Text size="xs" c="dimmed" mt={6}>$/kW-yr{sel.year === 2026 ? ', annualized year-to-date' : ''}. Click a location to select it.</Text>
-            </div>
+            </ScrollBox>
             </Split>
           </>
         )
@@ -197,8 +203,8 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
       xAxis: { type: 'category', data: data.months.map((m) => MONTHS[m - 1]), ...axisBase(t) },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 16, barGap: '15%', data: data.pf, itemStyle: { color: t.baseline, borderRadius: [3, 3, 0, 0] } },
-        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 16, data: data.da, itemStyle: { color: t.series[0], borderRadius: [3, 3, 0, 0] } },
+        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 16, barGap: '15%', data: data.pf, itemStyle: { color: t.foresight, borderRadius: [3, 3, 0, 0] } },
+        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 16, data: data.da, itemStyle: { color: t.plan, borderRadius: [3, 3, 0, 0] } },
       ],
     });
   }, [data]);
@@ -212,6 +218,7 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
     <Card
       title="Month by month: perfect foresight vs Day-ahead plan" terms={['perfect_foresight', 'da', 'capture_rate']}
       subtitle={run ? `$ per kW, net of degradation · ${locFull(run.meta.location)} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
+      look="Blue is the day-ahead plan, green is perfect foresight. The gap is the price of not knowing."
       csv={csv}
     >
       {(ex) =>
@@ -253,8 +260,8 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
       xAxis: { type: 'category', data: m.months.map((x) => MONTHS[x - 1]), ...axisBase(t) },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { id: 'before', name: 'Before', type: 'bar', barMaxWidth: 16, barGap: '15%', data: b, itemStyle: { color: t.baseline, borderRadius: [3, 3, 0, 0] } },
-        { id: 'after', name: 'After', type: 'bar', barMaxWidth: 16, data: a, itemStyle: { color: t.series[0], borderRadius: [3, 3, 0, 0] } },
+        { id: 'before', name: 'Before', type: 'bar', barMaxWidth: 16, barGap: '15%', data: b, itemStyle: { color: t.before, borderRadius: [3, 3, 0, 0] } },
+        { id: 'after', name: 'After', type: 'bar', barMaxWidth: 16, data: a, itemStyle: { color: t.after, borderRadius: [3, 3, 0, 0] } },
       ],
     });
   }, [run, view]);
@@ -276,6 +283,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
     <Card
       title={`Before vs after RTC+B · ${locFull(sel.location)}`} terms="rtcb"
       subtitle={w ? `${durLabel(sel.duration)} battery, $${sel.deg}/MWh degradation. ${fmtDate(w.before.start)} – ${fmtDate(w.before.end)} vs ${fmtDate(w.after.start)} – ${fmtDate(w.after.end)}, same calendar days. Ignores the year selector.` : undefined}
+      look="Grey is before RTC+B, blue is after. Same calendar months, one year apart."
       csv={csv}
     >
       {(ex) =>
@@ -290,7 +298,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
             />
             <Chart build={build} height={ex ? '50vh' : 300} label="Monthly revenue before and after RTC+B" />
             </div>
-            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Monthly revenue before and after table, scrolls sideways when it does not fit">
+            <ScrollBox label="Monthly revenue before and after table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
                 <Table.Thead><Table.Tr><Table.Th>{run.days} matched days</Table.Th><Table.Th ta="right">Before</Table.Th><Table.Th ta="right">After</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody style={tnum}>
@@ -306,7 +314,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
                   ))}
                 </Table.Tbody>
               </Table>
-            </div>
+            </ScrollBox>
             </Split>
           </>
         )
@@ -342,8 +350,8 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
       xAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: (v: number) => `${Math.round(v * 100)}%` } },
       yAxis: { type: 'category', data: rev.map((r) => locAxis(r.l)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14 } },
       series: [
-        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 9, barGap: '25%', data: rev.map((r) => r.run.change.pf_revenue), itemStyle: { color: t.baseline, borderRadius: 3 } },
-        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 9, data: rev.map((r) => r.run.change.da_rt_revenue), itemStyle: { color: t.series[0], borderRadius: 3 } },
+        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 9, barGap: '25%', data: rev.map((r) => r.run.change.pf_revenue), itemStyle: { color: t.foresight, borderRadius: 3 } },
+        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 9, data: rev.map((r) => r.run.change.da_rt_revenue), itemStyle: { color: t.plan, borderRadius: 3 } },
       ],
     });
   }, [rows]);
@@ -361,14 +369,15 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
     <Card
       title="Before vs after RTC+B · every location" terms={['rtcb', 'perfect_foresight', 'da']}
       subtitle={`Change in revenue over matched windows · ${durLabel(sel.duration)} battery · $${sel.deg}/MWh degradation`}
+      look="Bars right of zero earned more after RTC+B. Bars left of zero earned less."
       csv={csv}
     >
       {(ex) =>
         !rows || !build ? <ChartSkeleton h={360} /> : (
           <>
-            <Split>
+            <Split stack>
             <Chart build={build} height={ex ? '70vh' : 460} label="Percent change in revenue after RTC+B by location" />
-            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Change by location table, scrolls sideways when it does not fit">
+            <ScrollBox label="Change by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={560} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
@@ -389,7 +398,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
                 </Table.Tbody>
               </Table>
               <Text size="xs" c="dimmed" mt={6}>Before → after. Revenue is $ per kW over the matched days, not annualized. |RT − DA| is the mean gap between each 15-min RT price and its hour’s DA price, $/MWh. The CSV adds RT volatility.</Text>
-            </div>
+            </ScrollBox>
             </Split>
           </>
         )

@@ -1,11 +1,10 @@
-import { Group, Paper, Stack, Table, Text, useComputedColorScheme } from '@mantine/core';
+import { Group, Paper, Stack, Table, Text } from '@mantine/core';
 import { QUEUE_CLASSES, queueSwatch } from './scale';
 import type { ContextFile } from '../../data/context';
 import { num } from '../../data/format';
 
 /** Legend for the planned-storage county shading: five equal-count classes of queued MW. */
 export function QueueLegend({ breaks, queue }: { breaks: number[]; queue: ContextFile['queue'] }) {
-  const mode = useComputedColorScheme('light');
   const label = (i: number) =>
     i === 0 ? `< ${num(breaks[0])} MW` : i === breaks.length ? `≥ ${num(breaks[i - 1])} MW` : `${num(breaks[i - 1])}–${num(breaks[i])} MW`;
   return (
@@ -16,7 +15,7 @@ export function QueueLegend({ breaks, queue }: { breaks: number[]; queue: Contex
       <Group gap={4} wrap="wrap">
         {Array.from({ length: QUEUE_CLASSES }, (_, i) => (
           <Stack key={i} gap={2} align="center" w={96}>
-            <div style={{ width: 96, height: 10, borderRadius: 3, background: queueSwatch(i, mode), border: '1px solid var(--mantine-color-default-border)' }} aria-hidden="true" />
+            <div style={{ width: 96, height: 10, borderRadius: 3, background: queueSwatch(i), border: '1px solid var(--mantine-color-default-border)' }} aria-hidden="true" />
             <Text size="xs" c="dimmed" className="tnum" style={{ whiteSpace: 'nowrap' }}>{label(i)}</Text>
           </Stack>
         ))}

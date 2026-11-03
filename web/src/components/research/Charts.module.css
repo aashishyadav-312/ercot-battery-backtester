@@ -13,27 +13,27 @@
 .val { margin-bottom: 4px; text-align: center; font-family: var(--mantine-font-family-monospace); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fill { display: block; border-radius: 5px 5px 1px 1px; animation: grow-y 700ms var(--ease) both; }
 .bar[data-tone='dot'] .fill { background: var(--dot-low); }
-.bar[data-tone='mint'] .fill { background: var(--mint); }
-.bar[data-tone='amber'] .fill { background: var(--amber); }
-.bar[data-tone='amber'] .val { color: var(--amber-text); }
-.bar[data-tone='mint'] .val { color: var(--mint-text); }
+.bar[data-tone='green'] .fill { background: var(--chart-green); }
+.bar[data-tone='blue'] .fill { background: var(--chart-blue); }
+.bar[data-tone='blue'] .val { color: var(--chart-blue); }
+.bar[data-tone='green'] .val { color: var(--mint-text); }
 .glabel { position: absolute; left: 0; right: 0; bottom: -26px; text-align: center; font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.04em; color: var(--faint); }
 
 .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 16px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--muted); }
 .legend li { display: inline-flex; align-items: center; gap: 8px; }
 .swatch { width: 12px; height: 12px; border-radius: 3px; background: var(--dot-low); }
-.swatch[data-tone='mint'] { background: var(--mint); }
-.swatch[data-tone='amber'] { background: var(--amber); }
+.swatch[data-tone='green'] { background: var(--chart-green); }
+.swatch[data-tone='blue'] { background: var(--chart-blue); }
 
 /* capture: two horizontal bars per hub */
 .hrows { display: flex; flex-direction: column; gap: 14px; margin: 24px 0 0; padding: 0; list-style: none; }
 .hhead { display: flex; justify-content: space-between; gap: 12px; font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--muted); }
 .hval { font-variant-numeric: tabular-nums; }
-.hval b { font-weight: 500; color: var(--amber-text); }
+.hval b { font-weight: 500; color: var(--chart-blue); }
 .track { height: 8px; margin-top: 5px; background: var(--track); border-radius: var(--r-pill); overflow: hidden; }
 .hfill { display: block; height: 100%; border-radius: var(--r-pill); animation: grow-x 700ms var(--ease) both; }
 .hfill[data-tone='dot'] { background: var(--dot-low); }
-.hfill[data-tone='amber'] { background: var(--amber); }
+.hfill[data-tone='blue'] { background: var(--chart-blue); }
 
 /* numbers as a table */
 .details { margin-top: 12px; font-size: 13px; color: var(--muted); }

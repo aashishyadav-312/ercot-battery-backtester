@@ -6,19 +6,22 @@
 
 import type { Selection } from '../data/types';
 
-export type Page = 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'map' | 'live' | 'overview' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
-/** Pages that no longer exist on their own: Studio replaced Custom run and Compare, Learn (first called Guide) replaced Start here and About. */
-type Retired = 'custom' | 'compare' | 'start' | 'about' | 'guide';
+export type Page = 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'map' | 'live' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
+/**
+ * Pages that no longer exist on their own: Studio replaced Custom run and Compare, Learn (first called Guide) replaced Start here and About,
+ * and Revenue absorbed Run overview (polish step 4).
+ */
+type Retired = 'custom' | 'compare' | 'start' | 'about' | 'guide' | 'overview';
 export type OldRoute = Exclude<Page, 'home' | 'atlas' | 'studio' | 'research' | 'learn'> | Retired;
 /** The pages from before the redesign. Their bare hash (`#/live`) is an old route that redirects to its new home. */
 export const OLD_PAGES: OldRoute[] = ['start', 'guide', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
-export const PAGES: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => !['custom', 'compare', 'start', 'about', 'guide'].includes(p))];
+export const PAGES: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => !['custom', 'compare', 'start', 'about', 'guide', 'overview'].includes(p))];
 /**
  * Old routes whose content the redesign replaced: they open the new page, not the old one. The old Map page became the
  * Atlas (all nodes); its 10-location view lives on as Atlas > Study sites (`#/atlas/sites`). Custom run and
  * Compare became Studio, which keeps their inputs from the query (`loc`, `dur`, `year`, `deg`, `mw`, ...).
  */
-const REPLACED: Partial<Record<OldRoute, Page>> = { map: 'atlas', custom: 'studio', compare: 'studio', start: 'learn', guide: 'learn', about: 'learn' };
+const REPLACED: Partial<Record<OldRoute, Page>> = { map: 'atlas', custom: 'studio', compare: 'studio', start: 'learn', guide: 'learn', about: 'learn', overview: 'revenue' };
 /** Old routes that land on one section of a page that absorbed them: `#/about` opens Learn at its About section (`?s=about`). */
 const SECTION: Partial<Record<OldRoute, string>> = { about: 'about' };
 /**
@@ -30,10 +33,10 @@ const RETIRED_VIEWS: Partial<Record<Tab, Record<string, Page>>> = { studio: { cu
 const RETIRED_SECTION: Partial<Record<Tab, Record<string, string>>> = { learn: { about: 'about' } };
 /** Tabs that were renamed: `#/guide/...` is `#/learn/...`. */
 const TAB_ALIAS: Record<string, Tab> = { guide: 'learn' };
-/** Views that were renamed (polish step 1): the old slug opens the new one. */
+/** Views that were renamed (polish step 1) or merged (step 4, Run overview into Revenue): the old slug opens the new one. */
 const VIEW_ALIAS: Partial<Record<Tab, Record<string, string>>> = {
   atlas: { detailed: 'sites' },
-  research: { dispatch: 'charging', realism: 'reality' },
+  research: { dispatch: 'charging', realism: 'reality', overview: 'revenue' },
 };
 
 export type Tab = 'home' | 'atlas' | 'studio' | 'research' | 'learn';
@@ -55,7 +58,6 @@ export const TABS: { tab: Tab; label: string; views: View[] }[] = [
     tab: 'research', label: 'Research',
     views: [
       { page: 'research', slug: '', label: 'Findings' },
-      { page: 'overview', slug: 'overview', label: 'Run overview' },
       { page: 'revenue', slug: 'revenue', label: 'Revenue' },
       { page: 'dispatch', slug: 'charging', label: 'Charging pattern' },
       { page: 'realism', slug: 'reality', label: 'Reality check' },
@@ -75,7 +77,7 @@ export function viewsOf(tab: Tab): View[] {
   return TABS.find((t) => t.tab === tab)!.views;
 }
 
-/** Path (no leading `#/`, no query) of a page: "research/overview", "atlas". */
+/** Path (no leading `#/`, no query) of a page: "research/revenue", "atlas". */
 export function pathOf(page: Page): string {
   const tab = tabOf(page);
   const v = viewsOf(tab).find((x) => x.page === page)!;
@@ -92,7 +94,7 @@ export interface ResolvedRoute {
   page: Page;
   /** Query string without the "?", exactly as written. */
   query: string;
-  /** The URL this route should have, `#/research/overview?...`. */
+  /** The URL this route should have, `#/research/revenue?...`. */
   canonical: string;
   /** True when the incoming hash was an old route, an unknown path or an unknown view, so the URL should be rewritten. */
   redirected: boolean;

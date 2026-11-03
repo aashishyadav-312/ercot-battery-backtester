@@ -10,8 +10,7 @@ import classes from './theme.module.css';
  * that asks Mantine for "body", "dimmed" or "primary" gets the token for the active theme.
  * Pseudo-classes and media queries the theme object can't express live in theme.module.css.
  *
- * Primary is amber. Charts still draw their series in the earlier blue/orange/aqua/violet set until
- * each page is redesigned (CHART below); only the surfaces under them moved to the new tokens.
+ * Primary is amber. Chart colours come from the same tokens through src/theme/chartColors.ts.
  */
 
 // Amber ramp. Shade 5 is the token --amber (#F2A93B), the fill for buttons and selected controls.
@@ -158,29 +157,6 @@ export const cssVariablesResolver: CSSVariablesResolver = () => {
     light: { ...both, ...lightText },
     dark: both,
   };
-};
-
-/**
- * Chart colours. Categorical series keep the set the charts were validated with (blue, orange, aqua, violet),
- * checked on the old surfaces and re-checked on the new panels (both pass 3:1 for marks). Text, grid, axis and
- * tooltip colours are the Chargeline tokens, so charts sit on the panel without a seam. `baseline` is the neutral
- * series colour for reference bars (hubs). Charts are redrawn page by page in later steps.
- */
-export const CHART = {
-  light: {
-    surface: '#faf9f6', text: '#15171a', muted: '#55595e', grid: '#e4e1d9', axis: '#b4b0a5',
-    baseline: '#8f8e88',
-    series: ['#2a78d6', '#eb6834', '#1baf7a', '#6250d6'],
-    charge: '#2a78d6', discharge: '#eb6834', neutral: '#e4e1d9',
-    tooltipBg: 'rgba(255,255,255,0.94)', tooltipBorder: 'rgba(21,23,26,0.12)',
-  },
-  dark: {
-    surface: '#171a1d', text: '#e8e6e1', muted: '#b8bdc2', grid: '#262b30', axis: '#3a4046',
-    baseline: '#7d858c',
-    series: ['#3987e5', '#d95926', '#199e70', '#9085e9'],
-    charge: '#3987e5', discharge: '#d95926', neutral: '#242a2f',
-    tooltipBg: 'rgba(28,32,36,0.94)', tooltipBorder: 'rgba(232,230,225,0.14)',
-  },
 };
 
 export const CHART_FONT = FONT;

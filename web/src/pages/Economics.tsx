@@ -6,7 +6,7 @@ import { Info } from '../components/Info';
 import { Kpi } from '../components/Kpi';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
-import { PageHeader, RunStatus } from './Overview';
+import { PageHeader, RunStatus } from './RunHeader';
 import { DEFAULTS, compute, tornado, type Assumptions, type Resource } from '../data/economics';
 import { fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { locFull } from '../data/site';
@@ -92,10 +92,10 @@ function TornadoCard({ rows, base, scenario }: { rows: ReturnType<typeof tornado
       },
       yAxis: { type: 'category', data: ordered.map((r) => r.label), ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, margin: 8, color: t.text } },
       series: [
-        { name: 'NPV falls', type: 'bar', stack: 'swing', data: lo, barMaxWidth: 20, itemStyle: { color: t.series[1] } },
+        { name: 'NPV falls', type: 'bar', stack: 'swing', data: lo, barMaxWidth: 20, itemStyle: { color: t.orange } },
         {
-          name: 'NPV rises', type: 'bar', stack: 'swing', data: hi, barMaxWidth: 20, itemStyle: { color: t.series[0] },
-          markLine: { silent: true, symbol: 'none', label: { show: false }, lineStyle: { color: t.baseline, type: 'solid', width: 1 }, data: [{ xAxis: 0 }] },
+          name: 'NPV rises', type: 'bar', stack: 'swing', data: hi, barMaxWidth: 20, itemStyle: { color: t.green },
+          markLine: { silent: true, symbol: 'none', label: { show: false }, lineStyle: { color: t.grey[1], type: 'solid', width: 1 }, data: [{ xAxis: 0 }] },
         },
       ],
     });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Alert, Anchor, Badge, Flex, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
-import { PageHeader } from './Overview';
+import { PageHeader } from './RunHeader';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { HUBS, loadAncillary } from '../data/loader';
@@ -139,7 +139,7 @@ export default function Method() {
         <summary style={{ cursor: 'pointer', minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 20, fontWeight: 600, letterSpacing: '-0.014em' }}>Technical notes<span aria-hidden="true">{notesOpen ? '−' : '+'}</span></summary>
         <Stack gap="lg" mt="sm">
           <Sub title="Energy plus ancillary services">
-            <Text size="sm">The separate strategy comparison on Run overview, Revenue and Reality check co-optimizes energy with Regulation Up, Regulation Down, Responsive Reserve (RRS), ECRS and Non-Spin. The existing KPI tiles and other charts remain energy-only. Both strategies in the new card use exactly the same covered days and energy price series; missing ancillary prices exclude a day rather than becoming zero revenue.</Text>
+            <Text size="sm">The separate strategy comparison on Revenue and Reality check co-optimizes energy with Regulation Up, Regulation Down, Responsive Reserve (RRS), ECRS and Non-Spin. The existing KPI tiles and other charts remain energy-only. Both strategies in the new card use exactly the same covered days and energy price series; missing ancillary prices exclude a day rather than becoming zero revenue.</Text>
             <Text size="sm">The new screen uses as-posted real-time energy prices from ERCOT public API NP6-905-CD for hubs and nodes. Its baseline is re-solved on those prices; the original hub charts use corrected annual archives and may differ. {anc ? `Before ${rtcLabel(anc)}` : 'Before RTC+B'}, the model uses hourly day-ahead capacity clearing prices from ERCOT NP4-188-CD. Awards are fixed within each physical UTC hour, including repeated DST hours. {anc ? `From ${rtcLabel(anc)}` : 'After RTC+B'} it uses the settled 15-minute real-time capacity prices in NP6-796-ER. Post-RTC+B results represent an all-real-time capacity position, with no day-ahead AS award or imbalance settlement added. The pre-RTC combination of real-time energy foresight and day-ahead capacity foresight is a screening scenario, not an executable bidding strategy.</Text>
             {anc && (
               <Table.ScrollContainer {...scroller('Reserve backing table, scrolls sideways when it does not fit', 480)}>

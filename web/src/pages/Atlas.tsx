@@ -173,7 +173,7 @@ function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: Node
         The ratio divides by {node.hub ?? 'the hub'} in the same all-node run ({usd(node.hub ? hubs.get(node.hub) : null, 1)}), so node and hub are on identical prices.
       </p>
       <div className={classes.links}>
-        {isDetailed(node.code) && <a className={classes.textLink} href={buildHash('overview', { ...sel, location: node.code })}>Full results for every year and size <span aria-hidden="true">→</span></a>}
+        {isDetailed(node.code) && <a className={classes.textLink} href={buildHash('revenue', { ...sel, location: node.code })}>Full results for every year and size <span aria-hidden="true">→</span></a>}
         {node.hub && <a className={classes.textLink} href={buildHash('map', { ...sel, location: node.hub })}>{node.hub} in Study sites <span aria-hidden="true">→</span></a>}
       </div>
       <p className={classes.srOnly} aria-live="polite">Selected {node.code}, rank {node.rank} of {file.meta.n_nodes}.</p>
@@ -237,7 +237,7 @@ function Stray({ file }: { file: NodesFile }) {
               </li>
             ))}
           </ul>
-          <p className={classes.small}>Each class includes its lower edge. Mint is a premium over the hub; amber is the tail at {BUCKETS[3].lo} times and above.</p>
+          <p className={classes.small}>Each class includes its lower edge. Green is a premium over the hub; orange is the tail at {BUCKETS[3].lo} times and above.</p>
         </article>
         <article className={classes.card}>
           <h3 className={classes.cardTitle}>Revenue percentiles</h3>

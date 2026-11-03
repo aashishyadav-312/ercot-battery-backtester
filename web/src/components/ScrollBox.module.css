@@ -1,0 +1,17 @@
+.box {
+  overflow-x: auto;
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+}
+/* Fade the right edge while there is more to see. */
+.box[data-fade] {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+}
+.box:focus-visible {
+  outline: 2px solid var(--amber-text);
+  outline-offset: 2px;
+}
+.hint::before {
+  content: '\2194\00a0';
+}

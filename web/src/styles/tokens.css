@@ -25,6 +25,17 @@
   --land: #1A1E22;
   --land-stroke: #4A5259;
   --dot-low: #8B949B;
+  /* Chart marks (src/theme/chartColors.ts): six hues that stay apart from each other and from the amber UI accent.
+     Each passes 3:1 on --panel; greys run strongest to faintest. */
+  --chart-blue: #5B9BF0;
+  --chart-green: #5FD6A4;
+  --chart-cyan: #4CC3D9;
+  --chart-violet: #A98BF5;
+  --chart-orange: #F0884A;
+  --chart-rose: #EE7BA0;
+  --chart-grey-1: #A3A9AF;
+  --chart-grey-2: #858C93;
+  --chart-grey-3: #6B7279;
   --glass: rgba(23, 26, 29, 0.72);
   --hero-glow: radial-gradient(900px 620px at 72% 52%, rgba(242, 169, 59, 0.12), rgba(95, 214, 164, 0.04) 45%, transparent 75%);
 
@@ -75,6 +86,15 @@
   --land: #E4E2DB;
   --land-stroke: #6E6A60;
   --dot-low: #8A8E8A;
+  --chart-blue: #2F6FCF;
+  --chart-green: #1E9A70;
+  --chart-cyan: #167F94;
+  --chart-violet: #7A5AD6;
+  --chart-orange: #C8551B;
+  --chart-rose: #C2457A;
+  --chart-grey-1: #55595E;
+  --chart-grey-2: #6F7378;
+  --chart-grey-3: #86857F;
   --glass: rgba(250, 249, 246, 0.82);
   --hero-glow: radial-gradient(900px 620px at 72% 52%, rgba(242, 169, 59, 0.20), rgba(95, 214, 164, 0.06) 45%, transparent 75%);
 

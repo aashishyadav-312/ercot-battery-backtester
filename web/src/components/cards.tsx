@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 import { Anchor, Badge, Switch, Table, Text } from '@mantine/core';
 import { Card, type CsvData } from './Card';
 import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from './Chart';
+import { fade } from '../theme/chartColors';
 import { ChartSkeleton } from './Skeletons';
+import { ScrollBox } from './ScrollBox';
 import type { IndexRun, NodeSelection, Run, Selection } from '../data/types';
 import { findRun } from '../data/loader';
 import { MONTHS, durLabel, fmtDate, num, pct, usd, yearLabel } from '../data/format';
@@ -22,12 +24,6 @@ const scenario = (r: Run) =>
 function Loading({ h = H, variant }: { h?: number | string; variant?: 'bars' | 'grid' | 'block' }) {
   return <ChartSkeleton h={h} variant={variant} />;
 }
-
-/** Vertical fade from a series colour to transparent, for area fills. */
-const fade = (hex: string, top = 0.22) => ({
-  type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-  colorStops: [{ offset: 0, color: hex + Math.round(top * 255).toString(16).padStart(2, '0') }, { offset: 1, color: hex + '00' }],
-});
 
 /** "High 98°F, low 77°F in Houston" for the tooltip of a top-10 day. */
 const wxLine = (w?: DayWeather) => (w ? `<br/><span style="opacity:.75">Weather: high ${w.hi}°F, low ${w.lo}°F (${w.city})</span>` : '');
@@ -57,7 +53,7 @@ export function MonthlyRevenueCard({ run }: { run?: Run }) {
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [{
         type: 'bar', data: vals, barMaxWidth: 26,
-        itemStyle: { color: t.series[0], borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: t.blue, borderRadius: [4, 4, 0, 0] },
         emphasis: { itemStyle: { opacity: 0.85 } },
       }],
     });
@@ -68,8 +64,13 @@ export function MonthlyRevenueCard({ run }: { run?: Run }) {
       headers: ['month', 'revenue_usd_per_kw'],
       rows: monthsCovered(run).map((m) => [MONTHS[m - 1], run.metrics.monthly_revenue_per_kw[String(m)] ?? 0]),
     };
+  const rev = run?.metrics.monthly_revenue_per_kw;
+  const best = run && rev && monthsCovered(run).reduce((a, m) => ((rev[String(m)] ?? 0) > (rev[String(a)] ?? 0) ? m : a));
   return (
-    <Card title="Monthly revenue" terms="degradation_cost" subtitle={run ? `$ per kW of power capacity, net of degradation · ${scenario(run)}` : undefined} csv={csv}>
+    <Card
+      title="Monthly revenue" terms="degradation_cost" subtitle={run ? `$ per kW of power capacity, net of degradation · ${scenario(run)}` : undefined} csv={csv}
+      look={best ? `Taller bars are months that paid more. ${new Date(2000, best - 1, 1).toLocaleString('en-US', { month: 'long' })} paid the most in this run.` : undefined}
+    >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Monthly revenue bar chart" /> : <Loading />)}
     </Card>
   );
@@ -94,7 +95,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
     const cells: [number, number, number][] = [];
     months.forEach((m, yi) => values[m - 1].forEach((v, h) => cells.push([h, yi, Math.round((v / pw) * 1000) / 10])));
     const peak = Math.max(...cells.map((c) => Math.abs(c[2])));
-    const cap = Math.max(20, Math.ceil(peak / 10) * 10); // symmetric so blue and orange are comparable
+    const cap = Math.max(20, Math.ceil(peak / 10) * 10); // symmetric so green and orange are comparable
     return (t: ChartTheme) => ({
       grid: { left: 40, right: overlay && share ? 44 : 14, top: 10, bottom: 84 },
       tooltip: {
@@ -118,7 +119,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
       visualMap: {
         min: -cap, max: cap, calculable: false, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 160,
         text: ['Discharging', 'Charging'], textStyle: { color: t.muted, fontSize: 11 },
-        inRange: { color: [t.charge, t.neutral, t.discharge] },
+        inRange: { color: [t.charge, t.surface, t.discharge] },
         formatter: (v: number) => `${Math.round(v)}%`,
       },
       series: [{
@@ -126,11 +127,11 @@ export function HeatmapCard({ run }: { run?: Run }) {
         emphasis: { itemStyle: { borderColor: t.text, borderWidth: 1.5 } },
       },
       ...(overlay && share ? [
-        { name: 'Solar share', data: share.solar, color: '#f2c200' },
-        { name: 'Wind share', data: share.wind, color: t.mode === 'light' ? '#1f2937' : '#e5e7eb' },
+        { name: 'Solar share', data: share.solar, dash: 'solid' },
+        { name: 'Wind share', data: share.wind, dash: 'dashed' },
       ].map((l) => ({
         name: l.name, type: 'line', yAxisIndex: 1, data: l.data, showSymbol: false, z: 6,
-        lineStyle: { width: 3, color: l.color, shadowColor: t.surface, shadowBlur: 4 }, itemStyle: { color: l.color },
+        lineStyle: { width: 3, type: l.dash, color: t.text, shadowColor: t.surface, shadowBlur: 4 }, itemStyle: { color: t.text },
       })) : []),
       ],
     });
@@ -146,7 +147,8 @@ export function HeatmapCard({ run }: { run?: Run }) {
   return (
     <Card
       title="Charging pattern by hour and month"
-      subtitle={run ? `Average net dispatch as % of rated power; orange = discharging, blue = charging · ${scenario(run)}` : undefined}
+      subtitle={run ? `Average net dispatch as % of rated power · ${scenario(run)}` : undefined}
+      look="Green cells charge, orange cells discharge. Read across a row for one month's day."
       csv={csv}
     >
       {(ex) => (
@@ -154,7 +156,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
           <Switch
             size="sm" mb="xs" checked={overlay} onChange={(e) => setOverlay(e.currentTarget.checked)} disabled={!share}
             label="Overlay solar and wind share of ERCOT generation"
-            description={share ? `Yellow = solar, dark = wind, as % of generation by hour (right axis); ${run?.meta.year} fuel mix averaged over the months shown. Shown beside the dispatch pattern, not as its cause.` : ctx ? 'No fuel-mix data for this year.' : 'Loading fuel mix…'}
+            description={share ? `Solid line = solar, dashed line = wind, as % of generation by hour (right axis); ${run?.meta.year} fuel mix averaged over the months shown. Shown beside the dispatch pattern, not as its cause.` : ctx ? 'No fuel-mix data for this year.' : 'Loading fuel mix…'}
           />
           {build ? <Chart build={build} height={ex ? '72vh' : 360} label="Heatmap of average net battery dispatch by hour of day and month" /> : <Loading h={360} variant="grid" />}
         </>
@@ -194,7 +196,10 @@ export function TypicalDayCard({ run }: { run?: Run }) {
   const csv = (): CsvData | undefined =>
     run && data && { filename: `typical_day_${tag(run)}.csv`, headers: ['hour_central', 'avg_net_pct_of_rated_power'], rows: data.map((v, h) => [h, Math.round(v * 1000) / 10]) };
   return (
-    <Card title="Typical day" subtitle="Average net dispatch by hour across the months covered. Orange discharges, blue charges." csv={csv}>
+    <Card
+      title="Typical day" subtitle="Average net dispatch by hour across the months covered." csv={csv}
+      look="Green bars below zero are charging hours. Orange bars above zero are discharging hours."
+    >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Average hourly net dispatch profile" /> : <Loading />)}
     </Card>
   );
@@ -226,14 +231,14 @@ export function CumulativeCard({ run }: { run?: Run }) {
           const i = run.daily.date.indexOf(date);
           const day = run.daily.revenue[i] / calc.k;
           const isTop = run.metrics.top10_days.includes(date);
-          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.series[1] + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW${isTop ? wxLine(wx?.on(date)) : ''}`;
+          return `<b>${fmtDate(date)}</b>${isTop ? ' <span style="color:' + t.highlight + '">top-10 day</span>' : ''}<br/>Cumulative ${usd(base.value[1], 2)}/kW<br/>That day ${usd(day, 2)}/kW${isTop ? wxLine(wx?.on(date)) : ''}`;
         },
       },
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.series[0] }, itemStyle: { color: t.series[0] }, areaStyle: { color: fade(t.series[0], t.mode === 'dark' ? 0.28 : 0.18) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
-        { name: '10 best days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.series[1], borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
+        { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.blue }, itemStyle: { color: t.blue }, areaStyle: { color: fade(t.blue, t.mode === 'dark' ? 0.28 : 0.18) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
+        { name: '10 best days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.highlight, borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
       ],
     });
   }, [run, calc, wx]);
@@ -248,6 +253,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
     <Card
       title="Cumulative revenue" terms="top10_day_share"
       subtitle={run ? `Orange dots mark the 10 best days${t10 != null ? `, together ${pct(t10, 0)} of the total` : ''} · ${scenario(run)}` : undefined}
+      look="Steep steps are the best days. Flat stretches earned little."
       csv={csv}
     >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Cumulative revenue line with top ten days marked" /> : <Loading />)}
@@ -272,15 +278,18 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
       xAxis: { type: 'time', ...axisBase(t), splitLine: { show: false } },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW per day', nameGap: 8 },
       series: [
-        { name: 'Other days', type: 'bar', barMaxWidth: 4, itemStyle: { color: t.series[0] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, 0] : [d, run.daily.revenue[i] / k])), large: true },
-        { name: '10 best days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.series[1] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
+        { name: 'Other days', type: 'bar', barMaxWidth: 4, itemStyle: { color: t.blue }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, 0] : [d, run.daily.revenue[i] / k])), large: true },
+        { name: '10 best days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.highlight }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
       ],
     });
   }, [run, wx]);
   const csv = (): CsvData | undefined =>
     run && { filename: `daily_revenue_${tag(run)}.csv`, headers: ['date', 'revenue_usd_per_kw', 'cycles'], rows: run.daily.date.map((d, i) => [d, Math.round((run.daily.revenue[i] / kw(run)) * 1e4) / 1e4, run.daily.cycles[i]]) };
   return (
-    <Card title="Daily revenue" subtitle="Each bar is one operating day, solved independently. The best ten are orange." csv={csv}>
+    <Card
+      title="Daily revenue" subtitle="Each bar is one operating day, solved independently." csv={csv}
+      look="Orange bars are the ten best days. Blue bars are every other day."
+    >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Daily revenue bar chart" /> : <Loading />)}
     </Card>
   );
@@ -303,7 +312,7 @@ export function TopDaysCard({ run }: { run?: Run }) {
     <Card title="Ten best days" terms="top10_day_share" subtitle={`Share is of the total for the period covered.${wx ? ` Temperatures are the daily high and low in ${wx.city}.` : ''}`} csv={csv}>
       {() =>
         !rows ? <Loading /> : (
-          <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Best days table, scrolls sideways when it does not fit">
+          <ScrollBox label="Best days table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" highlightOnHover>
               <Table.Thead><Table.Tr><Table.Th>#</Table.Th><Table.Th>Date</Table.Th><Table.Th ta="right">$/kW</Table.Th><Table.Th ta="right">Share</Table.Th>{wx && <Table.Th ta="right">High / low</Table.Th>}</Table.Tr></Table.Thead>
               <Table.Tbody>
@@ -317,7 +326,7 @@ export function TopDaysCard({ run }: { run?: Run }) {
                 ))}
               </Table.Tbody>
             </Table>
-          </div>
+          </ScrollBox>
         )
       }
     </Card>
@@ -348,6 +357,7 @@ export function CapturePricesCard({ run }: { run?: Run }) {
     <Card
       title="Prices paid and received" terms="spread_captured"
       subtitle={m ? `Energy-weighted. Spread captured ${usd(m.avg_spread_captured, 0)}/MWh (sell price minus buy price).` : undefined}
+      look="Green is the average price paid to charge, orange the price received. The gap is the spread."
       csv={csv}
     >
       {(ex) => (build ? <Chart build={build} height={tall(ex)} label="Average charge versus discharge price" /> : <Loading />)}
@@ -376,11 +386,12 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
       series: [{
         type: 'bar', barMaxWidth: 64,
         label: { show: true, position: 'top', color: t.text, fontSize: 12, formatter: (p: { value: number }) => usd(p.value, 1) },
-        data: vals.map((v, i) => ({ value: v, itemStyle: { color: [t.series[0], t.series[1], t.series[2]][i], borderRadius: [4, 4, 0, 0] } })),
+        data: vals.map((v, i) => ({ value: v, itemStyle: { color: [1, 2, 4][i] === sel.duration ? t.selected : t.grey[1], borderRadius: [4, 4, 0, 0] } })),
       }],
     });
-  }, [index, valsKey]);
+  }, [index, valsKey, sel.duration]);
   const annualized = rows.some((r) => r?.annualized);
+  const bestDur = rows.reduce<IndexRun | undefined>((a, r) => (r && (!a || r.revenue_per_kw_year > a.revenue_per_kw_year) ? r : a), undefined)?.duration_h;
   const csv = (): CsvData | undefined =>
     index ? {
       filename: `duration_comparison_${sel.location}_${sel.year}_deg${sel.deg}.csv`,
@@ -391,12 +402,13 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
     <Card
       title="1h vs 2h vs 4h" terms={['usd_per_kw_yr', 'usd_per_kwh_yr', 'cycles']}
       subtitle={`${locFull(sel.location)} · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation${annualized ? ' · annualized year-to-date' : ''}`}
+      look={bestDur ? `Blue is the ${sel.duration}-hour battery you picked. The ${bestDur}-hour earned the most per kW.` : undefined}
       csv={csv}
     >
       {(ex) => (
         <>
           {build ? <Chart build={build} height={tall(ex, 220)} label="Revenue by battery duration" /> : <Loading h={220} />}
-          <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Duration table, scrolls sideways when it does not fit">
+          <ScrollBox label="Duration table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
               <Table.Thead>
                 <Table.Tr><Table.Th>Duration</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">$/kWh-yr</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th><Table.Th ta="right">{TERMS.top10DayShare.label}</Table.Th></Table.Tr>
@@ -413,7 +425,7 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
                 ))}
               </Table.Tbody>
             </Table>
-          </div>
+          </ScrollBox>
         </>
       )}
     </Card>
@@ -479,11 +491,11 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW (matched window)', nameGap: 8 },
       series: names.map((m, mi) => ({
         name: locFull(m), type: 'bar', barMaxWidth: 30,
-        itemStyle: { color: mi === 0 ? t.baseline : t.series[mi - 1], borderRadius: [4, 4, 0, 0] },
+        itemStyle: { color: mi === 0 ? t.grey[1] : m === sel.location ? t.selected : [t.green, t.violet, t.cyan, t.rose][(mi - 1) % 4], borderRadius: [4, 4, 0, 0] },
         data: calc.map((c) => c.vals[mi]),
       })),
     });
-  }, [calc, names]);
+  }, [calc, names, sel.location]);
 
   const csv = (): CsvData | undefined =>
     calc && {
@@ -512,6 +524,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
     <Card
       title={isHub ? 'Hub vs the nodes near it' : 'Node vs its hub'} terms={['hub', 'resource_node', 'load_zone']}
       subtitle={`Same battery, same days: ${sel.duration}h, $${sel.deg}/MWh degradation. Nodes are matched to the hub of their load zone.`}
+      look={members.length > 1 ? 'Grey is the hub. Compare each node bar with the grey bar in the same year.' : undefined}
       csv={members.length > 1 ? csv : undefined}
       footer={calc && members.length > 1 ? <NodeHubTable members={names} calc={calc} /> : undefined}
     >
@@ -522,7 +535,7 @@ export function NodeHubCard({ sel, index, nodes }: { sel: Selection; index: Inde
 
 function NodeHubTable({ members, calc }: { members: string[]; calc: { year: number; vals: (number | null)[]; days: number; first: string; last: string }[] }) {
   return (
-    <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Node and hub table, scrolls sideways when it does not fit">
+    <ScrollBox label="Node and hub table, scrolls sideways when it does not fit">
       <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
         <Table.Thead>
           <Table.Tr><Table.Th>Year (days)</Table.Th>{members.map((m, i) => <Table.Th key={m} ta="right">{i === 0 ? `${locFull(m)} $/kW` : `${locFull(m)} ×hub`}</Table.Th>)}</Table.Tr>
@@ -544,7 +557,7 @@ function NodeHubTable({ members, calc }: { members: string[]; calc: { year: numb
       <Text size="xs" c="dimmed" mt={6}>
         Windows: {calc.map((c) => `${c.year}: ${c.first ? `${fmtDate(c.first)} to ${fmtDate(c.last)}` : 'n/a'}`).join(' · ')}.
       </Text>
-    </div>
+    </ScrollBox>
   );
 }
 
@@ -579,7 +592,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
         label: { show: true, position: 'right', color: t.text, fontSize: 11, formatter: (p: { value: number }) => usd(p.value, 0) },
         data: sorted.map((d) => ({
           value: d.r.revenue_per_kw_year,
-          itemStyle: { color: d.r.location === sel.location ? t.series[0] : d.r.location_type === 'hub' ? t.baseline : t.series[2], borderRadius: [0, 4, 4, 0] },
+          itemStyle: { color: d.r.location === sel.location ? t.selected : d.r.location_type === 'hub' ? t.grey[1] : t.green, borderRadius: [0, 4, 4, 0] },
         })),
       }],
     });
@@ -594,14 +607,15 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
   return (
     <Card
       title="All locations" terms={['hub', 'resource_node', 'usd_per_kw_yr']}
-      subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation. Grey = hub, green = node, blue = selected.`}
+      subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
+      look="Longer bars earned more. Blue is your pick, grey bars are hubs, green bars are nodes."
       csv={csv}
     >
       {(ex) =>
         !data || !build ? <Loading h={440} /> : (
           <>
             <Chart build={build} height={ex ? '70vh' : 440} label="Revenue by location, ranked" />
-            <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Revenue by location table, scrolls sideways when it does not fit">
+            <ScrollBox label="Revenue by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" highlightOnHover>
                 <Table.Thead><Table.Tr><Table.Th>Location</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">{TERMS.top10DayShare.label}</Table.Th><Table.Th ta="right">Top day</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody>
@@ -621,7 +635,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
                   ))}
                 </Table.Tbody>
               </Table>
-            </div>
+            </ScrollBox>
           </>
         )
       }

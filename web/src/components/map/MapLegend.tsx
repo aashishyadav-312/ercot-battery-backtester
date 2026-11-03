@@ -1,15 +1,15 @@
-import { Group, Stack, Text, useComputedColorScheme } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import { Info } from '../Info';
-import { markerSize, rampAt, type Domain } from './scale';
+import { markerSize, type Domain } from './scale';
 import { pct, usd } from '../../data/format';
 import { TERMS } from '../../copy/terms';
 
 /** Legend for the map: what size, colour and shape mean. */
 export function MapLegend({ domain }: { domain: Domain }) {
-  const mode = useComputedColorScheme('light');
-  const stops = Array.from({ length: 6 }, (_, i) => rampAt(i / 5, mode)).join(', ');
+  // Same ramp as scale.ts rampAt, drawn from the tokens so it switches with the theme.
+  const stops = 'var(--chart-grey-3), var(--chart-green)';
   const sizes = [domain.revMax * 0.25, domain.revMax * 0.6, domain.revMax].map((v) => Math.round(v / 10) * 10);
-  const fill = rampAt(0.55, mode);
+  const fill = 'color-mix(in srgb, var(--chart-green) 55%, var(--chart-grey-3))';
   const outline = 'var(--mantine-color-default-border)';
   return (
     <Group gap="xl" align="flex-start" role="group" aria-label="Map legend" mt="sm" wrap="wrap">

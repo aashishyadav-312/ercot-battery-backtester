@@ -1,10 +1,8 @@
+// Header, status line and KPI row shared by the one-run Research pages (Revenue, Charging pattern, Reality check).
 import type { ReactNode } from 'react';
 import { Alert, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { Kpi } from '../components/Kpi';
 import { DataQuality } from '../components/DataQuality';
-import { StartBanner } from '../components/StartBanner';
-import { Ancillary } from '../components/Ancillary';
-import { CumulativeCard, DurationCard, HeatmapCard, MonthlyRevenueCard } from '../components/cards';
 import { useApp } from '../state';
 import { useLocations, useSelectedRun } from '../hooks';
 import { fmtDate, num, pct, usd } from '../data/format';
@@ -101,24 +99,4 @@ export function RunStatus() {
   if (missing) return <Alert color="red" title="No result for this combination" />;
   if (error) return <Alert color="red" title="Could not load results">{error}</Alert>;
   return <DataQuality run={run} />;
-}
-
-export default function Overview() {
-  const { run } = useSelectedRun();
-  const { sel, index } = useApp();
-  return (
-    <Stack gap="lg">
-      <StartBanner />
-      <PageHeader title="Run overview" hero />
-      <RunStatus />
-      <KpiRow />
-      <Ancillary />
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-        <MonthlyRevenueCard run={run} />
-        <CumulativeCard run={run} />
-        <HeatmapCard run={run} />
-        <DurationCard sel={sel} index={index} />
-      </SimpleGrid>
-    </Stack>
-  );
 }

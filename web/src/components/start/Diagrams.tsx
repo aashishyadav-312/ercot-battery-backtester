@@ -1,21 +1,19 @@
 import type { ReactNode } from 'react';
 import { useComputedColorScheme } from '@mantine/core';
-import { CHART } from '../../theme';
 import { clock } from '../../data/walkthrough';
 import type { WalkDay } from '../../data/types';
 
 /*
- * Four small inline-SVG diagrams for "ERCOT in 2 minutes". They draw with theme variables and the chart palette,
+ * Four small inline-SVG diagrams for "ERCOT in 2 minutes". They draw with the chart tokens (CSS variables),
  * so they follow light and dark mode. Three are schematics (labelled as such); the day-ahead vs real-time one is
  * drawn from the real featured-day data.
  */
 
 function useInk() {
   const scheme = useComputedColorScheme('light');
-  const c = CHART[scheme];
   return {
-    text: c.text, muted: c.muted, line: c.axis, grid: c.grid, surface: c.surface,
-    blue: c.series[0], orange: c.series[1], green: c.series[2], violet: c.series[3], base: c.baseline,
+    text: 'var(--text)', muted: 'var(--muted)', line: 'var(--line-2)', grid: 'var(--line)', surface: 'var(--panel)',
+    green: 'var(--chart-green)', orange: 'var(--chart-orange)', blue: 'var(--chart-blue)', violet: 'var(--chart-violet)', grey: 'var(--chart-grey-1)', base: 'var(--chart-grey-2)',
     tint: scheme === 'dark' ? 'rgb(240 239 236 / 0.06)' : 'rgb(22 22 21 / 0.04)',
   };
 }

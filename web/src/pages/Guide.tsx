@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { Anchor, Badge, Button, Group, List, Paper, SimpleGrid, Stack, Text, Title, useComputedColorScheme } from '@mantine/core';
-import { PageHeader } from './Overview';
+import { PageHeader } from './RunHeader';
 import { Section } from './Method';
 import { Info } from '../components/Info';
 import { Walkthrough } from '../components/start/Walkthrough';
@@ -207,7 +207,7 @@ function GuideTile({ card }: { card: GuideCard }) {
 export default function Guide() {
   const { go } = useApp();
   const walk = useWalkthrough();
-  useEffect(() => markStartSeen(), []); // opening this page counts as having seen the Overview banner
+  useEffect(() => markStartSeen(), []); // opening this page counts as having seen the Revenue banner
   // `#/learn?s=about` opens at a section. The frame wait lets the app's own scroll-to-top on navigation finish first.
   useEffect(() => {
     const to = () => {

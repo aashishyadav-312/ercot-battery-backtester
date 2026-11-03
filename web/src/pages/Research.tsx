@@ -260,8 +260,7 @@ function Overview({ data, sections, head }: { data: ResearchData; sections: Map<
           Pick a location, year, duration and degradation cost and read the same run in detail.
         </p>
         <ul className={classes.explore}>
-          <li><a href="#/research/overview">Run overview</a></li>
-          <li><a href="#/research/revenue">Revenue by day</a></li>
+          <li><a href="#/research/revenue">Revenue</a></li>
           <li><a href="#/research/charging">Charging pattern</a></li>
           <li><a href="#/research/reality">Reality check</a></li>
         </ul>
