@@ -34,6 +34,13 @@ code {
   outline-offset: 2px;
 }
 
+/* First-visit tour: the element the popover points at gets a soft outline (no scrim over the page). */
+[data-tour-active] {
+  outline: 2px solid color-mix(in srgb, var(--amber-text) 55%, transparent);
+  outline-offset: 4px;
+  border-radius: var(--r-input);
+}
+
 /* Reading measure: running text stops at about 75 characters, and a last line is not left with one word. Zero specificity,
    so a component that sets its own width keeps it. */
 :where(main p, footer p) { max-width: 75ch; text-wrap: pretty; }

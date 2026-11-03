@@ -12,6 +12,7 @@ import { GLOSSARY, SITE, locName } from '../data/site';
 import { GUIDE, LEFT_OUT, START_DEFAULTS, type GuideCard } from '../data/start';
 import { fmtDate } from '../data/format';
 import { markStartSeen } from '../components/StartBanner';
+import { requestTour } from '../components/tour/steps';
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
@@ -257,6 +258,7 @@ export default function Guide() {
       </GuideSection>
 
       <GuideSection id="read" n={3} title="How to read this site" lede="Each page answers one question. Every link opens the page already set up for a 2-hour battery at Houston Hub in 2025, and on the run pages you can change the location, length, year and wear cost in the bar at the top.">
+        <Button variant="default" size="md" mb="lg" onClick={requestTour}>Take the tour</Button>
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
           {GUIDE.map((c) => <GuideTile key={c.page} card={c} />)}
         </SimpleGrid>

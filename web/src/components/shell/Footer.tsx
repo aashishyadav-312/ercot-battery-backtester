@@ -2,6 +2,7 @@ import type { IndexRun, Selection } from '../../data/types';
 import { dataThrough, SITE } from '../../data/site';
 import { fmtDate } from '../../data/format';
 import { buildHash } from '../../shell/route';
+import { requestTour } from '../tour/steps';
 import classes from './Footer.module.css';
 
 /** Disclaimer, who built it, the data cut-off and where to report problems. Shown under every page. */
@@ -26,7 +27,8 @@ export function Footer({ index, sel }: { index: IndexRun[] | null; sel: Selectio
           <a href={SITE.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a> ·{' '}
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{' '}
           <a href={SITE.issues} target="_blank" rel="noopener noreferrer">Report an issue</a> ·{' '}
-          <a href={`${buildHash('learn', sel)}&s=about`}>About</a>
+          <a href={`${buildHash('learn', sel)}&s=about`}>About</a> ·{' '}
+          <button type="button" className={classes.link} onClick={requestTour}>Take the tour</button>
         </p>
         <p className={classes.small}>
           An independent project, not affiliated with ERCOT or any company. Prices are ERCOT public data. Results are illustrative models.

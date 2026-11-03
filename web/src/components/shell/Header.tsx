@@ -32,7 +32,7 @@ export function Header({ active, sel, scheme, onToggleScheme }: Props) {
         </a>
         <nav className={classes.nav} aria-label="Primary">
           {TABS.map(({ tab, label, views }) => (
-            <a key={tab} className={classes.tab} href={buildHash(views[0].page, sel)} aria-current={active === tab ? 'page' : undefined}>
+            <a key={tab} className={classes.tab} data-tour={`tab-${tab}`} href={buildHash(views[0].page, sel)} aria-current={active === tab ? 'page' : undefined}>
               {label}
             </a>
           ))}
