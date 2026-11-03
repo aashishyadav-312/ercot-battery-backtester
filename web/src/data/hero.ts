@@ -1,7 +1,8 @@
 import type { IndexRun, Run, Selection } from './types';
-import { pct, usd } from './format';
+import { num, pct, usd } from './format';
 import type { Page } from '../state';
 import { locFull } from './site';
+import { topNodeLine } from './notes';
 
 /** A sentence split into plain text and the one figure to emphasise. */
 export type Part = string | { em: string };
@@ -54,15 +55,29 @@ function capture(r: Run): Hero | null {
   return make(['Scheduling on day-ahead prices captured ', { em: pct(c, 0) }, ` of the perfect-foresight revenue in ${period(r)}.`]);
 }
 
-/** Map page: the spread between the best and weakest tracked location for the chosen scenario. */
+/** Scenario rows of the study sites, best first. */
+const mapRows = (sel: Selection, index: IndexRun[]) => index
+  .filter((r) => r.year === sel.year && r.duration_h === sel.duration && r.deg_cost_per_mwh === sel.deg)
+  .sort((a, b) => b.revenue_per_kw_year - a.revenue_per_kw_year);
+
+/** Map page: how many times more the best study site earned than the weakest, for the chosen scenario. */
 function mapSpread(sel: Selection, index: IndexRun[]): Hero | null {
-  const rows = index
-    .filter((r) => r.year === sel.year && r.duration_h === sel.duration && r.deg_cost_per_mwh === sel.deg)
-    .sort((a, b) => b.revenue_per_kw_year - a.revenue_per_kw_year);
+  const rows = mapRows(sel, index);
   if (rows.length < 2) return null;
+  const ratio = rows[0].revenue_per_kw_year / rows[rows.length - 1].revenue_per_kw_year;
+  if (!(ratio > 0) || !Number.isFinite(ratio)) return null;
+  return make(['Same battery, ', { em: `${num(ratio, 1)}×` }, ' the revenue. Location decides.']);
+}
+
+/** Map page subhead: the top node and its hub with both values; the best and weakest site when no node has a hub row. */
+export function mapLede(sel: Selection, index: IndexRun[] | null, hubOf: (code: string) => string | null | undefined): string | null {
+  if (!index) return null;
+  const rows = mapRows(sel, index);
+  if (rows.length < 2) return null;
+  const line = topNodeLine(rows, hubOf);
+  if (line) return line;
   const [best, worst] = [rows[0], rows[rows.length - 1]];
-  const yr = best.annualized ? `${sel.year} so far` : String(sel.year);
-  return make([`Where the battery sits matters: in ${yr}, ${locFull(best.location)} earned `, { em: `${usd(best.revenue_per_kw_year, 0)}/kW-yr` }, `, against `, { em: `${usd(worst.revenue_per_kw_year, 0)}/kW-yr` }, ` at ${locFull(worst.location)}.`]);
+  return `${locFull(best.location)} earned ${usd(best.revenue_per_kw_year, 0)}/kW-yr; ${locFull(worst.location)} earned ${usd(worst.revenue_per_kw_year, 0)}/kW-yr.`;
 }
 
 export function heroFor(page: Page, run: Run | undefined, sel: Selection, index: IndexRun[] | null): Hero | null {

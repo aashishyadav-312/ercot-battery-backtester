@@ -10,6 +10,7 @@ import { PageHeader, RunStatus } from './RunHeader';
 import { DEFAULTS, compute, tornado, type Assumptions, type Resource } from '../data/economics';
 import { fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { locFull } from '../data/site';
+import { economicsVerdict } from '../data/notes';
 import { TERMS } from '../copy/terms';
 
 type Source = 'pf' | 'da';
@@ -206,6 +207,7 @@ export default function Economics() {
               hint={resource && `${usd(form.costPerKwh, 0)}/kWh × ${resource.durationH} h${form.itcPct ? `, less ${num(form.itcPct, 1)}% tax credit` : ''}.`}
             />
           </SimpleGrid>
+          {out && <Text size="sm" c="dimmed" lh={1.45} data-testid="econ-verdict">{economicsVerdict(out)}</Text>}
           {rows && out && <TornadoCard rows={rows} base={out.npv} scenario={scenario} />}
         </Stack>
       </SimpleGrid>

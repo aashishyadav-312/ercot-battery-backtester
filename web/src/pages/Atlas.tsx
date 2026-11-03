@@ -107,6 +107,9 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
             </ul>
             <p className={classes.small}>{num(where.nUnplaced)} nodes are not on the map yet. Click a dot, pick from the list, or search.</p>
           </div>
+          <p className={classes.small} data-testid="atlas-look">
+            What to look for: bigger, darker dots mean higher {mInfo.label.toLowerCase()}. Neighbouring dots can differ a lot{strayStory(file).tailCount > 0 ? `; ${num(strayStory(file).tailCount)} nodes earn ${TAIL_RATIO}× their hub or more` : ''}.
+          </p>
           <Select
             className={classes.search} label="Find any node" placeholder="Type a node, substation or zone" searchable clearable={false} limit={50}
             data={all.map((n) => ({ value: n.code, label: `${n.code}${n.sub ? ` · ${n.sub}` : ''} · ${zoneShort(n.lz)}${placed(n) ? '' : ' · not on map'}` }))}
@@ -219,7 +222,7 @@ function Stray({ file }: { file: NodesFile }) {
       <p className={classes.eyebrow}>How far nodes stray from their hub</p>
       <h2 id="stray-title" className={classes.h2} data-testid="stray-title">
         {story.withinShare != null && <>{pct(story.withinShare)} of nodes earn within {band}% of their hub. </>}
-        {story.tailCount > 0 && story.maxRatio != null && <>{story.tailCount} earn {TAIL_RATIO} to {story.maxRatio.toFixed(1)} times as much.</>}
+        {strayStory(file).tailCount > 0 && story.maxRatio != null && <>{strayStory(file).tailCount} earn {TAIL_RATIO} to {story.maxRatio.toFixed(1)} times as much.</>}
       </h2>
       <div className={classes.pair}>
         <article className={classes.card}>
