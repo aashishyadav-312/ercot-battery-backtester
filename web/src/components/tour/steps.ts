@@ -14,6 +14,7 @@ export const TOUR_STEPS: TourStep[] = [
   { anchor: 'tab-studio', title: 'Studio', body: 'Run your own battery. Pick a place, size and year; anything new solves in your browser.' },
   { anchor: 'tab-research', title: 'Research', body: 'What the replay found, how far a real schedule falls short, and how the model works.' },
   { anchor: 'tab-learn', title: 'Learn', body: 'New to ERCOT? Start here. You will also find the glossary and who built this.' },
+  { anchor: 'support', title: 'Support', body: 'If you like Chargeline, please consider supporting the creator and help offset its build costs. Even a small donation matters.' },
 ];
 
 /** Finishing the tour (Done) is remembered for good. */

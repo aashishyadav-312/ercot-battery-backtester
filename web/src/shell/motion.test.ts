@@ -60,7 +60,7 @@ describe('motion', () => {
     expect(block).toMatch(/animation-iteration-count:\s*1\s*!important/);
   });
 
-  it('infinite animations are the ticker, the map breathing and rings, the skeleton sheen and the indeterminate bar', () => {
+  it('infinite animations are the ticker, the map breathing and rings, the skeleton sheen, the indeterminate bar and the Support glow', () => {
     const found: string[] = [];
     for (const p of css) for (const m of read(p).matchAll(/animation\s*:[^;]*\binfinite\b[^;]*;/g)) found.push(`${rel(p)}: ${m[0].match(/:\s*([\w-]+)/)?.[1]}`);
     expect(found.sort()).toEqual([
@@ -68,6 +68,7 @@ describe('motion', () => {
       'components/home/HomeMap.module.css: ring',
       'components/shell/Ticker.module.css: tick-slide',
       'pages/Studio.module.css: slide',
+      'support/Support.module.css: support-glow',
       'theme.module.css: sheen',
     ]);
   });
