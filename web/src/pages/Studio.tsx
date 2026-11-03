@@ -4,6 +4,7 @@ import { useApp } from '../state';
 import { loadPriceIndex, loadRun as loadRunFile } from '../data/loader';
 import { MONTHS, fmtDate, num, pct, usd } from '../data/format';
 import { locFull, locName } from '../data/site';
+import { degNote, yearNote } from '../data/notes';
 import type { IndexRun, NodeSelection, Run } from '../data/types';
 import {
   INPUT_STEP, applyPatch, batteryDiffers, compareRows, durationTradeoff, initialForm, monthlyBars, money, nearest, presetFor, presetGaps,
@@ -271,6 +272,7 @@ function Inputs({ form, coverage, index, set, preset }: {
           label="Year" name="year" value={year} onPick={(y) => { const r = yearRange(form.location, y, index, coverage); if (r) set(r); }}
           options={years.map((c) => ({ value: c.year, label: String(c.year) }))}
         />
+        {yearNote(index, year) && <p className={classes.hint} data-testid="year-note">{yearNote(index, year)}</p>}
       </div>
 
       <div className={classes.dates}>
@@ -316,6 +318,7 @@ function Inputs({ form, coverage, index, set, preset }: {
           label="Degradation cost presets" name="deg" value={form.degCost} onPick={(degCost) => set({ degCost })}
           options={PRECOMPUTED.degs.map((d) => ({ value: d, label: `$${d}/MWh` }))}
         />
+        <p className={classes.hint} data-testid="deg-note">{degNote(PRECOMPUTED.degs)} Any value works here; costs without a preset are solved in your browser.</p>
         <Num
           label="Cost per MWh discharged" value={form.degCost} onChange={(degCost) => set({ degCost })} lim={LIMITS.degCost}
           step={INPUT_STEP.degCost} prefix="$" testId="deg"

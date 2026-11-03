@@ -6,10 +6,10 @@ import { StartBanner } from '../components/StartBanner';
 import { Ancillary } from '../components/Ancillary';
 import { CumulativeCard, DurationCard, HeatmapCard, MonthlyRevenueCard } from '../components/cards';
 import { useApp } from '../state';
-import { useSelectedRun } from '../hooks';
+import { useLocations, useSelectedRun } from '../hooks';
 import { fmtDate, num, pct, usd } from '../data/format';
 import { annualizedBadge, topDay } from '../data/analytics';
-import { heroFor, ledeFor } from '../data/hero';
+import { heroFor, ledeFor, mapLede } from '../data/hero';
 import type { Run } from '../data/types';
 import { TERMS } from '../copy/terms';
 
@@ -72,7 +72,9 @@ function HeroSentence() {
   const { page, index } = useApp();
   const { sel, run } = useSelectedRun();
   const hero = heroFor(page, run, sel, index);
-  const lede = ledeFor(run, page);
+  const locs = useLocations();
+  const hubs = new Map((locs.data?.locations ?? []).map((l) => [l.code, l.nearest_hub]));
+  const lede = page === 'map' ? mapLede(sel, index, (c) => hubs.get(c)) : ledeFor(run, page);
   return (
     <>
       {hero ? (
