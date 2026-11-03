@@ -13,11 +13,12 @@ import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
 import { AtlasMap } from '../components/atlas/AtlasMap';
 import { Info } from '../components/Info';
 import classes from './Atlas.module.css';
+import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
 /** Value of a metric for display: dollars for revenue, a percentage for the two shares. */
 const fmtMetric = (m: Metric, v: number | null | undefined) => (m === 'rev' ? usd(v, 1) : pct(v));
 const fmtRatio = (r: number | null) => (r == null ? '–' : `${r.toFixed(2)}x`);
-const UNIT: Record<Metric, string> = { rev: '$/kW-year, perfect foresight', capture: 'of perfect foresight kept by a day-ahead schedule', top10: 'of revenue from the 10 best days' };
+const UNIT: Record<Metric, string> = { rev: `${TERMS.revenueUnit.label}, ${TERMS.perfectForesight.label.toLowerCase()}`, capture: `of ${TERMS.perfectForesight.label.toLowerCase()} kept by the ${TERMS.dayAheadPlan.label.toLowerCase()}`, top10: 'of revenue from the 10 best days' };
 
 /** The all-node file and the Texas outline. The all-node file is fetched only by Home and the Atlas, and cached by the loader. */
 function useAtlasData() {
@@ -70,7 +71,7 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
   return (
     <div className={classes.page}>
       <header className={classes.intro}>
-        <p className={classes.eyebrow}>Atlas · {year} · {durH}-hour battery · $/kW-year</p>
+        <p className={classes.eyebrow}>Atlas · {year} · {durH}-hour battery · {TERMS.revenueUnit.label} ({PER_KW_PER_YEAR})</p>
         <h1 className={classes.h1}>Every node, one map.</h1>
         <p className={classes.lede} data-testid="atlas-lede">
           {num(where.nNodes)} ERCOT resource nodes have complete {year} prices. {num(where.nPlaced)} of them are placed on the map from public plant
@@ -134,9 +135,9 @@ function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: Node
   const stats: { id: string; label: string; value: string; term?: string }[] = [
     { id: 'rev', label: 'Revenue', value: usd(node.rev, 1), term: 'usd_per_kw_yr' },
     { id: 'ratio', label: node.hub ? `vs ${node.hub}` : 'vs own hub', value: fmtRatio(ratio) },
-    { id: 'da', label: 'Day-ahead scheduled', value: usd(node.da_rev, 1), term: 'da' },
-    { id: 'capture', label: 'Capture', value: pct(node.capture), term: 'capture_rate' },
-    { id: 'top10', label: 'Top 10 days', value: pct(node.top10), term: 'top10_day_share' },
+    { id: 'da', label: TERMS.dayAheadPlan.label, value: usd(node.da_rev, 1), term: 'da' },
+    { id: 'capture', label: TERMS.captureRate.label, value: pct(node.capture), term: 'capture_rate' },
+    { id: 'top10', label: TERMS.top10DayShare.label, value: pct(node.top10), term: 'top10_day_share' },
     { id: 'cycles', label: 'Cycles a year', value: num(node.cycles), term: 'cycles' },
   ];
   return (
@@ -170,7 +171,7 @@ function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: Node
       </p>
       <div className={classes.links}>
         {isDetailed(node.code) && <a className={classes.textLink} href={buildHash('overview', { ...sel, location: node.code })}>Full results for every year and size <span aria-hidden="true">→</span></a>}
-        {node.hub && <a className={classes.textLink} href={buildHash('map', { ...sel, location: node.hub })}>{node.hub} in Detailed locations <span aria-hidden="true">→</span></a>}
+        {node.hub && <a className={classes.textLink} href={buildHash('map', { ...sel, location: node.hub })}>{node.hub} in Study sites <span aria-hidden="true">→</span></a>}
       </div>
       <p className={classes.srOnly} aria-live="polite">Selected {node.code}, rank {node.rank} of {file.meta.n_nodes}.</p>
     </section>
@@ -237,10 +238,10 @@ function Stray({ file }: { file: NodesFile }) {
         </article>
         <article className={classes.card}>
           <h3 className={classes.cardTitle}>Revenue percentiles</h3>
-          <p className={classes.meta}>$/kW-year, and as a multiple of own hub</p>
+          <p className={classes.meta}>{TERMS.revenueUnit.label}, and as a multiple of own hub</p>
           <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Revenue percentiles table, scrolls sideways when it does not fit">
             <table className={classes.table} data-testid="percentiles">
-              <thead><tr><th scope="col">Percentile</th><th scope="col" className={classes.num}>$/kW-yr</th><th scope="col" className={classes.num}>vs hub</th></tr></thead>
+              <thead><tr><th scope="col">Percentile</th><th scope="col" className={classes.num}>{TERMS.revenueUnit.label}</th><th scope="col" className={classes.num}>vs hub</th></tr></thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.label}>
@@ -285,11 +286,11 @@ const COLS: { key: Key; label: string; term?: string; num?: boolean }[] = [
   { key: 'rank', label: '#', num: true },
   { key: 'code', label: 'Node' },
   { key: 'lz', label: 'Load zone' },
-  { key: 'rev', label: '$/kW-yr', term: 'usd_per_kw_yr', num: true },
+  { key: 'rev', label: TERMS.revenueUnit.label, term: 'usd_per_kw_yr', num: true },
   { key: 'vs_hub', label: 'vs hub', num: true },
-  { key: 'da_rev', label: 'DA-sched.', term: 'da', num: true },
-  { key: 'capture', label: 'Capture', term: 'capture_rate', num: true },
-  { key: 'top10', label: 'Top 10', term: 'top10_day_share', num: true },
+  { key: 'da_rev', label: TERMS.dayAheadPlan.label, term: 'da', num: true },
+  { key: 'capture', label: TERMS.captureRate.label, term: 'capture_rate', num: true },
+  { key: 'top10', label: TERMS.top10DayShare.label, term: 'top10_day_share', num: true },
   { key: 'cycles', label: 'Cycles', term: 'cycles', num: true },
   { key: 'spread', label: 'Spread', term: 'spread_captured', num: true },
   { key: 'corr_hub', label: 'Corr. hub', term: 'corr_hub', num: true },

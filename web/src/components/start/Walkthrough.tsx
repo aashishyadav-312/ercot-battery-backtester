@@ -253,7 +253,7 @@ export function Walkthrough({ data, error }: { data?: WalkData; error?: string }
       <Group gap="sm">
         <Button
           variant="light"
-          onClick={() => go('overview', { location: data.meta.location, duration: data.meta.duration_h, year: data.meta.year, deg: data.meta.deg_cost_per_mwh })}
+          onClick={() => go('revenue', { location: data.meta.location, duration: data.meta.duration_h, year: data.meta.year, deg: data.meta.deg_cost_per_mwh })}
         >
           See this battery across the whole year
         </Button>

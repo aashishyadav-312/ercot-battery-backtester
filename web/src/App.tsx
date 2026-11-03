@@ -26,13 +26,13 @@ import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'guide', 'method', 'live'];
+const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', 'method', 'live'];
 
 /** Run pages whose cards sit directly under the h1. */
 const FLAT_HEADINGS: Page[] = ['overview', 'revenue', 'dispatch', 'realism', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, atlas: Atlas, studio: Studio, research: Research, guide: Guide, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
+  home: Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
   realism: Realism, economics: Economics, live: Live, method: Method,
 };
 
@@ -66,7 +66,7 @@ export default function App() {
       <Ticker />
       <Header active={tab} sel={sel} scheme={scheme} onToggleScheme={toggle} />
       <main id="main" ref={main} tabIndex={-1} className={classes.main}>
-        {/* Home is the landing page: no sub-navigation above the hero. Its "Today in ERCOT" view links back to it. */}
+        {/* Home is the landing page: no sub-navigation above the hero. Its "Live prices" view links back to it. */}
         {page !== 'home' && (
           <ViewBar tab={tab} page={page} sel={sel}>
             {selectors && <Group visibleFrom="md"><Selectors /></Group>}

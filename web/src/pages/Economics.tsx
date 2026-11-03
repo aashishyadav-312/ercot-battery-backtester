@@ -13,6 +13,7 @@ import { fmtDate, num, pct, usd as usdRaw, yearLabel } from '../data/format';
 /** Dollars with the sign in front of the symbol: -$503, not $-503. */
 const usd = (v: number | null | undefined, d = 1) => (v != null && v < 0 && usdRaw(v, d) !== usdRaw(0, d) ? `-${usdRaw(-v, d)}` : usdRaw(v === 0 ? 0 : v, d));
 import { locFull } from '../data/site';
+import { TERMS } from '../copy/terms';
 
 type Source = 'pf' | 'da';
 
@@ -174,7 +175,7 @@ export default function Economics() {
           </div>
           <SegmentedControl
             value={use} onChange={(v) => setSource(v as Source)} aria-label="Revenue source"
-            data={[{ value: 'pf', label: 'Perfect foresight' }, { value: 'da', label: 'DA-scheduled', disabled: !hasDa }]}
+            data={[{ value: 'pf', label: TERMS.perfectForesight.label }, { value: 'da', label: TERMS.dayAheadPlan.label, disabled: !hasDa }]}
           />
         </Group>
       </Paper>

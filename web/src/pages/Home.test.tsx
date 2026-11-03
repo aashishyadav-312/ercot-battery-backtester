@@ -7,6 +7,7 @@ import { HomeView } from './Home';
 import { num, pct, usd } from '../data/format';
 import type { IndexRun, LocationsFile, NodesFile, TexasGeo } from '../data/types';
 import type { LiveLoad, LiveState } from '../live/live';
+import { retiredIn } from '../copy/retired';
 
 afterEach(cleanup);
 
@@ -54,7 +55,7 @@ describe('Home shows the loaded numbers', () => {
   it('the kept range and the gap equal the data', () => {
     view();
     const kept = ['HB_HOUSTON', 'HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_PAN'].map((h) => run(h).capture_rate!);
-    expect(screen.getByTestId('keeps-title').textContent).toBe(`A real schedule keeps ${pct(Math.min(...kept))} to ${pct(Math.max(...kept))} of perfect hindsight.`);
+    expect(screen.getByTestId('keeps-title').textContent).toBe(`A real schedule keeps ${pct(Math.min(...kept))} to ${pct(Math.max(...kept))} of perfect foresight.`);
     const h = run('HB_HOUSTON');
     expect(screen.getByTestId('gap').textContent).toContain(num(h.value_of_perfect_foresight_per_kw_year, 1));
   });
@@ -83,18 +84,18 @@ describe('Home shows the loaded numbers', () => {
     view();
     const chip1 = screen.getByTestId('chip-1');
     expect(chip1.textContent).toContain(usd(run('HB_WEST').revenue_per_kw_year, 1));
-    fireEvent.click(screen.getByRole('button', { name: 'Capture' }));
-    expect(screen.getByRole('button', { name: 'Capture' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(screen.getByRole('button', { name: 'Capture rate' }));
+    expect(screen.getByRole('button', { name: 'Capture rate' }).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByTestId('chip-1').textContent).toContain(pct(run('HB_WEST').capture_rate));
     const top = NODES.nodes.find((n) => n.rank === 1)!;
     expect(screen.getByTestId('chip-3').textContent).toContain(pct(top.capture));
-    fireEvent.click(screen.getByRole('button', { name: 'Spike share' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Top-10-day share' }));
     expect(screen.getByTestId('chip-2').textContent).toContain(pct(run('HB_HOUSTON').top10_day_share));
   });
 
   it('labels the rank-1 node "location under review" when its geocode is manual_review', () => {
     const top = NODES.nodes.find((n) => n.rank === 1)!;
-    fireEvent.click(view().getByRole('button', { name: 'Capture' }));
+    fireEvent.click(view().getByRole('button', { name: 'Capture rate' }));
     if (top.geo === 'manual_review') expect(screen.getByTestId('chip-3').textContent).toContain('location under review');
   });
 
@@ -139,5 +140,13 @@ describe('Home live section', () => {
     const tiles = screen.getByRole('list', { name: 'Latest real-time price at each hub' });
     const dirs = [...tiles.querySelectorAll('[data-dir]')].map((e) => e.getAttribute('data-dir'));
     expect(dirs).toEqual(['up', 'down']); // Houston 30.90 -> 31.40, West 25.10 -> 24.70
+  });
+});
+
+describe('Home uses the shared vocabulary', () => {
+  it('shows none of the retired labels', async () => {
+    view();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(retiredIn(document.body.textContent ?? '')).toEqual([]);
   });
 });

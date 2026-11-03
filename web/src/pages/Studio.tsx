@@ -14,6 +14,7 @@ import { cancelRun, runInWorker, type CustomRunResult, type RunProgress } from '
 import { DataQuality } from '../components/DataQuality';
 import { CumulativeCard, HeatmapCard, NodeHubCard, TopDaysCard } from '../components/cards';
 import classes from './Studio.module.css';
+import { NODES_LABEL, PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
 /** What Studio needs to solve a run: the worker in the app, a direct solver in the tests. */
 export type Solve = (form: CustomForm, onProgress: (p: RunProgress) => void) => Promise<{ result: CustomRunResult; ms: number }>;
@@ -154,7 +155,7 @@ export function StudioView({ index, nodes, coverage, loadRun = loadRunFile, solv
         <h1 id="studio-title" className={classes.h1}>Run your own battery.</h1>
         <p className={classes.lede}>
           Choose a location, a year and a battery. Studio replays the prices day by day and shows what it would have earned, and
-          how much of that a day-ahead schedule keeps. Precomputed runs show at once; any other inputs are solved in your browser
+          how much of that a day-ahead plan keeps. Precomputed runs show at once; any other inputs are solved in your browser
           with the same model. Nothing is sent to a server, and the address bar keeps your inputs.
         </p>
       </section>
@@ -260,7 +261,7 @@ function Inputs({ form, coverage, index, set, preset }: {
         description={`${locations.length} locations have price files: ${hubs.length} trading hubs and ${others.length} resource nodes. Every node is in the Atlas, for one standard battery.`}
         data={[
           { group: 'Trading hubs', items: hubs.map((c) => ({ value: c, label: `${locName(c)} · ${c}` })) },
-          { group: 'Resource nodes', items: others.map((c) => ({ value: c, label: `${locName(c)} · ${c}` })) },
+          { group: NODES_LABEL, items: others.map((c) => ({ value: c, label: `${locName(c)} · ${c}` })) },
         ]}
       />
 
@@ -411,13 +412,13 @@ function SolvedNotes({ shown, preset, current }: { shown: Shown; preset: IndexRu
       {(skipped.length > 0 || daSkipped.length > 0) && (
         <p className={classes.small}>
           {skipped.length > 0 && `Skipped for missing prices: ${skipped.map(fmtDate).join(', ')}. `}
-          {daSkipped.length > 0 && `The day-ahead schedule skipped ${num(daSkipped.length)} day(s) whose day-ahead prices were incomplete.`}
+          {daSkipped.length > 0 && `The day-ahead plan skipped ${num(daSkipped.length)} day(s) whose day-ahead prices were incomplete.`}
         </p>
       )}
       {same && (
         <p className={classes.small} data-testid="check-result">
-          Precomputed in Python: {usd(same.revenue_per_kw_year, 2)}/kW-year perfect foresight
-          {same.da_rt_revenue_per_kw_year != null && <> and {usd(same.da_rt_revenue_per_kw_year, 2)} day-ahead</>}. Your browser: {usd(m.revenue_per_kw_year, 2)}
+          Precomputed in Python: {usd(same.revenue_per_kw_year, 2)}/kW-yr perfect foresight
+          {same.da_rt_revenue_per_kw_year != null && <> and {usd(same.da_rt_revenue_per_kw_year, 2)} day-ahead plan</>}. Your browser: {usd(m.revenue_per_kw_year, 2)}
           {m.da_rt_revenue_per_kw_year != null && <> and {usd(m.da_rt_revenue_per_kw_year, 2)}</>}.
         </p>
       )}
@@ -467,25 +468,25 @@ function TotalsCard({ run, powerMw }: { run: Run; powerMw: number }) {
   const ann = t.annualized ? ' (annualized)' : '';
   return (
     <section className={classes.card} aria-labelledby="totals-title">
-      <h2 id="totals-title" className={classes.visuallyHidden}>Revenue, perfect foresight and day-ahead schedule</h2>
+      <h2 id="totals-title" className={classes.visuallyHidden}>Revenue, perfect foresight and day-ahead plan</h2>
       <div className={classes.totals}>
         <div>
-          <p className={classes.eyebrowMuted}>Perfect foresight, {periodLabel(run)}</p>
+          <p className={classes.eyebrowMuted}>{TERMS.perfectForesight.label}, {periodLabel(run)}</p>
           <p className={classes.money} data-tone="mint" data-testid="total-pf">{money(t.pf)}</p>
-          <p className={classes.monoSmall}>{usd(t.pfYear, 1)} per kW-year{ann}</p>
+          <p className={classes.monoSmall}>{usd(t.pfYear, 1)} {PER_KW_PER_YEAR}{ann}</p>
           <p className={classes.small}>An upper bound no operator can reach.</p>
         </div>
         <div>
-          <p className={classes.eyebrowMuted}>Day-ahead schedule, {periodLabel(run)}</p>
+          <p className={classes.eyebrowMuted}>{TERMS.dayAheadPlan.label}, {periodLabel(run)}</p>
           <p className={classes.money} data-tone="amber" data-testid="total-da">{money(t.da)}</p>
-          <p className={classes.monoSmall}>{usd(t.daYear, 1)} per kW-year{ann}{t.kept != null && <> · <span data-testid="kept">{pct(t.kept)}</span> kept</>}</p>
+          <p className={classes.monoSmall}>{usd(t.daYear, 1)} {PER_KW_PER_YEAR}{ann}{t.kept != null && <> · <span data-testid="kept">{pct(t.kept)}</span> {TERMS.captureRate.label.toLowerCase()}</>}</p>
           <p className={classes.small}>Planned the day before on day-ahead prices, settled in real time.</p>
         </div>
       </div>
-      <Bar label="Perfect foresight, $/kW-year" value={usd(t.pfYear, 1)} share={max > 0 ? t.pfYear / max : 0} tone="mint" />
-      {t.daYear != null && <Bar label="Day-ahead schedule, $/kW-year" value={usd(t.daYear, 1)} share={max > 0 ? t.daYear / max : 0} tone="amber" />}
+      <Bar label={`${TERMS.perfectForesight.label}, ${TERMS.revenueUnit.label}`} value={usd(t.pfYear, 1)} share={max > 0 ? t.pfYear / max : 0} tone="mint" />
+      {t.daYear != null && <Bar label={`${TERMS.dayAheadPlan.label}, ${TERMS.revenueUnit.label}`} value={usd(t.daYear, 1)} share={max > 0 ? t.daYear / max : 0} tone="amber" />}
       {t.kept != null && (
-        <p className={classes.small}>Kept compares the two on the {num(run.metrics.da_days_matched ?? run.meta.days_solved)} days both strategies solved.</p>
+        <p className={classes.small}>{TERMS.captureRate.label} compares the two on the {num(run.metrics.da_days_matched ?? run.meta.days_solved)} days both strategies solved.</p>
       )}
     </section>
   );
@@ -501,14 +502,14 @@ function MonthlyCard({ run, strategy, onStrategy }: { run: Run; strategy: 'pf' |
       <div className={classes.cardHead}>
         <div>
           <h2 id="monthly-title" className={classes.cardTitle}>Revenue by month</h2>
-          <p className={classes.meta}>$/kW · {strategy === 'pf' ? 'perfect foresight' : 'day-ahead schedule'}</p>
+          <p className={classes.meta}>$/kW · {strategy === 'pf' ? 'perfect foresight' : 'day-ahead plan'}</p>
         </div>
         <Choice
           label="Strategy" name="strat" value={strategy} onPick={onStrategy}
-          options={[{ value: 'pf', label: 'Perfect foresight' }, { value: 'da', label: 'Day-ahead' }]}
+          options={[{ value: 'pf', label: TERMS.perfectForesight.label }, { value: 'da', label: TERMS.dayAheadPlan.label }]}
         />
       </div>
-      <ol className={classes.vbars} aria-label={`Revenue by month, $/kW, ${strategy === 'pf' ? 'perfect foresight' : 'day-ahead schedule'}`} data-testid="monthly">
+      <ol className={classes.vbars} aria-label={`Revenue by month, $/kW, ${strategy === 'pf' ? 'perfect foresight' : 'day-ahead plan'}`} data-testid="monthly">
         {bars.map((b) => {
           const v = b.value ?? 0;
           return (
@@ -526,7 +527,7 @@ function MonthlyCard({ run, strategy, onStrategy }: { run: Run; strategy: 'pf' |
           );
         })}
       </ol>
-      {strategy === 'da' && <p className={classes.small}>Days the day-ahead schedule skipped count as zero.</p>}
+      {strategy === 'da' && <p className={classes.small}>Days the day-ahead plan skipped count as zero.</p>}
     </section>
   );
 }
@@ -541,7 +542,7 @@ function DurationCard({ index, form, onPick }: { index: IndexRun[]; form: Custom
   return (
     <section className={classes.card} aria-labelledby="duration-title">
       <h2 id="duration-title" className={classes.cardTitle}>Duration trade-off</h2>
-      <p className={classes.meta}>Precomputed · {locName(form.location)} · {year}{rows[0].annualized ? ' (annualized)' : ''} · {usd(deg, 0)}/MWh · $/kW-year · $/kWh</p>
+      <p className={classes.meta}>Precomputed · {locName(form.location)} · {year}{rows[0].annualized ? ' (annualized)' : ''} · {usd(deg, 0)}/MWh · {TERMS.revenueUnit.label} · $/kWh</p>
       <ul className={classes.durList}>
         {rows.map((r) => (
           <li key={r.hours}>
@@ -569,7 +570,7 @@ function OperatedCard({ run }: { run: Run }) {
     { id: 'buy', label: 'Avg charge price', value: usd(m.avg_charge_price, 0), sub: 'per MWh' },
     { id: 'sell', label: 'Avg discharge price', value: usd(m.avg_discharge_price, 0), sub: 'per MWh' },
     { id: 'spread', label: 'Spread captured', value: usd(m.avg_spread_captured, 0), sub: 'per MWh, discharge minus charge' },
-    { id: 'top10', label: 'Top 10 days', value: pct(m.top10_day_share), sub: "of the period's revenue" },
+    { id: 'top10', label: TERMS.top10DayShare.label, value: pct(m.top10_day_share), sub: "of the period's revenue" },
     ...(m.da_losing_days != null ? [{ id: 'losing', label: 'Day-ahead losing days', value: num(m.da_losing_days), sub: `of ${num(m.da_days_matched)} scheduled` }] : []),
   ];
   return (
@@ -603,7 +604,7 @@ function CompareSection({ index, nodes, form, onPick }: { index: IndexRun[]; nod
       <h2 id="compare-title" className={classes.h2}>Every location with the same battery</h2>
       <p className={classes.sub}>
         {duration}-hour battery · {year}{rows.some((r) => r.annualized) ? ` (annualized, runs end ${ends.map(fmtDate).join(' or ')})` : ''} ·{' '}
-        {usd(deg, 0)}/MWh degradation · {PRECOMPUTED.rtePct}% round trip. Ranked by perfect foresight, $/kW-year. Pick a location to load it.
+        {usd(deg, 0)}/MWh degradation · {PRECOMPUTED.rtePct}% round trip. Ranked by perfect foresight, {TERMS.revenueUnit.label}. Pick a location to load it.
       </p>
       <div className={classes.card}>
         <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Every-location comparison table, scrolls sideways when it does not fit">
@@ -611,8 +612,8 @@ function CompareSection({ index, nodes, form, onPick }: { index: IndexRun[]; nod
             <thead>
               <tr>
                 <th scope="col">#</th><th scope="col">Location</th>
-                <th scope="col" className={classes.num}>Perfect foresight</th><th scope="col" className={classes.num}>Day-ahead</th>
-                <th scope="col" className={classes.num}>Kept</th><th scope="col" className={classes.num}>Top 10 days</th>
+                <th scope="col" className={classes.num}>{TERMS.perfectForesight.label}</th><th scope="col" className={classes.num}>{TERMS.dayAheadPlan.label}</th>
+                <th scope="col" className={classes.num}>{TERMS.captureRate.label}</th><th scope="col" className={classes.num}>{TERMS.top10DayShare.label}</th>
                 <th scope="col" className={classes.num}>vs its hub</th>
               </tr>
             </thead>

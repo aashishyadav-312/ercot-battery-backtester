@@ -1,7 +1,7 @@
 // Custom run: the browser port of model/run_year.py (perfect foresight),
 // model/forecast.py (schedule on day-ahead, settle in real time) and the
 // metrics in model/metrics.py. Each local operating day is solved on its own;
-// the DA-scheduled strategy runs on the same days the perfect-foresight run
+// the Day-ahead plan strategy runs on the same days the perfect-foresight run
 // solved, so the two compare day for day, as in the precomputed results.
 import type { Highs } from 'highs';
 import type { Run, RunMetrics } from '../data/types';
@@ -47,7 +47,7 @@ export interface DayRow {
   cycles: number;
   usedMilp: boolean;
   intervals: number;
-  /** DA-scheduled, RT-settled revenue; null when the DA strategy skipped the day. */
+  /** Day-ahead plan, RT-settled revenue; null when the DA strategy skipped the day. */
   daRtRevenue: number | null;
   daDaRevenue: number | null;
   daCycles: number | null;
@@ -75,7 +75,7 @@ interface DaySlice {
   daDay?: Day;
 }
 
-/** The DA-scheduled day, or null when DA and RT intervals don't line up (model/forecast.py rules). */
+/** The Day-ahead plan day, or null when DA and RT intervals don't line up (model/forecast.py rules). */
 function daScheduleDay(highs: Highs, s: DaySlice, p: CustomParams, rtPrices: Float64Array) {
   const { file, rtDay, daDay } = s;
   if (!daDay) return null;

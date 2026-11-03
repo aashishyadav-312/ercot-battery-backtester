@@ -15,7 +15,7 @@ import { markStartSeen } from '../components/StartBanner';
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' } as const;
 
-/** Sections of the page, in order. `#/guide?s=<id>` opens it at one (the footer's About link, and old #/about links). */
+/** Sections of the page, in order. `#/learn?s=<id>` opens it at one (the footer's About link, and old #/about links). */
 export const GUIDE_SECTIONS = [
   { id: 'ercot', label: 'ERCOT in 2 minutes' },
   { id: 'money', label: 'How a battery makes money' },
@@ -207,7 +207,7 @@ export default function Guide() {
   const { go } = useApp();
   const walk = useWalkthrough();
   useEffect(() => markStartSeen(), []); // opening this page counts as having seen the Overview banner
-  // `#/guide?s=about` opens at a section. The frame wait lets the app's own scroll-to-top on navigation finish first.
+  // `#/learn?s=about` opens at a section. The frame wait lets the app's own scroll-to-top on navigation finish first.
   useEffect(() => {
     const to = () => {
       const id = hashParam(window.location.hash, 's');
@@ -220,7 +220,7 @@ export default function Guide() {
   return (
     <Stack gap={56} maw={1040}>
       <Stack gap="lg">
-        <PageHeader title="Guide">
+        <PageHeader title="Learn">
           <Text size="lg" c="dimmed" maw={700} lh={1.5}>
             New to ERCOT or to batteries? This page explains the market in two minutes, follows one real day of a battery trading,
             and shows where to look next. A glossary, and notes on who built this and where the data comes from, close the page.

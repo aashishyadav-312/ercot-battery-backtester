@@ -11,6 +11,7 @@ import { useRuns, useApp } from '../state';
 import { useContextData, useWeather } from '../hooks';
 import { avgShareByHour, type DayWeather } from '../data/context';
 import { locAxis, locFull } from '../data/site';
+import { TERMS } from '../copy/terms';
 
 const H = 280;
 const tall = (expanded: boolean, h = H) => (expanded ? '70vh' : h);
@@ -144,7 +145,7 @@ export function HeatmapCard({ run }: { run?: Run }) {
     };
   return (
     <Card
-      title="Dispatch pattern by hour and month"
+      title="Charging pattern by hour and month"
       subtitle={run ? `Average net dispatch as % of rated power; orange = discharging, blue = charging · ${scenario(run)}` : undefined}
       csv={csv}
     >
@@ -216,7 +217,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
     const { cum, marks } = calc;
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 14, top: 56, bottom: 30 },
-      legend: { ...legendBase(t), data: ['Cumulative revenue', 'Top-10 days'] },
+      legend: { ...legendBase(t), data: ['Cumulative revenue', '10 best days'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis',
         formatter: (ps: { seriesName: string; value: [string, number, number?]; dataIndex: number }[]) => {
@@ -232,7 +233,7 @@ export function CumulativeCard({ run }: { run?: Run }) {
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
         { name: 'Cumulative revenue', type: 'line', showSymbol: false, symbol: 'none', lineStyle: { width: 2, color: t.series[0] }, itemStyle: { color: t.series[0] }, areaStyle: { color: fade(t.series[0], t.mode === 'dark' ? 0.28 : 0.18) }, data: run.daily.date.map((d, i) => [d, cum[i]]) },
-        { name: 'Top-10 days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.series[1], borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
+        { name: '10 best days', type: 'scatter', symbolSize: 10, itemStyle: { color: t.series[1], borderColor: t.surface, borderWidth: 2 }, data: marks, z: 5 },
       ],
     });
   }, [run, calc, wx]);
@@ -263,7 +264,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
     const top = new Set(run.metrics.top10_days);
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 14, top: 56, bottom: 30 },
-      legend: { ...legendBase(t), data: ['Other days', 'Top-10 days'] },
+      legend: { ...legendBase(t), data: ['Other days', '10 best days'] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'line' },
         formatter: (ps: { value: [string, number] }[]) => `<b>${fmtDate(ps[0].value[0])}</b>${top.has(ps[0].value[0]) ? ' (top-10 day)' : ''}<br/>${usd(ps[0].value[1], 2)} per kW${top.has(ps[0].value[0]) ? wxLine(wx?.on(ps[0].value[0])) : ''}`,
@@ -272,7 +273,7 @@ export function DailyRevenueCard({ run }: { run?: Run }) {
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW per day', nameGap: 8 },
       series: [
         { name: 'Other days', type: 'bar', barMaxWidth: 4, itemStyle: { color: t.series[0] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, 0] : [d, run.daily.revenue[i] / k])), large: true },
-        { name: 'Top-10 days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.series[1] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
+        { name: '10 best days', type: 'bar', barMaxWidth: 4, barGap: '-100%', itemStyle: { color: t.series[1] }, data: run.daily.date.map((d, i) => (top.has(d) ? [d, run.daily.revenue[i] / k] : [d, 0])) },
       ],
     });
   }, [run, wx]);
@@ -398,7 +399,7 @@ export function DurationCard({ sel, index }: { sel: Selection; index: IndexRun[]
           <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Duration table, scrolls sideways when it does not fit">
             <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
               <Table.Thead>
-                <Table.Tr><Table.Th>Duration</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">$/kWh-yr</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th><Table.Th ta="right">Top-10 share</Table.Th></Table.Tr>
+                <Table.Tr><Table.Th>Duration</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">$/kWh-yr</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th><Table.Th ta="right">{TERMS.top10DayShare.label}</Table.Th></Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {rows.map((r, i) => r && (
@@ -593,7 +594,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
   return (
     <Card
       title="All locations" terms={['hub', 'resource_node', 'usd_per_kw_yr']}
-      subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation. Grey = hub, green = resource node, blue = selected.`}
+      subtitle={`${sel.duration}-hour battery · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation. Grey = hub, green = node, blue = selected.`}
       csv={csv}
     >
       {(ex) =>
@@ -602,7 +603,7 @@ export function LocationsCard({ sel, index, nodes }: { sel: Selection; index: In
             <Chart build={build} height={ex ? '70vh' : 440} label="Revenue by location, ranked" />
             <div style={{ overflowX: 'auto' }} tabIndex={0} role="region" aria-label="Revenue by location table, scrolls sideways when it does not fit">
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" highlightOnHover>
-                <Table.Thead><Table.Tr><Table.Th>Location</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">Top-10 share</Table.Th><Table.Th ta="right">Top day</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th></Table.Tr></Table.Thead>
+                <Table.Thead><Table.Tr><Table.Th>Location</Table.Th><Table.Th ta="right">$/kW-yr</Table.Th><Table.Th ta="right">{TERMS.top10DayShare.label}</Table.Th><Table.Th ta="right">Top day</Table.Th><Table.Th ta="right">Cycles/yr</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody>
                   {data.map(({ r, top }) => (
                     <Table.Tr key={r.location} fw={r.location === sel.location ? 600 : undefined}>

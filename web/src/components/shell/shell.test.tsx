@@ -71,13 +71,13 @@ describe('Header', () => {
     render(<Header active="research" sel={sel} scheme="dark" onToggleScheme={() => {}} />);
     const nav = screen.getByRole('navigation', { name: 'Primary' });
     const links = within(nav).getAllByRole('link');
-    expect(links.map((l) => l.textContent)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Guide']);
+    expect(links.map((l) => l.textContent)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
     expect(links.map((l) => l.getAttribute('href'))).toEqual([
       '#/home?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/atlas?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/studio?loc=HB_WEST&dur=4&year=2025&deg=10',
       '#/research?loc=HB_WEST&dur=4&year=2025&deg=10',
-      '#/guide?loc=HB_WEST&dur=4&year=2025&deg=10',
+      '#/learn?loc=HB_WEST&dur=4&year=2025&deg=10',
     ]);
     expect(links.filter((l) => l.getAttribute('aria-current') === 'page').map((l) => l.textContent)).toEqual(['Research']);
   });
@@ -100,13 +100,13 @@ describe('ViewBar', () => {
     const nav = screen.getByRole('navigation', { name: 'Research pages' });
     const names = within(nav).getAllByRole('link').map((l) => l.textContent);
     expect(names).toEqual(TABS.find((t) => t.tab === 'research')!.views.map((v) => v.label));
-    expect(within(nav).getByRole('link', { name: 'Dispatch' }).getAttribute('aria-current')).toBe('page');
+    expect(within(nav).getByRole('link', { name: 'Charging pattern' }).getAttribute('aria-current')).toBe('page');
   });
 
   it('links the Atlas to its 10-location view, keeping the scenario in the query', () => {
     render(<ViewBar tab="atlas" page="atlas" sel={sel} />);
     const nav = screen.getByRole('navigation', { name: 'Atlas pages' });
     expect(within(nav).getByRole('link', { name: 'All nodes' }).getAttribute('aria-current')).toBe('page');
-    expect(within(nav).getByRole('link', { name: 'Detailed locations' }).getAttribute('href')).toBe('#/atlas/detailed?loc=HB_HOUSTON&dur=2&year=2025&deg=10');
+    expect(within(nav).getByRole('link', { name: 'Study sites' }).getAttribute('href')).toBe('#/atlas/sites?loc=HB_HOUSTON&dur=2&year=2025&deg=10');
   });
 });

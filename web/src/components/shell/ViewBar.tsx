@@ -4,7 +4,7 @@ import { TABS, buildHash, type Page, type Tab } from '../../shell/route';
 import classes from './ViewBar.module.css';
 
 /**
- * Sub-navigation for a tab that holds more than one of the existing pages (Studio, Research, Guide) until those
+ * Sub-navigation for a tab that holds more than one of the existing pages (Studio, Research) until those
  * pages are redesigned. Hidden for single-view tabs. `children` carries the scenario selectors on pages that use them.
  */
 export function ViewBar({ tab, page, sel, children }: { tab: Tab; page: Page; sel: Selection; children?: ReactNode }) {

@@ -7,26 +7,27 @@
 
 import { DURATIONS, HUBS } from './loader';
 import type { IndexRun, LocationsFile, NodeRec, NodesFile, TexasGeo } from './types';
+import { TERMS } from '../copy/terms';
 
 export type Metric = 'rev' | 'capture' | 'top10';
 
 export const METRICS: { id: Metric; label: string; long: string }[] = [
-  { id: 'rev', label: 'Revenue', long: 'Perfect-foresight revenue, $/kW-year' },
-  { id: 'capture', label: 'Capture', long: 'Share of perfect-foresight revenue a day-ahead schedule kept' },
-  { id: 'top10', label: 'Spike share', long: 'Share of revenue earned on the 10 best days' },
+  { id: 'rev', label: 'Revenue', long: `Perfect-foresight revenue, ${TERMS.revenueUnit.label}` },
+  { id: 'capture', label: TERMS.captureRate.label, long: TERMS.captureRate.definition },
+  { id: 'top10', label: TERMS.top10DayShare.label, long: TERMS.top10DayShare.definition },
 ];
 
 export interface HubRow {
   code: string;
-  /** Perfect-foresight revenue, $/kW-year (detailed run). */
+  /** Perfect-foresight revenue, $/kW-yr (detailed run). */
   pf: number;
-  /** Day-ahead schedule settled at real-time prices, $/kW-year. */
+  /** Day-ahead plan settled at real-time prices, $/kW-yr. */
   da: number | null;
   /** da / pf on the same days. */
   kept: number | null;
   /** Share of perfect-foresight revenue from the 10 best days. */
   top10: number | null;
-  /** pf minus da-matched pf: what perfect hindsight adds. */
+  /** pf minus da-matched pf: what perfect foresight adds. */
   gap: number | null;
 }
 

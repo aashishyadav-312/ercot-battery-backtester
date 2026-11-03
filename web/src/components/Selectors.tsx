@@ -4,6 +4,7 @@ import { locationGroups } from '../data/analytics';
 import { DEGS, DURATIONS, YEARS } from '../data/loader';
 import { yearLabel } from '../data/format';
 import { locFull } from '../data/site';
+import { HUBS_LABEL, NODES_LABEL, TERMS } from '../copy/terms';
 
 /** Top-bar selectors: Location (hubs and nodes grouped), Duration, Year, Degradation. */
 export function Selectors({ fullWidth = false }: { fullWidth?: boolean }) {
@@ -16,8 +17,8 @@ export function Selectors({ fullWidth = false }: { fullWidth?: boolean }) {
     <Select
       {...common} w={w(250)} aria-label="Location" label={label('Location')}
       data={[
-        { group: 'Hubs', items: g.hubs.map((c) => ({ value: c, label: locFull(c) })) },
-        { group: 'Resource nodes', items: g.nodes.map((c) => ({ value: c, label: locFull(c) })) },
+        { group: HUBS_LABEL, items: g.hubs.map((c) => ({ value: c, label: locFull(c) })) },
+        { group: NODES_LABEL, items: g.nodes.map((c) => ({ value: c, label: locFull(c) })) },
       ]}
       value={sel.location} onChange={(v) => v && setSel({ location: v })} searchable
     />
@@ -38,8 +39,8 @@ export function Selectors({ fullWidth = false }: { fullWidth?: boolean }) {
   );
   const deg = (
     <Select
-      {...common} w={w(172)} aria-label="Degradation cost" label={label('Degradation cost')}
-      data={DEGS.map((d) => ({ value: String(d), label: `Degr. $${d}/MWh` }))}
+      {...common} w={w(232)} aria-label={TERMS.degradationCost.label} label={label(TERMS.degradationCost.label)}
+      data={DEGS.map((d) => ({ value: String(d), label: `${TERMS.degradationCost.label} $${d}/MWh` }))}
       value={String(sel.deg)} onChange={(v) => v != null && setSel({ deg: Number(v) })}
     />
   );

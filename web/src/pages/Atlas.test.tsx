@@ -7,6 +7,7 @@ import { MantineProvider } from '@mantine/core';
 import { AtlasView } from './Atlas';
 import { num, pct, usd } from '../data/format';
 import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
+import { retiredIn } from '../copy/retired';
 
 afterEach(cleanup);
 beforeAll(() => {
@@ -73,7 +74,7 @@ describe('Atlas shows the loaded numbers', () => {
     expect(list().map((b) => b.textContent)).toEqual(byRev.map((n, i) => expect.stringContaining(`${i + 1}${n.code}`)));
     expect(list()[0].textContent).toContain(usd(byRev[0].rev, 1));
 
-    fireEvent.click(within(screen.getByRole('group', { name: 'Map metric' })).getByRole('button', { name: 'Capture' }));
+    fireEvent.click(within(screen.getByRole('group', { name: 'Map metric' })).getByRole('button', { name: 'Capture rate' }));
     const byCap = [...NODES.nodes].sort((a, b) => b.capture! - a.capture! || a.rank - b.rank).slice(0, 12);
     expect(list()[0].textContent).toContain(byCap[0].code);
     expect(list()[0].textContent).toContain(pct(byCap[0].capture));
@@ -134,5 +135,13 @@ describe('Atlas shows the loaded numbers', () => {
     view();
     const placed = NODES.nodes.filter(isPlaced).length;
     expect(screen.getByRole('img', { name: new RegExp(`${placed} of ${NODES.nodes.length} resource nodes placed`) })).toBeTruthy();
+  });
+});
+
+describe('Atlas uses the shared vocabulary', () => {
+  it('shows none of the retired labels', async () => {
+    view();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(retiredIn(document.body.textContent ?? '')).toEqual([]);
   });
 });

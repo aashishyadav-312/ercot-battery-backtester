@@ -2,6 +2,7 @@ import { Group, Stack, Text, useComputedColorScheme } from '@mantine/core';
 import { Info } from '../Info';
 import { markerSize, rampAt, type Domain } from './scale';
 import { pct, usd } from '../../data/format';
+import { TERMS } from '../../copy/terms';
 
 /** Legend for the map: what size, colour and shape mean. */
 export function MapLegend({ domain }: { domain: Domain }) {
@@ -43,7 +44,7 @@ export function MapLegend({ domain }: { domain: Domain }) {
           </Group>
           <Group gap={6} wrap="nowrap">
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill={fill} stroke={outline} /></svg>
-            <Text size="xs" c="dimmed">Resource node (plant)</Text>
+            <Text size="xs" c="dimmed">{TERMS.node.label} (plant)</Text>
           </Group>
         </Group>
       </Stack>

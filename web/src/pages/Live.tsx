@@ -15,6 +15,7 @@ import {
   type LiveDay, type LiveLoad, type LiveState,
 } from '../live/live';
 import { LIVE_RTE, solveDay } from '../live/solver';
+import { NODES_LABEL } from '../copy/terms';
 
 const REFRESH_MS = 5 * 60_000;
 const HOUR = 3_600_000;
@@ -179,7 +180,7 @@ function SoFarCard({ s, loc, durationH }: { s: LiveState; loc: string; durationH
   return (
     <Card
       title="Best possible battery so far today" terms={['perfect_foresight', 'cycles']}
-      subtitle={`A 1 MW, ${durationH}-hour battery at ${locName(loc)} with perfect hindsight on today's real-time prices from midnight${through ? ` to ${through} CT` : ''}.`}
+      subtitle={`A 1 MW, ${durationH}-hour battery at ${locName(loc)} with perfect foresight on today's real-time prices from midnight${through ? ` to ${through} CT` : ''}.`}
       csv={() => r && ({
         filename: `live_so_far_${loc}_${s.today.date}_${durationH}h.csv`,
         headers: ['interval_start_utc', 'price', 'charge_mw', 'discharge_mw', 'soc_mwh'],
@@ -231,7 +232,7 @@ function TomorrowCard({ s, loc, durationH }: { s: LiveState; loc: string; durati
       footer={
         <Text size="xs" c="dimmed" lh={1.5}>
           Revenue here is at day-ahead prices. Settled against tomorrow's real-time prices it will differ: that gap is the capture rate
-          on the Realism page. {day.daFirstSeenAt && `Tomorrow's day-ahead prices were first seen at ${ctTime(day.daFirstSeenAt)} CT today.`}
+          on the Reality check page. {day.daFirstSeenAt && `Tomorrow's day-ahead prices were first seen at ${ctTime(day.daFirstSeenAt)} CT today.`}
         </Text>
       }
     >
@@ -321,7 +322,7 @@ export default function Live() {
           label="Location" size="sm" w={{ base: '100%', xs: 340 }} allowDeselect={false} comboboxProps={{ withinPortal: true }}
           data={[
             { group: 'Hubs', items: s.hubs.map((c) => ({ value: c, label: locFull(c) })) },
-            { group: 'Resource nodes', items: s.nodes.map((c) => ({ value: c, label: locFull(c) })) },
+            { group: NODES_LABEL, items: s.nodes.map((c) => ({ value: c, label: locFull(c) })) },
           ]}
           value={all.includes(loc) ? loc : s.hubs[0]} onChange={(v) => v && setLoc(v)}
         />
