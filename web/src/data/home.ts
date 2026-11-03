@@ -119,6 +119,26 @@ export function headlinePct(m: HomeModel): number | null {
   return p > 0 ? p : null;
 }
 
+/**
+ * The hub comparison in the hero: West over Houston while West earns more (the published finding), otherwise the top
+ * and bottom hubs of the ranked list. `pct` is rounded as printed; null when there is nothing to compare.
+ */
+export function heroComparison(m: HomeModel): { top: string; bottom: string; pct: number } | null {
+  const westPct = headlinePct(m);
+  if (westPct != null) return { top: 'HB_WEST', bottom: 'HB_HOUSTON', pct: westPct };
+  const top = m.hubs[0];
+  const bottom = m.hubs.at(-1);
+  if (!top || !bottom || top === bottom || !(bottom.pf > 0)) return null;
+  const p = Math.round((top.pf / bottom.pf - 1) * 100);
+  return p > 0 ? { top: top.code, bottom: bottom.code, pct: p } : null;
+}
+
+/** First and last year with any hub run in the results index. */
+export function yearSpan(index: IndexRun[]): [number, number] | null {
+  const ys = index.map((r) => r.year);
+  return ys.length ? [Math.min(...ys), Math.max(...ys)] : null;
+}
+
 /** Revenue per kWh of storage for each duration, and what the longest-but-one to longest step adds. */
 export function durationStory(m: HomeModel) {
   const perKwh = m.durations.map((d) => ({ h: d.h, v: d.pf / d.h }));
@@ -205,9 +225,6 @@ export function mapDots(nodes: NodeRec[], metric: Metric): MapDot[] {
     })
     .sort((a, b) => a.norm - b.norm); // larger dots drawn last, on top
 }
-
-/** Width of a map callout box for a line of 11px DM Mono text (about 6.7 units a character, plus padding). */
-export const calloutWidth = (s: string) => s.length * 6.7 + 16;
 
 /** Hub marker position: the representative city in results/locations.json. Schematic, never a site. */
 export function hubPoint(locs: LocationsFile, code: string) {

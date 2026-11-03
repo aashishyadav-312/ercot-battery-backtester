@@ -8,6 +8,7 @@ import { num, pct, usd } from '../data/format';
 import type { IndexRun, LocationsFile, NodesFile, TexasGeo } from '../data/types';
 import type { LiveLoad, LiveState } from '../live/live';
 import { retiredIn } from '../copy/retired';
+import { locName } from '../data/site';
 
 afterEach(cleanup);
 
@@ -31,16 +32,34 @@ const view = (live: LiveLoad | null = NONE, index = INDEX) =>
   render(<HomeView index={index} nodes={NODES} locs={LOCS} geo={GEO} live={{ load: live, now: Date.now() }} />);
 
 describe('Home shows the loaded numbers', () => {
-  it('headline percentage equals West / Houston - 1 from the hub results', () => {
+  it('hero subhead compares West with Houston and the best node with its hub, from the data', () => {
     view();
     const p = Math.round((run('HB_WEST').revenue_per_kw_year / run('HB_HOUSTON').revenue_per_kw_year - 1) * 100);
-    expect(screen.getByTestId('headline').textContent).toBe(`West hub batteries would have out-earned Houston by ${p}% in ${year}.`);
+    const top = NODES.nodes.find((n) => n.rank === 1)!;
+    const ratio = (top.rev / NODES.hubs.find((h) => h.code === top.hub)!.rev).toFixed(1);
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Where in Texas does a battery earn the most?');
+    expect(screen.getByTestId('hero-sub').textContent).toBe(
+      `Chargeline replays real ERCOT prices through a grid battery at every trading hub and ${NODES.nodes.length} nodes. `
+      + `In ${year}, a battery at the ${locName('HB_WEST')} out-earned the ${locName('HB_HOUSTON')} by ${p}%, and the best node earned ${ratio}× its hub.`,
+    );
   });
 
-  it('falls back to a neutral headline when West no longer beats Houston', () => {
+  it('eyebrow counts locations and spans the years in the results', () => {
+    view();
+    const ys = INDEX.map((r) => r.year);
+    const hubs = new Set(INDEX.filter((r) => r.location.startsWith('HB_')).map((r) => r.location)).size;
+    expect(screen.getByTestId('hero-eyebrow').textContent).toBe(`Live ERCOT prices · ${NODES.nodes.length + hubs} locations · ${Math.min(...ys)}–${Math.max(...ys)}`);
+  });
+
+  it('compares the top and bottom hubs when West no longer beats Houston', () => {
     const swapped = INDEX.map((r) => (r.location === 'HB_WEST' && r.year === year ? { ...r, revenue_per_kw_year: 1 } : r));
     view(NONE, swapped);
-    expect(screen.getByTestId('headline').textContent).not.toMatch(/\d/);
+    const pf = (c: string) => swapped.find((r) => r.location === c && r.year === year && r.duration_h === dur && r.deg_cost_per_mwh === deg)!.revenue_per_kw_year;
+    const ranked = ['HB_HOUSTON', 'HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_PAN'].sort((a, b) => pf(b) - pf(a));
+    const [hi, lo] = [ranked[0], ranked.at(-1)!];
+    expect(screen.getByTestId('hero-sub').textContent).toContain(
+      `a battery at the ${locName(hi)} out-earned the ${locName(lo)} by ${Math.round((pf(hi) / pf(lo) - 1) * 100)}%`,
+    );
   });
 
   it('three key numbers equal the data', () => {
@@ -129,10 +148,29 @@ describe('Home live section', () => {
 
   it('with partial ERCOT errors shows tiles, a plain sentence, and the raw errors only under Details', () => {
     view({ source: 'worker', state: STATE });
-    expect(document.body.textContent).toContain('could not fetch everything from ERCOT');
+    expect(document.body.textContent).toContain('Some prices could not be updated. Showing the last good values from');
     const details = screen.getByText('Details').closest('details')!;
     expect(details.textContent).toContain('Rate limit is exceeded');
     expect(document.body.textContent!.replace(details.textContent!, '')).not.toContain('Rate limit');
+  });
+
+  it('live chip shows the latest Houston price and links to the hub prices', () => {
+    const now = Date.parse('2026-11-03T06:35:00.000Z'); // 5 min after the second interval ends
+    render(<HomeView index={INDEX} nodes={NODES} locs={LOCS} geo={GEO} live={{ load: { source: 'worker', state: STATE }, now }} />);
+    const chip = screen.getByTestId('live-chip');
+    expect(chip.getAttribute('data-state')).toBe('live');
+    expect(chip.textContent).toMatch(/^Live · Houston \$31\.40\/MWh · 12:30 AM CT$/);
+  });
+
+  it('live chip says delayed with the age, and unavailable with no feed', () => {
+    const now = Date.parse('2026-11-03T09:30:00.000Z');
+    render(<HomeView index={INDEX} nodes={NODES} locs={LOCS} geo={GEO} live={{ load: { source: 'worker', state: STATE }, now }} />);
+    expect(screen.getByTestId('live-chip').getAttribute('data-state')).toBe('delayed');
+    expect(screen.getByTestId('live-chip').textContent).toBe('Delayed · 3 h old · Houston $31.40/MWh');
+    cleanup();
+    view(NONE);
+    expect(screen.getByTestId('live-chip').textContent).toBe('Live prices unavailable');
+    expect(screen.getByTestId('live-chip').getAttribute('data-state')).toBe('unavailable');
   });
 
   it('hub tiles colour moves by the same rule as the ticker: up for a rise, down for a fall', () => {

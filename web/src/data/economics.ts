@@ -10,6 +10,7 @@
  * revenue is already net of charging). The tax credit is a plain percentage of installed cost, taken in year 0.
  * It is a screening model: good for "which knob matters", not for a financing decision.
  */
+import { usd } from './format';
 
 export interface Assumptions {
   /** Installed (turnkey) cost, $ per kWh of energy capacity. */
@@ -192,7 +193,7 @@ export interface TornadoRow {
   npvHigh: number;
 }
 
-const money = (v: number) => `$${Math.round(v).toLocaleString('en-US')}`;
+const money = (v: number) => usd(Math.round(v), 0);
 const points = (v: number) => `${(v * 100).toFixed(v * 100 % 1 ? 1 : 0)}%`;
 
 /**

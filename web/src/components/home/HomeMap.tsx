@@ -1,15 +1,11 @@
 import type { CSSProperties } from 'react';
-import { VIEW_H, VIEW_W, calloutWidth, type MapDot, type Metric } from '../../data/home';
+import { VIEW_H, VIEW_W, type MapDot, type Metric } from '../../data/home';
 import classes from './HomeMap.module.css';
 
 export interface Marker {
   n: number;
   x: number;
   y: number;
-  /** Short callout text: place name and the value of the active metric. */
-  callout: string;
-  /** Second callout line, e.g. "location under review" or "hub, schematic". */
-  note: string | null;
   /** Hover text: what the marker is and how it was placed. */
   tip: string;
 }
@@ -24,7 +20,7 @@ export function fill(d: MapDot, metric: Metric) {
 /**
  * Texas with every placed node of the all-node run, drawn in the spec projection (src/data/home.ts). No card around
  * it: it shares the hero's glow. The numbered markers are chosen with the chips below the map, which are the keyboard
- * path; clicking a marker does the same.
+ * path and carry the place's details, so no label is drawn over the dots; clicking a marker does the same.
  */
 export function HomeMap({ outline, dots, metric, markers, selected, onSelect, label }: {
   outline: string;
@@ -37,7 +33,6 @@ export function HomeMap({ outline, dots, metric, markers, selected, onSelect, la
 }) {
   const top3 = dots.slice(-3).map((d) => d.code); // the three largest values breathe, each a third of a cycle behind the last
   const breathing = new Set(top3);
-  const on = markers.find((m) => m.n === selected);
   return (
     <svg className={classes.map} viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} role="img" aria-label={label} data-metric={metric}>
       <path d={outline} className={classes.land} />
@@ -61,24 +56,6 @@ export function HomeMap({ outline, dots, metric, markers, selected, onSelect, la
           <text x={m.x} y={m.y} className={classes.markerNum} textAnchor="middle" dominantBaseline="central">{m.n}</text>
         </g>
       ))}
-      {on && <Callout m={on} />}
     </svg>
-  );
-}
-
-function Callout({ m }: { m: Marker }) {
-  const w = Math.max(calloutWidth(m.callout), m.note ? calloutWidth(m.note) : 0);
-  const h = m.note ? 40 : 24;
-  // Level with the marker, to its left, flipped to the right when that would leave the map.
-  let x = m.x - w - 18;
-  if (x < 4) x = m.x + 18;
-  x = Math.min(x, VIEW_W - w - 4);
-  const y = Math.min(Math.max(4, m.y - h / 2), VIEW_H - h - 4);
-  return (
-    <g className={classes.callout} aria-hidden="true">
-      <rect x={x} y={y} width={w} height={h} rx={6} />
-      <text x={x + 8} y={y + 16}>{m.callout}</text>
-      {m.note && <text x={x + 8} y={y + 32} className={classes.calloutNote}>{m.note}</text>}
-    </g>
   );
 }

@@ -250,3 +250,7 @@ tr[data-first] .miniFill { background: var(--amber); }
   .primary, .secondary, .chip, .metricBtn { transition: none; }
   .primary:active, .secondary:active, .chip:active, .metricBtn:active { transform: none; }
 }
+
+/* One plain "what to look for" line under a chart title (PLAN_V3_POLISH, rule 7). */
+.look { margin: 8px 0 0; max-width: 40em; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.chipNote { font-size: 12px; color: var(--amber-text); }

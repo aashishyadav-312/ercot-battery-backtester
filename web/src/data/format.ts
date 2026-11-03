@@ -1,5 +1,9 @@
-export const usd = (v: number | null | undefined, d = 1) =>
-  v == null || Number.isNaN(v) ? '–' : `$${v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}`;
+/** Dollars with the minus (U+2212) before the sign: −$1.87, never $-1.87. A value that rounds to zero has no minus. */
+export function usd(v: number | null | undefined, d = 1) {
+  if (v == null || Number.isNaN(v)) return '–';
+  const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  return `${v < 0 && /[1-9]/.test(s) ? '−' : ''}$${s}`;
+}
 export const pct = (v: number | null | undefined, d = 0) =>
   v == null || Number.isNaN(v) ? '–' : `${(v * 100).toFixed(d)}%`;
 export const num = (v: number | null | undefined, d = 0) =>
