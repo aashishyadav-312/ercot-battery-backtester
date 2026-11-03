@@ -63,6 +63,7 @@
 .tab:active { transform: scale(0.97); }
 .tab[aria-current='page'] { color: var(--text); }
 .tab[aria-current='page']::after { transform: scaleX(1); }
+.actions { display: flex; align-items: center; gap: 8px; }
 .toggle {
   display: inline-grid;
   place-items: center;

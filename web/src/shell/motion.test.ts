@@ -43,11 +43,12 @@ describe('motion', () => {
     expect(bad).toEqual([]);
   });
 
-  it('UI transitions are 300ms or less; only the map marks recolour over 420ms', () => {
+  it('UI transitions are 300ms or less; only the map marks recolour over 420ms and the support bar fills over 700ms', () => {
     const long = transitions().flatMap((t) =>
       [...t.value.matchAll(/(\d+(?:\.\d+)?)(ms|s)\b/g)].map((m) => ({ ...t, ms: m[2] === 's' ? Number(m[1]) * 1000 : Number(m[1]) })),
     ).filter((t) => t.ms > 300);
-    const unexpected = long.filter((t) => !(t.ms === 420 && /^components\/(home\/HomeMap|atlas\/AtlasMap)\.module\.css$/.test(t.file)));
+    const unexpected = long.filter((t) => !(t.ms === 420 && /^components\/(home\/HomeMap|atlas\/AtlasMap)\.module\.css$/.test(t.file))
+      && !(t.ms === 700 && t.file === 'support/Support.module.css'));
     expect(unexpected, JSON.stringify(unexpected)).toEqual([]);
   });
 

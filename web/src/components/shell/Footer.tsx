@@ -3,6 +3,7 @@ import { dataThrough, SITE } from '../../data/site';
 import { fmtDate } from '../../data/format';
 import { buildHash } from '../../shell/route';
 import { requestTour } from '../tour/steps';
+import { requestSupport } from '../../support/api';
 import classes from './Footer.module.css';
 
 /** Disclaimer, who built it, the data cut-off and where to report problems. Shown under every page. */
@@ -28,7 +29,8 @@ export function Footer({ index, sel }: { index: IndexRun[] | null; sel: Selectio
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·{' '}
           <a href={SITE.feedback}>Report an issue</a> ·{' '}
           <a href={buildHash('author', sel)}>About the author</a> ·{' '}
-          <button type="button" className={classes.link} onClick={requestTour}>Take the tour</button>
+          <button type="button" className={classes.link} onClick={requestTour}>Take the tour</button> ·{' '}
+          <button type="button" className={classes.link} onClick={requestSupport}>Support</button>
         </p>
         <p className={classes.small}>
           An independent project, not affiliated with ERCOT or any company. Prices are ERCOT public data. Results are illustrative models.

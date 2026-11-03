@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import { MantineProvider } from '@mantine/core';
 import { TickerView } from './Ticker';
 import { Header } from './Header';
 import { ViewBar } from './ViewBar';
@@ -66,9 +68,12 @@ describe('Ticker', () => {
 
 describe('Header', () => {
   const sel = { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 };
+  // The Support button is a Mantine Popover.
+  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent: () => false })) as never;
+  const wrapper = ({ children }: { children: ReactNode }) => <MantineProvider env="test">{children}</MantineProvider>;
 
   it('has the five tabs as real links, in order, with the current one marked', () => {
-    render(<Header active="research" sel={sel} scheme="dark" onToggleScheme={() => {}} />);
+    render(<Header active="research" sel={sel} scheme="dark" onToggleScheme={() => {}} />, { wrapper });
     const nav = screen.getByRole('navigation', { name: 'Primary' });
     const links = within(nav).getAllByRole('link');
     expect(links.map((l) => l.textContent)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
@@ -84,7 +89,7 @@ describe('Header', () => {
 
   it('has a theme toggle that names the theme it switches to', () => {
     const on = vi.fn();
-    const { rerender } = render(<Header active="home" sel={sel} scheme="dark" onToggleScheme={on} />);
+    const { rerender } = render(<Header active="home" sel={sel} scheme="dark" onToggleScheme={on} />, { wrapper });
     fireEvent.click(screen.getByRole('button', { name: 'Switch to light theme' }));
     expect(on).toHaveBeenCalledTimes(1);
     rerender(<Header active="home" sel={sel} scheme="light" onToggleScheme={on} />);

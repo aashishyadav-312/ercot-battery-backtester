@@ -2,6 +2,7 @@ import type { Selection } from '../../data/types';
 import { TABS, buildHash, viewsOf, type Tab } from '../../shell/route';
 import type { Scheme } from '../../shell/scheme';
 import { IconMoon, IconSun } from '../Icons';
+import { SupportButton } from '../../support/Support';
 import classes from './Header.module.css';
 
 function Logo() {
@@ -38,9 +39,12 @@ export function Header({ active, sel, scheme, onToggleScheme }: Props) {
             </a>
           ))}
         </nav>
-        <button type="button" className={classes.toggle} onClick={onToggleScheme} aria-label={`Switch to ${next} theme`} title={`Switch to ${next} theme`}>
-          {scheme === 'dark' ? <IconSun /> : <IconMoon />}
-        </button>
+        <div className={classes.actions}>
+          <SupportButton />
+          <button type="button" className={classes.toggle} onClick={onToggleScheme} aria-label={`Switch to ${next} theme`} title={`Switch to ${next} theme`}>
+            {scheme === 'dark' ? <IconSun /> : <IconMoon />}
+          </button>
+        </div>
       </div>
     </header>
   );
