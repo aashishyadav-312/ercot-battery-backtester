@@ -8,10 +8,7 @@ import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { PageHeader, RunStatus } from './Overview';
 import { DEFAULTS, compute, tornado, type Assumptions, type Resource } from '../data/economics';
-import { fmtDate, num, pct, usd as usdRaw, yearLabel } from '../data/format';
-
-/** Dollars with the sign in front of the symbol: -$503, not $-503. */
-const usd = (v: number | null | undefined, d = 1) => (v != null && v < 0 && usdRaw(v, d) !== usdRaw(0, d) ? `-${usdRaw(-v, d)}` : usdRaw(v === 0 ? 0 : v, d));
+import { fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { locFull } from '../data/site';
 import { TERMS } from '../copy/terms';
 

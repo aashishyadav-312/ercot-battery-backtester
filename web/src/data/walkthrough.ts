@@ -112,7 +112,7 @@ export interface Step {
 }
 
 const mwh = (v: number) => `${v.toLocaleString('en-US', { maximumFractionDigits: 0 })} MWh`;
-const price = (v: number) => `$${v.toLocaleString('en-US', { maximumFractionDigits: 0 })}/MWh`;
+const price = (v: number) => `${usd(v, 0)}/MWh`;
 const dollars = (v: number) => usd(Math.round(v), 0);
 
 /** The ordered steps of the walkthrough for one day: intro, one per block, then the day's total. */

@@ -4,11 +4,13 @@ import { loadLocations, loadNodes, loadTexas } from '../data/loader';
 import { num, pct, usd } from '../data/format';
 import { locName } from '../data/site';
 import {
-  METRICS, TIER_LABEL, buildHome, durationStory, headlinePct, hubPoint, mapDots, metricValue, outlinePath, project,
+  METRICS, TIER_LABEL, buildHome, durationStory, heroComparison, hubPoint, mapDots, metricValue, outlinePath, project, yearSpan,
   type HomeModel, type HubRow, type Metric, type Tier,
 } from '../data/home';
 import type { LocationsFile, NodesFile, TexasGeo } from '../data/types';
 import { HomeMap, type Marker } from '../components/home/HomeMap';
+import { LiveChip } from '../components/home/LiveChip';
+import { liveChip } from '../live/chip';
 import { HubTiles } from '../components/live/HubTiles';
 import { ErrorDetails } from '../components/live/ErrorDetails';
 import { useLiveFeed } from '../live/useLiveFeed';
@@ -26,6 +28,8 @@ interface Chip {
   name: string;
   value: string;
   sub: string;
+  /** How the place is drawn on the map: "hub, schematic" or "location under review". Shown in the chip, not over the dots. */
+  note: string | null;
 }
 
 /** The three numbered places: the West and Houston hubs (detailed runs) and the rank-1 node (all-node run). */
@@ -34,13 +38,15 @@ function chipsFor(m: HomeModel, metric: Metric): Chip[] {
     n, name,
     value: metric === 'rev' ? usd(h.pf, 1) : pct(metric === 'capture' ? h.kept : h.top10),
     sub: metric === 'rev' ? 'perfect foresight' : metric === 'capture' ? 'kept by day-ahead' : 'from the 10 best days',
+    note: 'hub, schematic',
   });
   const b = m.best;
   const node: Chip | null = b && {
     n: 3,
     name: `${b.node.code}${zoneName(b.node.lz) ? `, ${zoneName(b.node.lz)}` : ''}`,
     value: fmtMetric(metric, metricValue(b.node, metric)),
-    sub: metric === 'rev' && b.ratio != null ? `${b.ratio.toFixed(1)}x its hub` : b.underReview ? 'location under review' : TERMS.node.label.toLowerCase(),
+    sub: metric === 'rev' && b.ratio != null ? `${b.ratio.toFixed(1)}x its hub` : TERMS.node.label.toLowerCase(),
+    note: b.underReview ? 'location under review' : null,
   };
   return [hub(1, m.west, 'West hub'), hub(2, m.houston, 'Houston hub'), node].filter((c): c is Chip => !!c);
 }
@@ -52,7 +58,7 @@ function markersFor(m: HomeModel, locs: LocationsFile, chips: Chip[]): Marker[] 
     const c = chips.find((x) => x.n === n);
     if (p && c) {
       out.push({
-        n, x: p.x, y: p.y, callout: `${c.name} · ${c.value}`, note: 'hub, schematic',
+        n, x: p.x, y: p.y,
         tip: `${locName(code)} (${code}), hub, schematic: drawn at ${p.city}. A hub is a price average over many buses, so it has no single location.`,
       });
     }
@@ -62,7 +68,7 @@ function markersFor(m: HomeModel, locs: LocationsFile, chips: Chip[]): Marker[] 
   if (b && c && b.node.lat != null && b.node.lon != null) {
     const [x, y] = project(b.node.lon, b.node.lat);
     out.push({
-      n: 3, x, y, callout: `${c.name} · ${c.value}`, note: b.underReview ? 'location under review' : null,
+      n: 3, x, y,
       tip: `${b.node.code}, rank 1 of ${m.nNodes} nodes${b.underReview ? '. Location under review: geocoded by hand, not yet confirmed' : ''}.`,
     });
   }
@@ -105,7 +111,9 @@ export function HomeView({ index, nodes, locs, geo, live }: {
   const dots = useMemo(() => mapDots(nodes.nodes, metric), [nodes, metric]);
   const chips = chipsFor(m, metric);
   const markers = markersFor(m, locs, chips);
-  const head = headlinePct(m);
+  const cmp = heroComparison(m);
+  const years = yearSpan(index);
+  const chip = liveChip(live.load, live.now);
   const mInfo = METRICS.find((x) => x.id === metric)!;
   const durH = `${m.durationH}-hour`;
   const top10 = [...dots].reverse().slice(0, 10);
@@ -116,20 +124,23 @@ export function HomeView({ index, nodes, locs, geo, live }: {
       {/* ------------------------------------------------ hero */}
       <section className={classes.hero} aria-labelledby="home-title">
         <div className={classes.heroText}>
-          <p className={classes.eyebrow}>The finding · {m.year} backtest · {m.nNodes} nodes</p>
-          <h1 id="home-title" className={classes.h1} data-testid="headline">
-            {head != null && m.west && m.houston
-              ? <>West hub batteries would have out-earned Houston by {head}% in {m.year}.</>
-              : <>Where a Texas battery sits changes what it earns.</>}
-          </h1>
-          <p className={classes.lede}>
-            We replayed ERCOT's {m.year} prices through a {durH} battery at the five trading hubs and at every one of {m.nNodes} resource
-            nodes with complete prices. The spread between places is wide, and so is the gap between a perfect trade and a scheduled one.
+          <p className={classes.eyebrow} data-testid="hero-eyebrow">
+            Live ERCOT prices · {m.nNodes + m.hubs.length} locations{years && <> · {years[0]}–{years[1]}</>}
+          </p>
+          <h1 id="home-title" className={classes.h1}>Where in Texas does a battery earn the most?</h1>
+          <p className={classes.lede} data-testid="hero-sub">
+            Chargeline replays real ERCOT prices through a grid battery at every trading hub and {m.nNodes} nodes.
+            {cmp && (
+              <> In {m.year}, a battery at the {locName(cmp.top)} out-earned the {locName(cmp.bottom)} by {cmp.pct}%
+                {m.best?.ratio != null ? <>, and the best node earned {m.best.ratio.toFixed(1)}× its hub.</> : <>.</>}
+              </>
+            )}
           </p>
           <div className={classes.ctas}>
             <a className={classes.primary} href="#/atlas">Explore the Atlas</a>
             <a className={classes.secondary} href="#/studio/custom">Run your own battery</a>
           </div>
+          <LiveChip chip={chip} targetId="today-title" />
         </div>
 
         <div className={classes.mapCol}>
@@ -142,6 +153,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
               <h2 className={classes.glassTitle}>{mInfo.label} by node</h2>
               <span className={classes.meta}>{m.year} · {durH} battery · {metric === 'rev' ? TERMS.revenueUnit.label : 'share'}</span>
             </div>
+            <p className={classes.look}>Bigger, brighter dots score higher on {mInfo.label.toLowerCase()}. Numbers match the places below.</p>
             <div className={classes.metrics} role="group" aria-label="Map metric">
               {METRICS.map((x) => (
                 <button key={x.id} type="button" className={classes.metricBtn} aria-pressed={metric === x.id} title={x.long} onClick={() => setMetric(x.id)}>
@@ -157,6 +169,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
                     <span className={classes.chipName}>{c.name}</span>
                     <span className={classes.chipValue}>{c.value}</span>
                     <span className={classes.chipSub}>{c.sub}</span>
+                    {c.note && <span className={classes.chipNote}>{c.note}</span>}
                   </span>
                 </button>
               ))}
@@ -231,7 +244,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
       {/* ------------------------------------------------ today */}
       <section className={classes.section} aria-labelledby="today-title">
         <p className={classes.eyebrow}>Today in ERCOT</p>
-        <h2 id="today-title" className={classes.h3}>Hub prices right now</h2>
+        <h2 id="today-title" className={classes.h3} tabIndex={-1}>Hub prices right now</h2>
         <Today live={live} />
       </section>
 
@@ -272,6 +285,7 @@ function GapCard({ h, m }: { h: HubRow; m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>The gap that matters</h3>
       <p className={classes.meta}>Houston hub · {m.year} · {m.durationH}-hour battery · {TERMS.revenueUnit.label}</p>
+      <p className={classes.look}>The amber bar is what a real schedule keeps. The gap is the cost of not knowing prices in advance.</p>
       <Bar label={`${TERMS.perfectForesight.label} (upper bound)`} value={num(h.pf, 1)} share={1} tone="mint" />
       {h.da != null && <Bar label={`${TERMS.dayAheadPlan.label}, real-time settled`} value={num(h.da, 1)} share={h.da / h.pf} tone="amber" />}
       {h.gap != null && <p className={classes.meta} data-testid="gap">{num(h.gap, 1)} {TERMS.revenueUnit.label} left on the table</p>}
@@ -290,6 +304,7 @@ function DurationCard({ m }: { m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Longer earns more per kW</h3>
       <p className={classes.meta}>Houston hub · {m.year} · {TERMS.revenueUnit.label}</p>
+      <p className={classes.look}>Each bar is one battery length. The amber bar is the {m.durationH}-hour battery used across this page.</p>
       <ol className={classes.vbars} aria-label="Perfect-foresight revenue by battery duration">
         {m.durations.map((d) => (
           <li key={d.h} className={classes.vbar}>
@@ -313,6 +328,7 @@ function HubTable({ m }: { m: HomeModel }) {
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Hub revenue, ranked</h3>
       <p className={classes.meta}>{m.year} · {m.durationH}-hour battery · {usd(m.deg, 0)}/MWh degradation · {TERMS.revenueUnit.label}</p>
+      <p className={classes.look}>Longer bars earned more. {TERMS.captureRate.label} is how much of that a day-ahead plan keeps.</p>
       <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Hub revenue table, scrolls sideways when it does not fit">
         <table className={classes.table}>
           <thead>
@@ -360,8 +376,9 @@ function Today({ live }: { live: { load: LiveLoad | null; now: number } }) {
         <p className={classes.small}>
           {load.source === 'cache'
             ? <>New prices could not be loaded. Showing the copy saved in this browser {ago(Date.parse(s.checkedAt), now)}.</>
-            : through === null ? <>No real-time prices posted yet today.</> : <>Real-time prices through {ctTime(through)} CT, {ago(through, now)}.</>}
-          {load.source === 'worker' && s.errors.length > 0 && <> The last update could not fetch everything from ERCOT, so some figures carry over from earlier.</>}
+            : through === null ? <>No real-time prices posted yet today.</>
+            : s.errors.length > 0 ? <>Some prices could not be updated. Showing the last good values from {ctTime(through)} CT.</>
+            : <>Real-time prices through {ctTime(through)} CT, {ago(through, now)}.</>}
         </p>
         <a className={classes.textLink} href="#/home/live">Today's charts and tomorrow's plan <span aria-hidden="true">→</span></a>
       </div>

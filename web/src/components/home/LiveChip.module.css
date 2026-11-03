@@ -1,0 +1,35 @@
+/* Live chip in the Home hero. Dot: mint live, amber delayed, grey unavailable or loading. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  margin-top: 16px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--panel);
+  color: var(--text);
+  font-family: var(--mantine-font-family-monospace);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  transition: border-color 160ms var(--ease);
+}
+.chip:hover { border-color: var(--line-2); }
+
+.dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--dot-low); }
+.chip[data-state='live'] .dot { background: var(--mint); animation: pulse 280ms var(--ease) 1; }
+.chip[data-state='delayed'] .dot { background: var(--amber); animation: pulse 280ms var(--ease) 1; }
+.chip[data-state='unavailable'], .chip[data-state='loading'] { color: var(--muted); }
+
+/* One pulse per new snapshot: the dot remounts when the snapshot changes. Transform and opacity only. */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  40% { transform: scale(1.8); opacity: 0.55; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip, .chip .dot { transition: none; animation: none !important; }
+}

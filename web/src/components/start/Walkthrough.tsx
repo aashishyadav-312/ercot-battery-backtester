@@ -53,7 +53,7 @@ function dayChart(w: WalkData, day: WalkDay, block: Block | undefined, expanded:
         splitLine: { show: false },
         axisPointer: { show: true },
       });
-      const money = (v: number) => `$${v.toLocaleString('en-US')}`;
+      const money = (v: number) => usd(v, Number.isInteger(v) ? 0 : 2);
       return {
         animationDurationUpdate: 360,
         title: [

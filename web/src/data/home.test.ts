@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { VIEW_H, VIEW_W, buildHome, durationStory, headlinePct, mapDots, project, type Metric } from './home';
+import { VIEW_H, VIEW_W, buildHome, durationStory, headlinePct, heroComparison, mapDots, project, yearSpan, type Metric } from './home';
 import type { IndexRun, NodesFile } from './types';
 
 // The real results files, so these tests fail if the page ever stops matching the data.
@@ -98,5 +98,27 @@ describe('map', () => {
     const top = dots.filter((d) => d.tier === 'top').length / dots.length;
     expect(top).toBeGreaterThan(0.05);
     expect(top).toBeLessThan(0.15);
+  });
+});
+
+describe('hero comparison', () => {
+  it('is West over Houston while West earns more', () => {
+    const m = buildHome(INDEX, NODES);
+    expect(heroComparison(m)).toEqual({ top: 'HB_WEST', bottom: 'HB_HOUSTON', pct: headlinePct(m) });
+  });
+
+  it('falls back to the top and bottom hubs, and to null with one hub', () => {
+    const swapped = INDEX.map((r) => (r.location === 'HB_WEST' && r.year === year ? { ...r, revenue_per_kw_year: 1 } : r));
+    const m = buildHome(swapped, NODES);
+    const c = heroComparison(m)!;
+    expect([c.top, c.bottom]).toEqual([m.hubs[0].code, m.hubs.at(-1)!.code]);
+    expect(c.pct).toBe(Math.round((m.hubs[0].pf / m.hubs.at(-1)!.pf - 1) * 100));
+    expect(heroComparison(buildHome(INDEX.filter((r) => r.location === 'HB_NORTH'), NODES))).toBeNull();
+  });
+
+  it('year span covers every year in the index', () => {
+    const ys = INDEX.map((r) => r.year);
+    expect(yearSpan(INDEX)).toEqual([Math.min(...ys), Math.max(...ys)]);
+    expect(yearSpan([])).toBeNull();
   });
 });
