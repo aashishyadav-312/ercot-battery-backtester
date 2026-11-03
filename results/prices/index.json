@@ -1,7 +1,7 @@
 {
  "format": "EBP1 (see data/price_files.py)",
  "description": "RT 15-min and DA hourly settlement point prices per location-year for the custom run",
- "total_bytes": 2599130,
+ "total_bytes": 2601344,
  "files": [
   {
    "location": "HB_HOUSTON",
@@ -211,12 +211,12 @@
    "location": "RUSSEKST_RN",
    "year": 2026,
    "file": "RUSSEKST_RN_2026.ebp",
-   "bytes": 81608,
+   "bytes": 82076,
    "rt_first_day": "2026-01-01",
-   "rt_last_day": "2026-10-31",
+   "rt_last_day": "2026-11-02",
    "da_first_day": "2026-01-01",
-   "da_last_day": "2026-10-31",
-   "rt_missing": 12,
+   "da_last_day": "2026-11-01",
+   "rt_missing": 16,
    "da_missing": 0
   },
   {
@@ -247,12 +247,12 @@
    "location": "CAMWIND_RN",
    "year": 2026,
    "file": "CAMWIND_RN_2026.ebp",
-   "bytes": 76720,
+   "bytes": 77154,
    "rt_first_day": "2026-01-01",
-   "rt_last_day": "2026-10-31",
+   "rt_last_day": "2026-11-02",
    "da_first_day": "2026-01-01",
-   "da_last_day": "2026-10-31",
-   "rt_missing": 12,
+   "da_last_day": "2026-11-01",
+   "rt_missing": 16,
    "da_missing": 0
   },
   {
@@ -283,12 +283,12 @@
    "location": "ANSON1_ALL",
    "year": 2026,
    "file": "ANSON1_ALL_2026.ebp",
-   "bytes": 77083,
+   "bytes": 77532,
    "rt_first_day": "2026-01-01",
-   "rt_last_day": "2026-10-31",
+   "rt_last_day": "2026-11-02",
    "da_first_day": "2026-01-01",
-   "da_last_day": "2026-10-31",
-   "rt_missing": 12,
+   "da_last_day": "2026-11-01",
+   "rt_missing": 16,
    "da_missing": 0
   },
   {
@@ -319,12 +319,12 @@
    "location": "WIPOPA_3_4",
    "year": 2026,
    "file": "WIPOPA_3_4_2026.ebp",
-   "bytes": 74795,
+   "bytes": 75221,
    "rt_first_day": "2026-01-01",
-   "rt_last_day": "2026-10-31",
+   "rt_last_day": "2026-11-02",
    "da_first_day": "2026-01-01",
-   "da_last_day": "2026-10-31",
-   "rt_missing": 12,
+   "da_last_day": "2026-11-01",
+   "rt_missing": 16,
    "da_missing": 0
   },
   {
@@ -355,12 +355,12 @@
    "location": "RHESS2_ESS1",
    "year": 2026,
    "file": "RHESS2_ESS1_2026.ebp",
-   "bytes": 77132,
+   "bytes": 77569,
    "rt_first_day": "2026-01-01",
-   "rt_last_day": "2026-10-31",
+   "rt_last_day": "2026-11-02",
    "da_first_day": "2026-01-01",
-   "da_last_day": "2026-10-31",
-   "rt_missing": 12,
+   "da_last_day": "2026-11-01",
+   "rt_missing": 16,
    "da_missing": 0
   }
  ]
