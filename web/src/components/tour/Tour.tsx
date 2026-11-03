@@ -73,10 +73,12 @@ export function Tour() {
     const d = dialog.current;
     if (!d || step === null) return;
     const vp = { width: window.innerWidth, height: window.innerHeight };
-    const isPhone = vp.width < PHONE_MAX;
-    setPhone(isPhone);
-    const el = anchorOf(TOUR_STEPS[step].anchor);
-    if (isPhone || !el) { setPlace(null); return; }
+    const anchor = TOUR_STEPS[step].anchor;
+    const el = anchorOf(anchor);
+    // On a phone only the first step docks to the bottom; the tab steps sit under their tab, which stays put in the sticky header.
+    const docked = vp.width < PHONE_MAX && anchor === 'hero';
+    setPhone(docked);
+    if (docked || !el) { setPlace(null); return; }
     const r = el.getBoundingClientRect();
     setPlace(placePopover({ left: r.left, top: r.top, width: r.width, height: r.height }, { width: d.offsetWidth, height: d.offsetHeight }, vp, (document.querySelector('header')?.getBoundingClientRect().bottom ?? 0) + 8));
   }, [step]);

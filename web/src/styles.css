@@ -41,6 +41,18 @@ code {
   border-radius: var(--r-input);
 }
 
+/* A tab the tour points at is lit as a filled gold pill, a little shorter than the 44px tap area so it reads as a button. */
+a[data-tour^='tab-'][data-tour-active] { outline: none; color: #15171A; font-weight: 600; }
+a[data-tour^='tab-'][data-tour-active]::before {
+  content: '';
+  position: absolute;
+  inset: 6px 2px;
+  z-index: -1;
+  border-radius: var(--r-pill);
+  background: var(--amber);
+}
+a[data-tour^='tab-'][data-tour-active]::after { display: none; }
+
 /* Reading measure: running text stops at about 75 characters, and a last line is not left with one word. Zero specificity,
    so a component that sets its own width keeps it. */
 :where(main p, footer p) { max-width: 75ch; text-wrap: pretty; }
