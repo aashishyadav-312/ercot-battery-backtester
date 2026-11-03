@@ -1,6 +1,7 @@
 import locations from './locations.json';
 import glossary from './glossary.json';
 import type { IndexRun } from './types';
+import { TERMS } from '../copy/terms';
 
 // ------------------------------------------------------------ site facts (About + footer)
 export const SITE = {
@@ -19,11 +20,11 @@ interface Loc { name: string; region: string; type: 'hub' | 'node' }
 const LOCS = locations.locations as Record<string, Loc>;
 const ZONES = locations.load_zones as Record<string, string>;
 
-/** "Houston Hub (HB_HOUSTON)" / "Russek St, West Texas resource node (RUSSEKST_RN)". Unknown codes pass through. */
+/** "Houston Hub (HB_HOUSTON)" / "Russek St, West Texas node (RUSSEKST_RN)". Unknown codes pass through. */
 export function locFull(code: string): string {
   const l = LOCS[code];
   if (!l) return code;
-  return l.type === 'hub' ? `${l.name} (${code})` : `${l.name}, ${l.region} resource node (${code})`;
+  return l.type === 'hub' ? `${l.name} (${code})` : `${l.name}, ${l.region} ${TERMS.node.label.toLowerCase()} (${code})`;
 }
 /** Label only, e.g. "Houston Hub" or "Russek St". */
 export const locName = (code: string): string => LOCS[code]?.name ?? code;
@@ -39,6 +40,11 @@ export const zoneFull = (code: string): string => (ZONES[code] ? `${ZONES[code]}
 // ------------------------------------------------------------ glossary
 export type TermId = keyof typeof glossary.terms;
 export const GLOSSARY = glossary.terms as Record<string, { term: string; definition: string }>;
+// The labels of the shared terms come from copy/terms.ts; the longer definitions stay in glossary.json until Learn is rebuilt.
+for (const [id, key] of [
+  ['perfect_foresight', 'perfectForesight'], ['capture_rate', 'captureRate'], ['top10_day_share', 'top10DayShare'], ['usd_per_kw_yr', 'revenueUnit'],
+  ['degradation_cost', 'degradationCost'], ['hub', 'hub'], ['resource_node', 'node'],
+] as const) GLOSSARY[id] = { ...GLOSSARY[id], term: TERMS[key].label };
 
 // ------------------------------------------------------------ data freshness
 /** Latest day covered by any run in results/index.json, plus the latest per location type. */

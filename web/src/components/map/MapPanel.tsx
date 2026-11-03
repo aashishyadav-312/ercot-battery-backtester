@@ -7,12 +7,13 @@ import { findRun } from '../../data/loader';
 import { MONTHS, pct, usd, yearLabel } from '../../data/format';
 import { locFull, locName, zoneFull } from '../../data/site';
 import type { IndexRun, LocationRec, Run } from '../../data/types';
+import { TERMS } from '../../copy/terms';
 
 function Stat({ label, term, value }: { label: string; term: string; value: string }) {
   return (
     <div>
-      <Group gap={2} wrap="nowrap" mb={4}>
-        <Text size="xs" c="dimmed" fw={560} tt="uppercase" style={{ letterSpacing: '.04em', whiteSpace: 'nowrap' }}>{label}</Text>
+      <Group gap={2} wrap="nowrap" mb={4} align="flex-start">
+        <Text size="xs" c="dimmed" fw={560} tt="uppercase" style={{ letterSpacing: '.04em', minWidth: 0 }}>{label}</Text>
         <Info terms={term} size={13} />
       </Group>
       <Text key={value} className="app-fade tnum" fz={22} fw={640} lh={1.1} c="bright" style={{ letterSpacing: '-0.02em' }}>{value}</Text>
@@ -93,7 +94,7 @@ export function MapPanel({ loc, locations, index }: { loc: LocationRec; location
           <Title order={3} fz={22} lh={1.2}>{loc.name}</Title>
           <Text size="xs" c="dimmed" ff="monospace" mt={2}>{loc.code}</Text>
           <Group gap={6} mt="xs">
-            <Badge variant="light" color={loc.type === 'hub' ? 'violet' : 'accent'}>{loc.type === 'hub' ? 'Hub' : 'Resource node'}</Badge>
+            <Badge variant="light" color={loc.type === 'hub' ? 'violet' : 'accent'}>{loc.type === 'hub' ? TERMS.hub.label : TERMS.node.label}</Badge>
             <Badge variant="light" color="gray">{zoneFull(loc.load_zone)}</Badge>
           </Group>
           <Group gap={2} mt={8} wrap="nowrap" align="flex-start">
@@ -112,8 +113,8 @@ export function MapPanel({ loc, locations, index }: { loc: LocationRec; location
 
         <SimpleGrid cols={3} spacing="xs">
           <Stat label="$/kW-yr" term="usd_per_kw_yr" value={row ? usd(row.revenue_per_kw_year, 1) : '–'} />
-          <Stat label="Capture" term="capture_rate" value={row ? pct(row.capture_rate, 0) : '–'} />
-          <Stat label="Top 10" term="top10_day_share" value={row ? pct(row.top10_day_share, 0) : '–'} />
+          <Stat label={TERMS.captureRate.label} term="capture_rate" value={row ? pct(row.capture_rate, 0) : '–'} />
+          <Stat label={TERMS.top10DayShare.label} term="top10_day_share" value={row ? pct(row.top10_day_share, 0) : '–'} />
         </SimpleGrid>
         <Text size="xs" c="dimmed" mt={-8}>{scenario}{row?.annualized ? ', annualized' : ''}.</Text>
 
@@ -148,7 +149,7 @@ export function MapPanel({ loc, locations, index }: { loc: LocationRec; location
         )}
 
         <Stack gap="xs">
-          <Button variant="filled" onClick={() => go('overview', { location: loc.code })}>Open in Overview</Button>
+          <Button variant="filled" onClick={() => go('revenue', { location: loc.code })}>Open in Revenue</Button>
           <Button variant="default" onClick={() => go('studio', { location: loc.code })}>
             {loc.type === 'node' ? 'Compare with hub' : 'Compare locations'}
           </Button>

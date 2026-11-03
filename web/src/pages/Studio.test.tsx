@@ -13,6 +13,7 @@ import { parsePriceFile } from '../custom/prices';
 import { runCustom } from '../custom/runner';
 import { toParams, type Coverage } from '../custom/params';
 import type { IndexRun, NodeSelection, Run } from '../data/types';
+import { retiredIn } from '../copy/retired';
 
 // The chart cards (echarts) and the node-vs-hub card load their own files; they are the existing cards, unchanged.
 vi.mock('../components/cards', () => ({
@@ -164,7 +165,7 @@ describe('other inputs are solved in the browser', () => {
     await act(async () => { fireEvent.click(screen.getByTestId('check')); });
     await waitFor(() => expect(text('summary-source')).toContain('Solved in your browser'));
     expect(text('check-result')).toBe(
-      `Precomputed in Python: ${usd(r.revenue_per_kw_year, 2)}/kW-year perfect foresight and ${usd(r.da_rt_revenue_per_kw_year, 2)} day-ahead. `
+      `Precomputed in Python: ${usd(r.revenue_per_kw_year, 2)}/kW-yr perfect foresight and ${usd(r.da_rt_revenue_per_kw_year, 2)} day-ahead plan. `
       + `Your browser: ${usd(run.metrics.revenue_per_kw_year, 2)} and ${usd(run.metrics.da_rt_revenue_per_kw_year, 2)}.`,
     );
   });
@@ -195,5 +196,13 @@ describe('compare presets', () => {
     fireEvent.click(within(screen.getByTestId('cmp-HB_WEST')).getByRole('button'));
     await waitFor(() => expect(loadRun).toHaveBeenLastCalledWith(row('HB_WEST', 2025, 2, 10).file));
     expect(screen.getByTestId('nodehub').textContent).toBe('HB_WEST');
+  });
+});
+
+describe('Studio uses the shared vocabulary', () => {
+  it('shows none of the retired labels', async () => {
+    view();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(retiredIn(document.body.textContent ?? '')).toEqual([]);
   });
 });

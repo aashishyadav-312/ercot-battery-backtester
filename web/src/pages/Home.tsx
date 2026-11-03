@@ -14,6 +14,7 @@ import { ErrorDetails } from '../components/live/ErrorDetails';
 import { useLiveFeed } from '../live/useLiveFeed';
 import { ago, ctTime, pricesThrough, type LiveLoad } from '../live/live';
 import classes from './Home.module.css';
+import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
 const zoneName = (lz: string | null) => (lz ? lz.replace(/^LZ_/, '').toLowerCase().replace(/^./, (c) => c.toUpperCase()) : null);
 
@@ -39,7 +40,7 @@ function chipsFor(m: HomeModel, metric: Metric): Chip[] {
     n: 3,
     name: `${b.node.code}${zoneName(b.node.lz) ? `, ${zoneName(b.node.lz)}` : ''}`,
     value: fmtMetric(metric, metricValue(b.node, metric)),
-    sub: metric === 'rev' && b.ratio != null ? `${b.ratio.toFixed(1)}x its hub` : b.underReview ? 'location under review' : 'resource node',
+    sub: metric === 'rev' && b.ratio != null ? `${b.ratio.toFixed(1)}x its hub` : b.underReview ? 'location under review' : TERMS.node.label.toLowerCase(),
   };
   return [hub(1, m.west, 'West hub'), hub(2, m.houston, 'Houston hub'), node].filter((c): c is Chip => !!c);
 }
@@ -139,7 +140,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
           <div className={classes.glass}>
             <div className={classes.glassHead}>
               <h2 className={classes.glassTitle}>{mInfo.label} by node</h2>
-              <span className={classes.meta}>{m.year} · {durH} battery · {metric === 'rev' ? '$/kW-year' : 'share'}</span>
+              <span className={classes.meta}>{m.year} · {durH} battery · {metric === 'rev' ? TERMS.revenueUnit.label : 'share'}</span>
             </div>
             <div className={classes.metrics} role="group" aria-label="Map metric">
               {METRICS.map((x) => (
@@ -170,7 +171,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
               the all-node run.
             </p>
             <details className={classes.listAlt}>
-              <summary>Top 10 placed nodes by {mInfo.label.toLowerCase()}, as a list</summary>
+              <summary>10 best placed nodes by {mInfo.label.toLowerCase()}, as a list</summary>
               <ol>
                 {top10.map((d) => <li key={d.code}><span className={classes.mono}>{d.code}</span> {fmtMetric(metric, d.value)}</li>)}
               </ol>
@@ -185,14 +186,14 @@ export function HomeView({ index, nodes, locs, geo, live }: {
           {m.west && m.houston && (
             <div className={classes.key}>
               <p className={classes.big} data-tone="amber" data-testid="key-west">{usd(m.west.pf, 1)}</p>
-              <p className={classes.keyText}>per kW-year at the West hub, against {usd(m.houston.pf, 1)} at Houston</p>
+              <p className={classes.keyText}>{PER_KW_PER_YEAR} at the West hub, against {usd(m.houston.pf, 1)} at Houston</p>
               <p className={classes.meta}>{m.year} · {durH} battery · perfect foresight</p>
             </div>
           )}
           {m.houston?.kept != null && (
             <div className={classes.key}>
               <p className={classes.big} data-testid="key-kept">{pct(m.houston.kept)}</p>
-              <p className={classes.keyText}>of perfect-foresight revenue kept by a day-ahead schedule at Houston</p>
+              <p className={classes.keyText}>of perfect-foresight revenue kept by the day-ahead plan at Houston</p>
               <p className={classes.meta}>{m.year} · {durH} battery</p>
             </div>
           )}
@@ -206,10 +207,9 @@ export function HomeView({ index, nodes, locs, geo, live }: {
         </div>
         <div className={classes.keyFoot}>
           <p>
-            Perfect foresight times every charge and discharge with hindsight, so it is an upper bound. A day-ahead schedule commits the
-            plan the day before and settles at real-time prices.
+            {TERMS.perfectForesight.definition} It is an upper bound. {TERMS.dayAheadPlan.definition}
           </p>
-          <a className={classes.textLink} href="#/guide">What each number means <span aria-hidden="true">→</span></a>
+          <a className={classes.textLink} href="#/learn">What each number means <span aria-hidden="true">→</span></a>
         </div>
       </section>
 
@@ -217,7 +217,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
       <section className={classes.section} aria-labelledby="keeps-title">
         <p className={classes.eyebrow}>What a schedule keeps</p>
         <h2 id="keeps-title" className={classes.h2} data-testid="keeps-title">
-          {m.keptRange ? <>A real schedule keeps {pct(m.keptRange[0])} to {pct(m.keptRange[1])} of perfect hindsight.</> : <>What a real schedule keeps.</>}
+          {m.keptRange ? <>A real schedule keeps {pct(m.keptRange[0])} to {pct(m.keptRange[1])} of perfect foresight.</> : <>What a real schedule keeps.</>}
         </h2>
         <p className={classes.sub}>Houston and duration first, then all five hubs. Perfect foresight is an upper bound no operator can reach.</p>
 
@@ -240,10 +240,10 @@ export function HomeView({ index, nodes, locs, geo, live }: {
         <h2 id="ways-title" className={classes.eyebrow}>Four ways in</h2>
         <ul className={classes.ways}>
           {[
-            { n: '01', title: 'Atlas', href: '#/atlas', cta: 'Open Atlas', text: `Every node on the map. Revenue, capture rate and spike dependence across ${m.nNodes} ERCOT resource nodes.` },
+            { n: '01', title: 'Atlas', href: '#/atlas', cta: 'Open Atlas', text: `Every node on the map. Revenue, ${TERMS.captureRate.label.toLowerCase()} and ${TERMS.top10DayShare.label.toLowerCase()} across ${m.nNodes} ERCOT resource nodes.` },
             { n: '02', title: 'Studio', href: '#/studio/custom', cta: 'Open Studio', text: 'Run your own battery. Choose a location, duration and efficiency, and the model solves it in your browser.' },
             { n: '03', title: 'Research', href: '#/research', cta: 'Read Research', text: 'Findings and method: perfect foresight vs day-ahead, ancillary services, and the real-time co-optimization change.' },
-            { n: '04', title: 'Guide', href: '#/guide', cta: 'Start with Guide', text: 'New here? Start here. What each number means, how to read it, and where the model stops being realistic.' },
+            { n: '04', title: 'Learn', href: '#/learn', cta: 'Open Learn', text: 'New here? Start here. What each number means, how to read it, and where the model stops being realistic.' },
           ].map((w) => (
             <li key={w.title} className={classes.way}>
               <span className={classes.wayNum} aria-hidden="true">{w.n}</span>
@@ -271,12 +271,12 @@ function GapCard({ h, m }: { h: HubRow; m: HomeModel }) {
   return (
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>The gap that matters</h3>
-      <p className={classes.meta}>Houston hub · {m.year} · {m.durationH}-hour battery · $/kW-year</p>
-      <Bar label="Perfect foresight (upper bound)" value={num(h.pf, 1)} share={1} tone="mint" />
-      {h.da != null && <Bar label="Day-ahead schedule, real-time settled" value={num(h.da, 1)} share={h.da / h.pf} tone="amber" />}
-      {h.gap != null && <p className={classes.meta} data-testid="gap">{num(h.gap, 1)} $/kW-year left on the table</p>}
+      <p className={classes.meta}>Houston hub · {m.year} · {m.durationH}-hour battery · {TERMS.revenueUnit.label}</p>
+      <Bar label={`${TERMS.perfectForesight.label} (upper bound)`} value={num(h.pf, 1)} share={1} tone="mint" />
+      {h.da != null && <Bar label={`${TERMS.dayAheadPlan.label}, real-time settled`} value={num(h.da, 1)} share={h.da / h.pf} tone="amber" />}
+      {h.gap != null && <p className={classes.meta} data-testid="gap">{num(h.gap, 1)} {TERMS.revenueUnit.label} left on the table</p>}
       <p className={classes.cardText}>
-        {h.kept != null && <>A day-ahead schedule keeps {pct(h.kept)} of what perfect hindsight would earn. </>}
+        {h.kept != null && <>The day-ahead plan keeps {pct(h.kept)} of what perfect foresight would earn. </>}
         {h.top10 != null && <>The 10 best days alone made {pct(h.top10)} of the perfect-foresight total.</>}
       </p>
     </article>
@@ -289,7 +289,7 @@ function DurationCard({ m }: { m: HomeModel }) {
   return (
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Longer earns more per kW</h3>
-      <p className={classes.meta}>Houston hub · {m.year} · $/kW-year</p>
+      <p className={classes.meta}>Houston hub · {m.year} · {TERMS.revenueUnit.label}</p>
       <ol className={classes.vbars} aria-label="Perfect-foresight revenue by battery duration">
         {m.durations.map((d) => (
           <li key={d.h} className={classes.vbar}>
@@ -312,11 +312,11 @@ function HubTable({ m }: { m: HomeModel }) {
   return (
     <article className={classes.card}>
       <h3 className={classes.cardTitle}>Hub revenue, ranked</h3>
-      <p className={classes.meta}>{m.year} · {m.durationH}-hour battery · {usd(m.deg, 0)}/MWh degradation · $/kW-year</p>
+      <p className={classes.meta}>{m.year} · {m.durationH}-hour battery · {usd(m.deg, 0)}/MWh degradation · {TERMS.revenueUnit.label}</p>
       <div className={classes.tableBox} tabIndex={0} role="region" aria-label="Hub revenue table, scrolls sideways when it does not fit">
         <table className={classes.table}>
           <thead>
-            <tr><th scope="col">Hub</th><th scope="col" className={classes.num}>Perfect foresight</th><th scope="col" className={classes.num}>Day-ahead</th><th scope="col" className={classes.num}>Kept</th></tr>
+            <tr><th scope="col">{TERMS.hub.label}</th><th scope="col" className={classes.num}>{TERMS.perfectForesight.label}</th><th scope="col" className={classes.num}>{TERMS.dayAheadPlan.label}</th><th scope="col" className={classes.num}>{TERMS.captureRate.label}</th></tr>
           </thead>
           <tbody>
             {m.hubs.map((h, i) => (
@@ -335,7 +335,7 @@ function HubTable({ m }: { m: HomeModel }) {
           </tbody>
         </table>
       </div>
-      <p className={classes.small}>Ranked by perfect-foresight revenue. Kept is day-ahead revenue as a share of perfect foresight. Detailed hub runs.</p>
+      <p className={classes.small}>Ranked by perfect-foresight revenue. {TERMS.captureRate.definition} Detailed hub runs.</p>
     </article>
   );
 }

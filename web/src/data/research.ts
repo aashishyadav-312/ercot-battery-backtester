@@ -159,7 +159,7 @@ export function captureChart(d: ResearchData): CaptureChart | null {
   const m = d.rtcb.meta;
   const win = (w: { start: string; end: string }) => `${fmtDate(w.start)} to ${fmtDate(w.end)}`;
   return {
-    title: drop >= 1 ? `After RTC+B, a day-ahead schedule keeps about ${drop} points less.` : 'What a day-ahead schedule kept, before and after RTC+B.',
+    title: drop >= 1 ? `After RTC+B, a day-ahead plan keeps about ${drop} points less.` : 'What a day-ahead plan kept, before and after RTC+B.',
     meta: `Capture rate · ${rows[0].days} matched days · ${durationH}h · ${usd(deg, 0)}/MWh`,
     rows,
     before: win(m.before),
@@ -204,9 +204,9 @@ export function fallChart(d: ResearchData): FallChart | null {
 
 export type Topic = 'pays' | 'run' | 'changed' | 'context';
 export const TOPICS: { id: Topic; label: string }[] = [
-  { id: 'pays', label: 'Where it pays' },
-  { id: 'run', label: 'How it is run' },
-  { id: 'changed', label: 'How it changed' },
+  { id: 'pays', label: 'Locations' },
+  { id: 'run', label: 'Operation' },
+  { id: 'changed', label: 'Change' },
   { id: 'context', label: 'Context' },
 ];
 export const topicLabel = (t: Topic) => TOPICS.find((x) => x.id === t)!.label;
@@ -243,7 +243,7 @@ export const FINDINGS: FindingDef[] = [
       const { year, durationH, deg } = standard(d.nodes);
       const w = findRow(d.index, 'HB_WEST', year, durationH, deg);
       const h = houston(d, year, durationH, deg);
-      return w && h ? `${usd(w.revenue_per_kw_year)} against ${usd(h.revenue_per_kw_year)} per kW-year for a ${durationH}-hour battery in ${year}.` : 'West Texas against Houston.';
+      return w && h ? `${usd(w.revenue_per_kw_year)} against ${usd(h.revenue_per_kw_year)} per kW per year for a ${durationH}-hour battery in ${year}.` : 'West Texas against Houston.';
     },
   },
   {
@@ -251,7 +251,7 @@ export const FINDINGS: FindingDef[] = [
     teaser: (d) => {
       const { year, deg } = standard(d.nodes);
       const rows = [1, 2, 4].map((h) => ({ h, r: houston(d, year, h, deg) })).filter((x) => x.r);
-      return rows.length ? `Houston ${year}: ${rows.map((x) => usd(x.r!.revenue_per_kw_year)).join(', ')} per kW-year for ${rows.map((x) => x.h).join(', ')} hours.` : 'Longer batteries, per kW and per kWh.';
+      return rows.length ? `Houston ${year}: ${rows.map((x) => usd(x.r!.revenue_per_kw_year)).join(', ')} per kW per year for ${rows.map((x) => x.h).join(', ')} hours.` : 'Longer batteries, per kW and per kWh.';
     },
   },
   {
@@ -290,7 +290,7 @@ export const FINDINGS: FindingDef[] = [
       const { durationH, deg } = standard(d.nodes);
       const parts = yearsOf(d.index).map((y) => ({ y, r: houston(d, y, durationH, deg) })).filter((x) => x.r?.capture_rate != null)
         .map((x) => `${pct(x.r!.capture_rate)} in ${x.y}${x.r!.annualized ? ' so far' : ''}`);
-      return parts.length ? `Houston capture: ${parts.join(', ')}.` : 'What a day-ahead schedule keeps.';
+      return parts.length ? `Houston capture: ${parts.join(', ')}.` : 'What a day-ahead plan keeps.';
     },
   },
   {
@@ -309,7 +309,7 @@ export const FINDINGS: FindingDef[] = [
       const revs = d.nodes.nodes.map((n) => n.rev).sort((a, b) => a - b);
       const top = Math.max(...revs);
       const mid = revs.length % 2 ? revs[(revs.length - 1) / 2] : (revs[revs.length / 2 - 1] + revs[revs.length / 2]) / 2;
-      return revs.length ? `Median node ${usd(mid)} per kW-year; the top node ${usd(top)}.` : 'Every resource node against its hub.';
+      return revs.length ? `Median node ${usd(mid)} per kW per year; the top node ${usd(top)}.` : 'Every resource node against its hub.';
     },
   },
   {
@@ -348,7 +348,7 @@ export const MODO_SOURCES = [
 
 export interface ValidationRow { year: number; fleet: string; note: string; ours: [number, number] | null; oursNoDeg: [number, number] | null }
 
-/** The model's range across the hubs for each benchmark year, in dollars per kW-year. */
+/** The model's range across the hubs for each benchmark year, in dollars per kW per year. */
 export function validationRows(index: IndexRun[], std: { durationH: number; deg: number }): ValidationRow[] {
   const range = (year: number, deg: number): [number, number] | null => {
     const v = HUBS.map((h) => findRow(index, h, year, std.durationH, deg)?.revenue_per_kw_year).filter((x): x is number => x != null);

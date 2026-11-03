@@ -221,7 +221,7 @@ export interface NodeRec {
   /** "plant": EIA plant coordinates. "county": county-level match (ERCOT GIS queue), drawn at the county's Census point. */
   prec: 'plant' | 'county' | null;
   county: string | null;
-  /** Perfect-foresight and DA-scheduled (RT-settled) revenue, $/kW-yr. */
+  /** Perfect-foresight and Day-ahead plan (RT-settled) revenue, $/kW-yr. */
   rev: number;
   da_rev: number;
   capture: number | null;

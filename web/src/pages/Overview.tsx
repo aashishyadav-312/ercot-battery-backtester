@@ -11,6 +11,7 @@ import { fmtDate, num, pct, usd } from '../data/format';
 import { annualizedBadge, topDay } from '../data/analytics';
 import { heroFor, ledeFor } from '../data/hero';
 import type { Run } from '../data/types';
+import { TERMS } from '../copy/terms';
 
 /** KPI tiles for the top-bar selection, or for `run` when given (a custom run). */
 export function KpiRow({ run: given }: { run?: Run } = {}) {
@@ -29,7 +30,7 @@ export function KpiRow({ run: given }: { run?: Run } = {}) {
           : `Full ${run!.meta.year}, ${m.days_covered} days, net of degradation cost.`)}
       />
       <Kpi
-        label="Top-10-day share" term="top10_day_share" value={m ? pct(m.top10_day_share, 1) : undefined}
+        label={TERMS.top10DayShare.label} term="top10_day_share" value={m ? pct(m.top10_day_share, 1) : undefined}
         hint={t ? `Best day: ${fmtDate(t.date)}, ${pct(t.share, 1)} of ${ann ? 'YTD' : 'annual'} revenue.` : undefined}
       />
       <Kpi
@@ -106,7 +107,7 @@ export default function Overview() {
   return (
     <Stack gap="lg">
       <StartBanner />
-      <PageHeader title="Overview" hero />
+      <PageHeader title="Run overview" hero />
       <RunStatus />
       <KpiRow />
       <Ancillary />

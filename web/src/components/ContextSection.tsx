@@ -91,7 +91,7 @@ export function ContextSection() {
         <Text component="h2" fw={650} size="lg" c="bright" m={0}>Context</Text>
         <Text size="sm" c="dimmed" maw={760} lh={1.5}>
           Public data beside the results, to help read them. Nothing here changes the model, and the series moving together does not show that one caused another.
-          The <Anchor size="sm" href="#/atlas">Map</Anchor> has a planned-storage layer, <Anchor size="sm" href="#/research/dispatch">Dispatch</Anchor> can overlay solar and wind share on the heatmap,
+          The <Anchor size="sm" href="#/atlas/sites">Study sites</Anchor> map has a planned-storage layer, <Anchor size="sm" href="#/research/charging">Charging pattern</Anchor> can overlay solar and wind share on the heatmap,
           and the ten best days list shows the weather on each.
         </Text>
       </div>

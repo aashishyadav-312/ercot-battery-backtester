@@ -14,9 +14,10 @@ import { queueByKey } from '../data/context';
 import { findRun } from '../data/loader';
 import { pct, usd, yearLabel } from '../data/format';
 import { SITE, locFull, zoneFull } from '../data/site';
+import { TERMS } from '../copy/terms';
 
 /**
- * Atlas > Detailed locations (#/atlas/detailed): the 10 locations with full runs for every year, size and degradation
+ * Atlas > Study sites (#/atlas/sites): the 10 locations with full runs for every year, size and degradation
  * cost, on a zoomable county map with the planned-storage layer. Every resource node in one standard configuration is
  * in the Atlas itself (pages/Atlas.tsx), which replaced this page's former heat mode.
  */
@@ -59,7 +60,7 @@ export default function MapPage() {
 
   return (
     <Stack gap="lg">
-      <PageHeader title="Detailed locations" hero />
+      <PageHeader title="Study sites" hero />
       {error && <Alert color="red" title="Could not load the map data">{error}</Alert>}
       <div style={{ display: 'grid', gap: 'var(--mantine-spacing-lg)', gridTemplateColumns: phone ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) minmax(300px, 360px)', alignItems: 'start' }}>
         <Paper withBorder p={{ base: 'sm', sm: 'lg' }} component="section" aria-label="Texas map of locations" data-interactive>
@@ -112,7 +113,7 @@ export default function MapPage() {
                 <Table.Tr>
                   <Table.Th>Location</Table.Th><Table.Th>Type</Table.Th><Table.Th>Load zone</Table.Th>
                   <Table.Th ta="right">$/kW-yr <Info terms="usd_per_kw_yr" size={13} /></Table.Th>
-                  <Table.Th ta="right">Capture <Info terms="capture_rate" size={13} /></Table.Th>
+                  <Table.Th ta="right">{TERMS.captureRate.label} <Info terms="capture_rate" size={13} /></Table.Th>
                   <Table.Th>On map</Table.Th>
                 </Table.Tr>
               </Table.Thead>
@@ -125,7 +126,7 @@ export default function MapPage() {
                         <Text size="xs" c="dimmed" ff="monospace">{loc.code}</Text>
                       </UnstyledButton>
                     </Table.Td>
-                    <Table.Td>{loc.type === 'hub' ? 'Hub' : 'Resource node'}</Table.Td>
+                    <Table.Td>{loc.type === 'hub' ? TERMS.hub.label : TERMS.node.label}</Table.Td>
                     <Table.Td>{zoneFull(loc.load_zone)}</Table.Td>
                     <Table.Td ta="right">{usd(revenue, 1)}</Table.Td>
                     <Table.Td ta="right">{pct(capture)}</Table.Td>

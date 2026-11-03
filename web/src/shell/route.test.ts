@@ -3,18 +3,19 @@ import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveH
 
 /** Where every route from before the redesign now lives (docs/REDESIGN.md, "Old to new routes"). */
 const OLD_TO_NEW: Record<OldRoute, string> = {
-  start: '#/guide',
+  start: '#/learn',
+  guide: '#/learn',
   map: '#/atlas',
   live: '#/home/live',
   overview: '#/research/overview',
   revenue: '#/research/revenue',
-  dispatch: '#/research/dispatch',
-  realism: '#/research/realism',
+  dispatch: '#/research/charging',
+  realism: '#/research/reality',
   compare: '#/studio',
   custom: '#/studio',
   economics: '#/studio/economics',
   method: '#/research/method',
-  about: '#/guide?s=about',
+  about: '#/learn?s=about',
 };
 
 describe('old routes redirect to their new home', () => {
@@ -25,8 +26,8 @@ describe('old routes redirect to their new home', () => {
   it.each(OLD_PAGES)('#/%s resolves to its new home and asks for the URL to be rewritten', (page) => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
-    // The Map page was replaced by the Atlas; Custom run and Compare by Studio; Start here and About by the Guide.
-    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : page === 'start' || page === 'about' ? 'guide' : page);
+    // The Map page was replaced by the Atlas; Custom run and Compare by Studio; Start here, Guide and About by Learn.
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : ['start', 'guide', 'about'].includes(page) ? 'learn' : page);
 
     expect(r.redirected).toBe(true);
   });
@@ -55,8 +56,8 @@ describe('new routes', () => {
   });
 
   it('has the five tabs in navigation order', () => {
-    expect(TAB_IDS).toEqual(['home', 'atlas', 'studio', 'research', 'guide']);
-    expect(TABS.map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Guide']);
+    expect(TAB_IDS).toEqual(['home', 'atlas', 'studio', 'research', 'learn']);
+    expect(TABS.map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
   });
 
   it('puts every page under exactly one tab', () => {
@@ -75,22 +76,42 @@ describe('new routes', () => {
     // An old link still being redirected already answers with the section it will land on.
     expect(hashParam('#/about', 's')).toBe('about');
     expect(hashParam('#/guide/start', 's')).toBeNull();
+    expect(hashParam('#/guide/about', 's')).toBe('about');
   });
 
   it('falls back to the default view of a tab for an unknown view', () => {
-    const r = resolveHash('#/guide/nonsense');
-    expect(r.canonical).toBe('#/guide');
+    const r = resolveHash('#/learn/nonsense');
+    expect(r.canonical).toBe('#/learn');
     expect(r.redirected).toBe(true);
     expect(resolveHash('#/research/nonsense?loc=HB_PAN').canonical).toBe('#/research?loc=HB_PAN');
   });
 
-  it('serves the merged Guide at #/guide, and sends the step 1-4 Guide URLs there', () => {
-    expect([resolveHash('#/guide').page, resolveHash('#/guide').redirected]).toEqual(['guide', false]);
-    expect(resolveHash('#/guide/start?loc=HB_WEST').canonical).toBe('#/guide?loc=HB_WEST');
-    expect(resolveHash('#/guide/about?loc=HB_WEST').canonical).toBe('#/guide?s=about&loc=HB_WEST');
+  it('serves Learn at #/learn, and sends every Guide URL there with its query', () => {
+    expect([resolveHash('#/learn').page, resolveHash('#/learn').redirected]).toEqual(['learn', false]);
+    expect(resolveHash('#/guide?loc=HB_WEST&s=glossary').canonical).toBe('#/learn?loc=HB_WEST&s=glossary');
+    expect(resolveHash('#/guide').redirected).toBe(true);
+    expect(resolveHash('#/guide/start?loc=HB_WEST').canonical).toBe('#/learn?loc=HB_WEST');
+    expect(resolveHash('#/guide/about?loc=HB_WEST').canonical).toBe('#/learn?s=about&loc=HB_WEST');
+    expect(resolveHash('#/learn/start?loc=HB_WEST').canonical).toBe('#/learn?loc=HB_WEST');
     // A link that already names a section keeps it.
-    expect(resolveHash('#/about?s=glossary').canonical).toBe('#/guide?s=glossary');
-    expect(buildHash('guide', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/guide?loc=HB_WEST&dur=4&year=2025&deg=10');
+    expect(resolveHash('#/about?s=glossary').canonical).toBe('#/learn?s=glossary');
+    expect(buildHash('learn', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/learn?loc=HB_WEST&dur=4&year=2025&deg=10');
+  });
+
+  it('opens the renamed Research and Atlas views from their old slugs, keeping the query', () => {
+    const q = 'loc=HB_WEST&dur=4&year=2025&deg=10';
+    for (const [old, now, page] of [
+      ['#/research/dispatch', '#/research/charging', 'dispatch'],
+      ['#/research/realism', '#/research/reality', 'realism'],
+      ['#/atlas/detailed', '#/atlas/sites', 'map'],
+    ] as const) {
+      const r = resolveHash(`${old}?${q}`);
+      expect([r.page, r.redirected, r.canonical]).toEqual([page, true, `${now}?${q}`]);
+      const fresh = resolveHash(`${now}?${q}`);
+      expect([fresh.page, fresh.redirected]).toEqual([page, false]);
+    }
+    // Run overview stays where it was until Research is merged.
+    expect(resolveHash('#/research/overview').redirected).toBe(false);
   });
 
   it('opens Home for an empty or unknown hash', () => {
@@ -103,13 +124,13 @@ describe('new routes', () => {
     expect(r.canonical).toBe('#/home?loc=HB_PAN');
   });
 
-  it('opens the all-node Atlas for old #/map links, and keeps the 10-location view at #/atlas/detailed', () => {
+  it('opens the all-node Atlas for old #/map links, and keeps the 10-location view at #/atlas/sites', () => {
     expect(resolveHash('#/map?view=heat').page).toBe('atlas');
     expect(resolveHash('#/atlas').page).toBe('atlas');
     expect(resolveHash('#/atlas').redirected).toBe(false);
-    const d = resolveHash('#/atlas/detailed?loc=HB_WEST&dur=4');
+    const d = resolveHash('#/atlas/sites?loc=HB_WEST&dur=4');
     expect([d.page, d.tab, d.redirected]).toEqual(['map', 'atlas', false]);
-    expect(buildHash('map', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/atlas/detailed?loc=HB_WEST&dur=4&year=2025&deg=10');
+    expect(buildHash('map', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 })).toBe('#/atlas/sites?loc=HB_WEST&dur=4&year=2025&deg=10');
   });
 
   it('serves Studio at #/studio, and sends the step 1-3 Studio URLs there with their inputs', () => {

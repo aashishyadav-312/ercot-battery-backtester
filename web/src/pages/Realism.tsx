@@ -27,7 +27,7 @@ export default function Realism() {
 
   return (
     <Stack gap="lg">
-      <PageHeader title="Realism" hero />
+      <PageHeader title="Reality check" hero />
       <RunStatus />
       <RealismKpis run={run} />
       <CaptureCard sel={sel} index={index} />
@@ -45,12 +45,12 @@ export default function Realism() {
       <Section title="How to read this page">
         <List size="sm" spacing={8} maw={820}>
           <List.Item>
-            <b>DA-scheduled</b> means the battery plans each day on the day-ahead prices, which are known the day before, then sticks to that
+            <b>Day-ahead plan</b> means the battery plans each day on the day-ahead prices, which are known the day before, then sticks to that
             plan and is paid real-time prices. It is one simple, reproducible strategy, not what a skilled operator would do. Real operators
             re-forecast through the day, sell ancillary services, and bid around their state of charge, so they can beat it or fall short of it.
           </List.Item>
           <List.Item>
-            <b>Capture rate</b> is DA-scheduled revenue divided by perfect-foresight revenue on the same days. It says how much of the
+            <b>Capture rate</b> is Day-ahead plan revenue divided by perfect-foresight revenue on the same days. It says how much of the
             theoretical arbitrage one plain forecast actually reaches. On a day when real-time prices move against the plan, the DA schedule
             can lose money; perfect foresight never does.
           </List.Item>

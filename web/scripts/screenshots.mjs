@@ -31,8 +31,8 @@ const base = `http://localhost:${PORT}/`;
 const ALL_PAGES = ['home', 'research', 'start', 'map', 'detailed', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  home: 'home', research: 'research', start: 'guide', map: 'atlas', detailed: 'atlas/detailed', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/dispatch',
-  realism: 'research/realism', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
+  home: 'home', research: 'research', start: 'learn', map: 'atlas', detailed: 'atlas/sites', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/charging',
+  realism: 'research/reality', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;
 const only = arg('pages', '');
@@ -103,7 +103,7 @@ try {
       if (size === 'desktop' && !only) {
         await page.goto(`${base}#/research/overview?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
         await settle(page);
-        await page.getByRole('button', { name: /Expand Dispatch pattern/ }).click();
+        await page.getByRole('button', { name: /Expand Charging pattern/ }).click();
         await page.waitForTimeout(1400);
         await page.screenshot({ path: name('expanded-heatmap', size, scheme) });
         shots++;

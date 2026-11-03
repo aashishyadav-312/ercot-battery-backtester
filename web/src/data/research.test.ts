@@ -48,10 +48,10 @@ describe('teasers equal the data', () => {
     expect(t(1)).toBe(`Houston earned ${pct(row('HB_HOUSTON', 2024).top10_day_share, 1)} of 2024 revenue in its 10 best days, and ${pct(row('HB_HOUSTON').top10_day_share, 1)} in ${Y}.`);
   });
   it('2: West and Houston revenue', () => {
-    expect(t(2)).toBe(`${usd(row('HB_WEST').revenue_per_kw_year)} against ${usd(row('HB_HOUSTON').revenue_per_kw_year)} per kW-year for a ${H}-hour battery in ${Y}.`);
+    expect(t(2)).toBe(`${usd(row('HB_WEST').revenue_per_kw_year)} against ${usd(row('HB_HOUSTON').revenue_per_kw_year)} per kW per year for a ${H}-hour battery in ${Y}.`);
   });
   it('3: Houston 1, 2 and 4 hours', () => {
-    expect(t(3)).toBe(`Houston ${Y}: ${[1, 2, 4].map((h) => usd(row('HB_HOUSTON', Y, h).revenue_per_kw_year)).join(', ')} per kW-year for 1, 2, 4 hours.`);
+    expect(t(3)).toBe(`Houston ${Y}: ${[1, 2, 4].map((h) => usd(row('HB_HOUSTON', Y, h).revenue_per_kw_year)).join(', ')} per kW per year for 1, 2, 4 hours.`);
   });
   it('4: same-window revenue needs the hub runs, and says what it is while they load', () => {
     expect(t(4, bare())).toBe('Revenue over the same window, year by year.');
@@ -81,7 +81,7 @@ describe('teasers equal the data', () => {
     const revs = NODES.nodes.map((n) => n.rev).sort((a, b) => a - b);
     const mid = (revs[revs.length / 2 - 1] + revs[revs.length / 2]) / 2;
     expect(NODES.nodes.length % 2).toBe(0);
-    expect(t(9)).toBe(`Median node ${usd(mid)} per kW-year; the top node ${usd(revs.at(-1))}.`);
+    expect(t(9)).toBe(`Median node ${usd(mid)} per kW per year; the top node ${usd(revs.at(-1))}.`);
   });
   it('10: energy only, stack and capped stack for Houston', () => {
     const s = stackTotals(Y, stackRun('HB_HOUSTON', Y).daily);
@@ -149,7 +149,7 @@ describe('the three charts', () => {
       expect([r.before, r.after]).toEqual([run.before.capture_rate, run.after.capture_rate]);
     }
     const drop = Math.round(c.rows.reduce((a, r) => a - r.pts, 0) / c.rows.length);
-    expect(c.title).toBe(`After RTC+B, a day-ahead schedule keeps about ${drop} points less.`);
+    expect(c.title).toBe(`After RTC+B, a day-ahead plan keeps about ${drop} points less.`);
   });
 
   it('capture: falls back to a neutral title if the schedule no longer keeps less', () => {

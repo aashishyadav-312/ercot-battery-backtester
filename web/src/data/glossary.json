@@ -39,7 +39,7 @@
   },
   "da": {
    "term": "DA (day-ahead)",
-   "definition": "The day-ahead market, cleared the day before for each hour. A strategy that is \"DA-scheduled\" plans its charge and discharge from these prices, then is paid real-time prices."
+   "definition": "The day-ahead market, cleared the day before for each hour. The day-ahead plan sets its charge and discharge from these prices, then is paid real-time prices."
   },
   "rt": {
    "term": "RT (real-time)",

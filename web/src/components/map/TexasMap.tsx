@@ -9,6 +9,7 @@ import { captureColor, markerSize, queueColor, type Domain } from './scale';
 import { countyKey, type QueueCounty } from '../../data/context';
 import type { LocationRec, TexasGeo } from '../../data/types';
 import { usd } from '../../data/format';
+import { NODES_LABEL } from '../../copy/terms';
 
 // Geo pieces are registered here (not in Chart.tsx) so they ship only in the lazily loaded Map page chunk.
 echarts.use([GeoComponent, LinesChart]);
@@ -130,7 +131,7 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
             data: rings.map((coords) => ({ coords })), lineStyle: { color: t.baseline, width: 1.3, opacity: 0.9 },
           },
           series('Hubs', 'diamond', 'hub'),
-          series('Resource nodes', 'circle', 'node'),
+          series(NODES_LABEL, 'circle', 'node'),
         ],
       };
     },

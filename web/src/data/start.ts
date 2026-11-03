@@ -23,11 +23,11 @@ export interface GuideCard {
 
 export const GUIDE: GuideCard[] = [
   {
-    page: 'overview', title: 'Overview',
+    page: 'overview', title: 'Run overview',
     question: 'How much could a battery have earned here, and what drove that number?',
     shows: 'Four headline numbers, revenue by month, the running total with the ten best days marked, the charge and discharge pattern, and 1h vs 2h vs 4h.',
-    open: {}, cta: 'Open Overview for Houston, 2-hour, 2025',
-    alt: 'Thumbnail of the Overview page: headline sentence, four number tiles and revenue charts.',
+    open: {}, cta: 'Open Run overview for Houston, 2-hour, 2025',
+    alt: 'Thumbnail of the Run overview page: headline sentence, four number tiles and revenue charts.',
   },
   {
     page: 'revenue', title: 'Revenue',
@@ -37,11 +37,11 @@ export const GUIDE: GuideCard[] = [
     alt: 'Thumbnail of the Revenue page: daily revenue bars and a list of the ten best days.',
   },
   {
-    page: 'dispatch', title: 'Dispatch',
+    page: 'dispatch', title: 'Charging pattern',
     question: 'When during the day does the battery charge and discharge?',
     shows: 'A heatmap of average charging and discharging by hour and month, plus the average day.',
-    open: {}, cta: 'Open Dispatch for Houston, 2-hour, 2025',
-    alt: 'Thumbnail of the Dispatch page: an hour-by-month heatmap in blue and orange.',
+    open: {}, cta: 'Open Charging pattern for Houston, 2-hour, 2025',
+    alt: 'Thumbnail of the Charging pattern page: an hour-by-month heatmap in blue and orange.',
   },
   {
     page: 'studio', thumb: 'compare', title: 'Studio',
@@ -51,11 +51,11 @@ export const GUIDE: GuideCard[] = [
     alt: 'Thumbnail of the former Compare page, now part of Studio: a resource node against its hub, and a ranking of all locations.',
   },
   {
-    page: 'realism', title: 'Realism',
+    page: 'realism', title: 'Reality check',
     question: 'How much of the perfect-foresight number survives a realistic strategy?',
     shows: 'Revenue when the schedule is set from day-ahead prices instead of knowing the future, and before and after the December 2025 market redesign.',
-    open: {}, cta: 'Open Realism for Houston, 2-hour, 2025',
-    alt: 'Thumbnail of the Realism page: capture rate by location and a month-by-month comparison.',
+    open: {}, cta: 'Open Reality check for Houston, 2-hour, 2025',
+    alt: 'Thumbnail of the Reality check page: capture rate by location and a month-by-month comparison.',
   },
   {
     page: 'method', title: 'Method',
@@ -77,7 +77,7 @@ export interface LeftOut {
 export const LEFT_OUT: LeftOut[] = [
   {
     title: 'Perfect foresight', effect: 'Overstates revenue', term: 'perfect_foresight',
-    body: 'Each day’s schedule is chosen knowing that day’s real prices. No real operator has that. The Realism page shows how much is kept when the schedule is set from day-ahead prices instead.',
+    body: 'Each day’s schedule is chosen knowing that day’s real prices. No real operator has that. The Reality check page shows how much is kept when the schedule is set from day-ahead prices instead.',
   },
   {
     title: 'Ancillary services in energy-only charts', effect: 'Understates revenue', term: 'ancillary_services',

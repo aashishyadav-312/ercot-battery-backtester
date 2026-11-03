@@ -10,6 +10,7 @@ import { MONTHS, durLabel, fmtDate, pct, usd, yearLabel } from '../data/format';
 import { annualizedBadge, kw } from '../data/analytics';
 import { useApp } from '../state';
 import { locAxis, locFull } from '../data/site';
+import { TERMS } from '../copy/terms';
 
 const tnum = { fontVariantNumeric: 'tabular-nums' } as const;
 /** Signed dollars with a true minus sign: −$1.4. */
@@ -52,20 +53,20 @@ export function RealismKpis({ run }: { run?: Run }) {
   return (
     <SimpleGrid cols={{ base: 2, lg: 4 }} spacing={{ base: 'sm', sm: 'lg' }}>
       <Kpi
-        label="DA-scheduled" term={['da', 'rt', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.da_rt_revenue_per_kw_year, 1))}
+        label={TERMS.dayAheadPlan.label} term={['da', 'rt', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.da_rt_revenue_per_kw_year, 1))}
         hint={m && (has ? `Scheduled on day-ahead prices, paid real-time prices. Lost money on ${m.da_losing_days} of ${m.da_days_matched} days.` : missing)}
       />
       <Kpi
-        label="Perfect foresight" term={['perfect_foresight', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.pf_revenue_per_kw_year_matched, 1))}
+        label={TERMS.perfectForesight.label} term={['perfect_foresight', 'usd_per_kw_yr']} unit="$/kW-yr" badge={badge} value={v(usd(m?.pf_revenue_per_kw_year_matched, 1))}
         hint="Same battery and days, scheduled with real-time prices known in advance."
       />
       <Kpi
         label="Value of foresight" term="perfect_foresight" unit="$/kW-yr" badge={badge} value={v(usd(m?.value_of_perfect_foresight_per_kw_year, 1))}
-        hint="Perfect foresight minus DA-scheduled: what knowing real-time prices in advance is worth."
+        hint="Perfect foresight minus Day-ahead plan: what knowing real-time prices in advance is worth."
       />
       <Kpi
         label="Capture rate" term="capture_rate" value={v(pct(m?.capture_rate, 0))}
-        hint={m && (has ? `DA-scheduled ÷ perfect foresight. Selling the same schedule day-ahead would have earned ${usd(m.da_da_revenue_per_kw_year, 1)}/kW-yr.` : 'DA-scheduled ÷ perfect foresight.')}
+        hint={m && (has ? `Day-ahead plan ÷ perfect foresight. Selling the same schedule day-ahead would have earned ${usd(m.da_da_revenue_per_kw_year, 1)}/kW-yr.` : 'Day-ahead plan ÷ perfect foresight.')}
       />
     </SimpleGrid>
   );
@@ -117,7 +118,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
   return (
     <Card
       title="Capture rate by location and duration" terms={['capture_rate', 'perfect_foresight', 'da']}
-      subtitle={`DA-scheduled revenue as a share of perfect foresight · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
+      subtitle={`Day-ahead plan revenue as a share of perfect foresight · ${yearLabel(sel.year)} · $${sel.deg}/MWh degradation`}
       csv={csv}
     >
       {(ex) =>
@@ -131,8 +132,8 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={460} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Location ({durLabel(sel.duration)})</Table.Th><Table.Th ta="right">Perfect foresight</Table.Th>
-                    <Table.Th ta="right">DA-scheduled</Table.Th><Table.Th ta="right">Gap</Table.Th><Table.Th ta="right">Capture</Table.Th>
+                    <Table.Th>Location ({durLabel(sel.duration)})</Table.Th><Table.Th ta="right">{TERMS.perfectForesight.label}</Table.Th>
+                    <Table.Th ta="right">{TERMS.dayAheadPlan.label}</Table.Th><Table.Th ta="right">Gap</Table.Th><Table.Th ta="right">{TERMS.captureRate.label}</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody style={{ ...tnum, whiteSpace: 'nowrap' }}>
@@ -163,7 +164,7 @@ export function CaptureCard({ sel, index }: { sel: Selection; index: IndexRun[] 
   );
 }
 
-// ---------------------------------------------------------------- monthly PF vs DA-scheduled
+// ---------------------------------------------------------------- monthly PF vs Day-ahead plan
 export function MonthlyRealismCard({ run }: { run?: Run }) {
   const data = useMemo(() => {
     if (!run?.daily.da_rt_revenue) return undefined;
@@ -184,20 +185,20 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
     if (!data) return undefined;
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 12, top: 36, bottom: 28 },
-      legend: { ...legendBase(t), data: ['Perfect foresight', 'DA-scheduled'] },
+      legend: { ...legendBase(t), data: [TERMS.perfectForesight.label, TERMS.dayAheadPlan.label] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (ps: { dataIndex: number }[]) => {
           const i = ps[0].dataIndex;
           const cap = data.pf[i] > 0 ? ` · capture ${pct(data.da[i] / data.pf[i], 0)}` : '';
-          return `<b>${MONTHS[data.months[i] - 1]}</b><br/>Perfect foresight ${usd(data.pf[i], 2)}/kW<br/>DA-scheduled ${usd(data.da[i], 2)}/kW${cap}`;
+          return `<b>${MONTHS[data.months[i] - 1]}</b><br/>Perfect foresight ${usd(data.pf[i], 2)}/kW<br/>Day-ahead plan ${usd(data.da[i], 2)}/kW${cap}`;
         },
       },
       xAxis: { type: 'category', data: data.months.map((m) => MONTHS[m - 1]), ...axisBase(t) },
       yAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: '${value}' }, name: '$/kW', nameGap: 8 },
       series: [
-        { name: 'Perfect foresight', type: 'bar', barMaxWidth: 16, barGap: '15%', data: data.pf, itemStyle: { color: t.baseline, borderRadius: [3, 3, 0, 0] } },
-        { name: 'DA-scheduled', type: 'bar', barMaxWidth: 16, data: data.da, itemStyle: { color: t.series[0], borderRadius: [3, 3, 0, 0] } },
+        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 16, barGap: '15%', data: data.pf, itemStyle: { color: t.baseline, borderRadius: [3, 3, 0, 0] } },
+        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 16, data: data.da, itemStyle: { color: t.series[0], borderRadius: [3, 3, 0, 0] } },
       ],
     });
   }, [data]);
@@ -209,12 +210,12 @@ export function MonthlyRealismCard({ run }: { run?: Run }) {
     };
   return (
     <Card
-      title="Month by month: perfect foresight vs DA-scheduled" terms={['perfect_foresight', 'da', 'capture_rate']}
+      title="Month by month: perfect foresight vs Day-ahead plan" terms={['perfect_foresight', 'da', 'capture_rate']}
       subtitle={run ? `$ per kW, net of degradation · ${locFull(run.meta.location)} · ${run.meta.duration_h}h · ${yearLabel(run.meta.year)}` : undefined}
       csv={csv}
     >
       {(ex) =>
-        build ? <Chart build={build} height={ex ? '62vh' : 300} label="Monthly revenue, perfect foresight versus day-ahead scheduled" />
+        build ? <Chart build={build} height={ex ? '62vh' : 300} label="Monthly revenue, perfect foresight versus day-ahead plan" />
           : run ? <Text size="sm" c="dimmed" py="md">No day-ahead result for this run. Try reloading the page.</Text>
             : <ChartSkeleton h={300} />}
     </Card>
@@ -238,7 +239,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
     if (!run) return undefined;
     const m = run.monthly;
     const [b, a] = view === 'pf' ? [m.pf_before, m.pf_after] : [m.da_rt_before, m.da_rt_after];
-    const label = view === 'pf' ? 'Perfect foresight' : 'DA-scheduled';
+    const label = view === 'pf' ? TERMS.perfectForesight.label : TERMS.dayAheadPlan.label;
     return (t: ChartTheme) => ({
       grid: { left: 48, right: 12, top: 36, bottom: 28 },
       legend: { ...legendBase(t), data: ['Before', 'After'] },
@@ -284,7 +285,7 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
             <div>
             <SegmentedControl
               size="xs" mb="sm" value={view} onChange={(v) => setView(v as 'pf' | 'da')}
-              data={[{ value: 'pf', label: 'Perfect foresight' }, { value: 'da', label: 'DA-scheduled' }]}
+              data={[{ value: 'pf', label: TERMS.perfectForesight.label }, { value: 'da', label: TERMS.dayAheadPlan.label }]}
               aria-label="Strategy shown in the monthly chart"
             />
             <Chart build={build} height={ex ? '50vh' : 300} label="Monthly revenue before and after RTC+B" />
@@ -293,8 +294,8 @@ export function RtcbCard({ sel, rtcb }: { sel: Selection; rtcb: Rtcb | null }) {
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs">
                 <Table.Thead><Table.Tr><Table.Th>{run.days} matched days</Table.Th><Table.Th ta="right">Before</Table.Th><Table.Th ta="right">After</Table.Th></Table.Tr></Table.Thead>
                 <Table.Tbody style={tnum}>
-                  <Table.Tr><Table.Td>Perfect foresight, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.pf_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.pf_revenue_per_kw)}<Change v={run.change.pf_revenue} /></Table.Td></Table.Tr>
-                  <Table.Tr><Table.Td>DA-scheduled, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.da_rt_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.da_rt_revenue_per_kw)}<Change v={run.change.da_rt_revenue} /></Table.Td></Table.Tr>
+                  <Table.Tr><Table.Td>{TERMS.perfectForesight.label}, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.pf_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.pf_revenue_per_kw)}<Change v={run.change.pf_revenue} /></Table.Td></Table.Tr>
+                  <Table.Tr><Table.Td>{TERMS.dayAheadPlan.label}, $/kW</Table.Td><Table.Td ta="right">{usd(run.before.da_rt_revenue_per_kw)}</Table.Td><Table.Td ta="right">{usd(run.after.da_rt_revenue_per_kw)}<Change v={run.change.da_rt_revenue} /></Table.Td></Table.Tr>
                   <Table.Tr><Table.Td>Capture rate</Table.Td><Table.Td ta="right">{pct(run.before.capture_rate)}</Table.Td><Table.Td ta="right">{pct(run.after.capture_rate)}<Change v={run.change.capture_rate_pts} kind="pts" /></Table.Td></Table.Tr>
                   {PRICE_ROWS.map((p) => (
                     <Table.Tr key={p.key}>
@@ -332,7 +333,7 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
     const rev = [...rows].reverse();
     return (t: ChartTheme) => ({
       grid: { left: 124, right: 20, top: 30, bottom: 28 },
-      legend: { ...legendBase(t), data: ['Perfect foresight', 'DA-scheduled'] },
+      legend: { ...legendBase(t), data: [TERMS.perfectForesight.label, TERMS.dayAheadPlan.label] },
       tooltip: {
         ...tooltipBase(t), trigger: 'axis', axisPointer: { type: 'shadow' },
         formatter: (ps: { dataIndex: number; marker: string; seriesName: string; value: number }[]) =>
@@ -341,8 +342,8 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
       xAxis: { type: 'value', ...axisBase(t), axisLabel: { ...axisBase(t).axisLabel, formatter: (v: number) => `${Math.round(v * 100)}%` } },
       yAxis: { type: 'category', data: rev.map((r) => locAxis(r.l)), ...axisBase(t), splitLine: { show: false }, axisLabel: { color: t.text, fontSize: 11, lineHeight: 14 } },
       series: [
-        { name: 'Perfect foresight', type: 'bar', barMaxWidth: 9, barGap: '25%', data: rev.map((r) => r.run.change.pf_revenue), itemStyle: { color: t.baseline, borderRadius: 3 } },
-        { name: 'DA-scheduled', type: 'bar', barMaxWidth: 9, data: rev.map((r) => r.run.change.da_rt_revenue), itemStyle: { color: t.series[0], borderRadius: 3 } },
+        { name: TERMS.perfectForesight.label, type: 'bar', barMaxWidth: 9, barGap: '25%', data: rev.map((r) => r.run.change.pf_revenue), itemStyle: { color: t.baseline, borderRadius: 3 } },
+        { name: TERMS.dayAheadPlan.label, type: 'bar', barMaxWidth: 9, data: rev.map((r) => r.run.change.da_rt_revenue), itemStyle: { color: t.series[0], borderRadius: 3 } },
       ],
     });
   }, [rows]);
@@ -371,8 +372,8 @@ export function RtcbAllCard({ sel, rtcb, index }: { sel: Selection; rtcb: Rtcb |
               <Table verticalSpacing={4} horizontalSpacing="sm" fz="sm" mt="xs" miw={560} highlightOnHover>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Location</Table.Th><Table.Th ta="right">Perfect foresight $/kW</Table.Th><Table.Th ta="right">DA-scheduled $/kW</Table.Th>
-                    <Table.Th ta="right">Capture</Table.Th><Table.Th ta="right">|RT − DA|</Table.Th>
+                    <Table.Th>Location</Table.Th><Table.Th ta="right">{TERMS.perfectForesight.label} $/kW</Table.Th><Table.Th ta="right">{TERMS.dayAheadPlan.label} $/kW</Table.Th>
+                    <Table.Th ta="right">{TERMS.captureRate.label}</Table.Th><Table.Th ta="right">|RT − DA|</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody style={{ ...tnum, whiteSpace: 'nowrap' }}>

@@ -132,7 +132,7 @@ export interface Totals {
   /** Dollars over the run's days at the chosen power. */
   pf: number;
   da: number | null;
-  /** $/kW-year (annualized when the run is not one whole calendar year). */
+  /** $/kW-yr (annualized when the run is not one whole calendar year). */
   pfYear: number;
   daYear: number | null;
   /** Day-ahead revenue as a share of perfect foresight on the same days. */
@@ -174,7 +174,7 @@ export interface MonthBar {
 
 /**
  * Revenue by month in $/kW, for the months the run covers. Perfect foresight is the run's own monthly series; the
- * day-ahead schedule is summed from its daily revenue (days the strategy skipped count as nothing).
+ * day-ahead plan is summed from its daily revenue (days the strategy skipped count as nothing).
  */
 export function monthlyBars(run: Run, strategy: 'pf' | 'da'): MonthBar[] {
   const first = Number(run.meta.first_day.slice(5, 7));
@@ -202,7 +202,7 @@ export const nearest = (v: number, list: readonly number[]) => list.reduce((a, b
 
 export interface DurationRow {
   hours: number;
-  /** $/kW-year, perfect foresight. */
+  /** $/kW-yr, perfect foresight. */
   pf: number;
   /** pf divided by hours: $ per kWh of storage per year. */
   perKwh: number;

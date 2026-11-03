@@ -24,7 +24,7 @@ In 2024, under 3% of the days produced about 40% of the revenue, mostly in May a
 
 ## 2. Location matters: West Texas earns ~20% more than Houston
 2-hour battery, 2025, $10/MWh degradation: **HB_WEST $48.7** and HB_PAN $46.8, against
-HB_HOUSTON $39.7 and HB_SOUTH $39.5 per kW-year. That's a 23% gap between hubs. Individual
+HB_HOUSTON $39.7 and HB_SOUTH $39.5 per kW per year. That's a 23% gap between hubs. Individual
 resource nodes spread far wider (section 6).
 
 ## 3. Longer batteries earn more per kW, less per kWh
@@ -122,14 +122,14 @@ February 2025 one, would change that node's result much more than 0.3%.
 Each day is optimized on ERCOT's day-ahead hourly prices with the same battery, the schedule is
 held fixed, and it is paid real-time 15-minute prices (each hourly MW applies to its four
 15-minute intervals). The DA price is used only as a forecast. Perfect-foresight and
-DA-scheduled revenue are compared on identical days. "Value of perfect foresight" is the gap
-between them, and the capture rate is DA-scheduled ÷ perfect foresight. Fields:
+day-ahead plan revenue are compared on identical days. "Value of perfect foresight" is the gap
+between them, and the capture rate is day-ahead plan ÷ perfect foresight. Fields:
 `metrics.da_rt_revenue_per_kw_year`, `value_of_perfect_foresight_per_kw_year` and
 `capture_rate` in each results JSON and in `results/index.json`.
 
 Capture rate, 2-hour battery, $10/MWh degradation:
 
-| Location | 2024 | 2025 | 2026 YTD | 2025: PF → DA-scheduled ($/kW-yr) |
+| Location | 2024 | 2025 | 2026 YTD | 2025: PF → day-ahead plan ($/kW-yr) |
 |---|---|---|---|---|
 | HB_HOUSTON | 68% | 61% | 46% | 39.7 → 24.2 |
 | HB_NORTH | 70% | 67% | 53% | 43.4 → 29.2 |
@@ -151,7 +151,7 @@ What this says:
   DA price often doesn't foresee; a 4-hour battery mostly follows the daily shape, which DA does.
 - **Congested nodes are harder to forecast from DA.** RUSSEKST_RN captured only 33–47%, so its
   lead over HB_WEST (2.4–3.6× with perfect foresight, section 6) shrinks to 1.2–1.75× for the
-  DA-scheduled strategy ($/kW-yr). RHESS2_ESS1 kept 73% in 2025 because its February spike was
+  day-ahead plan strategy ($/kW-yr). RHESS2_ESS1 kept 73% in 2025 because its February spike was
   partly visible day-ahead: DA prices reached $6,863/MWh those mornings, and the DA schedule
   earned $67 of the $77/kW that perfect foresight made on Feb 19–20.
 - **The DA schedule loses money at RT on 39–90 days a year** (out of ~365), when real-time
@@ -165,13 +165,13 @@ One plain forecast is not what operators do. They re-forecast through the day, s
 services and bid around their state of charge, so they can land above or below these figures.
 The capture rate is a reference point, not an estimate of real capture.
 
-## 8. Before vs after RTC+B: the DA-scheduled strategy fell more than perfect foresight
+## 8. Before vs after RTC+B: the day-ahead plan strategy fell more than perfect foresight
 RTC+B went live on Dec 5, 2025. Windows: **Dec 5, 2024 – Oct 24, 2025** vs **Dec 5, 2025 –
 Oct 24, 2026**. Each day in the second window is paired with the same calendar day a year
 earlier (324 pairs at every location), so the months match. `results/rtcb.json`,
 `python -m scripts.rtcb`. 2-hour battery, $10/MWh degradation, $/kW over the window:
 
-| Location | PF before → after | DA-scheduled before → after | Capture | Mean \|RT − DA\| ($/MWh) | RT std ($/MWh) | Median daily RT std |
+| Location | PF before → after | day-ahead plan before → after | Capture | Mean \|RT − DA\| ($/MWh) | RT std ($/MWh) | Median daily RT std |
 |---|---|---|---|---|---|---|
 | HB_HOUSTON | 35.9 → 28.0 (−22%) | 22.2 → 13.1 (−41%) | 62% → 47% | 11.1 → 11.8 | 42.5 → 35.0 | 13.4 → 11.5 |
 | HB_NORTH | 38.9 → 35.7 (−8%) | 27.0 → 18.8 (−30%) | 69% → 53% | 11.7 → 13.5 | 50.1 → 49.5 | 13.5 → 12.0 |
@@ -186,7 +186,7 @@ earlier (324 pairs at every location), so the months match. `results/rtcb.json`,
 
 **What changed** (measured, same days of the year):
 - At all five hubs and both typical nodes, perfect-foresight arbitrage fell 7–22% and the
-  DA-scheduled strategy fell more, 27–41%. Capture dropped 13–17 points for a 2-hour battery
+  day-ahead plan strategy fell more, 27–41%. Capture dropped 13–17 points for a 2-hour battery
   (16–22 points for 1-hour, 4–9 points for 4-hour).
 - Real-time prices moved further from day-ahead: mean |RT − DA| rose 6–17% at hubs, and RT
   settled further below DA on average (mean RT − DA went from about −$1 to about −$2.5/MWh).
@@ -199,7 +199,7 @@ earlier (324 pairs at every location), so the months match. `results/rtcb.json`,
 
 Read together: less within-day spread for perfect foresight to capture, and a DA price that was
 a worse guide to where RT would land. That combination fits the larger fall for the
-DA-scheduled strategy.
+day-ahead plan strategy.
 
 **What caused it** (not established):
 - The capture rate was already drifting before RTC+B (hub 2-hour capture fell 0–7 points from
@@ -224,7 +224,7 @@ schedules on day-ahead prices fell by a larger share (27–41%) than the perfect
 ## 9. All 642 resource nodes: half earn within 10% of their hub; 2% earn 2–4.5×
 
 **Setup.** One standard configuration: 2-hour battery, 85% round-trip efficiency, $10/MWh degradation, 2025, the same daily
-LP as the detailed runs (perfect foresight, plus the DA-scheduled / RT-settled strategy). ERCOT priced 776 resource nodes
+LP as the detailed runs (perfect foresight, plus the day-ahead plan / RT-settled strategy). ERCOT priced 776 resource nodes
 during 2025; 642 have complete data (both strategies solve all 365 days). The other 134 have less than 99% of the year's RT
 intervals (see the completeness note below). Results are in `results/nodes_2025_2h.json` (summary
 metrics and monthly revenue only); print these tables with `python -m scripts.node_findings`.
@@ -281,9 +281,9 @@ West Texas nodes earn more than the West hub itself (median 1.28×): the hub ave
 than where the wind, solar and storage plants sit. Houston nodes are their hub (90th percentile only $41.9). Congestion value
 is a West and South Texas story.
 
-**Top 20 nodes, 2025** (perfect foresight $/kW-yr, with DA-scheduled revenue and price correlation with the hub):
+**Top 20 nodes, 2025** (perfect foresight $/kW-yr, with day-ahead plan revenue and price correlation with the hub):
 
-| # | Node | Load zone (substation) | $/kW-yr | ÷ hub | DA-sched. | Capture | Top-10 share | Corr. hub |
+| # | Node | Load zone (substation) | $/kW-yr | ÷ hub | Day-ahead plan | Capture | Top-10-day share | Corr. hub |
 |---|---|---|---|---|---|---|---|---|
 | 1 | RHESS2_ESS1 | LZ_SOUTH (GEORSO) | 179.2 | 4.46× | 130.2 | 0.73 | 64% | 0.10 |
 | 2 | RUSSEKST_RN | LZ_WEST (RUSSEKST) | 176.0 | 3.58× | 58.5 | 0.33 | 15% | 0.39 |
@@ -308,7 +308,7 @@ is a West and South Texas story.
 
 Top 20 by load zone: **9 West, 9 South, 2 North, 0 Houston.** Several entries are the same electrical pocket listed
 twice (JUNCTION_RN/JUNORTH_RN, ALP_BESS_RN/LAMESASLR_G at substation LMESA, AMISTAD_ALL/HAMI_BESS_RN), so the top 20 cover
-about 17 distinct locations. Even the 20th node earns 1.9× its hub, but with a DA-scheduled strategy every top-20 node
+about 17 distinct locations. Even the 20th node earns 1.9× its hub, but with a day-ahead plan strategy every top-20 node
 except RHESS2_ESS1 and NF_BRP_RN earns $39–59/kW-yr, about what the hubs earn with perfect foresight ($40–49). Most of
 the node premium needs RT foresight to capture.
 
@@ -317,7 +317,7 @@ the node premium needs RT foresight to capture.
 results exactly for the 4 detailed nodes it covers, and the hubs within 0.25%. "Premium" means at least 1.5× the node's own
 hub. Nodes without a complete 2024 are compared with their hub over the days they do have.
 
-| # | Node | Load zone | 2025 $/kW-yr | 2025 ÷ hub | Top-10 share 2025 | 2024 $/kW-yr | 2024 ÷ hub | Top-10 share 2024 | Flag |
+| # | Node | Load zone | 2025 $/kW-yr | 2025 ÷ hub | Top-10-day share 2025 | 2024 $/kW-yr | 2024 ÷ hub | Top-10-day share 2024 | Flag |
 |---|---|---|---|---|---|---|---|---|---|
 | 1 | RHESS2_ESS1 | LZ_SOUTH | 179.2 | 4.46× | 64% | 107.3 | 1.90× | 46% | both years |
 | 2 | RUSSEKST_RN | LZ_WEST | 176.0 | 3.58× | 15% | partial¹ | 2.43× | – | both years |
@@ -458,7 +458,7 @@ Across the five hubs, the same standard 2025 capacity screen ranges from $53.70 
 
 Before Dec 5, 2025 the screen uses hourly DA capacity clearing prices (NP4-188-CD), with awards fixed for each physical UTC hour. From that date it uses settled 15-minute RT capacity prices (NP6-796-ER), without adding DA AS awards or imbalance cash flows. RT AS prices are never silently replaced with DA prices. Pre-RTC regulation/RRS full-hour backing is a conservative screening assumption; ECRS/Non-Spin backing is 2/4 hours. Post-RTC backing is 0.5/0.5/0.5/1/4 hours for RegUp/RegDown/RRS/ECRS/Non-Spin, following NPRR1282 for the changed products. See [the sourced methodology](../docs/ANCILLARY_METHOD.md).
 
-The Realism chart (Research > Realism) pairs identical calendar days in Dec 5, 2024–Oct 24, 2025 and Dec 5, 2025–Oct 24, 2026. Houston has 324 pairs. Missing days are removed from both sides, not zero-filled. Both market prices and model duration parameters change across these periods; this is a descriptive comparison, not a causal estimate of RTC+B.
+The Reality check chart (Research > Reality check) pairs identical calendar days in Dec 5, 2024–Oct 24, 2025 and Dec 5, 2025–Oct 24, 2026. Houston has 324 pairs. Missing days are removed from both sides, not zero-filled. Both market prices and model duration parameters change across these periods; this is a descriptive comparison, not a causal estimate of RTC+B.
 
 ### Numerical validation and runtime
 
@@ -472,7 +472,7 @@ The 180 detail files total **12.2 MiB** (largest 75.6 KiB; manifest 13 KiB). Onl
 
 ## 11. Context: the battery fleet, the queue, weather and solar/wind share
 
-These series sit beside the results (Research > Revenue "Context", the Atlas storage layer, the Dispatch overlay, the ten-best-days weather).
+These series sit beside the results (Research > Revenue "Context", the Atlas storage layer, the Charging pattern overlay, the ten-best-days weather).
 They are descriptions of things that moved together. This model cannot say what caused what. Sources and limits are in the README
 ("Context layers") and `results/context.json`.
 

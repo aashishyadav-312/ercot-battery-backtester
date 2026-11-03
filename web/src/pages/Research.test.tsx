@@ -6,6 +6,7 @@ import { parseDoc } from '../data/markdown';
 import { ancillaryChart, captureChart, fallChart, fmtRange, FINDINGS, TOPICS, validationRows, standard } from '../data/research';
 import { pct, usd } from '../data/format';
 import { DATA, FINDINGS_MD, INDEX, NODES, bare } from '../data/research.fixtures';
+import { retiredIn } from '../copy/retired';
 
 afterEach(cleanup);
 beforeAll(() => {
@@ -104,10 +105,10 @@ describe('topic filters', () => {
     view();
     const group = screen.getByRole('group', { name: 'Filter findings by topic' });
     expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual(['All', ...TOPICS.map((t) => t.label)]);
-    fireEvent.click(within(group).getByRole('button', { name: 'How it changed' }));
+    fireEvent.click(within(group).getByRole('button', { name: 'Change' }));
     const want = FINDINGS.filter((f) => f.topic === 'changed').map((f) => f.n);
     expect(screen.getAllByTestId(/^finding-/).map((c) => Number(c.getAttribute('data-testid')!.slice(8)))).toEqual(want);
-    expect(within(group).getByRole('button', { name: 'How it changed' }).getAttribute('aria-pressed')).toBe('true');
+    expect(within(group).getByRole('button', { name: 'Change' }).getAttribute('aria-pressed')).toBe('true');
     expect(within(group).getByRole('button', { name: 'All' }).getAttribute('aria-pressed')).toBe('false');
     expect(screen.getByText(`Showing ${want.length} of ${FINDINGS.length} findings`)).toBeTruthy();
     fireEvent.click(within(group).getByRole('button', { name: 'All' }));
@@ -160,5 +161,13 @@ describe('one finding, rendered from FINDINGS.md', () => {
     view(DATA, 99);
     expect(screen.queryByTestId('reader')).toBeNull();
     expect(screen.getAllByTestId(/^finding-/)).toHaveLength(FINDINGS.length);
+  });
+});
+
+describe('Research uses the shared vocabulary', () => {
+  it('shows none of the retired labels', async () => {
+    view();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(retiredIn(document.body.textContent ?? '')).toEqual([]);
   });
 });

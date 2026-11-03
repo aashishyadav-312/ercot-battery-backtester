@@ -7,7 +7,7 @@ export default function Dispatch() {
   const { run } = useSelectedRun();
   return (
     <Stack gap="lg">
-      <PageHeader title="Dispatch" hero />
+      <PageHeader title="Charging pattern" hero />
       <RunStatus />
       <KpiRow />
       <HeatmapCard run={run} />

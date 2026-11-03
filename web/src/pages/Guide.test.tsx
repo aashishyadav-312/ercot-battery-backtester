@@ -6,6 +6,7 @@ import Guide, { GUIDE_SECTIONS } from './Guide';
 import { Footer } from '../components/shell/Footer';
 import { GLOSSARY, SITE } from '../data/site';
 import { GUIDE } from '../data/start';
+import { retiredIn } from '../copy/retired';
 
 // The Guide only needs `go` from the app and the walkthrough day, which is a file fetch; both are replaced here.
 vi.mock('../state', async () => {
@@ -30,7 +31,7 @@ describe('Guide merges Start here, the glossary and About', () => {
     const nav = screen.getByRole('navigation', { name: 'Sections on this page' });
     expect(within(nav).getAllByRole('button')).toHaveLength(GUIDE_SECTIONS.length);
     for (const s of GUIDE_SECTIONS) expect(document.getElementById(s.id)?.tagName, s.id).toBe('H2');
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Guide');
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Learn');
   });
 
   it('lists every glossary term with its definition', () => {
@@ -63,7 +64,7 @@ describe('Guide merges Start here, the glossary and About', () => {
 
 describe('opening at a section', () => {
   it('scrolls to the section named in the hash (the footer About link and old #/about links)', async () => {
-    window.location.hash = '#/guide?s=about';
+    window.location.hash = '#/learn?s=about';
     const seen: Element[] = [];
     const orig = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function (this: Element) { seen.push(this); };
@@ -73,7 +74,7 @@ describe('opening at a section', () => {
   });
 
   it('does not move for an unknown section', async () => {
-    window.location.hash = '#/guide?s=nonsense';
+    window.location.hash = '#/learn?s=nonsense';
     let moved = 0;
     const orig = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function () { moved++; };
@@ -85,7 +86,15 @@ describe('opening at a section', () => {
 
   it('is what the footer About link opens', () => {
     render(<Footer index={null} sel={{ location: 'HB_WEST', duration: 4, year: 2025, deg: 10 }} />);
-    expect(screen.getByRole('link', { name: 'About' }).getAttribute('href')).toBe('#/guide?loc=HB_WEST&dur=4&year=2025&deg=10&s=about');
+    expect(screen.getByRole('link', { name: 'About' }).getAttribute('href')).toBe('#/learn?loc=HB_WEST&dur=4&year=2025&deg=10&s=about');
     fireEvent.click(screen.getByRole('link', { name: 'About' }));
+  });
+});
+
+describe('Learn uses the shared vocabulary', () => {
+  it('shows none of the retired labels', async () => {
+    view();
+    await new Promise((r) => setTimeout(r, 50));
+    expect(retiredIn(document.body.textContent ?? '')).toEqual([]);
   });
 });
