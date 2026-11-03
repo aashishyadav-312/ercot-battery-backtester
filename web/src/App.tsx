@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef } from 'react';
 import { Group, Skeleton, Text } from '@mantine/core';
 import { useApp } from './state';
 import { Selectors } from './components/Selectors';
+import { SelectorNotes } from './components/SelectorNotes';
 import { CardHeadingLevel } from './components/Card';
 import { Ticker } from './components/shell/Ticker';
 import { Header } from './components/shell/Header';
@@ -74,6 +75,7 @@ export default function App() {
           </ViewBar>
         )}
         {selectors && <Group hiddenFrom="md" mb="md"><div style={{ width: '100%' }}><Selectors fullWidth /></div></Group>}
+        {selectors && <SelectorNotes />}
         {/* Keyed by page so each page arrives with a short rise-and-fade (fade only under reduced motion). */}
         <div key={page} className="app-enter">
           {error ? <Text c="var(--down)">Could not load results: {error}</Text> : !index && page === 'method' ? <Skeleton h={300} radius="lg" /> : <Suspense fallback={<Skeleton h={400} radius="lg" />}><CardHeadingLevel.Provider value={FLAT_HEADINGS.includes(page) ? 2 : 3}><Page /></CardHeadingLevel.Provider></Suspense>}
