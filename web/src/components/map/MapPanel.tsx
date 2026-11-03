@@ -40,7 +40,7 @@ function Sparkline({ run }: { run: Run | undefined }) {
         yAxis: { type: 'value', show: false, min: 0 },
         series: [{
           id: 'monthly', name: 'monthly', type: 'line', data, symbol: 'circle', symbolSize: 5, showSymbol: true, connectNulls: false,
-          lineStyle: { color: t.series[0], width: 2 }, itemStyle: { color: t.series[0] }, areaStyle: { color: t.series[0], opacity: 0.12 },
+          lineStyle: { color: t.amber, width: 2 }, itemStyle: { color: t.amber }, areaStyle: { color: t.amber, opacity: 0.12 },
         }],
       };
     },

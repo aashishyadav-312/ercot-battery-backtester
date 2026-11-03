@@ -14,7 +14,6 @@ import Guide from './pages/Guide';
 import Home from './pages/Home';
 const Atlas = lazy(() => import('./pages/Atlas'));
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
-import Overview from './pages/Overview';
 import Revenue from './pages/Revenue';
 import Dispatch from './pages/Dispatch';
 import Realism from './pages/Realism';
@@ -30,10 +29,10 @@ import classes from './App.module.css';
 const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', 'method', 'live'];
 
 /** Run pages whose cards sit directly under the h1. */
-const FLAT_HEADINGS: Page[] = ['overview', 'revenue', 'dispatch', 'realism', 'live'];
+const FLAT_HEADINGS: Page[] = ['revenue', 'dispatch', 'realism', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, map: MapPage, overview: Overview, revenue: Revenue, dispatch: Dispatch,
+  home: Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, map: MapPage, revenue: Revenue, dispatch: Dispatch,
   realism: Realism, economics: Economics, live: Live, method: Method,
 };
 

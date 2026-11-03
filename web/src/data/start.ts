@@ -23,16 +23,9 @@ export interface GuideCard {
 
 export const GUIDE: GuideCard[] = [
   {
-    page: 'overview', title: 'Run overview',
-    question: 'How much could a battery have earned here, and what drove that number?',
-    shows: 'Four headline numbers, revenue by month, the running total with the ten best days marked, the charge and discharge pattern, and 1h vs 2h vs 4h.',
-    open: {}, cta: 'Open Run overview for Houston, 2-hour, 2025',
-    alt: 'Thumbnail of the Run overview page: headline sentence, four number tiles and revenue charts.',
-  },
-  {
     page: 'revenue', title: 'Revenue',
-    question: 'When in the year did the money come in?',
-    shows: 'Daily revenue as bars, the ten best days, and how much of the year they account for.',
+    question: 'How much could a battery have earned here, and when did the money come in?',
+    shows: 'Four headline numbers, energy and ancillary revenue, revenue by month, 1h vs 2h vs 4h, the running total, daily revenue and the ten best days.',
     open: {}, cta: 'Open Revenue for Houston, 2-hour, 2025',
     alt: 'Thumbnail of the Revenue page: daily revenue bars and a list of the ten best days.',
   },

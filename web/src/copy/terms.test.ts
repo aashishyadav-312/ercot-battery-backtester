@@ -66,7 +66,7 @@ describe('tab and pill labels', () => {
     expect(Object.fromEntries(TABS.map((t) => [t.tab, t.views.map((v) => v.label)]))).toMatchObject({
       atlas: ['All nodes', 'Study sites'],
       studio: ['Your battery', 'Economics'],
-      research: ['Findings', 'Run overview', 'Revenue', 'Charging pattern', 'Reality check', 'Method'],
+      research: ['Findings', 'Revenue', 'Charging pattern', 'Reality check', 'Method'],
     });
   });
 

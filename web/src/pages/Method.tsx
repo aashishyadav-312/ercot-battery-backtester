@@ -1,5 +1,5 @@
 import { Alert, Anchor, Badge, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
-import { PageHeader } from './Overview';
+import { PageHeader } from './RunHeader';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { IconWarn } from '../components/Icons';

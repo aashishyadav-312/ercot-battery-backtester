@@ -17,6 +17,8 @@ export interface CsvData {
 interface Props {
   title: string;
   subtitle?: string;
+  /** One plain "what to look for" line under the subtitle, at most 18 words, built from what the chart shows. */
+  look?: string;
   /** Glossary key(s) for jargon used in the title or subtitle; shows an info icon beside the title. */
   terms?: string | string[];
   /** Build the CSV lazily; return undefined while data is still loading. */
@@ -26,7 +28,7 @@ interface Props {
   footer?: ReactNode;
 }
 
-export function Card({ title, subtitle, terms, csv, children, footer }: Props) {
+export function Card({ title, subtitle, look, terms, csv, children, footer }: Props) {
   const [open, setOpen] = useState(false);
   const level = useContext(CardHeadingLevel);
   const head = (
@@ -37,6 +39,7 @@ export function Card({ title, subtitle, terms, csv, children, footer }: Props) {
           {terms && <Info terms={terms} />}
         </Group>
         {subtitle && <Text size="sm" c="dimmed" lh={1.45} mt={2}>{subtitle}</Text>}
+        {look && <Text size="sm" lh={1.45} mt={4} data-look>{look}</Text>}
       </div>
       <Group gap={2} wrap="nowrap" mt={-6} mr={-8}>
         <Tooltip label="Download CSV">
@@ -72,7 +75,8 @@ export function Card({ title, subtitle, terms, csv, children, footer }: Props) {
             <Modal.CloseButton aria-label="Close" />
           </Modal.Header>
           <Modal.Body>
-            {subtitle && <Text size="sm" c="dimmed" mb="md">{subtitle}</Text>}
+            {subtitle && <Text size="sm" c="dimmed" mb={look ? 4 : 'md'}>{subtitle}</Text>}
+            {look && <Text size="sm" mb="md">{look}</Text>}
             {open && children(true)}
             {open && footer}
           </Modal.Body>

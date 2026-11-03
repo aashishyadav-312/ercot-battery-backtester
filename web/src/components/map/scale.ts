@@ -1,4 +1,5 @@
 import type { IndexRun } from '../../data/types';
+import { mix, type ChartTheme } from '../../theme/chartColors';
 
 /** Value ranges for the whole results grid, so marker size and colour mean the same thing whichever selector is chosen. */
 export interface Domain {
@@ -16,30 +17,17 @@ export function domainOf(index: IndexRun[]): Domain {
   };
 }
 
-/** One sequential blue ramp per colour scheme. Light mode: darker = higher. Dark mode: lighter = higher. */
-const RAMP = {
-  light: ['#cfe3fa', '#86b6ef', '#3987e5', '#1c5cab', '#104281'],
-  dark: ['#27456f', '#3269b0', '#4f8fe0', '#86b6ef', '#d0e4fb'],
-};
-/** Colour for a location with no capture rate. */
-export const NO_DATA = { light: '#a8a7a0', dark: '#6f6e68' };
-
-const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-const toHex = (c: number[]) => `#${c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('')}`;
-
-/** Colour at position t in [0, 1] along the ramp. */
-export function rampAt(t: number, mode: 'light' | 'dark'): string {
-  const r = RAMP[mode];
-  const x = Math.min(1, Math.max(0, t)) * (r.length - 1);
-  const i = Math.min(r.length - 2, Math.floor(x));
-  const a = hex(r[i]);
-  const b = hex(r[i + 1]);
-  return toHex(a.map((v, k) => v + (b[k] - v) * (x - i)));
+/**
+ * Capture rate runs from the faintest chart grey (low) to mint (high), both tokens. `mix` blends the two in sRGB; the
+ * DOM legend draws the same ramp with CSS (MapLegend), so map and legend match in both themes.
+ */
+export function rampAt(x: number, t: ChartTheme): string {
+  return mix(t.mint, t.grey[2], Math.min(1, Math.max(0, x)));
 }
 
-export function captureColor(c: number | null | undefined, d: Domain, mode: 'light' | 'dark'): string {
-  if (c == null) return NO_DATA[mode];
-  return rampAt((c - d.capMin) / (d.capMax - d.capMin), mode);
+export function captureColor(c: number | null | undefined, d: Domain, t: ChartTheme): string {
+  if (c == null) return t.noData;
+  return rampAt((c - d.capMin) / (d.capMax - d.capMin), t);
 }
 
 export const SIZE_MIN = 12;
@@ -51,20 +39,20 @@ export function markerSize(rev: number | null | undefined, d: Domain): number {
 }
 
 // ------------------------------------------------------------ planned-storage layer (Phase 17)
-/** Purple ramp for the interconnection-queue layer, so it never reads as the blue revenue scale. */
-const QUEUE_RAMP = {
-  light: ['#efe3f6', '#d6b4e8', '#b27fd2', '#8749b0', '#5b2784'],
-  dark: ['#3a2a4b', '#5b3f7b', '#7f59a8', '#aa8cd2', '#dac8ef'],
-};
-export const QUEUE_CLASSES = 5;
+/**
+ * Queue layer: county shades from the land colour toward the text colour, so they never read as the mint capture scale.
+ * Class i is QUEUE_MIX[i] percent text over land; QueueLegend draws the same steps with CSS color-mix.
+ */
+export const QUEUE_MIX = [14, 28, 42, 56, 70];
+export const QUEUE_CLASSES = QUEUE_MIX.length;
 
 /** Colour class 0..QUEUE_CLASSES-1 of a county's queued MW; breaks come from quantileBreaks over counties that have any. */
-export function queueColor(mw: number, breaks: number[], mode: 'light' | 'dark'): string {
+export function queueColor(mw: number, breaks: number[], t: ChartTheme): string {
   let i = 0;
   while (i < breaks.length && mw > breaks[i]) i++;
-  return QUEUE_RAMP[mode][i];
+  return mix(t.text, t.land, QUEUE_MIX[i] / 100);
 }
-export const queueSwatch = (i: number, mode: 'light' | 'dark') => QUEUE_RAMP[mode][i];
+export const queueSwatch = (i: number) => `color-mix(in srgb, var(--text) ${QUEUE_MIX[i]}%, var(--land))`;
 
 // ------------------------------------------------------------ equal-count classes
 /**

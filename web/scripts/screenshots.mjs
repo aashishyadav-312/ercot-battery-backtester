@@ -28,16 +28,18 @@ const server = spawn(process.execPath, [join(here, 'node_modules/vite/bin/vite.j
 await new Promise((r) => setTimeout(r, 2500));
 
 const base = `http://localhost:${PORT}/`;
-const ALL_PAGES = ['home', 'research', 'start', 'map', 'detailed', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
+const ALL_PAGES = ['home', 'research', 'start', 'map', 'detailed', 'live', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method'];
 // Each page's current route. File names keep the page name, so before/after shots of a page pair up across the redesign.
 const ROUTES = {
-  home: 'home', research: 'research', start: 'learn', map: 'atlas', detailed: 'atlas/sites', live: 'home/live', overview: 'research/overview', revenue: 'research/revenue', dispatch: 'research/charging',
+  home: 'home', research: 'research', start: 'learn', map: 'atlas', detailed: 'atlas/sites', live: 'home/live', revenue: 'research/revenue', dispatch: 'research/charging',
   realism: 'research/reality', method: 'research/method', compare: 'studio/compare', economics: 'studio/economics', custom: 'studio/custom',
 };
 const route = (p) => ROUTES[p] ?? p;
 const only = arg('pages', '');
 const pages = only ? only.split(',') : ALL_PAGES;
 const sizes = { desktop: { width: 1440, height: 900 }, phone: { width: 390, height: 844 } };
+// --combos desktop-dark,phone-light limits the size and scheme pairs (default: all four).
+const combos = arg('combos', '') ? arg('combos', '').split(',') : null;
 const name = (...parts) => join(out, `${parts.join('-')}-${suffix}.png`);
 
 // Set PW_CHROMIUM_PATH to use a pre-installed Chromium (e.g. in CI or cloud containers).
@@ -58,6 +60,7 @@ async function overflow(page, where) {
 try {
   for (const [size, viewport] of Object.entries(sizes)) {
     for (const scheme of ['light', 'dark']) {
+      if (combos && !combos.includes(`${size}-${scheme}`)) continue;
       const ctx = await browser.newContext({
         viewport, colorScheme: scheme, deviceScaleFactor: size === 'phone' ? 2 : 1, hasTouch: size === 'phone', isMobile: size === 'phone',
       });
@@ -73,7 +76,7 @@ try {
         // The custom run solves in the browser after load; wait for its results. Studio (design step 4) opens a preset.
         if (p === 'custom') await page.getByText(/days solved in|Precomputed ·|Solved in your browser/).first().waitFor({ timeout: 120_000 });
         await settle(page);
-        if (arg('strategy', 'energy') === 'stacked' && ['overview', 'revenue', 'realism'].includes(p)) {
+        if (arg('strategy', 'energy') === 'stacked' && ['revenue', 'realism'].includes(p)) {
           await page.getByText('Energy + AS', { exact: true }).click();
           await settle(page);
         }
@@ -85,7 +88,7 @@ try {
       // Data-quality note on a volatile node, node-vs-hub on Compare (Studio since step 4), and inputs Studio has to solve.
       for (const [file, url, ready] of [
         ...(only ? [] : [
-          ['data-quality', 'research/overview?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
+          ['data-quality', 'research/revenue?loc=RHESS2_ESS1&dur=2&year=2025&deg=10'],
           ['compare-node', 'studio/compare?loc=RUSSEKST_RN&dur=2&year=2025&deg=10'],
         ]),
         // A resource node selected in the Atlas (an old #/map?loc= link opens on that node).
@@ -103,7 +106,7 @@ try {
       }
 
       if (size === 'desktop' && !only) {
-        await page.goto(`${base}#/research/overview?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
+        await page.goto(`${base}#/research/charging?loc=HB_HOUSTON&dur=2&year=2026&deg=10`);
         await settle(page);
         await page.getByRole('button', { name: /Expand Charging pattern/ }).click();
         await page.waitForTimeout(1400);

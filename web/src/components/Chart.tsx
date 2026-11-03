@@ -8,14 +8,15 @@ import {
 } from 'echarts/components';
 import { SVGRenderer } from 'echarts/renderers';
 import type { EChartsCoreOption } from 'echarts/core';
-import { CHART, CHART_FONT } from '../theme';
+import { CHART_FONT } from '../theme';
+import { chartColors, type ChartTheme } from '../theme/chartColors';
 
 echarts.use([
   BarChart, LineChart, HeatmapChart, ScatterChart, GridComponent, TooltipComponent, LegendComponent,
   VisualMapComponent, MarkLineComponent, MarkAreaComponent, TitleComponent, DataZoomComponent, AriaComponent, SVGRenderer,
 ]);
 
-export type ChartTheme = (typeof CHART)['light'] & { mode: 'light' | 'dark' };
+export type { ChartTheme };
 
 /** Axis styling shared by every card so each chart only supplies data and series. */
 export function axisBase(t: ChartTheme) {
@@ -96,7 +97,7 @@ export function Chart({ build, height, label, onChartReady, onClick }: Props) {
   useEffect(() => {
     const chart = inst.current;
     if (!chart) return;
-    const t: ChartTheme = { ...CHART[scheme], mode: scheme };
+    const t = chartColors(scheme);
     const opt = build(t) as Record<string, unknown>;
     const series = ([] as SeriesLike[]).concat((opt.series as SeriesLike | SeriesLike[] | undefined) ?? []);
     const withIds = series.map((s, i) => ({ ...s, id: s.id ?? s.name ?? `s${i}` }));

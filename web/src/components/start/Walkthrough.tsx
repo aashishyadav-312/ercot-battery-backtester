@@ -94,7 +94,7 @@ function dayChart(w: WalkData, day: WalkDay, block: Block | undefined, expanded:
           ...(da
             ? [{
                 id: 'da', name: 'Day-ahead', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: da, step: 'end', showSymbol: false,
-                lineStyle: { width: 1.4, color: t.baseline, type: 'dashed' }, itemStyle: { color: t.baseline }, z: 2,
+                lineStyle: { width: 1.4, color: t.amber, type: 'dashed' }, itemStyle: { color: t.amber }, z: 2,
               }]
             : []),
           {
@@ -108,8 +108,8 @@ function dayChart(w: WalkData, day: WalkDay, block: Block | undefined, expanded:
           },
           {
             id: 'soc', name: 'Charge', type: 'line', xAxisIndex: 2, yAxisIndex: 2, data: day.soc_mwh, showSymbol: false, step: 'end',
-            lineStyle: { width: 1.6, color: t.series[2] }, itemStyle: { color: t.series[2] },
-            areaStyle: { color: t.series[2], opacity: 0.16 },
+            lineStyle: { width: 1.6, color: t.text }, itemStyle: { color: t.text },
+            areaStyle: { color: t.text, opacity: 0.12 },
             markArea: area(blockColor(t)),
           },
         ],
@@ -198,7 +198,7 @@ export function Walkthrough({ data, error }: { data?: WalkData; error?: string }
 
       <Card
         title={`${where.replace(/ \(.*\)$/, '')}, ${fmtDate(day.date)}`}
-        subtitle={`${day.label}. Black line: real-time price. ${day.da_price ? 'Dashed: day-ahead price. ' : ''}Orange: selling. Blue: charging. Green: how full the battery is.`}
+        subtitle={`${day.label}. Solid line: real-time price. ${day.da_price ? 'Dashed amber: day-ahead price. ' : ''}Amber: selling. Mint: charging. Shaded line: how full the battery is.`}
         csv={() => csvFor(data, day)}
       >
         {(ex) => {

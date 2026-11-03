@@ -88,7 +88,7 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
           value: [p.loc.lon, p.loc.lat, p.revenue, p.capture],
           symbolSize: markerSize(p.revenue, domain),
           z: on ? 30 : 10,
-          itemStyle: { color: captureColor(p.capture, domain, t.mode), borderColor: on ? t.text : t.surface, borderWidth: on ? 3 : 1.5, opacity: 0.96 },
+          itemStyle: { color: captureColor(p.capture, domain, t), borderColor: on ? t.text : t.surface, borderWidth: on ? 3 : 1.5, opacity: 0.96 },
         };
       };
       const series = (id: string, symbol: string, kind: LocationRec['type']) => ({
@@ -118,17 +118,17 @@ export function TexasMap({ geo, points, domain, selected, onSelect, focus, heigh
         },
         geo: {
           map: MAP_NAME, roam: true, silent: !queue, scaleLimit: { min: 1, max: 14 }, aspectScale: 0.86, layoutCenter: ['50%', '52%'], layoutSize: '104%',
-          itemStyle: { areaColor: t.mode === 'light' ? '#eeede9' : '#242423', borderColor: t.mode === 'light' ? '#d9d8d2' : '#3a3a37', borderWidth: 0.5 },
+          itemStyle: { areaColor: t.land, borderColor: t.grid, borderWidth: 0.5 },
           emphasis: { disabled: true }, select: { disabled: true }, label: { show: false },
           regions: queue ? geo.counties.features.flatMap((f) => {
             const c = queue.counties.get(countyKey(f.properties.name));
-            return c && c.mw > 0 ? [{ name: f.properties.name, itemStyle: { areaColor: queueColor(c.mw, queue.breaks, t.mode) } }] : [];
+            return c && c.mw > 0 ? [{ name: f.properties.name, itemStyle: { areaColor: queueColor(c.mw, queue.breaks, t) } }] : [];
           }) : [],
         },
         series: [
           {
             id: 'outline', name: 'outline', type: 'lines', coordinateSystem: 'geo', polyline: true, silent: true, z: 5,
-            data: rings.map((coords) => ({ coords })), lineStyle: { color: t.baseline, width: 1.3, opacity: 0.9 },
+            data: rings.map((coords) => ({ coords })), lineStyle: { color: t.landStroke, width: 1.3, opacity: 0.9 },
           },
           series('Hubs', 'diamond', 'hub'),
           series(NODES_LABEL, 'circle', 'node'),

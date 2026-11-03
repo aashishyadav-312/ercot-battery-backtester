@@ -21,7 +21,7 @@ export function markStartSeen() {
   }
 }
 
-/** One-time banner on Overview pointing first-time visitors to Learn. Dismissal is remembered in localStorage. */
+/** One-time banner on Revenue pointing first-time visitors to Learn. Dismissal is remembered in localStorage. */
 export function StartBanner() {
   const { go } = useApp();
   const [open, setOpen] = useState(() => !wasSeen());

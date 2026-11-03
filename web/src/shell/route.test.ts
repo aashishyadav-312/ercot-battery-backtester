@@ -7,7 +7,7 @@ const OLD_TO_NEW: Record<OldRoute, string> = {
   guide: '#/learn',
   map: '#/atlas',
   live: '#/home/live',
-  overview: '#/research/overview',
+  overview: '#/research/revenue',
   revenue: '#/research/revenue',
   dispatch: '#/research/charging',
   realism: '#/research/reality',
@@ -27,7 +27,7 @@ describe('old routes redirect to their new home', () => {
     const r = resolveHash(`#/${page}`);
     expect(r.canonical).toBe(OLD_TO_NEW[page as keyof typeof OLD_TO_NEW]);
     // The Map page was replaced by the Atlas; Custom run and Compare by Studio; Start here, Guide and About by Learn.
-    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : ['start', 'guide', 'about'].includes(page) ? 'learn' : page);
+    expect(r.page).toBe(page === 'map' ? 'atlas' : page === 'custom' || page === 'compare' ? 'studio' : ['start', 'guide', 'about'].includes(page) ? 'learn' : page === 'overview' ? 'revenue' : page);
 
     expect(r.redirected).toBe(true);
   });
@@ -42,8 +42,8 @@ describe('old routes redirect to their new home', () => {
   });
 
   it('accepts the hash with or without the slash', () => {
-    expect(resolveHash('#overview').canonical).toBe('#/research/overview');
-    expect(resolveHash('overview?loc=HB_PAN').canonical).toBe('#/research/overview?loc=HB_PAN');
+    expect(resolveHash('#overview').canonical).toBe('#/research/revenue');
+    expect(resolveHash('overview?loc=HB_PAN').canonical).toBe('#/research/revenue?loc=HB_PAN');
   });
 });
 
@@ -110,8 +110,9 @@ describe('new routes', () => {
       const fresh = resolveHash(`${now}?${q}`);
       expect([fresh.page, fresh.redirected]).toEqual([page, false]);
     }
-    // Run overview stays where it was until Research is merged.
-    expect(resolveHash('#/research/overview').redirected).toBe(false);
+    // Run overview was merged into Revenue (polish step 4): its link opens Revenue with the query kept.
+    const o = resolveHash('#/research/overview?loc=HB_WEST&dur=4');
+    expect([o.page, o.redirected, o.canonical]).toEqual(['revenue', true, '#/research/revenue?loc=HB_WEST&dur=4']);
   });
 
   it('opens Home for an empty or unknown hash', () => {
