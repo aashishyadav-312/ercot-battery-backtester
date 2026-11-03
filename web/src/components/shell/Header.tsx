@@ -6,9 +6,10 @@ import classes from './Header.module.css';
 
 function Logo() {
   return (
-    <svg className={classes.logo} width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
-      <circle cx="12" cy="12" r="3.6" fill="currentColor" />
+    <svg className={classes.logo} width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="15" fill="#171A1D" />
+      <path d="M41 20.1 A15.5 15.5 0 1 0 31 47.5 H47" fill="none" stroke="#F2A93B" strokeWidth="5.5" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="52" cy="47.5" r="4" fill="#5FD6A4" />
     </svg>
   );
 }
