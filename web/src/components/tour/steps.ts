@@ -16,29 +16,36 @@ export const TOUR_STEPS: TourStep[] = [
   { anchor: 'tab-learn', title: 'Learn', body: 'New to ERCOT? Start here. You will also find the glossary and who built this.' },
 ];
 
-export const SEEN_KEY = 'chargeline-tour-seen';
+/** Finishing the tour (Done) is remembered for good. */
+export const DONE_KEY = 'chargeline-tour-done';
+/** Skipping or Esc is remembered for this browser session only (it survives a refresh, not closing the browser). */
+export const SHOWN_KEY = 'chargeline-tour-shown';
 /** Viewports narrower than this get the popover docked to the bottom edge, pointing at nothing. */
 export const PHONE_MAX = 640;
 
-/** Set when storage cannot be written (or after any close), so the tour never auto-opens twice in one page session. */
+/** Set on any close, so the tour never auto-opens twice in one page session even when storage is blocked. */
 let seenThisSession = false;
 
+const read = (store: () => Storage, key: string) => { try { return store().getItem(key) === '1'; } catch { return false; } };
+const write = (store: () => Storage, key: string) => { try { store().setItem(key, '1'); } catch { /* storage blocked: the in-memory flag covers this page session */ } };
+
 export function hasSeenTour(): boolean {
-  if (seenThisSession) return true;
-  try { return localStorage.getItem(SEEN_KEY) === '1'; } catch { return false; }
+  return seenThisSession || read(() => sessionStorage, SHOWN_KEY) || read(() => localStorage, DONE_KEY);
 }
 
-export function markTourSeen(): void {
+/** `completed` is true only when the visitor reached Done. */
+export function markTourSeen(completed = false): void {
   seenThisSession = true;
-  try { localStorage.setItem(SEEN_KEY, '1'); } catch { /* storage blocked: the in-memory flag above covers this session */ }
+  write(() => sessionStorage, SHOWN_KEY);
+  if (completed) write(() => localStorage, DONE_KEY);
 }
 
 /** Test hook: forget the in-memory flag. */
 export function resetTourSession(): void { seenThisSession = false; }
 
-/** The tour opens by itself only on Home, with no query string (a shared deep link never gets it), and only once. */
-export function shouldAutoStart(page: string, hash: string, search: string): boolean {
-  return page === 'home' && !hash.includes('?') && search === '' && !hasSeenTour();
+/** The tour opens by itself on Home, once per browser session, until the visitor has finished it. */
+export function shouldAutoStart(page: string): boolean {
+  return page === 'home' && !hasSeenTour();
 }
 
 const REPLAY_EVENT = 'chargeline:tour';

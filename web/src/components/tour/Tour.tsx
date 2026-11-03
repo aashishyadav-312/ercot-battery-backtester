@@ -17,18 +17,19 @@ export function Tour() {
   const [animate, setAnimate] = useState(true);
   const dialog = useRef<HTMLDivElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
-  // Decided once, from the URL the visitor arrived on: a later trip to Home (which carries a query) is not a first visit.
+  // Decided once, from the page the visitor arrived on.
   const auto = useRef<boolean | null>(null);
-  if (auto.current === null) auto.current = shouldAutoStart(page, window.location.hash, window.location.search);
+  if (auto.current === null) auto.current = shouldAutoStart(page);
   const startPage = useRef(page);
   const [wanted, setWanted] = useState(false); // a start was requested; open as soon as Home and its hero exist
 
   const open = step !== null;
-  const close = useCallback(() => {
-    markTourSeen();
+  const close = useCallback((completed = false) => {
+    markTourSeen(completed);
     setStep(null);
     setWanted(false);
-    returnTo.current?.focus?.();
+    // preventScroll: a replay from the footer must not drag the page back down to the footer link.
+    returnTo.current?.focus?.({ preventScroll: true });
     returnTo.current = null;
   }, []);
 
@@ -45,6 +46,7 @@ export function Tour() {
         if (anchorOf('hero')) {
           returnTo.current = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null;
           startPage.current = page;
+          window.scrollTo({ top: 0 });
           setAnimate(true);
           setStep(0);
         }
@@ -56,7 +58,7 @@ export function Tour() {
   }, [wanted, open, page, go]);
 
   // Leaving Home while the tour is open (a tab click) ends it.
-  useEffect(() => { if (open && page !== startPage.current) close(); }, [page, open, close]);
+  useEffect(() => { if (open && page !== startPage.current) close(false); }, [page, open, close]);
 
   // Outline the anchor.
   useEffect(() => {
@@ -94,7 +96,7 @@ export function Tour() {
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(false); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [open, close]);
@@ -127,10 +129,10 @@ export function Tour() {
         <p id="tour-body" className={classes.body}>{s.body}</p>
       </div>
       <div className={classes.actions}>
-        <button type="button" className={classes.skip} onClick={close}>Skip tour</button>
+        <button type="button" className={classes.skip} onClick={() => close(false)}>Skip tour</button>
         <span className={classes.spacer} />
         {step > 0 && <button type="button" className={classes.btn} onClick={move(step - 1)}>Back</button>}
-        <button type="button" className={`${classes.btn} ${classes.primary}`} onClick={last ? close : move(step + 1)}>{last ? 'Done' : 'Next'}</button>
+        <button type="button" className={`${classes.btn} ${classes.primary}`} onClick={last ? () => close(true) : move(step + 1)}>{last ? 'Done' : 'Next'}</button>
       </div>
     </div>
   );
