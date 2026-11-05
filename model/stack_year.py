@@ -43,30 +43,31 @@ def valid_days(rt: pd.DataFrame, da: pd.DataFrame, as_da: pd.DataFrame, end_day:
     rt = rt.assign(day=_local_day(rt["interval_start_utc"]), hour=rt["interval_start_utc"].dt.floor("h"))
     da = da.assign(day=_local_day(da["interval_start_utc"]))
     asd = as_da.assign(day=_local_day(as_da["interval_start_utc"]))
-    rt_ok = {}
-    for day, g in rt.groupby("day"):
-        exp = _expected_intervals(pd.Timestamp(day), 0.25)
-        rt_ok[day] = len(g) == exp and exp - int(g["price"].notna().sum()) <= MAX_GAP_INTERVALS
-    da_hours = da.groupby("day")["interval_start_utc"].apply(set)
-    da_gaps = da.groupby("day")["price"].apply(lambda s: int(s.isna().sum()))
-    rt_hours = rt.groupby("day")["hour"].apply(lambda s: s.value_counts().to_dict())
     others = [c for c in AS_COLUMNS if c != "ECRS"]
-    as_ok = asd.groupby("day").apply(
-        lambda g: bool(g[others].notna().all().all() and (g["ECRS"].notna().all() or g["ECRS"].isna().all())),
-        include_groups=False,
-    )
-    as_hours = asd.groupby("day")["interval_start_utc"].apply(set)
+    rt_n = rt.groupby("day").size()
+    rt_ok_n = rt.groupby("day")["price"].count()
+    per_hour = rt.groupby(["day", "hour"]).size()
+    hour_ok = (per_hour == 4).groupby(level="day").all()
+    rt_hours = {d: set(g.index.get_level_values("hour")) for d, g in per_hour.groupby(level="day")}
+    da_gaps = da["price"].isna().groupby(da["day"]).sum()
+    da_hours = {d: set(g) for d, g in da.groupby("day")["interval_start_utc"]}
+    as_ok = asd[others].notna().all(axis=1).groupby(asd["day"]).all()
+    ecrs_n = asd["ECRS"].notna().groupby(asd["day"]).sum()
+    as_n = asd.groupby("day").size()
+    as_hours = {d: set(g) for d, g in asd.groupby("day")["interval_start_utc"]}
     out = []
-    for day in sorted(rt_ok):
+    for day in sorted(rt_n.index):
         if end_day and day > end_day:
             continue
-        if not rt_ok[day] or day not in da_hours or da_gaps[day] > MAX_DA_GAP_HOURS or not as_ok.get(day, False):
+        exp = _expected_intervals(pd.Timestamp(day), 0.25)
+        if rt_n[day] != exp or exp - rt_ok_n[day] > MAX_GAP_INTERVALS or not hour_ok[day]:
+            continue
+        if day not in da_hours or da_gaps[day] > MAX_DA_GAP_HOURS or day not in as_hours:
+            continue
+        if not as_ok[day] or ecrs_n[day] not in (0, as_n[day]):
             continue
         hours = da_hours[day]
-        if hours != as_hours.get(day) or len(hours) * 4 != _expected_intervals(pd.Timestamp(day), 0.25):
-            continue
-        counts = rt_hours[day]
-        if set(counts) != hours or any(v != 4 for v in counts.values()):
+        if len(hours) * 4 != exp or hours != as_hours[day] or hours != rt_hours[day]:
             continue
         out.append(day)
     return out
@@ -119,7 +120,7 @@ def run_point_year(rt, da, as_da, as_rt, days, hours, rules, mode, battery=None,
     if mode == "foresight":
         dur = np.where(post_rt[:, None], post_d, pre_d)
         # Pre-RTC+B awards are DAM awards: one per physical hour. Afterwards per interval.
-        group = np.where(post_rt, np.arange(len(rt)), -1 - ((rt["hour"] - pd.Timestamp(0, tz="UTC")) // pd.Timedelta(hours=1)).to_numpy())
+        group = np.where(post_rt, np.arange(len(rt)), -1 - rt["hour"].dt.tz_localize(None).to_numpy().astype("datetime64[h]").astype(np.int64))
         out = optimize(rt["price"].to_numpy(), rt_as, 0.25, rt["day"].to_numpy(), dur,
                        award_groups=group, battery=bat, options=opt, block_days=block_days)
         daily = pd.DataFrame(out["days"])[cols]
