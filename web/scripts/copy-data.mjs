@@ -7,7 +7,7 @@
 // reads JSON the browser cached from the previous build (GitHub Pages sends
 // max-age=600), while unchanged data keeps its URL and stays cached.
 import { createHash } from 'node:crypto';
-import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -44,6 +44,18 @@ for (const f of readdirSync(prices).sort()) {
     n++;
   }
 }
+// V4 data (results/v4/**, for example results/v4/geo and results/v4/stack). Copied as-is, hashed with the rest.
+function copyTree(from, to, rel = '') {
+  for (const e of readdirSync(from, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+    if (e.isDirectory()) { copyTree(join(from, e.name), join(to, e.name), `${rel}${e.name}/`); continue; }
+    if (!e.name.endsWith('.json')) continue;
+    mkdirSync(to, { recursive: true });
+    cpSync(join(from, e.name), join(to, e.name));
+    hash.update(`v4/${rel}${e.name}`).update(readFileSync(join(from, e.name)));
+    n++;
+  }
+}
+if (existsSync(join(src, 'v4'))) copyTree(join(src, 'v4'), join(dst, 'v4'));
 const version = hash.digest('hex').slice(0, 12);
 writeFileSync(join(here, '..', 'src', 'data', 'data-version.json'), JSON.stringify({ version }) + '\n');
 console.log(
