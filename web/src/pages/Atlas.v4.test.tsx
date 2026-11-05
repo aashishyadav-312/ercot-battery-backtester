@@ -10,7 +10,7 @@ import { fixtureFile } from '../v4/fixture';
 import { mapDots } from '../data/atlas';
 import type { NodesFile, Selection, TexasGeo } from '../data/types';
 
-vi.mock('../v4/flag', () => ({ V4: true }));
+vi.mock('../config/features', () => ({ V4: true }));
 
 afterEach(cleanup);
 beforeAll(() => {
