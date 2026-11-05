@@ -7,7 +7,7 @@
 // reads JSON the browser cached from the previous build (GitHub Pages sends
 // max-age=600), while unchanged data keeps its URL and stays cached.
 import { createHash } from 'node:crypto';
-import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +41,20 @@ for (const f of readdirSync(prices).sort()) {
     cpSync(join(prices, f), join(dst, 'prices', f));
     hash.update(`prices/${f}`).update(bytes);
     priceBytes += bytes.length;
+    n++;
+  }
+}
+// v4 revenue stack (results/v4/stack/*.json, Step 1). Served at data/v4/stack/. When that folder does not exist yet, setting
+// V4_FIXTURE=1 serves web/fixtures/v4/stack instead (made-up numbers marked FIXTURE, for building the UI). Never both.
+const stackReal = join(src, 'v4', 'stack');
+const stackFixture = join(here, '..', 'fixtures', 'v4', 'stack');
+const stackSrc = existsSync(stackReal) ? stackReal : process.env.V4_FIXTURE === '1' ? stackFixture : null;
+if (stackSrc) {
+  mkdirSync(join(dst, 'v4', 'stack'), { recursive: true });
+  for (const f of readdirSync(stackSrc).sort()) {
+    if (!f.endsWith('.json')) continue;
+    cpSync(join(stackSrc, f), join(dst, 'v4', 'stack', f));
+    hash.update(`v4/stack/${f}`).update(readFileSync(join(stackSrc, f)));
     n++;
   }
 }

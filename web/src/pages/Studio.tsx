@@ -14,6 +14,7 @@ import { FORM_DEFAULTS, LIMITS, PRECOMPUTED, formQuery, toParams, type Coverage,
 import { cancelRun, runInWorker, type CustomRunResult, type RunProgress } from '../custom/client';
 import { DataQuality } from '../components/DataQuality';
 import { CumulativeCard, HeatmapCard, NodeHubCard, TopDaysCard } from '../components/cards';
+import { StackNote } from '../v4/StackNote';
 import classes from './Studio.module.css';
 import { NODES_LABEL, PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
@@ -172,6 +173,7 @@ export function StudioView({ index, nodes, coverage, loadRun = loadRunFile, solv
           {view && shown && (
             <div className={classes.stack} data-stale={!current || undefined} aria-busy={running || undefined}>
               <TotalsCard run={view} powerMw={form.powerMw} />
+              <StackNote form={shown.form} />
               <MonthlyCard run={view} strategy={form.strategy} onStrategy={(strategy) => set({ strategy })} />
               <DurationCard index={index} form={shown.form} onPick={(durationH) => set({ durationH })} />
               <OperatedCard run={view} />
