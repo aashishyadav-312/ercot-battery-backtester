@@ -1,0 +1,153 @@
+{
+  "as_of": "2026-11-05",
+  "description": "ERCOT ancillary service rules used by the v4 revenue stack engine (model/stack.py). Each rule has a source. Items marked ASSUMPTION could not be verified from a primary source and use a conservative value.",
+  "rtcb_go_live": {
+    "date": "2025-12-05",
+    "source": "https://www.ercot.com/mktrules/issues/NPRR1282",
+    "note": "NPRR1282 effective date 12/05/2025, the RTC+B go-live. Days from this date use the post-RTC+B rules and real-time AS prices."
+  },
+  "products": {
+    "regup": {
+      "column": "REGUP",
+      "name": "Regulation Up",
+      "direction": "up",
+      "symmetric": false,
+      "eligible_esr": true,
+      "duration_h": {
+        "pre_rtcb": {
+          "value": 1.0,
+          "status": "ASSUMPTION",
+          "source": "https://www.ercot.com/files/docs/2025/05/29/June-1-2025-Nodal-Protocols.pdf",
+          "note": "Protocols section 6.5.7.5 ties pre-RTC+B ESR SOC backing to the remaining operating hour. A full hour is used as a conservative upper bound on the backing energy."
+        },
+        "post_rtcb": {
+          "value": 0.5,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1282",
+          "note": "Regulation Service duration requirement thirty minutes, effective 12/05/2025."
+        }
+      }
+    },
+    "regdn": {
+      "column": "REGDN",
+      "name": "Regulation Down",
+      "direction": "down",
+      "symmetric": false,
+      "eligible_esr": true,
+      "duration_h": {
+        "pre_rtcb": {
+          "value": 1.0,
+          "status": "ASSUMPTION",
+          "source": "https://www.ercot.com/files/docs/2025/05/29/June-1-2025-Nodal-Protocols.pdf",
+          "note": "Same conservative full-hour backing as Regulation Up, applied to charging headroom."
+        },
+        "post_rtcb": {
+          "value": 0.5,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1282",
+          "note": "NPRR1282 sets thirty minutes for Regulation Service; the page does not split Up and Down, so the same value is applied to both."
+        }
+      }
+    },
+    "rrs": {
+      "column": "RRS",
+      "name": "Responsive Reserve",
+      "direction": "up",
+      "symmetric": false,
+      "eligible_esr": true,
+      "duration_h": {
+        "pre_rtcb": {
+          "value": 1.0,
+          "status": "ASSUMPTION",
+          "source": "https://www.ercot.com/files/docs/2025/05/29/June-1-2025-Nodal-Protocols.pdf",
+          "note": "Conservative full-hour backing, as for Regulation."
+        },
+        "post_rtcb": {
+          "value": 0.5,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1282",
+          "note": "RRS duration requirement thirty minutes, effective 12/05/2025."
+        }
+      }
+    },
+    "ecrs": {
+      "column": "ECRS",
+      "name": "ERCOT Contingency Reserve Service",
+      "direction": "up",
+      "symmetric": false,
+      "eligible_esr": true,
+      "available_from": {
+        "value": "first day with a DAM ECRS clearing price in NP4-188-CD",
+        "status": "SOURCED",
+        "source": "https://www.ercot.com/mp/data-products/data-product-details?id=NP4-188-CD",
+        "note": "ECRS started in June 2023. Before its first published clearing price the engine allows no ECRS award."
+      },
+      "duration_h": {
+        "pre_rtcb": {
+          "value": 2.0,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1096",
+          "note": "Capacity sustained for two consecutive hours."
+        },
+        "post_rtcb": {
+          "value": 1.0,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1282",
+          "note": "ECRS duration requirement one hour, effective 12/05/2025."
+        }
+      }
+    },
+    "nsrs": {
+      "column": "NSPIN",
+      "name": "Non-Spinning Reserve",
+      "direction": "up",
+      "symmetric": false,
+      "eligible_esr": true,
+      "duration_h": {
+        "pre_rtcb": {
+          "value": 4.0,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1096",
+          "note": "Capacity sustained for four consecutive hours."
+        },
+        "post_rtcb": {
+          "value": 4.0,
+          "status": "SOURCED",
+          "source": "https://www.ercot.com/mktrules/issues/NPRR1096",
+          "note": "NPRR1282 changes Regulation, RRS and ECRS only, so the NPRR1096 four-hour Non-Spin requirement is kept."
+        }
+      }
+    }
+  },
+  "eligibility_note": {
+    "status": "ASSUMPTION",
+    "source": "https://www.ercot.com/mktrules/issues/NPRR1096",
+    "note": "The engine treats a standalone ESR as qualified for all five products. Qualification testing, telemetry and performance requirements are not modelled. NPRR1096 refers to ESRs providing ECRS and Non-Spin."
+  },
+  "regulation_deployment_factor": {
+    "value": 0.1,
+    "status": "ASSUMPTION",
+    "source": null,
+    "note": "Average energy deployed per MW of Regulation award, as a share of the award, for each of Reg Up (discharge) and Reg Down (charge). No ERCOT source with a typical value was found. 10% is used so that regulation awards move state of charge and earn or pay the energy price. Set to 0 to ignore deployment."
+  },
+  "headroom": {
+    "value": "two_sided",
+    "status": "MODEL CHOICE",
+    "source": null,
+    "note": "discharge + up-products <= P and charge + Reg Down <= P, plus charge + discharge <= P (one shared inverter). The older v2 screen (model/ancillary.py) used the stricter charge + discharge + all products <= P."
+  },
+  "price_basis": {
+    "foresight": "Energy at RT 15-minute settlement point prices with perfect foresight. AS at the DAM clearing price (MCPC, NP4-188-CD) held for the whole hour before RTC+B. From RTC+B, AS per 15 minutes at the higher of the DAM MCPC for that hour and the settled RT MCPC (NP6-796-ER). This is an upper bound.",
+    "realistic": "Energy schedule and AS awards chosen from DAM prices only (DA settlement point prices and DAM MCPC), hourly. The energy schedule is settled at RT 15-minute prices, as in model/forecast.py. AS awards are paid the DAM MCPC and held in real time.",
+    "sources": [
+      "https://www.ercot.com/mp/data-products/data-product-details?id=NP4-188-CD",
+      "https://www.ercot.com/mp/data-products/data-product-details?id=NP6-796-ER",
+      "https://www.ercot.com/mp/data-products/data-product-details?id=NP6-905-CD",
+      "https://www.ercot.com/mp/data-products/data-product-details?id=NP4-190-CD"
+    ]
+  },
+  "price_taker": {
+    "status": "ASSUMPTION",
+    "note": "The battery takes historical clearing prices and never moves them. AS markets are thin compared with the energy market, and as more batteries offer AS, clearing prices fall (saturation). AS revenue here is an upper bound on what a new battery could capture."
+  }
+}
