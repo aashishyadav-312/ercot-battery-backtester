@@ -104,7 +104,8 @@ export default function Guide() {
     to();
     window.addEventListener('hashchange', to);
     return () => window.removeEventListener('hashchange', to);
-  }, []);
+    // Again once the walk-through has loaded: it grows the page, which would leave a later section (Site screening) off screen.
+  }, [walk.data]);
   return (
     <Stack gap={56} maw={1040}>
       <Stack gap="lg">

@@ -1,7 +1,7 @@
 // Method page, v4 Step 8: the revenue stack (C) and Data Center mode (D). Loaded lazily by pages/Method.tsx, only with V4 on.
 // Every rule, rate, date and result figure is read from a config or a result file; the sentences around them are the only copy.
 import { useEffect, useState } from 'react';
-import { Alert, Anchor, Badge, List, Stack, Table, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Badge, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
 import dcRules from '../../custom/config/datacenter_rules.json';
 import { Section } from '../../pages/Method';
 import { fmtDate } from '../../data/format';
@@ -83,7 +83,7 @@ export default function V4Method() {
         {failed && <Alert color="yellow">The stack rules and coverage could not be loaded. Reload the page to try again.</Alert>}
         {asRules?.price_basis && (
           <Sub title="Two modes">
-            <Text size="sm"><b>{TERMS.perfectForesight.label}</b> (upper bound). {asRules.price_basis.foresight}</Text>
+            <Text size="sm"><b>{TERMS.perfectForesight.label}</b>. {asRules.price_basis.foresight}</Text>
             <Text size="sm"><b>{TERMS.dayAheadPlan.label}</b>. {asRules.price_basis.realistic}</Text>
           </Sub>
         )}
@@ -149,13 +149,14 @@ export default function V4Method() {
             Two strategies: <b>{TERMS.perfectForesight.label}</b> knows the peak intervals, and the realistic one discharges on days when the day’s
             peak load is close to the month’s highest so far. The realistic one counts only the intervals it actually covered.
           </Text>
-          <Alert color="yellow" title="4CP may change" data-testid="v4-4cp-review">
+          <Paper withBorder p="md" data-testid="v4-4cp-review" style={{ borderInlineStartWidth: 4, borderInlineStartColor: 'var(--mantine-color-yellow-6)' }}>
+            <Text size="sm" fw={600} mb={4}>4CP may change</Text>
             <Text size="sm">{review.text}</Text>
             <List size="sm" spacing={2} mt={6}>
               {review.sources.map((s) => <List.Item key={s}><Anchor size="sm" href={s} {...ext}>{s}</Anchor></List.Item>)}
             </List>
             <Text size="xs" c="dimmed" mt={6}>Status as of {review.asOf}, from <code>datacenter_rules.json</code>.</Text>
-          </Alert>
+          </Paper>
         </Sub>
         <Sub title="SB 6">
           <Text size="sm">
