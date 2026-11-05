@@ -44,8 +44,28 @@
 .stack, .pair, .full { transition: opacity 200ms var(--ease); }
 [data-stale] { opacity: 0.55; }
 
-.card, .inputs { padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
-.inputs { display: flex; flex-direction: column; gap: 20px; position: sticky; top: calc(var(--app-header-h, 72px) + 16px); }
+.card, .inputs { padding: 24px; border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
+.card { background: var(--panel); }
+/* Inputs panel: sticky beside the results on wide screens. It is capped to the space under the header and scrolls inside itself, so
+   its lower inputs are reachable without waiting for the results column to end. A soft edge at the bottom shows there is more:
+   the scroll-attached gradient is hidden by a panel-coloured cover that is attached to the content (it comes into view at the end). */
+.inputs {
+  display: flex; flex-direction: column; gap: 20px;
+  background:
+    linear-gradient(var(--panel), var(--panel)) bottom / 100% 32px no-repeat local,
+    linear-gradient(to bottom, transparent, color-mix(in srgb, var(--text) 16%, transparent)) bottom / 100% 32px no-repeat scroll,
+    var(--panel);
+}
+@media (min-width: 1000px) {
+  .inputs {
+    position: sticky;
+    top: calc(var(--app-header-h, 72px) + 16px);
+    max-height: calc(100dvh - var(--app-header-h, 72px) - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: 16px 40px; /* a focused input stops clear of the edges and the fade */
+  }
+}
 .inputsHead, .cardHead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
 .cardTitle { margin: 0; font-family: var(--mantine-font-family-headings); font-size: 20px; font-weight: 700; color: var(--text); }
 
@@ -257,9 +277,10 @@
 .code { font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--faint); }
 
 /* ------------------------------------------------ narrower screens stack */
+@media (max-width: 999px) {
+  .layout { grid-template-columns: minmax(0, 1fr); } /* below 1000px the panel stacks above the results, not sticky */
+}
 @media (max-width: 900px) {
-  .layout { grid-template-columns: minmax(0, 1fr); }
-  .inputs { position: static; }
   .pair { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {

@@ -1,0 +1,21 @@
+/* Assumptions panel: sticky beside the results on wide screens, capped to the space under the header, scrolls inside itself.
+   Same rules as the Studio inputs panel (Studio.module.css .inputs). Below 1000px it stacks normally. */
+.assumptions {
+  background-image:
+    linear-gradient(var(--mantine-color-body), var(--mantine-color-body)),
+    linear-gradient(to bottom, transparent, color-mix(in srgb, var(--mantine-color-text) 16%, transparent));
+  background-position: bottom, bottom;
+  background-size: 100% 32px, 100% 32px;
+  background-repeat: no-repeat;
+  background-attachment: local, scroll; /* the cover moves with the content, so it hides the fade once the end is reached */
+}
+@media (min-width: 1000px) {
+  .assumptions {
+    position: sticky;
+    top: calc(var(--app-header-h, 72px) + 16px);
+    max-height: calc(100dvh - var(--app-header-h, 72px) - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: 16px 40px;
+  }
+}

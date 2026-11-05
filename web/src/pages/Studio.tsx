@@ -21,6 +21,7 @@ import { ModeSwitch } from '../v4/dc/ModeSwitch';
 
 // Data Center mode (v4 Step 7) loads only when someone opens it, behind the V4 flag.
 const DataCenterView = lazy(() => import('../v4/dc/DataCenter'));
+import { revealFocused } from '../shell/panelScroll';
 import classes from './Studio.module.css';
 import { NODES_LABEL, PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
@@ -279,7 +280,7 @@ function Inputs({ form, coverage, index, set, preset }: {
   const end = pricesEnd(form, coverage);
   const range = yearRange(form.location, year, index, coverage);
   return (
-    <section className={classes.inputs} aria-labelledby="battery-title">
+    <section className={classes.inputs} aria-labelledby="battery-title" onFocus={revealFocused}>
       <div className={classes.inputsHead}>
         <h2 id="battery-title" className={classes.cardTitle}>Battery</h2>
         <button type="button" className={classes.quiet} onClick={() => set({ ...FORM_DEFAULTS, ...yearRange(FORM_DEFAULTS.location, Number(FORM_DEFAULTS.startDate.slice(0, 4)), index, coverage) })}>

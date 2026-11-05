@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { IndexRun, NodeSelection, Run, Selection } from './data/types';
 import { DEGS, DURATIONS, YEARS, loadIndex, loadNodeSelection, loadRun } from './data/loader';
 import { buildHash, resolveHash, type Page, type Tab } from './shell/route';
+import { carryRevParams } from './v4/revenueSource';
 
 export { PAGES, buildHash } from './shell/route';
 export type { Page, Tab } from './shell/route';
@@ -78,7 +79,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
   const setSel = useCallback((patch: Partial<Selection>) => {
     const cur = parseHash();
-    window.location.hash = buildHash(cur.page, { ...cur.sel, ...patch });
+    const next = buildHash(cur.page, { ...cur.sel, ...patch });
+    // Project economics keeps its revenue-source choice (rev, src, dc) when the scenario changes.
+    window.location.hash = cur.page === 'economics' ? carryRevParams(window.location.hash, next) : next;
   }, []);
 
   const value = useMemo(

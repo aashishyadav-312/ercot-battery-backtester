@@ -9,10 +9,14 @@ import { Chart } from '../../components/Chart';
 import { downloadCsv, fmtDate, num, usd } from '../../data/format';
 import { money } from '../../data/studio';
 import { locName } from '../../data/site';
-import { loadFourCp, loadStack, loadStackIndex } from '../../data/loader';
+import { DURATIONS, YEARS, loadFourCp, loadStack, loadStackIndex } from '../../data/loader';
 import { TERMS } from '../../copy/terms';
 import { isUpperBoundYear, type StackRow } from '../stack';
 import { AS_UPPER_BOUND_NOTE } from '../config';
+import { revealFocused } from '../../shell/panelScroll';
+import { setDcCase } from './dcCase';
+import { economicsLink } from '../revenueSource';
+import { buildHash } from '../../shell/route';
 import { parseStackIndex, type StackKey } from '../site/stackIndex';
 import {
   DC_ASSUMPTIONS, DC_DEFAULTS, DC_STEP, breakdownRows, dcCsv, dcLocations, dcQuery, dcYears, defaultYear, durationOf, fitWindow,
@@ -252,7 +256,7 @@ function Inputs({ form, set, coverage, profile, csvError, onFile, clearProfile, 
   const a = DC_ASSUMPTIONS;
   const peak = profile ? Math.max(...profile.values) : null;
   return (
-    <section className={studio.inputs} aria-labelledby="dc-inputs-title">
+    <section className={studio.inputs} aria-labelledby="dc-inputs-title" onFocus={revealFocused}>
       <div className={studio.inputsHead}>
         <h2 id="dc-inputs-title" className={studio.cardTitle}>Inputs</h2>
         <button type="button" className={studio.quiet} onClick={() => set({ ...DC_DEFAULTS })}>Reset</button>
@@ -368,6 +372,13 @@ function Results({ shown, stale }: { shown: Shown; stale: boolean }) {
   const diff = r.perKwYr - r.standalone.perKwYr;
   const s = r.dispatchSample;
   const notes = [...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes];
+  // Project economics can use this case's total as its "Data Center site" revenue source.
+  const label = `${num(f.batteryMw)} MW / ${num(f.batteryMwh)} MWh at ${locName(f.loc)}, ${shown.year}`;
+  useEffect(() => { setDcCase({ perKwYr: r.perKwYr, label }); }, [r.perKwYr, label]);
+  const dur = durationOf(f);
+  const econHref = economicsLink(buildHash('economics', {
+    location: f.loc, duration: DURATIONS.includes(dur) ? dur : 2, year: YEARS.includes(f.year) ? f.year : 2025, deg: 10,
+  }), r.perKwYr);
   const csv = () => {
     const { headers, rows: out } = dcCsv(f, r, { yearLabel: shown.year, stackNote: shown.stackNote, profileName: shown.profile });
     downloadCsv(`chargeline-datacenter-${f.loc}-${f.year}.csv`, headers, out);
@@ -462,6 +473,7 @@ function Results({ shown, stale }: { shown: Shown; stale: boolean }) {
       <div className={studio.actions}>
         <button type="button" className={studio.secondary} onClick={csv} data-testid="dc-csv-out">Download CSV</button>
         <button type="button" className={studio.secondary} onClick={() => window.print()}>Print</button>
+        <a className={studio.secondary} href={econHref} data-testid="dc-to-economics">Use in Project economics</a>
       </div>
       <DcPrint shown={shown} />
     </div>

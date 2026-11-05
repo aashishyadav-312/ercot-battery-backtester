@@ -22,11 +22,15 @@ export function degNote(degs: readonly number[]): string {
 }
 
 /** One sentence under the Economics KPI row, from the computed result. */
-export function economicsVerdict(out: Outputs): string {
+export function economicsVerdict(out: Outputs, ctx: { source?: 'energy' | 'stack' | 'dc'; stackOffered?: boolean } = {}): string {
+  const what = ctx.source === 'stack' ? 'full stack revenue' : ctx.source === 'dc' ? 'the Data Center site revenue' : 'energy arbitrage alone';
+  const npv = `NPV ${usd(out.npv, 0)}/kW`;
   if (out.npv < 0) {
-    return `At these inputs, energy arbitrage alone does not pay back the battery (NPV ${usd(out.npv, 0)}/kW). Try a lower installed cost or add a tax credit.`;
+    // On Energy, with a full-stack option for this scenario, the next thing to try is Full stack.
+    const next = ctx.source === 'energy' && ctx.stackOffered ? ' Full stack revenue is available for this scenario: try it in the Revenue switch above.' : '';
+    return `At these inputs, ${what} does not pay back the battery (${npv}). Try a lower installed cost or add a tax credit.${next}`;
   }
-  return `At these inputs, energy arbitrage alone pays back the battery (NPV ${usd(out.npv, 0)}/kW). Raise the installed cost or the haircut to see where that stops.`;
+  return `At these inputs, ${what} pays back the battery (${npv}). Raise the installed cost or the haircut to see where that stops.`;
 }
 
 /** Study sites subhead: the best node among the study sites and the hub it sits in, both for the chosen scenario. */

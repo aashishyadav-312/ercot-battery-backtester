@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Button, Group, NumberInput, Paper, SegmentedControl, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { Card, type CsvData } from '../components/Card';
 import { Chart, axisBase, tooltipBase, type ChartTheme } from '../components/Chart';
@@ -12,8 +12,31 @@ import { fmtDate, num, pct, usd, yearLabel } from '../data/format';
 import { locFull } from '../data/site';
 import { economicsVerdict } from '../data/notes';
 import { TERMS } from '../copy/terms';
+import { V4 } from '../v4/flag';
+import { useEconStack } from '../v4/useEconStack';
+import { getDcCase } from '../v4/dc/dcCase';
+import {
+  REV_LABEL, effectiveSource, parseRevHash, revOptions, revenueOf, sourceDetail, withRevParams,
+  type DcCase, type Offered, type PlanSource, type RevParams, type RevSource,
+} from '../v4/revenueSource';
+import { revealFocused } from '../shell/panelScroll';
+import classes from './Economics.module.css';
 
-type Source = 'pf' | 'da';
+/** The revenue-source choice lives in the URL (rev, src, dc). Changing it rewrites the URL in place, so Back still leaves the page. */
+function useRevParams(): [RevParams, (patch: Partial<RevParams>) => void] {
+  const [p, setP] = useState(() => parseRevHash(window.location.hash));
+  useEffect(() => {
+    const on = () => setP(parseRevHash(window.location.hash));
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+  const update = useCallback((patch: Partial<RevParams>) => {
+    const next = { ...parseRevHash(window.location.hash), ...patch };
+    window.history.replaceState(null, '', withRevParams(window.location.hash, next));
+    setP(next);
+  }, []);
+  return [p, update];
+}
 
 /** Inputs as typed on screen: rates in percent, everything else in its own unit. */
 interface Form {
@@ -50,7 +73,7 @@ function Field({ label, term, value, onChange, suffix, prefix, min = 0, max, ste
 
 function Inputs({ form, set, reset }: { form: Form; set: (p: Partial<Form>) => void; reset: () => void }) {
   return (
-    <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label="Assumptions">
+    <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section" aria-label="Assumptions" className={classes.assumptions} onFocus={revealFocused}>
       <Group justify="space-between" mb="md">
         <Title order={2} fz={17} fw={620}>Assumptions</Title>
         <Button variant="subtle" color="gray" size="compact-sm" onClick={reset}>Reset to defaults</Button>
@@ -119,18 +142,32 @@ export default function Economics() {
   const { sel } = useApp();
   const { row, run } = useSelectedRun();
   const [form, setForm] = useState<Form>(remembered);
-  const [source, setSource] = useState<Source>('pf');
+  const [params, setParams] = useRevParams();
   const set = (p: Partial<Form>) => setForm((f) => (remembered = { ...f, ...p }));
   const reset = () => setForm((remembered = FORM_DEFAULTS));
 
   const hasDa = row?.da_rt_revenue_per_kw_year != null;
-  const use: Source = source === 'da' && hasDa ? 'da' : 'pf';
+  const use: PlanSource = params.plan === 'da' && hasDa ? 'da' : 'pf';
 
-  const resource: Resource | undefined = row && {
+  // Revenue source (v4): Energy is the default; Full stack and Data Center site are offered only when their data exists.
+  const stackRes = useEconStack(sel.year, sel.duration, use, sel.location, V4);
+  const dcCase: DcCase | null = useMemo(() => {
+    if (!V4) return null;
+    const mem = getDcCase();
+    if (params.dc != null) return { perKwYr: params.dc, label: mem && Math.abs(mem.perKwYr - params.dc) < 0.01 ? mem.label : 'Data Center case from the link' };
+    return mem;
+  }, [params.dc]);
+  const offered: Offered = { stack: stackRes.offered?.row ?? null, stackMeta: stackRes.offered?.meta ?? null, dc: dcCase };
+  const options = revOptions(offered);
+  const stackPending = V4 && params.rev === 'stack' && stackRes.status === 'loading';
+  const rev: RevSource = effectiveSource(params.rev, offered);
+  const detail = sourceDetail(rev, offered, use);
+
+  const resource: Resource | undefined = row && !stackPending ? {
     durationH: row.duration_h,
-    revenuePerKwYr: use === 'da' ? row.da_rt_revenue_per_kw_year! : row.revenue_per_kw_year,
+    revenuePerKwYr: revenueOf(rev, use === 'da' ? row.da_rt_revenue_per_kw_year! : row.revenue_per_kw_year, offered),
     cyclesPerYear: use === 'da' ? (run?.metrics.da_cycles_per_year ?? row.cycles_per_year) : row.cycles_per_year,
-  };
+  } : undefined;
   const assumptions = useMemo(() => toAssumptions(form), [form]);
   const out = useMemo(() => resource && compute(assumptions, resource), [assumptions, resource?.durationH, resource?.revenuePerKwYr, resource?.cyclesPerYear]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => resource && tornado(assumptions, resource), [assumptions, resource?.durationH, resource?.revenuePerKwYr, resource?.cyclesPerYear]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -138,7 +175,7 @@ export default function Economics() {
   const scenario = row ? `${locFull(sel.location)} · ${sel.duration}h · ${yearLabel(sel.year)}` : '';
   const yr1 = resource ? resource.revenuePerKwYr * (1 - form.haircutPct / 100) : undefined;
   const life = Math.max(1, Math.round(form.lifeYears));
-  const ann = !!row?.annualized;
+  const ann = !!row?.annualized && rev === 'energy';
 
   return (
     <Stack gap="lg">
@@ -150,7 +187,11 @@ export default function Economics() {
       </PageHeader>
       <Alert color="yellow" variant="light" title="Illustrative screening model, not investment advice." styles={{ title: { fontSize: 15 } }}>
         Defaults are placeholders, not quotes or forecasts. The model has no debt, income tax, depreciation, inflation, salvage value or
-        merchant-risk premium, and the revenue is energy arbitrage only. Change every input to your own view.
+        merchant-risk premium, and {rev === 'stack'
+          ? 'the revenue is energy plus ancillary services from the backtest, with no allowance for prices falling as more batteries bid.'
+          : rev === 'dc'
+            ? 'the revenue is the Data Center case you ran, including the 4CP and reliability values you set.'
+            : 'the revenue is energy arbitrage only.'} Change every input to your own view.
       </Alert>
       <RunStatus />
 
@@ -162,19 +203,33 @@ export default function Economics() {
               <Info terms={['perfect_foresight', 'capture_rate', 'revenue_haircut']} />
             </Group>
             <Text size="sm" c="dimmed" mt={2} maw={640} lh={1.45}>
-              {row ? (
+              {row && resource ? (
                 <>
-                  {scenario}: <b className="tnum">{usd(resource!.revenuePerKwYr, 1)}/kW-yr</b> before haircut
-                  {ann ? ` (annualized from ${fmtDate(row.first_day)} to ${fmtDate(row.last_day)})` : ''}.
+                  {scenario}: <b className="tnum">{usd(resource.revenuePerKwYr, 1)}/kW-yr</b> before haircut
+                  {rev === 'energy' ? '' : ` (${detail.label})`}
+                  {ann ? ` (annualized from ${fmtDate(row.first_day)} to ${fmtDate(row.last_day)})` : ''}
+                  {detail.yearNote ? ` (${detail.yearNote})` : ''}.
+                  {detail.split && <> Energy <b className="tnum">{usd(detail.split.energy, 1)}</b> plus ancillary services <b className="tnum">{usd(detail.split.ancillary, 1)}</b>.</>}
                   {' '}After a {pct(form.haircutPct / 100, 0)} haircut, year 1 revenue is <b className="tnum">{usd(yr1, 1)}/kW-yr</b>.
+                  {detail.upperBoundNote && <> {detail.upperBoundNote}</>}
+                  {detail.extra && <> {detail.extra}</>}
                 </>
               ) : 'Loading…'}
             </Text>
           </div>
-          <SegmentedControl
-            value={use} onChange={(v) => setSource(v as Source)} aria-label="Revenue source"
-            data={[{ value: 'pf', label: TERMS.perfectForesight.label }, { value: 'da', label: TERMS.dayAheadPlan.label, disabled: !hasDa }]}
-          />
+          <Group gap="sm" justify="flex-end">
+            {options.length > 1 && (
+              <SegmentedControl
+                value={rev} onChange={(v) => setParams({ rev: v as RevSource, ...(v === 'dc' && dcCase ? { dc: dcCase.perKwYr } : {}) })}
+                aria-label="Revenue" data-testid="rev-pill"
+                data={options.map((o) => ({ value: o, label: REV_LABEL[o] }))}
+              />
+            )}
+            <SegmentedControl
+              value={use} onChange={(v) => setParams({ plan: v as PlanSource })} aria-label="Revenue source"
+              data={[{ value: 'pf', label: TERMS.perfectForesight.label }, { value: 'da', label: TERMS.dayAheadPlan.label, disabled: !hasDa }]}
+            />
+          </Group>
         </Group>
       </Paper>
 
@@ -207,7 +262,7 @@ export default function Economics() {
               hint={resource && `${usd(form.costPerKwh, 0)}/kWh × ${resource.durationH} h${form.itcPct ? `, less ${num(form.itcPct, 1)}% tax credit` : ''}.`}
             />
           </SimpleGrid>
-          {out && <Text size="sm" c="dimmed" lh={1.45} data-testid="econ-verdict">{economicsVerdict(out)}</Text>}
+          {out && <Text size="sm" c="dimmed" lh={1.45} data-testid="econ-verdict">{economicsVerdict(out, { source: rev, stackOffered: !!offered.stack })}</Text>}
           {rows && out && <TornadoCard rows={rows} base={out.npv} scenario={scenario} />}
         </Stack>
       </SimpleGrid>
