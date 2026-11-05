@@ -43,6 +43,12 @@ CKPT_DIR = RAW_DIR / "stack_ckpt"
 HUBS = ("HB_HOUSTON", "HB_NORTH", "HB_PAN", "HB_SOUTH", "HB_WEST")
 POWER_MW, RTE, DEG = 100.0, 0.85, 10.0
 MODES = ("foresight", "realistic")
+# Known source gaps, checked on 2026-11-05 (a re-fetch returned the same files).
+DATA_GAPS = {
+    2026: ["ERCOT public API archive NP6-905-CD is missing 40 RT 15-minute files between 2026-10-17 and 2026-10-31 "
+           "(most on Oct 29 to 31). Single gaps are filled; 2026-10-31 has too many, so nodes cover one day fewer than "
+           "hubs. Each point is annualized on its own days."],
+}
 TIERS = {
     1: {"points": "hubs", "years": (2023, 2024, 2025, 2026), "durs": (1, 2, 4), "modes": MODES},
     2: {"points": "nodes", "years": (2025, 2026), "durs": (2, 4), "modes": ("realistic",)},
@@ -155,8 +161,13 @@ def rebuild(rules) -> list[Path]:
             continue
         as_da, _ = load_as(year)
         full = system_days(as_da, year)
-        complete = [r for r in recs if r["days"] == full]
-        excluded = sorted(r["code"] for r in recs if r["days"] != full)
+        # Complete = every day its own price source covers. The ERCOT API archive can miss a few
+        # recent RT files for every node at once (late October 2026), while hub archives are whole.
+        by_source = {}
+        for r in recs:
+            by_source[r["source"]] = max(by_source.get(r["source"], 0), r["days"])
+        complete = [r for r in recs if r["days"] == by_source[r["source"]]]
+        excluded = sorted(r["code"] for r in recs if r["days"] != by_source[r["source"]])
         last = end_day(year)
         months = int(last[5:7])
         year_days = 366 if year % 4 == 0 else 365
@@ -178,6 +189,8 @@ def rebuild(rules) -> list[Path]:
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "units": "$/kW-yr", "powerMw": POWER_MW, "rte": RTE, "degCostPerMwh": DEG,
             "firstDay": f"{year}-01-01", "lastDay": last, "daysCovered": full,
+            "daysCoveredBySource": {src: n for src, n in sorted(by_source.items())},
+            "dataGaps": DATA_GAPS.get(year, []),
             "hubs": [h for h in HUBS if h in nodes], "nNodes": len(nodes),
             "excludedIncomplete": excluded,
             "rtAsPriceMissingDays": rt_missing if mode == "foresight" else [],
