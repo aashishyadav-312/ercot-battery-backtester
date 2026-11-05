@@ -2,8 +2,8 @@
 
 /**
  * RTC+B (real-time co-optimization plus batteries) went live in ERCOT on this day. Source: the event text in
- * results/rtcb.json (the repository's own before/after study) and ERCOT's RTC+B programme page,
- * https://www.ercot.com/about/rtcb. As of 2026-11-05. A test pins this to results/rtcb.json `after.start`.
+ * results/rtcb.json (the repository's own before/after study) and ERCOT's go-live announcement,
+ * https://www.ercot.com/news/release/12052025-ercot-goes-live. As of 2026-11-05. A test pins this to results/rtcb.json `after.start`.
  */
 export const RTCB_GO_LIVE = '2025-12-05';
 
