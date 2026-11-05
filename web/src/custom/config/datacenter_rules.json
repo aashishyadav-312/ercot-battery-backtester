@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "asOf": "2026-11-05",
+  "notes": "Rules and defaults for runDataCenterCase (web/src/custom/datacenter.ts). Each item has a source URL and an as-of date. Items marked assumption: true are not rules; they are labelled defaults the user can change.",
+  "fourCp": {
+    "method": {
+      "text": "A TSP's wholesale transmission rate is its approved transmission cost of service divided by the ERCOT average 4CP demand: the average of ERCOT coincident peak demand in June, July, August and September, excluding wholesale storage load. Each distribution service provider pays the monthly rate times its previous year's average load at the four ERCOT 4CP intervals.",
+      "citation": "16 TAC §25.192(b)",
+      "source": "https://ftp.puc.texas.gov/public/puct-info/agency/rulesnlaws/subrules/electric/25.192/25.192.pdf",
+      "asOf": "2026-11-05"
+    },
+    "chargeTiming": {
+      "text": "The charge uses the previous year's 4CP. A cut at this summer's 4CP intervals lowers next year's transmission charge.",
+      "citation": "16 TAC §25.192(b)",
+      "source": "https://ftp.puc.texas.gov/public/puct-info/agency/rulesnlaws/subrules/electric/25.192/25.192.pdf",
+      "asOf": "2026-11-05"
+    },
+    "postageStampRate": {
+      "value": 68.547301,
+      "unit": "$/kW-yr of average 4CP demand",
+      "text": "Total ERCOT postage stamp rate in the PUCT's 2025 transmission charge matrix, on an average 4CP load of 81,042.6566 MW (2024).",
+      "citation": "PUCT Docket No. 57491, Order (June 5, 2025), transmission charge matrix",
+      "source": "https://interchange.puc.texas.gov/Documents/57491_58_1505349.PDF",
+      "asOf": "2025-06-05"
+    },
+    "defaultRatePerKwPer4cp": {
+      "value": 17.14,
+      "unit": "$/kW per 4CP interval",
+      "assumption": true,
+      "text": "Default 4CP rate: the 2025 ERCOT postage stamp rate divided by 4 and rounded to the cent. The annual charge is the rate times the average of four 4CP loads, so 1 kW less at one interval saves a quarter of the annual rate. This is the ERCOT-wide wholesale average. A site's own TDSP passes transmission cost through its TCRF, which differs by utility. Enter your tariff's rate to override.",
+      "source": "https://interchange.puc.texas.gov/Documents/57491_58_1505349.PDF",
+      "asOf": "2025-06-05"
+    },
+    "interval": {
+      "minutes": 15,
+      "convention": "interval_ending",
+      "coverBothConventions": true,
+      "assumption": true,
+      "text": "ERCOT's 4CP report labels each interval with one time (for example 6/19/2025 17:00). ERCOT settlement times are interval ending, so 17:00 is read as 16:45 to 17:00. Hourly load cannot confirm this reading, so the engine only counts a cut that holds from 15 minutes before to 15 minutes after the label. For a year ERCOT has not published, the interval is the month's peak hour from hourly load.",
+      "source": "https://www.ercot.com/mktinfo/data_agg/4cp",
+      "asOf": "2026-11-05"
+    },
+    "realisticStrategy": {
+      "thresholdPct": 95,
+      "windowStartLocal": "15:00",
+      "windowEndLocal": "18:00",
+      "assumption": true,
+      "text": "Realistic 4CP strategy: discharge on a June to September day when that day's ERCOT peak load is at least 95% of the highest daily peak so far that month (the first day of a month always counts). The battery holds an even cut from 15:00 to 18:00 local. The window covers every official 4CP interval in 2023 to 2025, which all end between 16:00 and 17:45. The daily peak is observed hourly load, so the strategy knows each day's peak but not which day will be the month's peak.",
+      "source": "https://www.ercot.com/mktinfo/data_agg/4cp",
+      "asOf": "2026-11-05"
+    },
+    "review": {
+      "status": "under review",
+      "text": "4CP may change. SB 6 Section 6 requires the PUCT to review the 4CP method and amend its rules by December 31, 2026. In Project No. 58000 the PUCT approved a proposal for publication on July 9, 2026 that would replace 4CP with 12 monthly 30-minute coincident peaks (12CP). ERCOT's October 2026 status report lists that rulemaking as in progress, due December 31, 2026.",
+      "sources": [
+        "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+        "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+        "https://www.ercot.com/files/docs/2025/09/15/89th-Legislative-Session-PPTX-ERCOT-Status-October-2026-Final-PDF.pdf"
+      ],
+      "asOf": "2026-11-05"
+    }
+  },
+  "sb6": {
+    "statute": {
+      "citation": "Senate Bill 6, 89th Texas Legislature, Regular Session (2025), enrolled",
+      "text": "Signed June 20, 2025 and effective immediately.",
+      "source": "https://capitol.texas.gov/BillLookup/History.aspx?LegSess=89R&Bill=SB6",
+      "billText": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+      "asOf": "2026-11-05"
+    },
+    "provisions": [
+      {
+        "id": "threshold",
+        "valueMw": 75,
+        "text": "Large load interconnection standards apply to a new or expanded interconnection where the total load at a single site would exceed a demand threshold set by the PUCT. The PUCT shall set 75 MW unless it finds a lower threshold necessary.",
+        "citation": "PURA §37.0561(a), (c), added by SB 6 Section 2",
+        "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+        "asOf": "2026-11-05"
+      },
+      {
+        "id": "backupGeneration",
+        "text": "Large load customers must disclose on-site backup generating facilities: generation that cannot export to the ERCOT grid and that, in aggregate, can serve at least 50 percent of on-site demand. Before or during an energy emergency alert, after deploying all available market services except frequency responsive services, ERCOT may direct these customers to deploy their backup generation or curtail load. ERCOT counts such a deployment as firm load shed in reliability price adjustments.",
+        "citation": "PURA §37.0561(e), added by SB 6 Section 2",
+        "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+        "asOf": "2026-11-05"
+      },
+      {
+        "id": "curtailmentProtocol",
+        "text": "For a transmission-voltage load interconnected after December 31, 2025, the serving utility must have a protocol, with any needed equipment installed before interconnection, to curtail the load during firm load shed. This does not apply to a critical load industrial customer or a critical natural gas facility.",
+        "citation": "PURA §39.170(a), added by SB 6",
+        "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+        "asOf": "2026-11-05"
+      },
+      {
+        "id": "demandManagementService",
+        "valueMw": 75,
+        "text": "ERCOT must develop a reliability service that competitively procures demand reductions from large loads of at least 75 MW for anticipated emergencies, with at least 24 hours' notice; a load stays curtailed for the energy emergency alert. A load that curtails in response to wholesale prices, or takes part in another reliability or ancillary service, cannot take part.",
+        "citation": "PURA §39.170(b), added by SB 6",
+        "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+        "asOf": "2026-11-05"
+      }
+    ],
+    "ruleStatus": [
+      {
+        "project": "58481",
+        "title": "Large Load Interconnection Standards (16 TAC §25.194)",
+        "status": "PUCT rulemaking complete; ERCOT implementation not started or in progress",
+        "asOf": "2026-10"
+      },
+      {
+        "project": "58482",
+        "title": "Large Load Demand Management Service",
+        "status": "in progress, ERCOT target January 2027",
+        "asOf": "2026-10"
+      },
+      {
+        "project": "58479",
+        "title": "Net metering with a large load co-located with existing generation (PURA §39.169)",
+        "status": "complete, March 2026",
+        "asOf": "2026-10"
+      },
+      {
+        "project": "58000",
+        "title": "Wholesale and IOU retail transmission cost recovery (4CP review)",
+        "status": "in progress, due December 31, 2026",
+        "asOf": "2026-10"
+      }
+    ],
+    "ruleStatusSource": "https://www.ercot.com/files/docs/2025/09/15/89th-Legislative-Session-PPTX-ERCOT-Status-October-2026-Final-PDF.pdf",
+    "batteryNote": {
+      "text": "The sources above do not say whether a co-located battery counts as on-site backup generation, or how a battery that trades on prices affects a load in the demand management service. The engine does not decide SB 6 eligibility. It values curtailment cover from the hours and value of lost load you enter.",
+      "assumption": true,
+      "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+      "asOf": "2026-11-05"
+    }
+  },
+  "defaults": {
+    "curtailmentHoursPerYear": {
+      "value": 0,
+      "assumption": true,
+      "text": "No public source forecasts how many hours a large load will be curtailed under SB 6, so the default is 0 hours and reliability value is $0 until you enter hours.",
+      "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+      "asOf": "2026-11-05"
+    },
+    "curtailmentEvents": {
+      "value": 1,
+      "assumption": true,
+      "text": "Curtailment hours are split evenly across this many events. The battery starts each event full and covers what it can.",
+      "source": "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm",
+      "asOf": "2026-11-05"
+    },
+    "valueOfLostLoad": {
+      "value": 35685,
+      "unit": "$/MWh",
+      "assumption": true,
+      "text": "The one-hour, system-wide value of lost load for the ERCOT region from the 2024 survey study (2024 dollars). A data center's own cost of an outage can be far higher or lower. Enter your own.",
+      "source": "https://brattle.com/wp-content/uploads/2024/09/Value-of-Lost-Load-Study-for-the-ERCOT-Region.pdf",
+      "asOf": "2024-09"
+    },
+    "asWithoutExport": {
+      "assumption": true,
+      "text": "Without export, ancillary service revenue is scaled by the lowest site load over the battery's power (capped at 1): an up-service the battery cannot deliver past the site load is not counted.",
+      "source": "https://github.com/aashishyadav-312/ercot-battery-backtester/blob/main/docs/v4-progress-2.md",
+      "asOf": "2026-11-05"
+    },
+    "asReservedHours": {
+      "assumption": true,
+      "text": "Ancillary service revenue from the Step 1 stack is reduced by the share of the year's hours the battery is held for 4CP windows.",
+      "source": "https://github.com/aashishyadav-312/ercot-battery-backtester/blob/main/docs/v4-progress-2.md",
+      "asOf": "2026-11-05"
+    }
+  }
+}
