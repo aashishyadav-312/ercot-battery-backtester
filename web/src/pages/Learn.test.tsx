@@ -77,7 +77,7 @@ describe('Glossary', () => {
   it('lists every term A to Z, with the short definition for the shared terms', () => {
     view(<Glossary />);
     const terms = [...document.querySelectorAll('dt')].map((t) => t.textContent!);
-    expect(terms).toHaveLength(Object.keys(GLOSSARY).length);
+    expect(terms).toHaveLength(Object.keys(GLOSSARY).filter((id) => !id.endsWith('_v4')).length);
     expect(terms).toEqual([...terms].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })));
     const def = (label: string) => [...document.querySelectorAll('dt')].find((t) => t.textContent === label)!.nextElementSibling!.textContent;
     expect(def(TERMS.captureRate.label)).toBe(TERMS.captureRate.definition);

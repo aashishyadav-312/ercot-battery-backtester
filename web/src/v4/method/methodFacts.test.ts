@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { AS_UPPER_BOUND_YEARS } from '../config';
 import {
-  asRulesAssumptions, coverageLines, dataCenterAssumptions, headroomGapPct, headroomLines, parseMethodFacts, reserveDurations, yearCoverage,
+  asRulesAssumptions, coverageLines, dataCenterAssumptions, HEADROOM_LINES, parseMethodFacts, reserveDurations, yearCoverage,
 } from './methodFacts';
 
 const root = resolve(process.cwd(), '..');
@@ -42,26 +42,19 @@ describe('assumptions are read from the configs', () => {
   });
 });
 
-describe('headroom check', () => {
-  it('the standard value is the stack file value and the stricter value is the one in the Step 1 progress file', () => {
-    const h = facts.headroom;
-    expect(h.twoSided).toBe(stack(`${h.year}_${h.durationH}h_${h.mode}.json`).nodes[h.location].total);
-    expect(text(h.sharedSource)).toContain(h.shared.toFixed(2));
-    expect(h.shared).toBeLessThan(h.twoSided);
+describe('headroom rule', () => {
+  it('says what the model allows and that a stricter rule gives lower values, with no comparison value', () => {
+    const text = HEADROOM_LINES.join(' ');
+    expect(text).toMatch(/full power up and down at the same time/);
+    expect(text).toMatch(/stricter rule/);
+    expect(text).toMatch(/lower values/);
+    expect(text).not.toMatch(/\$|\d/);
   });
 
-  it('says both values, the gap, and that the gap is not the rule alone', () => {
-    const h = facts.headroom;
-    const lines = headroomLines(h, asRules.regulation_deployment_factor.value).join(' ');
-    expect(lines).toContain(`$${h.twoSided.toFixed(2)}`);
-    expect(lines).toContain(`$${h.shared.toFixed(2)}`);
-    expect(lines).toContain(`${headroomGapPct(h)}%`);
-    expect(lines).toMatch(/full power up and down at the same time/);
-    expect(lines).toMatch(/not the rule alone/);
-  });
-
-  it('the gap is a whole percent of the standard value', () => {
-    expect(headroomGapPct({ twoSided: 110, shared: 99 })).toBe(10);
+  it('the data build no longer reads the progress files', () => {
+    const src = readFileSync(resolve(process.cwd(), 'scripts/build-v4-method.mjs'), 'utf8');
+    expect(src).not.toMatch(/progress/);
+    expect(facts).not.toHaveProperty('headroom');
   });
 });
 
@@ -94,7 +87,7 @@ describe('coverage statements follow the stack files', () => {
 
   it('parseMethodFacts rejects a malformed file', () => {
     expect(parseMethodFacts(null)).toBeNull();
-    expect(parseMethodFacts({ headroom: {}, coverage: [] })).toBeNull();
+    expect(parseMethodFacts({ coverage: 'x' })).toBeNull();
   });
 
   it('lists the energy-only all-node files', () => {

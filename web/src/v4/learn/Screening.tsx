@@ -23,7 +23,7 @@ export function Screening() {
         </Step>
         <Step n={2} title="Read the Site Value card" link={<Anchor href="#/atlas">Pin a site on Atlas {'→'}</Anchor>}>
           The card gives a range in $/kW-yr across the nearest nodes, with the median marked. Switch between Energy and Full stack, which adds
-          ancillary services <Info terms="ancillary_services" /> and shows the effect of RTC+B <Info terms="rtcb" />. The year strip shows how the range moved.
+          ancillary services <Info terms="ancillary_services_v4" /> and shows the effect of RTC+B <Info terms="rtcb_v4" />. The year strip shows how the range moved.
           It is a backtest, not a forecast, and a nearby node is not an interconnection point.
         </Step>
         <Step n={3} title="Open Data Center mode" link={<Anchor href="#/studio?mode=dc">Open Data Center mode {'→'}</Anchor>}>

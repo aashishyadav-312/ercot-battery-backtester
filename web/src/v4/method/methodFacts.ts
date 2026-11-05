@@ -77,25 +77,13 @@ export function dataCenterAssumptions(rules: unknown): Assumption[] {
   return out;
 }
 
-// ---------------------------------------------------------------- headroom check
+// ---------------------------------------------------------------- headroom rule
 
-export interface HeadroomFacts { location: string; year: number; durationH: number; mode: string; twoSided: number; shared: number; sharedSource: string }
-
-/** How much lower the stricter value is, as a whole percent of the standard value. */
-export const headroomGapPct = (h: Pick<HeadroomFacts, 'twoSided' | 'shared'>): number => Math.round(((h.twoSided - h.shared) / h.twoSided) * 100);
-
-/**
- * The headroom paragraph. The two values come from the stack file and the Step 1 progress file (scripts/build-v4-method.mjs).
- * The stricter value also differs in two other ways, which the text says, so the gap is not credited to the rule alone.
- */
-export function headroomLines(h: HeadroomFacts, regDeployment: number | null): string[] {
-  const where = `${h.location}, ${h.year}, ${h.durationH}-hour battery, ${h.mode === 'foresight' ? 'perfect foresight' : 'day-ahead plan'}`;
-  return [
-    'Headroom rule: an idle battery may offer its full power up and down at the same time. Discharge plus up products stay within rated power, and charge plus Reg Down stay within rated power. This is the standard formulation.',
-    `A stricter rule counts charge, discharge and every product together against rated power. It gave $${h.shared.toFixed(2)}/kW-yr at ${where}, against $${h.twoSided.toFixed(2)} for the standard rule, about ${headroomGapPct(h)}% less.`,
-    `That comparison is not the rule alone. The older screen also ran with no Regulation deployment energy${regDeployment != null ? ` (the stack uses a deployment factor of ${regDeployment})` : ''} and read prices from a different ERCOT source. Source for the stricter value: ${h.sharedSource}.`,
-  ];
-}
+/** The headroom statement. No comparison value: it says only what the model allows and that a stricter rule would give lower values. */
+export const HEADROOM_LINES: readonly string[] = [
+  'Headroom rule: the model lets an idle battery offer its full power up and down at the same time. Discharge plus up products stay within rated power, and charge plus Reg Down stay within rated power. This is the standard formulation.',
+  'A stricter rule, which counts charge, discharge and every product together against rated power, would give lower values.',
+];
 
 // ---------------------------------------------------------------- coverage of the stack files
 
@@ -105,11 +93,10 @@ export interface CoverageEntry {
   daysCoveredBySource: Record<string, number>; dataGaps: string[];
 }
 
-export interface MethodFacts { headroom: HeadroomFacts; coverage: CoverageEntry[]; energyAllNode: { year: number; durationH: number }[] }
+export interface MethodFacts { coverage: CoverageEntry[]; energyAllNode: { year: number; durationH: number }[] }
 
 export function parseMethodFacts(raw: unknown): MethodFacts | null {
-  if (!isObj(raw) || !isObj(raw.headroom) || !Array.isArray(raw.coverage)) return null;
-  if (typeof raw.headroom.twoSided !== 'number' || typeof raw.headroom.shared !== 'number') return null;
+  if (!isObj(raw) || !Array.isArray(raw.coverage)) return null;
   return { energyAllNode: [], ...raw } as unknown as MethodFacts;
 }
 

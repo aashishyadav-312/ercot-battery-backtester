@@ -6,7 +6,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import V4Method from './V4Method';
 import { AS_UPPER_BOUND_NOTE } from '../config';
-import { asRulesAssumptions, dataCenterAssumptions, headroomGapPct } from './methodFacts';
+import { asRulesAssumptions, dataCenterAssumptions } from './methodFacts';
 
 const data = (f: string) => JSON.parse(readFileSync(resolve(process.cwd(), 'public/data/v4', f), 'utf8'));
 const FACTS = data('method_facts.json');
@@ -30,17 +30,15 @@ beforeAll(() => {
 const view = () => render(<MantineProvider><V4Method /></MantineProvider>);
 
 describe('Method: revenue stack and Data Center', () => {
-  it('has a section for each, with the headroom rule and both values read from the data', async () => {
+  it('has a section for each, with the headroom rule and no comparison value', async () => {
     const { container } = view();
-    await screen.findByRole("heading", { name: "Headroom rule" });
+    await screen.findByRole('heading', { name: 'Headroom rule' });
     expect([...container.querySelectorAll('section > h2')].map((h) => h.textContent)).toEqual(['Revenue stack', 'Data Center mode']);
-    const h = FACTS.headroom;
     const body = container.textContent ?? '';
     expect(body).toContain('full power up and down at the same time');
-    expect(body).toContain(`$${h.twoSided.toFixed(2)}`);
-    expect(body).toContain(`$${h.shared.toFixed(2)}`);
-    expect(body).toContain(`about ${headroomGapPct(h)}% less`);
-    expect(body).toMatch(/not the rule alone/);
+    expect(body).toMatch(/stricter rule[^.]*would give lower values/);
+    expect(body).not.toMatch(/stricter[^.]*\$\d/);
+    expect(body).not.toMatch(/102\.|110\.72/);
   });
 
   it('lists every ASSUMPTION item of both configs, each with its config path', async () => {
@@ -94,5 +92,15 @@ describe('Method: revenue stack and Data Center', () => {
     const { container } = view();
     await screen.findByRole("heading", { name: "Headroom rule" });
     expect((container.textContent ?? '').includes('—')).toBe(false);
+  });
+});
+
+describe('Method links', () => {
+  it('links nowhere on GitHub: a repository file source shows as its path', async () => {
+    const { container } = view();
+    await waitFor(() => expect(container.querySelectorAll('[data-testid="v4-assumption"]').length).toBeGreaterThan(0));
+    const hrefs = [...container.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')!);
+    expect(hrefs.filter((h) => /github\.com/.test(h))).toEqual([]);
+    expect(container.textContent).toMatch(/Source: docs\/v4-progress-2\.md in the repository/);
   });
 });

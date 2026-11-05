@@ -89,7 +89,7 @@ export interface PriceIndex {
 export const loadPriceIndex = () => getJson<PriceIndex>('prices/index.json');
 
 /** 4CP intervals and daily peaks for one year (results/v4/fourcp/<year>.json, v4 Step 2). */
-export const loadFourCp = (year: number) => getJson<import('../custom/datacenter').FourCpYear>(`v4/fourcp/${year}.json`)
+export const loadFourCp = (year: number) => getJson<import('../custom/datacenter').FourCpYear>(`v4/fourcp/${year}.json`);
 /** v4 Method page (scripts/build-v4-method.mjs): the AS rules config and the facts quoted from the stack files. Loaded only on Method. */
 export const loadAsRules = () => getJson<unknown>('v4/as_rules.json');
-export const loadMethodFacts = () => getJson<unknown>('v4/method_facts.json');;
+export const loadMethodFacts = () => getJson<unknown>('v4/method_facts.json');

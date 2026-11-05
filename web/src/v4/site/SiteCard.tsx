@@ -7,11 +7,10 @@ import { SitePrint } from './SitePrint';
 import { dcLinkFromSite } from '../dc/dcForm';
 import {
   resolveSettings, siteCsv, stripFor, studioHash, studioLocation, durationsFor, hasFullStack, modesFor, writeSiteToHash,
-  type Basis, type Point, type Settings, type SiteData,
+  upperBoundCaveat, type Basis, type Point, type Settings, type SiteData,
 } from './siteValue';
 import { useSiteBase, useSiteFiles, type SiteSource } from './useSiteData';
-import { isUpperBoundYear, type StackMode } from '../stack';
-import { AS_UPPER_BOUND_NOTE } from '../config';
+import type { StackMode } from '../stack';
 import atlas from '../map/AtlasSite.module.css'; // the nearest-node rows keep their Step 4 look
 import classes from './SiteCard.module.css';
 
@@ -55,7 +54,8 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
   const hubCode = near?.nearestHub?.code ?? null;
   const strip: Point[] = useMemo(() => stripFor(settings, nearList, hubCode, data), [settings, nearList, hubCode, data]);
   const cur = strip.find((p) => p.year === settings.year) ?? null;
-  const caveats = settings.basis === 'stack' && strip.some((p) => isUpperBoundYear(p.year)) ? [...CAVEATS, AS_UPPER_BOUND_NOTE] : CAVEATS;
+  const upper = upperBoundCaveat(settings.basis, strip);
+  const caveats = upper ? [...CAVEATS, upper] : CAVEATS;
   const range = cur?.range ?? null;
 
   useEffect(() => { if (ready) onSettings(settings); }, [ready, settings, onSettings]);

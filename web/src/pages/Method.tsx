@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Alert, Anchor, Badge, Flex, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
 import { PageHeader } from './RunHeader';
+import { Section } from '../components/Section';
 import { useApp } from '../state';
 import { useSelectedRun } from '../hooks';
 import { HUBS, loadAncillary } from '../data/loader';
@@ -14,15 +15,6 @@ import { TERMS } from '../copy/terms';
 import { V4 } from '../config/features';
 
 const V4Method = lazy(() => import('../v4/method/V4Method'));
-
-export function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="section">
-      <Title order={2} fz={20} mb="sm" style={{ letterSpacing: '-0.014em' }}>{title}</Title>
-      <Stack gap="sm">{children}</Stack>
-    </Paper>
-  );
-}
 
 function Sub({ title, children }: { title: string; children: React.ReactNode }) {
   return (

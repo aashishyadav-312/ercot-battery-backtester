@@ -21,6 +21,6 @@ export default defineConfig({
   preview: { proxy: liveProxy },
   plugins: [react()],
   build: { chunkSizeWarningLimit: 1200 },
-  // The unit tests assume the V4 release switch is off (src/config/features.ts); a test that needs V4 mocks the flag.
-  test: { env: { VITE_V4: '0' } },
+  // Unit tests run with V4 off unless VITE_V4 is set in the shell (CI runs them both ways); a test that needs V4 mocks the flag.
+  test: { env: { VITE_V4: process.env.VITE_V4 ?? '0' } },
 });

@@ -56,7 +56,7 @@ export function StackByYear() {
   const where = `${locFull(sel.location)}, ${sel.duration}-hour battery`;
   return (
     <Card
-      title="Revenue stack by year" terms={['ancillary_services', 'rtcb']}
+      title="Revenue stack by year" terms={['ancillary_services_v4', 'rtcb_v4']}
       subtitle={`${where}. Energy plus ancillary services, $/kW-yr.`}
       look={years.length ? 'Bars are realistic revenue by product. The diamond is the perfect-foresight ceiling. Tinted years are after RTC+B.' : undefined}
       csv={years.length ? () => ({ filename: `stack_${sel.location}_${sel.duration}h.csv`, ...stackCsv(years) }) : undefined}

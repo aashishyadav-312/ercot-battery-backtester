@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Alert, Anchor, Badge, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
 import dcRules from '../../custom/config/datacenter_rules.json';
-import { Section } from '../../pages/Method';
+import { Section } from '../../components/Section';
 import { fmtDate } from '../../data/format';
 import { loadAsRules, loadMethodFacts } from '../../data/loader';
 import { TERMS } from '../../copy/terms';
 import { AS_UPPER_BOUND_NOTE } from '../config';
 import {
-  asRulesAssumptions, coverageLines, dataCenterAssumptions, headroomLines, parseMethodFacts, reserveDurations,
+  asRulesAssumptions, coverageLines, dataCenterAssumptions, HEADROOM_LINES, parseMethodFacts, reserveDurations,
   type Assumption, type MethodFacts,
 } from './methodFacts';
 
@@ -25,6 +25,9 @@ function Sub({ title, children }: { title: string; children: React.ReactNode }) 
   );
 }
 
+/** The site links nowhere on GitHub: a source that is a file in this repository shows as its path, not a link. */
+const repoPath = (url: string): string | null => /^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/[^/]+\/(.+)$/.exec(url)?.[1] ?? null;
+
 /** One ASSUMPTION item: its title, the config text, and the source and date when the config has them. */
 function AssumptionItem({ a }: { a: Assumption }) {
   return (
@@ -34,7 +37,7 @@ function AssumptionItem({ a }: { a: Assumption }) {
       <Text size="sm">{a.text}</Text>
       <Text size="xs" c="dimmed">
         <code>{a.file}</code> › <code>{a.path}</code>
-        {a.source ? <> · <Anchor size="xs" href={a.source} {...ext}>Source</Anchor></> : ' · No source found'}
+        {a.source ? <> · {repoPath(a.source) ? `Source: ${repoPath(a.source)} in the repository` : <Anchor size="xs" href={a.source} {...ext}>Source</Anchor>}</> : ' · No source found'}
         {a.asOf ? ` · as of ${a.asOf}` : ''}
       </Text>
     </List.Item>
@@ -65,7 +68,7 @@ export default function V4Method() {
     return () => { live = false; };
   }, []);
 
-  const asRules = rules as { rtcb_go_live?: { date?: string; source?: string }; regulation_deployment_factor?: { value?: number }; price_basis?: { foresight?: string; realistic?: string; sources?: string[] }; description?: string } | null;
+  const asRules = rules as { rtcb_go_live?: { date?: string; source?: string }; price_basis?: { foresight?: string; realistic?: string; sources?: string[] }; description?: string } | null;
   const reserve = rules ? reserveDurations(rules) : [];
   const asItems = rules ? asRulesAssumptions(rules) : [];
   const dcItems = dataCenterAssumptions(dcRules);
@@ -87,11 +90,9 @@ export default function V4Method() {
             <Text size="sm"><b>{TERMS.dayAheadPlan.label}</b>. {asRules.price_basis.realistic}</Text>
           </Sub>
         )}
-        {facts && (
-          <Sub title="Headroom rule">
-            {headroomLines(facts.headroom, asRules?.regulation_deployment_factor?.value ?? null).map((t) => <Text key={t} size="sm">{t}</Text>)}
-          </Sub>
-        )}
+        <Sub title="Headroom rule">
+          {HEADROOM_LINES.map((t) => <Text key={t} size="sm">{t}</Text>)}
+        </Sub>
         {reserve.length > 0 && (
           <Sub title="RTC+B">
             <Text size="sm">

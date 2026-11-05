@@ -39,6 +39,25 @@ jobs:
           npm test
           npm run build
 
+  # The release turns V4 on for everyone, so the same unit tests also run with it on. Tests that need V4 off are the ones
+  # that pass in the job above; any test that fails here assumes V4 is off and should mock the flag.
+  web-v4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install and test with V4 on
+        working-directory: web
+        env:
+          VITE_V4: "1"
+        run: |
+          npm ci
+          npm test
+
   worker:
     runs-on: ubuntu-latest
     steps:

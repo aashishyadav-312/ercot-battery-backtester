@@ -12,11 +12,10 @@ can be reverted alone (`git revert <that commit>`; it changes one constant, `V4_
   - `datacenter_rules.json` (imported): the 4CP method, the "4CP may change" box with its links, the SB 6 rule status and every
     `"assumption": true` item.
   - `data/v4/method_facts.json` (same script): the headroom check and the coverage of every stack file.
-- **Headroom rule**: states the standard formulation (an idle battery may offer full power up and down at once). The stricter value
-  ($102.01, HB_HOUSTON 2024, 2 h, perfect foresight) is read from the sentence in `docs/v4-progress-1.md`; the standard value
-  ($110.72) is read from `results/v4/stack/2024_2h_foresight.json`. The build stops if the two sources disagree or the sentence is gone.
-  **The page says the gap is not the rule alone.** The older screen also ran with no Regulation deployment energy and a different
-  ERCOT price source. A clean headroom-only number needs the raw AS prices (not in the repository); see "Decide" below.
+- **Headroom rule**: says only that the model lets an idle battery offer full power up and down at the same time (the standard
+  formulation) and that a stricter rule would give lower values. No comparison number: an earlier draft quoted the older screen's
+  value, but that run also differed in Regulation deployment and price source, so it was dropped. `build-v4-method.mjs` no longer
+  reads any progress file.
 - **2023**: `AS_UPPER_BOUND_YEARS` in `web/src/v4/config.ts`. 2023 is labelled "(upper bound)" in the stack chart (title, axis, note),
   the Atlas Full stack note, the Site Value card (strip, caveats, print, CSV) and Data Center (headline, notes, print, CSV; only when
   the stack was used). A test pins the config to the data: the 2023 ancillary part is more than twice every other year at every hub.
@@ -24,7 +23,11 @@ can be reverted alone (`git revert <that commit>`; it changes one constant, `V4_
   `coverageLines()`. The stack index lists four years, but all-node results exist only for 2025 and 2026; 2023 and 2024 hold the five
   hubs. The text is computed from the files, so it follows them.
 - **4CP may change**: the PUCT 12CP proposal text and links come from `datacenter_rules.json` (`fourCp.review`).
-- **Learn**: "Site screening" (3 steps) is section 3 of Basics. Glossary: Ancillary services, RTC+B, 4CP, SB 6.
+- **Learn**: "Site screening" (3 steps) is section 3 of Basics.
+- **Glossary**: the original `ancillary_services` and `rtcb` entries are unchanged (Studio's Ancillary card and the RTC+B cards use
+  them). V4 views use new `ancillary_services_v4` and `rtcb_v4` entries, which the Glossary page does not list. 4CP and SB 6 are
+  built from `datacenter_rules.json` (`web/src/v4/glossary.ts`): text, citation, source link and as-of date are the config's; the
+  Glossary page shows the link and date and the tooltip shows the citation and date.
 - **Tour**: the Atlas step also mentions site search (no new step, same anchors).
 - **Flag**: `V4_DEFAULT_ON` (false until the last commit). `?v4=0` or `VITE_V4=0` turn V4 off; the address wins over the build
   variable. Unit tests run with `VITE_V4=0` (`vite.config.ts`).
@@ -45,24 +48,25 @@ can be reverted alone (`git revert <that commit>`; it changes one constant, `V4_
   controls are 44px high.
 - No horizontal overflow at 320 and 390 px on Method, Learn, Atlas and Data Center. Zero console errors and zero failed requests on
   all nine screenshot pages.
+- Method links nowhere on GitHub: a source that is a repository file shows as its path.
 - Hardcoded numbers: `src/shell/numbers.test.ts` now covers `v4/method/V4Method.tsx` and `v4/learn/Screening.tsx`; a grep of
   `src/v4/**/*.tsx` shows only chart and map geometry.
 - Data loaded lazily (gzipped, measured with a production preview): Home 0 B of v4 data and no v4 script; Method 2.7 KB; Data Center
   17 KB; Atlas with a place search and the card about 79 KB (county outlines 31 KB, node index 9 KB, two 2025 stack files 30 KB);
   Research revenue chart about 73 KB. All far under the 400 KB target.
 
-Screenshots in `web/screenshots/v4-release-*.png` (nine). In the PR: Atlas search with the card (phone), the stack chart, Data Center.
+Screenshots are not in the repository. Three are attached to PR #46 (branch `pr-46-screenshots`, not for merging).
 
 ## Tests
 
-`npm test`, `pytest` and `npm run build` were run once before marking the PR ready (numbers in the PR).
+`npm test` (with `VITE_V4=0` and with `VITE_V4=1`), `pytest` and `npm run build` were run before marking the PR ready (numbers in the PR). CI
+runs both unit-test modes (`web` and `web-v4` jobs in `.github/workflows/ci.yml`). `VITE_V4` set in the shell is passed to the tests
+(`vite.config.ts`); unset means off.
 
 ## Decide
 
-- The stricter-rule comparison mixes three differences. To get a headroom-only number, re-run `model/stack.py` for HB_HOUSTON 2024
-  2 h with `headroom="shared"` and the same deployment factor, with the raw AS prices (`data/fetch_ancillary.py`), and store it in
-  `results/v4/`. Until then the page says so.
-- The Method page builds from `docs/v4-progress-1.md`. If that sentence is edited, `npm run prepare-data` stops with a clear error.
+- Nothing open. If you want a headroom-only number on Method later, re-run `model/stack.py` with `headroom="shared"` and the same
+  deployment factor on the raw AS prices, store it under `results/v4/`, and read it from there.
 
 ## Resume
 

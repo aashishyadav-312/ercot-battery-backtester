@@ -26,13 +26,15 @@ beforeAll(() => {
   window.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as never;
 });
 
+// With V4 on, Method also shows the revenue stack and Data Center sections (v4/method/V4Method.test.tsx covers them).
+const V4_SECTIONS = ['Revenue stack', 'Data Center mode'];
 const view = () => render(<MantineProvider><Method /></MantineProvider>);
 
 describe('Method', () => {
   it('lists the sections in order, with the long material in one closed details element', async () => {
     const { container } = view();
     await screen.findByText('Reserve backing (hours)', undefined, { timeout: 2000 }).catch(() => {});
-    const heads = [...container.querySelectorAll('section > h2')].map((h) => h.textContent);
+    const heads = [...container.querySelectorAll('section > h2')].map((h) => h.textContent).filter((h) => !V4_SECTIONS.includes(h ?? ''));
     expect(heads).toEqual(['What the model does', 'Assumptions', 'Two strategies', 'What it leaves out', 'Checked against real fleet revenue', 'Locations and data']);
     const details = container.querySelectorAll('details');
     expect(details).toHaveLength(1);
@@ -45,6 +47,7 @@ describe('Method', () => {
     await waitFor(() => expect(container.querySelector('details table')).toBeTruthy());
     const copy = container.cloneNode(true) as HTMLElement;
     copy.querySelector('details')!.remove();
+    copy.querySelectorAll('section').forEach((sec) => { if (V4_SECTIONS.includes(sec.querySelector('h2')?.textContent ?? '')) sec.remove(); });
     const words = (copy.textContent ?? '').split(/\s+/).filter(Boolean).length;
     expect(words).toBeLessThan(650);
   });
