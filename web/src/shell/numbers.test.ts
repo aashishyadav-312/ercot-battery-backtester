@@ -14,6 +14,8 @@ const REBUILT = [
   'components/live/HubTiles.tsx',
   'components/live/ErrorDetails.tsx',
   'components/live/MoveArrow.tsx',
+  'v4/dc/DataCenter.tsx',
+  'v4/dc/ModeSwitch.tsx',
 ];
 
 describe('no hardcoded decimal numbers in rebuilt screens', () => {

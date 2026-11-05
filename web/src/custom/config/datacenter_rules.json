@@ -153,6 +153,7 @@
       "value": 35685,
       "unit": "$/MWh",
       "assumption": true,
+      "label": "ERCOT-wide average, not data-center specific",
       "text": "The one-hour, system-wide value of lost load for the ERCOT region from the 2024 survey study (2024 dollars). A data center's own cost of an outage can be far higher or lower. Enter your own.",
       "source": "https://brattle.com/wp-content/uploads/2024/09/Value-of-Lost-Load-Study-for-the-ERCOT-Region.pdf",
       "asOf": "2024-09"

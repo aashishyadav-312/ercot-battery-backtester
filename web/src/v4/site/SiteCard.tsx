@@ -4,6 +4,7 @@ import { TERMS } from '../../copy/terms';
 import type { nearestNodes } from '../geo/nearest';
 import { StackNotes, FixtureBanner } from '../Parts';
 import { SitePrint } from './SitePrint';
+import { dcLinkFromSite } from '../dc/dcForm';
 import {
   resolveSettings, siteCsv, stripFor, studioHash, studioLocation, durationsFor, hasFullStack, modesFor, writeSiteToHash,
   type Basis, type Point, type Settings, type SiteData,
@@ -213,6 +214,17 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
 
           <div className={classes.actions}>
             {studioLoc && <a className={classes.action} href={studioHash(studioLoc, settings)} data-testid="site-studio">Open in Studio</a>}
+            {studioLoc && (
+              <a
+                className={classes.action} data-testid="site-dc"
+                href={dcLinkFromSite({
+                  loc: studioLoc, year: settings.year, durationH: settings.durationH, mode: settings.mode,
+                  site: { label: pin.label, lat: pin.lat, lon: pin.lon, node: nearList[0]?.code ?? null, km: nearList[0]?.km ?? null },
+                })}
+              >
+                Data Center mode
+              </a>
+            )}
             <button type="button" className={classes.action} onClick={copy}>Copy link</button>
             <button type="button" className={classes.action} onClick={csv} disabled={!strip.length}>Download CSV</button>
             <button type="button" className={classes.action} onClick={() => window.print()}>Print</button>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { NativeSelect, NumberInput, TextInput } from '@mantine/core';
 import { useApp } from '../state';
 import { loadPriceIndex, loadRun as loadRunFile } from '../data/loader';
@@ -15,6 +15,12 @@ import { cancelRun, runInWorker, type CustomRunResult, type RunProgress } from '
 import { DataQuality } from '../components/DataQuality';
 import { CumulativeCard, HeatmapCard, NodeHubCard, TopDaysCard } from '../components/cards';
 import { StackNote } from '../v4/StackNote';
+import { V4 } from '../v4/flag';
+import { isDcHash } from '../v4/dc/dcForm';
+import { ModeSwitch } from '../v4/dc/ModeSwitch';
+
+// Data Center mode (v4 Step 7) loads only when someone opens it, behind the V4 flag.
+const DataCenterView = lazy(() => import('../v4/dc/DataCenter'));
 import classes from './Studio.module.css';
 import { NODES_LABEL, PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 
@@ -49,12 +55,34 @@ export default function Studio() {
       .then((ix) => setCoverage(ix.files.map((f) => ({ location: f.location, year: f.year, first: f.rt_first_day, last: f.rt_last_day }))))
       .catch((e) => setError(String(e)));
   }, []);
+  const dc = useDcMode();
   if (error) return <p className={classes.lede}>Could not load the price files: {error}</p>;
   if (!index || !coverage) return <div className={classes.loading} aria-busy="true">Loading Studio…</div>;
-  return <StudioView index={index} nodes={nodes} coverage={coverage} />;
+  if (dc) {
+    return (
+      <Suspense fallback={<div className={classes.loading} aria-busy="true">Loading Data Center mode…</div>}>
+        <DataCenterView coverage={coverage} top={<ModeSwitch mode="dc" />} />
+      </Suspense>
+    );
+  }
+  return <StudioView index={index} nodes={nodes} coverage={coverage} top={V4 ? <ModeSwitch mode="battery" /> : undefined} />;
 }
 
-export function StudioView({ index, nodes, coverage, loadRun = loadRunFile, solve = solveInWorker }: {
+/** True while the address is a Data Center mode link (`#/studio?mode=dc...`) and V4 is on. */
+function useDcMode(): boolean {
+  const [dc, setDc] = useState(() => V4 && isDcHash(window.location.hash));
+  useEffect(() => {
+    if (!V4) return;
+    const on = () => setDc(isDcHash(window.location.hash));
+    window.addEventListener('hashchange', on);
+    return () => window.removeEventListener('hashchange', on);
+  }, []);
+  return dc;
+}
+
+export function StudioView({ index, nodes, coverage, loadRun = loadRunFile, solve = solveInWorker, top }: {
+  /** Shown above the page title (the V4 mode switch). */
+  top?: ReactNode;
   index: IndexRun[];
   nodes: NodeSelection | null;
   coverage: Coverage[];
@@ -153,6 +181,7 @@ export function StudioView({ index, nodes, coverage, loadRun = loadRunFile, solv
   return (
     <div className={classes.page}>
       <section className={classes.hero} aria-labelledby="studio-title">
+        {top}
         <p className={classes.eyebrow}>Studio · your battery on real ERCOT prices</p>
         <h1 id="studio-title" className={classes.h1}>Run your own battery.</h1>
         <p className={classes.lede}>

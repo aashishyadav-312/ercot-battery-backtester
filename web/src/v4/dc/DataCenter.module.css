@@ -1,0 +1,51 @@
+/* Data Center mode (v4 Step 7). Builds on Studio.module.css; tokens only, no new colours. */
+.modes { max-width: 360px; margin-bottom: 20px; }
+.siteLine { margin: 16px 0 0; max-width: 40em; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.siteLine strong { color: var(--text); font-weight: 600; }
+.status { margin: 0; font-size: 14px; color: var(--muted); }
+.errors { margin: 0; padding-left: 18px; font-size: 14px; color: var(--down); }
+
+.group { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--line); min-width: 0; }
+.legend { padding: 0; font-family: var(--mantine-font-family-headings); font-size: 16px; font-weight: 700; color: var(--text); }
+.file { min-height: var(--tap); font: inherit; font-size: 14px; color: var(--muted); max-width: 100%; }
+.file:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+.advanced { border-top: 1px solid var(--line); padding-top: 8px; }
+.summary {
+  display: flex; align-items: center; min-height: var(--tap); cursor: pointer;
+  font-family: var(--mantine-font-family-headings); font-size: 16px; font-weight: 700; color: var(--text);
+}
+.summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: var(--r-input); }
+.advancedBody { display: flex; flex-direction: column; gap: 20px; padding-top: 8px; }
+
+.note { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted); text-wrap: pretty; }
+.note a { color: var(--text); text-underline-offset: 2px; }
+.tag {
+  display: inline-block; margin-right: 4px; padding: 0 6px; border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber-text);
+}
+
+.look { margin: 8px 0 12px; font-size: 14px; line-height: 1.45; color: var(--text); }
+.rows { margin: 12px 0 0; padding: 0; list-style: none; }
+.row {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; align-items: center; gap: 4px 12px;
+  min-height: 36px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text);
+}
+.row:last-child { border-bottom: 0; font-weight: 600; }
+.rowVal { font-family: var(--mantine-font-family-monospace); font-variant-numeric: tabular-nums; }
+.rowSub { min-width: 6em; text-align: right; font-family: var(--mantine-font-family-monospace); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.swatch { width: 10px; height: 10px; border-radius: 3px; background: var(--chart-grey-1); }
+.swatch[data-key='energy'] { background: var(--chart-blue); }
+.swatch[data-key='as'] { background: var(--chart-green); }
+.swatch[data-key='fourCp'] { background: var(--chart-violet); }
+.swatch[data-key='reliability'] { background: var(--chart-orange); }
+
+.notes { margin: 8px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.notes li + li { margin-top: 4px; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.links a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--text); overflow-wrap: anywhere; text-underline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .row { grid-template-columns: 12px minmax(0, 1fr) auto; }
+  .rowSub { grid-column: 2 / -1; text-align: left; }
+}
