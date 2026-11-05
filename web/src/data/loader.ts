@@ -50,6 +50,12 @@ export const loadAncillaryRun = (file: string) => getJson<StackRun>(file);
 export const loadContext = () => getJson<ContextFile>('context.json');
 /** v4 revenue stack (results/v4/stack). Rejects when the file does not exist, so callers treat a missing combination as absent. */
 export const loadStack = (year: number, durationH: number, mode: StackMode) => getJson<StackFile>(stackPath(year, durationH, mode));
+/** v4 stack index (results/v4/stack/index.json): the stack files that exist. Parsed by v4/site/stackIndex.ts. */
+export const loadStackIndex = () => getJson<unknown>('v4/stack/index.json');
+/** v4 list of the all-node files that exist (written by scripts/copy-data.mjs). */
+export const loadNodesManifest = () => getJson<unknown>('v4/nodes_index.json');
+/** Any all-node file named in that list. */
+export const loadNodesFile = (file: string) => getJson<NodesFile>(file);
 export const loadWalkthrough = () => getJson<Walkthrough>('walkthrough.json');
 export const loadLocations = () => getJson<LocationsFile>('locations.json');
 export const loadTexas = () => getJson<TexasGeo>('texas.json');

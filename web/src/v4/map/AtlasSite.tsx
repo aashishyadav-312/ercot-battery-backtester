@@ -4,8 +4,13 @@ import { AtlasMap } from '../../components/atlas/AtlasMap';
 import { project } from '../../data/home';
 import { loadCountiesTopo, loadCountyIndex, loadNodeIndex, loadPlaces, countiesGeoJson } from '../geo/load';
 import { nearestNodes } from '../geo/nearest';
+import { countyAt, nearestPlace } from '../geo/place';
 import { buildSearchIndex, inTexas, type CountyInput, type SearchHit } from '../geo/search';
 import type { NodeIndex, Place } from '../geo/types';
+import { SITE_NEAR_K } from '../config';
+import { SiteCard } from '../site/SiteCard';
+import { readSiteFromHash, writeSiteToHash, type Settings } from '../site/siteValue';
+import { REAL_SITE_SOURCE, type SiteSource } from '../site/useSiteData';
 import { layoutCities } from './labels';
 import { SiteSearch } from './SiteSearch';
 import {
@@ -27,8 +32,6 @@ export const REAL_SOURCE: GeoSource = { places: loadPlaces, counties: loadCounty
 export interface Pin { lat: number; lon: number; label: string; sub: string; county?: string }
 
 type MapProps = Parameters<typeof AtlasMap>[0];
-const NEAR_K = 3;
-const fmtKm = (km: number) => (km < 10 ? km.toFixed(1) : String(Math.round(km)));
 
 /** Load once, when `enabled` first becomes true. A failed load leaves the value empty; the rest of the map still works. */
 function useLazy<T>(load: () => Promise<T>, enabled: boolean): T | null {
@@ -49,9 +52,15 @@ function useLazy<T>(load: () => Promise<T>, enabled: boolean): T | null {
  * a search box, zoom and drag, a "Pick a site" mode that drops a pin on a click, and the nearest nodes to the pin.
  * `children` (the legend) sit between the map and the nearest-node list.
  */
-export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Omit<MapProps, 'v4'> & { source?: GeoSource; children?: ReactNode }) {
-  const [view, setView] = useState<View>(FULL_VIEW);
-  const [pin, setPin] = useState<Pin | null>(null);
+export default function AtlasSite({ source = REAL_SOURCE, siteSource = REAL_SITE_SOURCE, children, ...map }: Omit<MapProps, 'v4'> & { source?: GeoSource; siteSource?: SiteSource; children?: ReactNode }) {
+  // A shared link (#/atlas?lat=&lon=&dur=&year=&mode=) opens on its site. Read once; the settings go to the card.
+  const [shared] = useState(() => {
+    const l = typeof window === 'undefined' ? null : readSiteFromHash(window.location.hash);
+    return l && inTexas(l.lat, l.lon) ? l : null;
+  });
+  const [view, setView] = useState<View>(() => (shared ? viewAround(shared.lat, shared.lon) : FULL_VIEW));
+  const [pin, setPin] = useState<Pin | null>(() => (shared ? { lat: shared.lat, lon: shared.lon, label: `${shared.lat.toFixed(3)}, ${shared.lon.toFixed(3)}`, sub: 'Shared link' } : null));
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [picking, setPicking] = useState(false);
   const zoom = zoomOf(view);
   const svg = useRef<SVGSVGElement>(null);
@@ -59,7 +68,7 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
   const load = useMemo(() => source, [source]);
   const places = useLazy(load.places, true);
   const counties = useLazy(load.counties, true);
-  const needCounties = zoom > COUNTY_FROM || !!pin?.county;
+  const needCounties = zoom > COUNTY_FROM || !!pin; // a pin needs them to name its county
   const topo = useLazy(load.topo, needCounties);
   const nodeIndex = useLazy(load.nodeIndex, !!pin);
 
@@ -71,8 +80,24 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
     if (!pin || !nodeIndex) return null;
     // Only nodes with prices in this run, so every row can be opened on the page.
     const inRun: NodeIndex = Object.fromEntries(Object.entries(nodeIndex).filter(([code, n]) => n.kind === 'hub' || map.zoneOf.has(code)));
-    return nearestNodes(inRun, pin.lat, pin.lon, NEAR_K);
+    return nearestNodes(inRun, pin.lat, pin.lon, SITE_NEAR_K);
   }, [pin, nodeIndex, map.zoneOf]);
+  const counts = useMemo(() => {
+    const placed = Object.entries(nodeIndex ?? {}).filter(([, n]) => n.kind === 'node');
+    return { indexed: placed.length, priced: placed.filter(([code]) => map.zoneOf.has(code)).length };
+  }, [nodeIndex, map.zoneOf]);
+  const county = useMemo(() => pin?.county ?? (pin && topo ? countyAt(countiesGeoJson(topo), pin.lat, pin.lon) : null), [pin, topo]);
+  const city = useMemo(() => {
+    const hit = pin && places ? nearestPlace(places, pin.lat, pin.lon) : null;
+    return hit ? { name: hit.place.name, km: hit.km } : null;
+  }, [pin, places]);
+
+  // The address always names the pinned site and the card's settings; clearing the site removes them. Other parameters stay.
+  useEffect(() => {
+    const next = writeSiteToHash(window.location.hash, pin && settings ? pin : null, pin && settings ? settings : null);
+    if (pin && !settings) return;
+    if (next !== (window.location.hash || '#/atlas')) window.history.replaceState(null, '', next);
+  }, [pin, settings]);
 
   const onPick = useCallback((hit: SearchHit) => {
     setPin({ lat: hit.lat, lon: hit.lon, label: hit.label, sub: hit.sub, county: hit.kind === 'county' ? hit.label.replace(/ County$/, '') : undefined });
@@ -159,55 +184,12 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
       </div>
       <p className={classes.mapNote}>Squares are the largest Texas cities. Faint lines are county borders; zoom in to see them.</p>
       {children}
-      {pin && <SitePanel pin={pin} near={near} onSelect={map.onSelect} onClear={clear} />}
-    </div>
-  );
-}
-
-type Near = ReturnType<typeof nearestNodes>;
-
-/** Nearest nodes to the pinned site. The Site Value card (Step 5) takes this slot. */
-function SitePanel({ pin, near, onSelect, onClear }: { pin: Pin; near: Near | null; onSelect: (code: string) => void; onClear: () => void }) {
-  return (
-    <section className={classes.panel} aria-labelledby="site-title" data-testid="site-panel">
-      <div className={classes.panelHead}>
-        <div>
-          <p className={classes.panelEyebrow}>Pinned site</p>
-          <h3 id="site-title" className={classes.panelTitle}>{pin.label}</h3>
-          <p className={classes.panelSub}>{pin.sub} · {pin.lat.toFixed(3)}, {pin.lon.toFixed(3)}</p>
-        </div>
-        <button type="button" className={classes.clear} onClick={onClear}>Clear site</button>
-      </div>
-      {!near ? <p className={classes.panelSub}>Finding nearby nodes…</p> : (
-        <>
-          <h4 className={classes.listTitle}>Nearest nodes</h4>
-          <ol className={classes.nearList} data-testid="near-list">
-            {near.nodes.map((n, i) => (
-              <li key={n.code}>
-                <button type="button" className={classes.nearBtn} onClick={() => onSelect(n.code)}>
-                  <span className={classes.nearNum}>{i + 1}</span>
-                  <span className={classes.nearName}>
-                    <span className={classes.mono}>{n.code}</span>
-                    <span className={classes.nearSub}>{n.county ? `${n.county} County` : 'County unknown'}{n.precision === 'county' ? ' · county-level location' : ''}</span>
-                  </span>
-                  <span className={classes.nearKm}>{fmtKm(n.km)} km</span>
-                </button>
-              </li>
-            ))}
-          </ol>
-          {near.nodes.length === 0 && <p className={classes.panelSub}>No placed node with prices in this run.</p>}
-          {near.nearestHub && (
-            <p className={classes.panelSub} data-testid="near-hub">
-              Nearest hub marker: <span className={classes.mono}>{near.nearestHub.code}</span>, {fmtKm(near.nearestHub.km)} km.
-              {near.zoneHub && near.zoneHub !== near.nearestHub.code && <> Load-zone hub of the nearest node: <span className={classes.mono}>{near.zoneHub}</span>.</>}
-            </p>
-          )}
-          <p className={classes.caveat}>
-            Straight-line distance, not an interconnection point. Hub markers sit at a representative city. A county-level location is the centre of the county, about 10 to 50 km from the site.
-          </p>
-        </>
+      {pin && (
+        <SiteCard
+          pin={pin} near={near} counts={counts} county={county} city={city} source={siteSource} initial={shared ?? undefined}
+          onSettings={setSettings} onSelect={map.onSelect} onClear={clear}
+        />
       )}
-      <p className={classes.srOnly} role="status">{near?.nodes[0] ? `${pin.label} pinned. Nearest node ${near.nodes[0].code}, ${fmtKm(near.nodes[0].km)} kilometres.` : ''}</p>
-    </section>
+    </div>
   );
 }

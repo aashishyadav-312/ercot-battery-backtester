@@ -48,3 +48,8 @@ for (const [year, y] of Object.entries(YEARS)) {
   }
 }
 console.log('wrote 8 FIXTURE files to', out);
+
+// index.json lists the files, as the Step 1 engine's index does for the real results (the Site Value card reads it).
+import { readdirSync } from 'node:fs';
+const files = readdirSync(out).filter((f) => /^\d{4}_\d+h_(foresight|realistic)\.json$/.test(f)).sort();
+writeFileSync(join(out, 'index.json'), JSON.stringify({ files }, null, 1) + '\n');

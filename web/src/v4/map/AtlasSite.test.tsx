@@ -10,9 +10,10 @@ import type { NodesFile } from '../../data/types';
 import { nearestNodes } from '../geo/nearest';
 import type { CountyInput } from '../geo/search';
 import type { NodeIndex, Place } from '../geo/types';
+import { SITE_NEAR_K } from '../config';
 import AtlasSite, { type GeoSource } from './AtlasSite';
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); window.history.replaceState(null, '', '#/atlas'); }); // the card writes the site into the address; start each test clean
 beforeAll(() => {
   window.matchMedia ??= ((q: string) => ({ matches: false, media: q, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent: () => false })) as never;
 });
@@ -50,7 +51,7 @@ function setup() {
 const ready = async (box: () => HTMLInputElement) => { await waitFor(() => expect(screen.queryByText('Loading places')).toBeNull()); box(); };
 
 describe('place search', () => {
-  it('"Jack County" drops a pin, zooms in, and lists the 3 nearest nodes with distances', async () => {
+  it('"Jack County" drops a pin, zooms in, and lists the nearest nodes with distances', async () => {
     const { box, zoneOf, svg } = setup();
     await ready(box);
     fireEvent.change(box(), { target: { value: 'Jack County' } });
@@ -64,12 +65,12 @@ describe('place search', () => {
     expect(within(panel).getByRole('heading', { level: 3 }).textContent).toBe('Jack County');
     const list = await screen.findByTestId('near-list');
     const rows = within(list).getAllByRole('listitem');
-    expect(rows).toHaveLength(3);
+    expect(rows).toHaveLength(SITE_NEAR_K);
 
     // Same answer as the helper, restricted to nodes that have prices in this run.
     const jack = (geo('county_index.json') as (CountyInput & { fips: string })[]).find((c) => c.name === 'Jack')!;
     const inRun = Object.fromEntries(Object.entries(NODE_INDEX).filter(([c, n]) => n.kind === 'hub' || zoneOf.has(c)));
-    const want = nearestNodes(inRun, jack.lat, jack.lon, 3).nodes;
+    const want = nearestNodes(inRun, jack.lat, jack.lon, SITE_NEAR_K).nodes;
     want.forEach((n, i) => {
       expect(rows[i].textContent).toContain(n.code);
       expect(rows[i].textContent).toContain(`${n.km < 10 ? n.km.toFixed(1) : Math.round(n.km)} km`);
