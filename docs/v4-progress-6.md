@@ -8,7 +8,7 @@ Branch `v4/6-stack-ui`, from `main`. Plan: PLAN_V4.md Step 6 (`docs/PLAN_V4.md` 
   Regenerate with `node web/scripts/make-stack-fixture.mjs`.
 - The fixture is served only when `V4_FIXTURE=1` is set for `npm run prepare-data`. Real `results/v4/stack/` wins when it exists.
 - `web/src/config/features.ts` does not exist (Step 3). Local stub `web/src/v4/flag.ts` has the same contract
-  (`V4`: `VITE_V4=1` or `?v4=1`). When Step 3 merges, make `flag.ts` re-export from `config/features`.
+  (`V4`). Step 3 has merged: `flag.ts` now re-exports from `config/features`.
 - Assumption to check against Step 1: stack values are annualized $/kW-yr. A partial year is labelled "YTD (N months)".
 - Atlas Full stack uses the realistic file (the mode every node gets in Tier 2). The upper bound (foresight) shows as a range on the node card when the file has the node.
 - RTC+B go-live date lives in `web/src/v4/config.ts` with a source; a test pins it to `results/rtcb.json`.
