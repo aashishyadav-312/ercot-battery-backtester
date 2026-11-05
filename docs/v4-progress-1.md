@@ -34,8 +34,17 @@ Branch `v4/1-stack`. Plan: `docs/PLAN_V4.md`, Step 1.
 - [x] AS rules config: `model/config/as_rules.json`
 - [x] Engine (`model/stack.py`, `model/stack_year.py`) + tests (`tests/test_stack.py`)
 - [x] Tier 1: 5 hubs x 2023-2026 YTD x 1/2/4 h x both modes -> `results/v4/stack/` (60 results)
-- [ ] Tier 2: all nodes x 2025, 2026 YTD x 2/4 h x realistic (waiting on the all-node price download)
-- [ ] Tier 3 (if time)
+- [x] Tier 2: all nodes x 2025, 2026 YTD x 2/4 h x realistic (647 points in 2025, 780 in 2026, hubs included)
+- [ ] Tier 3: all nodes x 2025, 2026 YTD x the remaining combinations (foresight 1/2/4 h, realistic 1 h). Running.
+  Nodes for 2023 and 2024 are not run: their all-node prices are not downloaded (about 1 h of API downloads each).
+
+## Data notes
+
+- The ERCOT public API archive (NP6-905-CD) is missing 40 RT 15-minute files between 2026-10-17 and 2026-10-31
+  (re-fetched on 2026-11-05, same result). Nodes cover 303 days of 2026 and hubs (annual archive) 304. A point counts
+  as complete when it has every day its own price source covers; see `meta.daysCoveredBySource`, `meta.dataGaps`.
+- 2026 YTD runs Jan 1 to Oct 31 (whole months). Re-running later moves the end to the last complete month.
+- ECRS has no DAM price before 2023-06-10; it earns nothing before then.
 
 ## Checks so far
 
@@ -62,4 +71,9 @@ pip install -e '.[dev]'
 python -m scripts.fetch_stack_data          # re-runnable, caches in data/raw/
 python -m scripts.run_stack --tier 1        # skips outputs that exist
 python -m scripts.run_stack --tier 2
+python -m scripts.run_stack --tier 3        # optional
+python -m scripts.run_stack --rebuild       # rewrite results/v4/stack/ from checkpoints in data/raw/stack_ckpt/
 ```
+
+Checkpoints live in `data/raw/stack_ckpt/` (git-ignored). A fresh container has none, so a resumed run recomputes
+from the cached prices; Tier 1 takes about 3 minutes, Tier 2 about 20 minutes on 4 cores.
