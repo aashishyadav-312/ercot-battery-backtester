@@ -30,10 +30,29 @@ Branch `v4/1-stack`. Plan: `docs/PLAN_V4.md`, Step 1.
 ## Status
 
 - [x] Audit
-- [ ] AS price data
-- [ ] AS rules config
-- [ ] Engine + tests
-- [ ] Tier 1, Tier 2 runs
+- [x] AS price data: DAM MCPC 2023 to 2026 YTD, RT MCPC from RTC+B (cached in data/raw/, `scripts/fetch_stack_data.py`)
+- [x] AS rules config: `model/config/as_rules.json`
+- [x] Engine (`model/stack.py`, `model/stack_year.py`) + tests (`tests/test_stack.py`)
+- [x] Tier 1: 5 hubs x 2023-2026 YTD x 1/2/4 h x both modes -> `results/v4/stack/` (60 results)
+- [ ] Tier 2: all nodes x 2025, 2026 YTD x 2/4 h x realistic (waiting on the all-node price download)
+- [ ] Tier 3 (if time)
+
+## Checks so far
+
+- Energy-only parity (AS off) vs published results, 2025, 2 h: HB_WEST, HB_NORTH, HB_HOUSTON, RHESS2_ESS1, ANSON1_ALL,
+  CAMWIND_RN, both modes, all within 0.5% (most exact to the cent). `tests/test_stack.py`.
+- Cross-check with the v2 AS screen: HB_HOUSTON 2024 2 h foresight with the v2 settings (shared headroom, no Reg
+  deployment) gives 102.01 $/kW-yr vs 101.87 published in `results/as_HB_HOUSTON_2024_2h_0.85_10.json` (different
+  price source: archive vs API). The v4 defaults (two-sided headroom, Reg deployment 10%) give 110.72.
+- Benchmark: one node-year, 4 cores available. Realistic (hourly) about 1.4 s; foresight (15-minute) about 4 s, with
+  7-day LP blocks (same answer as daily solves, SOC reset at each midnight).
+
+## Sources and assumptions
+
+All in `model/config/as_rules.json`. Sourced: RTC+B go-live and post-RTC+B durations (NPRR1282: Regulation and RRS
+30 minutes, ECRS 1 hour, effective 12/05/2025), ECRS 2 h and Non-Spin 4 h (NPRR1096), price reports NP4-188-CD,
+NP6-796-ER, NP6-905-CD, NP4-190-CD. ASSUMPTION: pre-RTC+B Regulation/RRS backing of 1 hour (conservative), Regulation
+deployment factor 0.1 (no ERCOT source found), ESR eligibility for all 5 products, price taker.
 
 ## Resume
 
