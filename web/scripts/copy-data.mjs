@@ -56,18 +56,9 @@ function copyTree(from, to, rel = '') {
   }
 }
 if (existsSync(join(src, 'v4'))) copyTree(join(src, 'v4'), join(dst, 'v4'));
-// FIXTURE stack (web/fixtures/v4/stack: made-up numbers marked FIXTURE, for building the UI). Served at data/v4/stack/ only when
-// V4_FIXTURE=1 is set and results/v4/stack does not exist. Real results always win.
-const stackFixture = join(here, '..', 'fixtures', 'v4', 'stack');
-if (process.env.V4_FIXTURE === '1' && !existsSync(join(src, 'v4', 'stack'))) {
-  mkdirSync(join(dst, 'v4', 'stack'), { recursive: true });
-  for (const f of readdirSync(stackFixture).sort()) {
-    if (!f.endsWith('.json')) continue;
-    cpSync(join(stackFixture, f), join(dst, 'v4', 'stack', f));
-    hash.update(`v4/stack/${f}`).update(readFileSync(join(stackFixture, f)));
-    n++;
-  }
-}
+// The FIXTURE stack (web/fixtures/v4/stack, made-up numbers for the unit tests) is never copied here. Tests read it from disk.
+// It used to be served with V4_FIXTURE=1 while Step 1 was unmerged; that path is gone so a build can never ship it.
+// scripts/check-no-fixture.mjs checks the finished build for it as well.
 // Site Value card (v4 Step 5): which all-node files exist (nodes_<year>_<dur>h.json), so the card never asks for one that is not there.
 const nodeFiles = readdirSync(src).sort().flatMap((f) => {
   const m = /^nodes_(\d{4})_(\d+(?:\.\d+)?)h\.json$/.exec(f);

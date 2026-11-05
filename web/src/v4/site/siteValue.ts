@@ -3,7 +3,7 @@
 
 import type { HubRec, IndexRun, NodeRec, NodesFile } from '../../data/types';
 import { SITE_DEFAULT_DURATION_H, SITE_DEG } from '../config';
-import type { StackFile, StackMode } from '../stack';
+import { isUpperBoundYear, type StackFile, type StackMode } from '../stack';
 import type { NodeFileKey, StackKey } from './stackIndex';
 
 export type Basis = 'energy' | 'stack';
@@ -95,7 +95,8 @@ export interface Point {
   hub: number | null;
 }
 
-export const yearLabel = (year: number, partial: boolean) => (partial ? `${year} YTD, annualized` : String(year));
+/** `upperBound`: a full-stack value for a year whose ancillary part is a ceiling (config.ts AS_UPPER_BOUND_YEARS). */
+export const yearLabel = (year: number, partial: boolean, upperBound = false) => (partial ? `${year} YTD, annualized` : String(year)) + (upperBound ? ' (upper bound)' : '');
 
 const byCode = new WeakMap<object, Map<string, NodeRec>>();
 function nodeMap(f: NodesFile): Map<string, NodeRec> {
@@ -108,9 +109,9 @@ function nodeMap(f: NodesFile): Map<string, NodeRec> {
 export function pointFor(year: number, s: Pick<Settings, 'durationH' | 'mode' | 'basis'>, near: NearIn[], hubCode: string | null, d: SiteData): Point {
   if (s.basis === 'stack') {
     const f = d.stackFiles.get(year);
-    if (!f) return { year, label: yearLabel(year, false), partial: false, range: null, hubCode, hub: null };
+    if (!f) return { year, label: yearLabel(year, false, isUpperBoundYear(year)), partial: false, range: null, hubCode, hub: null };
     const vals = near.flatMap((n) => (f.nodes[n.code] ? [{ code: n.code, km: n.km, value: f.nodes[n.code].total }] : []));
-    return { year, label: yearLabel(year, f.meta.partialYear), partial: f.meta.partialYear, range: rangeOf(vals, near.length), hubCode, hub: hubCode ? f.nodes[hubCode]?.total ?? null : null };
+    return { year, label: yearLabel(year, f.meta.partialYear, isUpperBoundYear(year)), partial: f.meta.partialYear, range: rangeOf(vals, near.length), hubCode, hub: hubCode ? f.nodes[hubCode]?.total ?? null : null };
   }
   const f = d.nodeFiles.get(year);
   const run = hubCode ? hubRuns(d.runs, s.durationH).find((r) => r.location === hubCode && r.year === year) : undefined;

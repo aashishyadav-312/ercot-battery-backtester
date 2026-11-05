@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Alert, Anchor, Badge, Flex, List, Paper, Stack, Table, Text, Title } from '@mantine/core';
 import { PageHeader } from './RunHeader';
 import { useApp } from '../state';
@@ -11,6 +11,9 @@ import {
   type AncillaryMeta,
 } from '../data/method';
 import { TERMS } from '../copy/terms';
+import { V4 } from '../config/features';
+
+const V4Method = lazy(() => import('../v4/method/V4Method'));
 
 export function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -98,6 +101,8 @@ export default function Method() {
           an operator can do. The {link('Reality check', 'realism')} page compares the two.
         </Text>
       </Section>
+
+      {V4 && <Suspense fallback={<Text size="sm" c="dimmed">Loading the stack and Data Center method…</Text>}><V4Method /></Suspense>}
 
       <Section title="What it leaves out">
         <List size="sm" spacing={4}>

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from '../../state';
-import { PHONE_MAX, TOUR_STEPS, markTourSeen, onTourRequest, placePopover, shouldAutoStart, type Placement } from './steps';
+import { PHONE_MAX, tourSteps, markTourSeen, onTourRequest, placePopover, shouldAutoStart, type Placement } from './steps';
+import { V4 } from '../../config/features';
 import classes from './Tour.module.css';
+
+const STEPS = tourSteps(V4);
 
 const anchorOf = (id: string) => document.querySelector<HTMLElement>(`[data-tour="${id}"]`);
 
@@ -63,7 +66,7 @@ export function Tour() {
   // Outline the anchor.
   useEffect(() => {
     if (step === null) return;
-    const el = anchorOf(TOUR_STEPS[step].anchor);
+    const el = anchorOf(STEPS[step].anchor);
     el?.setAttribute('data-tour-active', '');
     return () => el?.removeAttribute('data-tour-active');
   }, [step]);
@@ -73,7 +76,7 @@ export function Tour() {
     const d = dialog.current;
     if (!d || step === null) return;
     const vp = { width: window.innerWidth, height: window.innerHeight };
-    const anchor = TOUR_STEPS[step].anchor;
+    const anchor = STEPS[step].anchor;
     const el = anchorOf(anchor);
     // On a phone only the first step docks to the bottom; the tab steps sit under their tab, which stays put in the sticky header.
     const docked = vp.width < PHONE_MAX && anchor === 'hero';
@@ -104,8 +107,8 @@ export function Tour() {
   }, [open, close]);
 
   if (step === null) return null;
-  const s = TOUR_STEPS[step];
-  const last = step === TOUR_STEPS.length - 1;
+  const s = STEPS[step];
+  const last = step === STEPS.length - 1;
   // A click with detail 0 came from the keyboard: those steps change without the grow animation.
   const move = (to: number) => (e: React.MouseEvent) => { setAnimate(e.detail > 0); setStep(to); };
   const style = phone || !place
@@ -126,7 +129,7 @@ export function Tour() {
     >
       {place && place.side !== 'over' && !phone && <span className={`${classes.pointer} ${place.side === 'above' ? classes.pointerBottom : classes.pointerTop}`} style={{ left: place.originX }} aria-hidden="true" />}
       <div aria-live="polite" aria-atomic="true">
-        <p className={classes.count}>{step + 1} of {TOUR_STEPS.length}</p>
+        <p className={classes.count}>{step + 1} of {STEPS.length}</p>
         <h2 id="tour-title" className={classes.title}>{s.title}</h2>
         <p id="tour-body" className={classes.body}>{s.body}</p>
       </div>

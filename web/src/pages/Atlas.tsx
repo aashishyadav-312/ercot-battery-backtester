@@ -18,7 +18,8 @@ import classes from './Atlas.module.css';
 import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
 import { useStackSet, type StackSet } from '../v4/useStack';
 import { FixtureBanner } from '../v4/Parts';
-import { PRODUCT_LABEL, asOf, withStackRevenue, yearTag } from '../v4/stack';
+import { PRODUCT_LABEL, asOf, isUpperBoundYear, withStackRevenue, yearTag } from '../v4/stack';
+import { AS_UPPER_BOUND_NOTE } from '../v4/config';
 
 // V4 map context and place search: a separate chunk, fetched only when the flag is on.
 const AtlasSite = lazy(() => import('../v4/map/AtlasSite'));
@@ -116,6 +117,7 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
       {stackOn && (
         <p className={classes.small} data-testid="atlas-stack-note">
           Full stack, realistic mode, {yearTag(stackFile!.meta)}, {file.meta.duration_h}-hour battery. The colour scale is rebuilt from these values.
+          {isUpperBoundYear(stackFile!.meta.year) && <> {AS_UPPER_BOUND_NOTE}</>}
           {shown.missing > 0 && <> {num(shown.missing)} nodes have no stack result yet and are not drawn.</>}
         </p>
       )}

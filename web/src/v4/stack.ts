@@ -1,7 +1,7 @@
 // Revenue stack: types for results/v4/stack/<year>_<dur>h_<mode>.json (the Stack results contract in the v4 plan) and the
 // pure functions the Atlas, the location chart and Studio use. No UI imports, so the tests can rebuild each figure.
 
-import { RTCB_GO_LIVE } from './config';
+import { AS_UPPER_BOUND_YEARS, RTCB_GO_LIVE } from './config';
 import type { NodeRec } from '../data/types';
 
 export const PRODUCTS = ['energy', 'regup', 'regdn', 'rrs', 'ecrs', 'nsrs'] as const;
@@ -57,8 +57,12 @@ export function eraOfYear(year: number, goLive = RTCB_GO_LIVE): RtcbEra {
   return year < y ? 'pre' : year > y ? 'post' : 'mixed';
 }
 
-/** "2026 YTD (10 months)" for a partial year, the plain year otherwise. */
-export const yearTag = (m: StackFile['meta']): string => (m.partialYear ? `${m.year} YTD (${m.monthsCovered} months)` : String(m.year));
+/** True for a year whose full-stack values are an upper bound (config.ts). */
+export const isUpperBoundYear = (year: number): boolean => AS_UPPER_BOUND_YEARS.includes(year);
+
+/** "2026 YTD (10 months)" for a partial year, "2023 (upper bound)" for an upper-bound year, the plain year otherwise. */
+export const yearTag = (m: StackFile['meta']): string =>
+  (m.partialYear ? `${m.year} YTD (${m.monthsCovered} months)` : String(m.year)) + (isUpperBoundYear(m.year) ? ' (upper bound)' : '');
 
 /** File path under the data folder. */
 export const stackPath = (year: number, durationH: number, mode: StackMode): string => `v4/stack/${year}_${durationH}h_${mode}.json`;

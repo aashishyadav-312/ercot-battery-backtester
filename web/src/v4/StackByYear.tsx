@@ -4,17 +4,17 @@ import { Card } from '../components/Card';
 import { Chart, axisBase, legendBase, tooltipBase, type ChartTheme } from '../components/Chart';
 import { useApp } from '../state';
 import { fmtDate, usd } from '../data/format';
-import { RTCB_GO_LIVE } from './config';
+import { AS_UPPER_BOUND_NOTE, RTCB_GO_LIVE } from './config';
 import { locFull } from '../data/site';
 import { alpha } from '../theme/chartColors';
-import { PRODUCTS, PRODUCT_LABEL, PRODUCT_TOKEN, eraLabel, stackCsv, totalRange, yearStacks, yearTag, type YearStack } from './stack';
+import { PRODUCTS, PRODUCT_LABEL, PRODUCT_TOKEN, eraLabel, isUpperBoundYear, stackCsv, totalRange, yearStacks, yearTag, type YearStack } from './stack';
 import { useStackSet } from './useStack';
 import { FixtureBanner, StackNotes } from './Parts';
 import { V4 } from './flag';
 import classes from './Stack.module.css';
 
 const UPPER = 'Upper bound (perfect foresight)';
-const axisYear = (y: YearStack) => `${y.meta.partialYear ? `${y.year} YTD` : y.year}\n${eraLabel(y.meta.rtcb)}`;
+const axisYear = (y: YearStack) => `${y.meta.partialYear ? `${y.year} YTD` : y.year}\n${eraLabel(y.meta.rtcb)}${isUpperBoundYear(y.year) ? '\nUpper bound' : ''}`;
 
 /** Chart options, kept apart from the component so the test can check the series against the files. */
 export function buildStackOption(t: ChartTheme, years: YearStack[], expanded = false) {
@@ -81,6 +81,7 @@ export function StackByYear() {
                   Backtest, not a forecast. Ancillary prices are thin and fall as more batteries offer them. The tint marks years that start after RTC+B went live on {fmtDate(RTCB_GO_LIVE)}; the year it went live spans both.
                   A year-to-date figure covers only the months shown.
                 </Text>
+                {years.some((y) => isUpperBoundYear(y.year)) && <Text size="xs" c="dimmed" mt="xs" data-testid="stack-upper-bound">{AS_UPPER_BOUND_NOTE}</Text>}
                 <StackNotes file={(set && (set.realistic.get(latest!.year) ?? set.foresight.get(latest!.year))) ?? null} />
               </>
             )}

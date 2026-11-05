@@ -11,11 +11,14 @@ import { locName } from '../data/site';
 import { START_DEFAULTS } from '../data/start';
 import { fmtDate } from '../data/format';
 import { markStartSeen } from '../components/StartBanner';
+import { V4 } from '../config/features';
+import { Screening } from '../v4/learn/Screening';
 
 /** Sections of the page, in order. `#/learn?s=<id>` opens it at one. The other old sections have their own pages now (shell/route.ts). */
 export const GUIDE_SECTIONS = [
   { id: 'ercot', label: 'ERCOT in 2 minutes' },
   { id: 'money', label: 'How a battery makes money' },
+  ...(V4 ? [{ id: 'screening', label: 'Site screening' }] : []),
 ];
 
 function jump(id: string) {
@@ -132,6 +135,12 @@ export default function Guide() {
       >
         <Walkthrough data={walk.data} error={walk.error} />
       </GuideSection>
+
+      {V4 && (
+        <GuideSection id="screening" n={3} title="Site screening" lede="From a place on the map to what a battery is worth there. Three steps.">
+          <Screening />
+        </GuideSection>
+      )}
     </Stack>
   );
 }

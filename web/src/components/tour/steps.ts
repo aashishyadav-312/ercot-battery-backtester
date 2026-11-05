@@ -17,6 +17,10 @@ export const TOUR_STEPS: TourStep[] = [
   { anchor: 'support', title: 'Support', body: 'If you like Chargeline, please consider supporting the creator and help offset its build costs. Even a small donation matters.' },
 ];
 
+/** With V4 on, the Atlas stop also tells the visitor about site search. The step count and anchors stay the same. */
+const ATLAS_SITE_BODY = 'Every hub and node on one map. Click a dot to see what a battery there would have earned, or search a county or city to see what one is worth at a site.';
+export const tourSteps = (v4: boolean): TourStep[] => (v4 ? TOUR_STEPS.map((s) => (s.anchor === 'tab-atlas' ? { ...s, body: ATLAS_SITE_BODY } : s)) : TOUR_STEPS);
+
 /** Finishing the tour (Done) is remembered for good. */
 export const DONE_KEY = 'chargeline-tour-done';
 /** Skipping or Esc is remembered for this browser session only (it survives a refresh, not closing the browser). */
