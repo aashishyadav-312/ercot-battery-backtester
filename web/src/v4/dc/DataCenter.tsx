@@ -513,6 +513,7 @@ function DcPrint({ shown }: { shown: Shown }) {
         <thead><tr><th>Source</th><th>{TERMS.revenueUnit.label}</th><th>$/yr</th></tr></thead>
         <tbody>
           {breakdownRows(r).map((x) => <tr key={x.key}><td>{x.label}</td><td>{usd(x.perKw, 1)}</td><td>{money(x.usd)}</td></tr>)}
+          <tr><td>Total at this site</td><td>{usd(r.perKwYr, 1)}</td><td>{money(r.totalUsd)}</td></tr>
           <tr><td>Standalone at {f.loc}</td><td>{usd(r.standalone.perKwYr, 1)}</td><td>{money(r.standalone.totalUsd)}</td></tr>
         </tbody>
       </table>

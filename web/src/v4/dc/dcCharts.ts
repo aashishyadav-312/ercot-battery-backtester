@@ -54,7 +54,7 @@ export function buildDispatchOption(t: ChartTheme, s: DispatchSample) {
   return {
     tooltip: { ...tooltipBase(t), trigger: 'axis', valueFormatter: (v: number) => `${v.toFixed(1)} MW` },
     legend: { ...legendBase(t), data: ['Site load', 'Grid draw', 'Discharge', 'Charge'] },
-    grid: { left: 56, right: 16, top: 40, bottom: 32 },
+    grid: { left: 56, right: 16, top: 56, bottom: 32 },
     xAxis: { ...axisBase(t), type: 'category', data: s.times, axisLabel: { color: t.muted, fontSize: 11, interval: 11 } },
     yAxis: { ...axisBase(t), type: 'value', name: 'MW', nameGap: 14 },
     series: [
