@@ -209,7 +209,8 @@ def node_jobs(year, configs, rules, limit=None):
         rt = rt_by.get(code)
         if not todo or code not in da_by or rt is None or rt["price"].notna().sum() < 0.99 * n_rt:
             continue
-        jobs.append((code, year, _series(rt, "RT15", year), _series(da_by[code], "DA", year), todo,
+        cols = ["interval_start_utc", "price"]
+        jobs.append((code, year, _series(rt, "RT15", year)[cols], _series(da_by[code], "DA", year)[cols], todo,
                      "ERCOT public API NP6-905-CD / NP4-190-CD", rules))
     return jobs
 
