@@ -11,7 +11,7 @@ Branch `v4/3-geo`. Status: done, PR ready for review.
   - `places.json`: 18 places (10 largest plus 8 regional anchors).
   - `node_index.json`: 425 entries (420 resource nodes with coordinates + 5 hubs). Extra optional fields: `kind`, `precision`, `hub`.
   - `SOURCES.json`: sources, vintages, selection rule, the list of nodes without coordinates.
-- `web/src/v4/geo/`: `search.ts` (county, city and lat/long search), `nearest.ts` (haversine, k nearest nodes, nearest hub), `load.ts` (lazy loaders), `types.ts`.
+- `web/src/v4/geo/`: `search.ts` (county, city and lat/long search), `nearest.ts` (haversine, k nearest nodes, nearest hub), `load.ts` (lazy loaders, TopoJSON to GeoJSON), `types.ts`.
 - Tests: `web/src/config/features.test.ts`, `web/src/v4/geo/geo.test.ts`.
 
 ## Sources (as of 2026-11-05)
@@ -26,9 +26,13 @@ Branch `v4/3-geo`. Status: done, PR ready for review.
 - `nearestNodes()` returns hubs separately. `nearestHub` is by distance to the hub's marker city; `zoneHub` is the hub of the nearest node's load zone, which is the better price reference.
 - 623 of the 1,043 ERCOT resource nodes have no coordinates and are not indexed (listed in `SOURCES.json`). All 296 nodes in the 2025 results that have coordinates are indexed (tested).
 - `copy-data.mjs` now also copies `results/v4/**/*.json` and hashes them, so the data-version string changes once (browsers refetch once). Existing files and schemas are untouched.
-- `topojson-client` is a dev dependency only, so the browser code does not decode TopoJSON here; Step 4's map layer decides how to draw `tx_counties.topo.json` (ECharts map registration takes GeoJSON, so decoding in the map layer will need `topojson-client` moved to dependencies, about 4 KB gzipped, or a build-time GeoJSON copy; Step 4 should pick).
+- `topojson-client` moved from devDependencies to dependencies (decision: one source of truth, about 4 KB). `countiesGeoJson()` in `web/src/v4/geo/load.ts` decodes `tx_counties.topo.json` to GeoJSON for ECharts `registerMap`; Step 4 uses it. It is only reached from V4 code, so it does not enter the main bundle until Step 4 imports it.
 - First-visit cost: nothing loads until a V4 screen asks. Total geo files about 185 KB raw.
 
 ## Resume / re-run
 - Rebuild data: `node web/scripts/build-v4-geo.mjs` (`--refresh` to redownload; needs network and `npx`).
 - Tests: `cd web && npx vitest run src/v4 src/config`.
+
+## Test status
+- Web: `npm test` and `npm run build` pass.
+- pytest: 2 failures (`test_ancillary.py::test_hourly_awards_are_held_and_capacity_share_is_obeyed`, `test_fetch_ancillary.py::test_missing_prices_do_not_become_zero_revenue`) also fail on `main` (40ae166) with pulp 4.2.0: `TypeError: A False object cannot be passed as a constraint`. Not caused by this step.

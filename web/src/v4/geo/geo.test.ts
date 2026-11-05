@@ -1,6 +1,8 @@
 import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import type { Topology } from 'topojson-specification';
+import { countiesGeoJson } from './load';
 import { haversineKm, nearestNodes } from './nearest';
 import { buildSearchIndex, inTexas, parseLatLon, searchSites } from './search';
 import type { NodeIndex, Place } from './types';
@@ -100,6 +102,12 @@ describe('committed geo data', () => {
     expect(COUNTIES).toHaveLength(254);
     expect(new Set(COUNTIES.map((c) => c.fips)).size).toBe(254);
     expect(COUNTIES.every((c) => c.fips.startsWith('48'))).toBe(true);
+  });
+  it('counties TopoJSON decodes to 254 features with name and FIPS matching the county index', () => {
+    const fc = countiesGeoJson(read<Topology>('tx_counties.topo.json'));
+    expect(fc.features).toHaveLength(254);
+    const byFips = new Map(COUNTIES.map((c) => [c.fips, c.name]));
+    for (const f of fc.features) expect(byFips.get(f.properties.fips)).toBe(f.properties.name);
   });
   it('places: at most 20, the 10 largest present, each with a county and a Texas point', () => {
     expect(PLACES.length).toBeLessThanOrEqual(20);
