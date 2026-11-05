@@ -1,9 +1,8 @@
-// Feature flags. V4 (site intelligence: map context, Site Value card, revenue stack, Data Center mode) is switched on for
-// everyone by V4_DEFAULT_ON. Until then it is off, and visible locally with VITE_V4=1 or by opening the site with ?v4=1.
+// Feature flags. V4 (site intelligence: map context, Site Value card, revenue stack, Data Center mode) is on for everyone (V4_DEFAULT_ON).
 // Once it is on, ?v4=0 or VITE_V4=0 turns it off again (the unit tests run with VITE_V4=0, see vite.config.ts).
 
 /** The release switch. Step 8 flips this in its own final commit, so that commit can be reverted alone. */
-export const V4_DEFAULT_ON = false;
+export const V4_DEFAULT_ON = true;
 
 /** Pure so it can be tested. An address parameter wins over the build variable, which wins over `defaultOn`. */
 export function v4Enabled(envValue: string | undefined, search: string, hash: string, defaultOn = false): boolean {
