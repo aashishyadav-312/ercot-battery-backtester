@@ -35,7 +35,15 @@ Branch `v4/1-stack`. Plan: `docs/PLAN_V4.md`, Step 1.
 - [x] Engine (`model/stack.py`, `model/stack_year.py`) + tests (`tests/test_stack.py`)
 - [x] Tier 1: 5 hubs x 2023-2026 YTD x 1/2/4 h x both modes -> `results/v4/stack/` (60 results)
 - [x] Tier 2: all nodes x 2025, 2026 YTD x 2/4 h x realistic (647 points in 2025, 780 in 2026, hubs included)
-- [ ] Tier 3: all nodes x 2025, 2026 YTD x the remaining combinations (foresight 1/2/4 h, realistic 1 h). Running.
+- [x] Tier 3: all nodes x 2025, 2026 YTD x the remaining combinations (foresight 1/2/4 h, realistic 1 h).
+  24 output files, about 1 MB in total. Realistic <= foresight for all 4,311 point/config pairs.
+- [x] Full checks: pytest 124 passed; web `npm test` 473 passed; `npm run build` ok.
+
+## Left for later steps
+
+- `web/scripts/copy-data.mjs` copies only top-level `results/*.json`, so `results/v4/stack/` is not served yet.
+  Step 6 (stack UI) should add it, lazily loaded. Not changed here to avoid a conflict with Step 3.
+- Nodes for 2023 and 2024 (needs those all-node downloads, then `--tier 3 --years 2024`).
   Nodes for 2023 and 2024 are not run: their all-node prices are not downloaded (about 1 h of API downloads each).
 
 ## Data notes
