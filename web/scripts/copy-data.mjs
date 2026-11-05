@@ -68,6 +68,19 @@ if (process.env.V4_FIXTURE === '1' && !existsSync(join(src, 'v4', 'stack'))) {
     n++;
   }
 }
+// Site Value card (v4 Step 5): which all-node files exist (nodes_<year>_<dur>h.json), so the card never asks for one that is not there.
+const nodeFiles = readdirSync(src).sort().flatMap((f) => {
+  const m = /^nodes_(\d{4})_(\d+(?:\.\d+)?)h\.json$/.exec(f);
+  return m ? [{ year: Number(m[1]), durationH: Number(m[2]), file: f }] : [];
+});
+mkdirSync(join(dst, 'v4'), { recursive: true });
+writeFileSync(join(dst, 'v4', 'nodes_index.json'), JSON.stringify({ files: nodeFiles }) + '\n');
+// The stack index lists the stack files that exist. Step 1 writes results/v4/stack/index.json; until then an empty list is served,
+// so the card finds no Full stack results and makes no request for a file that is missing.
+if (!existsSync(join(dst, 'v4', 'stack', 'index.json'))) {
+  mkdirSync(join(dst, 'v4', 'stack'), { recursive: true });
+  writeFileSync(join(dst, 'v4', 'stack', 'index.json'), JSON.stringify({ files: [] }) + '\n');
+}
 const version = hash.digest('hex').slice(0, 12);
 writeFileSync(join(here, '..', 'src', 'data', 'data-version.json'), JSON.stringify({ version }) + '\n');
 console.log(

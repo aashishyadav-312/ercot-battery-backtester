@@ -1,0 +1,82 @@
+/* Site Value card. Existing tokens only. */
+.card { margin-top: 16px; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.eyebrow { margin: 0; font-size: 13px; color: var(--muted); }
+.title { margin: 4px 0 0; font-size: 20px; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.sub { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.clear { min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line-2); border-radius: var(--r-input); background: transparent; color: var(--muted); font: inherit; font-size: 14px; cursor: pointer; }
+.clear:hover { color: var(--text); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; }
+.group { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pill {
+  min-height: var(--tap); padding: 0 14px; border: 1px solid var(--line-2); border-radius: var(--r-pill); background: transparent; color: var(--muted);
+  font-family: var(--mantine-font-family-monospace); font-size: 13px; cursor: pointer;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), transform 160ms var(--ease);
+}
+.pill:hover { color: var(--text); }
+.pill:active { transform: scale(0.97); }
+.pill[aria-pressed='true'] { background: var(--text); border-color: var(--text); color: var(--bg); }
+.fixed { font-family: var(--mantine-font-family-monospace); font-size: 13px; color: var(--muted); }
+
+.main { margin-top: 18px; }
+.big { margin: 0; font-size: 1.75rem; font-weight: 620; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.unit { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.bar { position: relative; height: 10px; margin: 14px 0 6px; border-radius: 5px; background: var(--track); }
+.barFill { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: var(--chart-blue); }
+.barMed { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); }
+.barLegend { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.h4 { margin: 20px 0 8px; font-size: 14px; font-weight: 500; color: var(--text); }
+.strip { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.stripBtn {
+  display: grid; grid-template-columns: minmax(96px, 150px) minmax(0, 1fr) auto; align-items: center; gap: 12px; width: 100%; min-height: var(--tap); padding: 6px 12px; box-sizing: border-box;
+  border: 1px solid var(--line); border-radius: var(--r-input); background: transparent; color: var(--text); font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+  transition: background-color 200ms var(--ease);
+}
+.stripBtn:hover { background: var(--panel-hi); }
+.stripBtn[aria-pressed='true'] { border-color: var(--amber); box-shadow: inset 0 0 0 1px var(--amber); }
+.stripTrack { position: relative; height: 8px; border-radius: 4px; background: var(--track); }
+.stripRange { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--chart-blue); }
+.stripDot { position: absolute; top: -1px; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; border: 2px solid var(--chart-blue); background: var(--bg); }
+.stripMed { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); }
+.stripVal { font-variant-numeric: tabular-nums; text-align: right; color: var(--muted); white-space: nowrap; }
+
+.nearVal { flex: none; min-width: 56px; text-align: right; font-family: var(--mantine-font-family-monospace); font-size: 14px; color: var(--text); }
+.priced { margin: 10px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.caveats { margin: 14px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--muted); max-width: 72ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.action {
+  display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line-2); border-radius: var(--r-input);
+  background: transparent; color: var(--text); font: inherit; font-size: 14px; text-decoration: none; cursor: pointer;
+  transition: background-color 200ms var(--ease), transform 160ms var(--ease);
+}
+.action:hover { background: var(--panel-hi); }
+.action:active { transform: scale(0.97); }
+.action:focus-visible, .pill:focus-visible, .stripBtn:focus-visible, .clear:focus-visible { outline: 2px solid var(--chart-blue); outline-offset: 2px; }
+.status { min-height: 20px; margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .card { padding: 16px; }
+  .stripBtn { grid-template-columns: minmax(0, 1fr) auto; }
+  .stripTrack { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill, .action, .stripBtn { transition: none; }
+  .pill:active, .action:active { transform: none; }
+}
+
+/* Print sheet: hidden on screen. When printing, everything else is hidden and this shows, black on white. */
+.sheet { display: none; }
+@media print {
+  @page { margin: 14mm; }
+  :global(body) > :not(.sheet) { display: none !important; }
+  .sheet { display: block; color: #000; background: #fff; font-size: 11pt; line-height: 1.4; }
+  .sheet p, .sheet ul { margin: 4pt 0; }
+  .sheetKicker { font-size: 9pt; color: #444; }
+  .sheetTitle { margin: 2pt 0; font-size: 20pt; font-weight: 600; }
+  .sheetBig { font-size: 22pt; font-weight: 600; }
+  .sheetTable { width: 100%; margin: 8pt 0; border-collapse: collapse; font-size: 10pt; }
+  .sheetTable th, .sheetTable td { padding: 3pt 6pt; border-bottom: 0.5pt solid #888; text-align: left; }
+  .sheetLink { font-size: 8pt; color: #444; overflow-wrap: anywhere; }
+}

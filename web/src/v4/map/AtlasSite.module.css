@@ -61,18 +61,7 @@
 .pin path { fill: var(--amber); stroke: var(--text); stroke-width: 1.4; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .pin circle { fill: var(--bg); }
 
-/* Pinned site */
-.panel { margin-top: 16px; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
-.panelHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
-.panelEyebrow { margin: 0; font-size: 13px; color: var(--muted); }
-.panelTitle { margin: 4px 0 0; font-size: 20px; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
-.panelSub { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
-.clear {
-  min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line-2); border-radius: var(--r-input); background: transparent;
-  color: var(--muted); font: inherit; font-size: 14px; cursor: pointer;
-}
-.clear:hover { color: var(--text); }
-.listTitle { margin: 16px 0 8px; font-size: 14px; font-weight: 500; color: var(--text); }
+/* Nearest-node rows (used by the Site Value card) */
 .nearList { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
 .nearBtn {
   display: flex; align-items: center; gap: 12px; width: 100%; min-height: var(--tap); padding: 8px 12px; box-sizing: border-box;
@@ -85,7 +74,7 @@
 .nearName { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-family: var(--mantine-font-family-monospace); font-size: 14px; overflow-wrap: anywhere; }
 .nearSub { font-family: inherit; font-size: 12px; color: var(--muted); }
 .nearKm { flex: none; font-family: var(--mantine-font-family-monospace); font-size: 14px; color: var(--text); }
-.caveat { margin: 12px 0 0; max-width: 72ch; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+
 
 @media (prefers-reduced-motion: reduce) {
   .pick, .zoomBtn, .zoomReset, .nearBtn, .countyLine { transition: none; }
