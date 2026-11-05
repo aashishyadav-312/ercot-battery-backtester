@@ -1,0 +1,28 @@
+{
+ "files": [
+  "2023_1h_foresight.json",
+  "2023_1h_realistic.json",
+  "2023_2h_foresight.json",
+  "2023_2h_realistic.json",
+  "2023_4h_foresight.json",
+  "2023_4h_realistic.json",
+  "2024_1h_foresight.json",
+  "2024_1h_realistic.json",
+  "2024_2h_foresight.json",
+  "2024_2h_realistic.json",
+  "2024_4h_foresight.json",
+  "2024_4h_realistic.json",
+  "2025_1h_foresight.json",
+  "2025_1h_realistic.json",
+  "2025_2h_foresight.json",
+  "2025_2h_realistic.json",
+  "2025_4h_foresight.json",
+  "2025_4h_realistic.json",
+  "2026_1h_foresight.json",
+  "2026_1h_realistic.json",
+  "2026_2h_foresight.json",
+  "2026_2h_realistic.json",
+  "2026_4h_foresight.json",
+  "2026_4h_realistic.json"
+ ]
+}

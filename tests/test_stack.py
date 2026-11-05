@@ -158,19 +158,22 @@ def test_per_kw_year_annualizes_partial_years():
 
 
 def test_stack_output_schema():
-    files = sorted(STACK.glob("*.json"))
+    files = sorted(p for p in STACK.glob("*.json") if p.name != "index.json")
     if not files:
         pytest.skip("no stack results yet")
+    index = json.loads((STACK / "index.json").read_text())
+    assert index == {"files": [p.name for p in files]}
     for path in files:
         doc = json.loads(path.read_text())
         m = doc["meta"]
         year, dur, mode = path.stem.split("_")
         assert m["year"] == int(year) and m["durationH"] == float(dur.rstrip("h")) and m["mode"] == mode
         assert mode in ("foresight", "realistic")
-        assert m["products"] == list(PRODUCTS)
+        assert m["products"] == ["energy", *PRODUCTS]
         assert m["rtcb"] in ("pre", "post", "mixed")
         assert isinstance(m["partialYear"], bool) and 1 <= m["monthsCovered"] <= 12
-        assert m["assumptions"] and m["sources"] and m["generated"]
+        assert m["assumptions"] and m["generated"]
+        assert m["sources"] and all(isinstance(x, str) for x in m["sources"])  # web/src/v4/stack.ts: string[]
         assert any("Price taker" in a for a in m["assumptions"])
         assert set(m["hubs"]) <= set(doc["nodes"])
         for code, v in doc["nodes"].items():

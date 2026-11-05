@@ -176,16 +176,16 @@ def rebuild(rules) -> list[Path]:
         nodes = {r["code"]: r["values"] for r in sorted(complete, key=lambda r: (r["code"] not in HUBS, r["code"]))}
         rt_missing = sorted({d for r in complete for d in r["rt_as_missing_days"]})
         meta = {
-            "year": year, "durationH": dur, "mode": mode, "products": list(PRODUCTS), "partialYear": full < year_days,
+            "year": year, "durationH": dur, "mode": mode, "products": ["energy", *PRODUCTS], "partialYear": full < year_days,
             "monthsCovered": months, "rtcb": span, "assumptions": assumptions(rules),
-            "sources": {
-                "rules": "model/config/as_rules.json",
-                "as_dam": "https://www.ercot.com/mp/data-products/data-product-details?id=NP4-188-CD",
-                "as_rt": "https://www.ercot.com/mp/data-products/data-product-details?id=NP6-796-ER",
-                "energy_hubs": "ERCOT annual archives NP6-785-ER (RT) and NP4-180-ER (DA)",
-                "energy_nodes": "ERCOT public API NP6-905-CD (RT 15-min) and NP4-190-CD (DA hourly), all settlement points",
-                "rules_sources": sorted({v["source"] for k in PRODUCTS for v in rules["products"][k]["duration_h"].values()}),
-            },
+            "sources": [
+                "Rules: model/config/as_rules.json",
+                "DAM AS clearing prices (MCPC): https://www.ercot.com/mp/data-products/data-product-details?id=NP4-188-CD",
+                "RT AS clearing prices from RTC+B: https://www.ercot.com/mp/data-products/data-product-details?id=NP6-796-ER",
+                "Hub energy prices: ERCOT annual archives NP6-785-ER (RT) and NP4-180-ER (DA)",
+                "Node energy prices: ERCOT public API NP6-905-CD (RT 15-min) and NP4-190-CD (DA hourly)",
+                *[f"Rule source: {u}" for u in sorted({v["source"] for k in PRODUCTS for v in rules["products"][k]["duration_h"].values()})],
+            ],
             "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "units": "$/kW-yr", "powerMw": POWER_MW, "rte": RTE, "degCostPerMwh": DEG,
             "firstDay": f"{year}-01-01", "lastDay": last, "daysCovered": full,
@@ -201,7 +201,17 @@ def rebuild(rules) -> list[Path]:
         path.write_text(json.dumps({"meta": meta, "nodes": nodes}, separators=(",", ":")))
         written.append(path)
         log.info("wrote %s: %d points (%d excluded as incomplete)", path.relative_to(RESULTS_DIR.parent), len(nodes), len(excluded))
+    write_index()
     return written
+
+
+def write_index() -> Path:
+    """results/v4/stack/index.json: {"files": [...]}, every stack file on disk (read by web/src/v4/site/stackIndex.ts)."""
+    files = sorted(p.name for p in OUT_DIR.glob("*_*h_*.json"))
+    path = OUT_DIR / "index.json"
+    path.write_text(json.dumps({"files": files}, indent=1) + "\n")
+    log.info("wrote %s: %d files", path.relative_to(RESULTS_DIR.parent), len(files))
+    return path
 
 
 def node_jobs(year, configs, rules, limit=None):
