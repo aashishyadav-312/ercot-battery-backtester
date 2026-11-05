@@ -78,6 +78,15 @@ describe('Atlas: Energy | Full stack (flag on)', () => {
     expect(within(list).getAllByRole('listitem')[0].textContent).toContain(usd(best[1].total, 1));
   });
 
+  it('Full stack moves the card to a node that has a stack result when the selected one has none', () => {
+    view(STACK, { ...SEL, location: 'RHESS2_ESS1' });
+    expect(screen.getByRole('heading', { level: 2, name: 'RHESS2_ESS1' })).toBeTruthy();
+    fireEvent.click(screen.getByTestId('basis-stack'));
+    const code = within(screen.getByTestId('node-card')).getByRole('heading', { level: 2 }).textContent!;
+    expect(real.nodes[code]).toBeDefined();
+    expect(screen.getByTestId('node-value').textContent).toBe(usd(real.nodes[code].total, 1));
+  });
+
   it('another metric returns to Energy and hides the switch', () => {
     view();
     fireEvent.click(screen.getByTestId('basis-stack'));

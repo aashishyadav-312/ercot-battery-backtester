@@ -27,7 +27,7 @@ export function StackNote({ form }: { form: CustomForm }) {
   if (!V4) return null;
   const file = year && set ? set[mode].get(year) : undefined;
   const row = file?.nodes[form.location];
-  const label = `${locName(form.location)}, ${form.durationH}-hour battery, ${year ?? 'several years'}`;
+  const label = `${locName(form.location)}, ${form.durationH}-hour battery${year ? `, ${year}` : ''}`;
   return (
     <section className={classes.note} aria-labelledby="stack-note-title" data-testid="stack-note">
       <h3 id="stack-note-title" className={classes.title}>Ancillary services</h3>
@@ -40,7 +40,7 @@ export function StackNote({ form }: { form: CustomForm }) {
         : !row || !file ? <p className={classes.small} data-testid="stack-note-empty">No precomputed full stack for {label}. Missing results are never shown as zero.</p>
         : (
           <>
-            <p className={classes.small}>{label}: {yearTag(file.meta)}, {eraLabel(file.meta.rtcb).toLowerCase()}. $/kW-yr.</p>
+            <p className={classes.small}>{locName(form.location)}, {form.durationH}-hour battery, {yearTag(file.meta)}. {eraLabel(file.meta.rtcb)}. $/kW-yr.</p>
             <ul className={classes.rows} aria-label="Revenue by product">
               {PRODUCTS.map((p) => (
                 <li key={p} className={classes.row}>

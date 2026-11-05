@@ -80,6 +80,14 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
   const mInfo = METRICS.find((x) => x.id === metric)!;
   const mLong = stackOn ? `Full stack revenue, realistic: energy plus ancillary services, ${TERMS.revenueUnit.label}` : mInfo.long;
   const pickMetric = (m: Metric) => { setMetric(m); if (m !== 'rev') setBasis('energy'); };
+  // Switching to Full stack while the selected node has no stack result moves the card to the best node that has one.
+  const pickBasis = (b: 'energy' | 'stack') => {
+    setBasis(b);
+    if (b === 'stack' && stackFile && code && !stackFile.nodes[code]) {
+      const first = topNodes(withStackRevenue(all, stackFile).nodes, 'rev', zone)[0];
+      if (first) setCode(first.code);
+    }
+  };
 
   const choose = (c: string, reveal = false) => {
     setCode(c);
@@ -111,7 +119,7 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
             {stackFile && metric === 'rev' && (
               <div className={classes.pills} role="group" aria-label="Revenue basis">
                 {(['energy', 'stack'] as const).map((b) => (
-                  <button key={b} type="button" className={classes.pill} aria-pressed={basis === b} onClick={() => setBasis(b)} data-testid={`basis-${b}`}>
+                  <button key={b} type="button" className={classes.pill} aria-pressed={basis === b} onClick={() => pickBasis(b)} data-testid={`basis-${b}`}>
                     {b === 'energy' ? 'Energy' : 'Full stack'}
                   </button>
                 ))}
