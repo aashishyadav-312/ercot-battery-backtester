@@ -5,6 +5,7 @@ import { MantineProvider } from '@mantine/core';
 import Guide, { GUIDE_SECTIONS } from './Guide';
 import { Footer } from '../components/shell/Footer';
 import { retiredIn } from '../copy/retired';
+import { V4 } from '../config/features';
 
 // The Guide only needs `go` from the app and the walkthrough day, which is a file fetch; both are replaced here.
 vi.mock('../state', async () => {
@@ -25,7 +26,7 @@ const view = () => render(<MantineProvider><Guide /></MantineProvider>);
 describe('Learn > Basics', () => {
   it('keeps the two explainers and drops the sections that have their own pages', () => {
     view();
-    expect(GUIDE_SECTIONS.map((s) => s.id)).toEqual(['ercot', 'money']);
+    expect(GUIDE_SECTIONS.map((s) => s.id)).toEqual(V4 ? ['ercot', 'money', 'screening'] : ['ercot', 'money']);
     for (const s of GUIDE_SECTIONS) expect(document.getElementById(s.id)?.tagName, s.id).toBe('H2');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Basics');
     for (const gone of ['read', 'left-out', 'glossary', 'about']) expect(document.getElementById(gone), gone).toBeNull();

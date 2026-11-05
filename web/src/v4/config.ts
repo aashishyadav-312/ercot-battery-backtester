@@ -34,3 +34,16 @@ export const FOURCP_YEARS = [2023, 2024, 2025, 2026] as const;
  * services only when its battery matches these, and a test pins them to the files.
  */
 export const STACK_BATTERY = { rte: 0.85, degCost: 10 } as const;
+
+/**
+ * Years whose full-stack values are an upper bound. In 2023 ERCOT's ancillary service prices were extreme (the ancillary part of
+ * a 2 h hub stack is several times that of every later year, pinned in config.test.ts from the stack files), and the model
+ * assumes the battery does not move prices. The ancillary part of these years is shown as a ceiling, and the year is labelled
+ * "(upper bound)" wherever a full-stack value for it appears. Source: results/v4/stack/2023_*.json and meta.assumptions
+ * ("Price taker"). As of 2026-11-05.
+ */
+export const AS_UPPER_BOUND_YEARS: readonly number[] = [2023];
+
+/** The one sentence shown under any full-stack figure for an upper-bound year. Plain words, no number. */
+export const AS_UPPER_BOUND_NOTE =
+  'Full-stack values for 2023 are an upper bound. Ancillary service prices were extreme that year, and the model assumes the battery does not move prices.';

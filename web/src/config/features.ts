@@ -1,15 +1,23 @@
-// Feature flags. V4 (site intelligence: map context, Site Value card, revenue stack, Data Center mode) is off on the live
-// site until the release step. Turn it on locally with VITE_V4=1 or by opening the site with ?v4=1.
+// Feature flags. V4 (site intelligence: map context, Site Value card, revenue stack, Data Center mode) is on for everyone (V4_DEFAULT_ON).
+// Once it is on, ?v4=0 or VITE_V4=0 turns it off again (the unit tests run with VITE_V4=0, see vite.config.ts).
 
-/** Pure so it can be tested: true for VITE_V4=1, or ?v4=1 in the address (before or after the #). */
-export function v4Enabled(envValue: string | undefined, search: string, hash: string): boolean {
-  if (envValue === '1') return true;
+/** The release switch. Step 8 flips this in its own final commit, so that commit can be reverted alone. */
+export const V4_DEFAULT_ON = true;
+
+/** Pure so it can be tested. An address parameter wins over the build variable, which wins over `defaultOn`. */
+export function v4Enabled(envValue: string | undefined, search: string, hash: string, defaultOn = false): boolean {
   const inHash = hash.includes('?') ? hash.slice(hash.indexOf('?')) : '';
-  return [search, inHash].some((q) => new URLSearchParams(q).get('v4') === '1');
+  const asked = [search, inHash].map((q) => new URLSearchParams(q).get('v4'));
+  if (asked.includes('1')) return true;
+  if (asked.includes('0')) return false;
+  if (envValue === '1') return true;
+  if (envValue === '0') return false;
+  return defaultOn;
 }
 
 export const V4: boolean = v4Enabled(
   import.meta.env.VITE_V4,
   typeof window === 'undefined' ? '' : window.location.search,
   typeof window === 'undefined' ? '' : window.location.hash,
+  V4_DEFAULT_ON,
 );

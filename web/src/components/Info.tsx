@@ -18,7 +18,7 @@ export function Info({ terms, size = 16 }: { terms: string | string[]; size?: nu
       label={
         <Stack gap={6}>
           {ids.map((t) => (
-            <Text key={t} size="xs" lh={1.45}><b>{GLOSSARY[t].term}.</b> {GLOSSARY[t].definition}</Text>
+            <Text key={t} size="xs" lh={1.45}><b>{GLOSSARY[t].term}.</b> {GLOSSARY[t].definition}{GLOSSARY[t].citation && ` Source: ${GLOSSARY[t].citation}, as of ${GLOSSARY[t].asOf}.`}</Text>
           ))}
         </Stack>
       }

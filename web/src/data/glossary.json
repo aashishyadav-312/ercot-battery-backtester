@@ -140,6 +140,14 @@
   "custom_run": {
    "term": "Custom run",
    "definition": "Your own battery, solved in your browser with the same daily optimization as the precomputed results (HiGHS compiled to WebAssembly). Nothing is sent to a server."
+  },
+  "ancillary_services_v4": {
+   "term": "Ancillary services",
+   "definition": "Paid services that keep the grid steady: Regulation Up and Down, Responsive Reserve (RRS), ECRS and Non-Spin. A battery is paid a clearing price to hold power and charge ready, whether or not it is called on."
+  },
+  "rtcb_v4": {
+   "term": "RTC+B",
+   "definition": "Real-Time Co-optimization plus Batteries, ERCOT’s real-time market design. It sets energy and ancillary service prices together and treats a battery as one resource that charges and discharges. It changed how batteries are paid for ancillary services."
   }
  }
 }

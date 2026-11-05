@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 // GitHub Pages serves the site from /ercot-battery-backtester/. Routing is
@@ -21,4 +21,6 @@ export default defineConfig({
   preview: { proxy: liveProxy },
   plugins: [react()],
   build: { chunkSizeWarningLimit: 1200 },
+  // Unit tests run with V4 off unless VITE_V4 is set in the shell (CI runs them both ways); a test that needs V4 mocks the flag.
+  test: { env: { VITE_V4: process.env.VITE_V4 ?? '0' } },
 });

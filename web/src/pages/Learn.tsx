@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { Anchor, Button, Group, List, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { PageHeader } from './RunHeader';
-import { Section } from './Method';
+import { Section } from '../components/Section';
 import { buildHash, useApp } from '../state';
 import type { Page } from '../shell/route';
 import { glossaryEntries, SITE } from '../data/site';
@@ -144,7 +144,10 @@ export function Glossary() {
           {glossaryEntries().map((g) => (
             <div key={g.id} id={`term-${g.id}`}>
               <Text component="dt" size="sm" fw={620} c="bright">{g.term}</Text>
-              <Text component="dd" size="sm" c="dimmed" ml={0} lh={1.5}>{g.definition}</Text>
+              <Text component="dd" size="sm" c="dimmed" ml={0} lh={1.5}>
+                {g.definition}
+                {g.source && <> <Anchor size="sm" href={g.source} {...ext}>{g.citation ?? 'Source'}</Anchor>, as of {g.asOf}.</>}
+              </Text>
             </div>
           ))}
         </SimpleGrid>

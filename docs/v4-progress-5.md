@@ -24,5 +24,5 @@ Branch `v4/5-site`, from `main` (Steps 3, 4, 6 merged; Step 1 not merged). Plan:
 - [ ] pytest: no Python touched; see PR for whether it ran
 
 ## Resume
-`cd web && npm ci && V4_FIXTURE=1 npm run prepare-data && VITE_V4=1 npx vite`, open `#/atlas?v4=1`, search "Jack County".
+`cd web && npm ci && npm run prepare-data && VITE_V4=1 npx vite`, open `#/atlas?v4=1`, search "Jack County".
 Tests: `npx vitest run src/v4`.

@@ -7,7 +7,7 @@ import { SitePrint } from './SitePrint';
 import { dcLinkFromSite } from '../dc/dcForm';
 import {
   resolveSettings, siteCsv, stripFor, studioHash, studioLocation, durationsFor, hasFullStack, modesFor, writeSiteToHash,
-  type Basis, type Point, type Settings, type SiteData,
+  upperBoundCaveat, type Basis, type Point, type Settings, type SiteData,
 } from './siteValue';
 import { useSiteBase, useSiteFiles, type SiteSource } from './useSiteData';
 import type { StackMode } from '../stack';
@@ -54,6 +54,8 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
   const hubCode = near?.nearestHub?.code ?? null;
   const strip: Point[] = useMemo(() => stripFor(settings, nearList, hubCode, data), [settings, nearList, hubCode, data]);
   const cur = strip.find((p) => p.year === settings.year) ?? null;
+  const upper = upperBoundCaveat(settings.basis, strip);
+  const caveats = upper ? [...CAVEATS, upper] : CAVEATS;
   const range = cur?.range ?? null;
 
   useEffect(() => { if (ready) onSettings(settings); }, [ready, settings, onSettings]);
@@ -209,7 +211,7 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
             </p>
           )}
 
-          <ul className={classes.caveats}>{CAVEATS.map((c) => <li key={c}>{c}</li>)}</ul>
+          <ul className={classes.caveats}>{caveats.map((c) => <li key={c}>{c}</li>)}</ul>
           {stackFile && <StackNotes file={stackFile} />}
 
           <div className={classes.actions}>
@@ -238,7 +240,7 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
             site={{
               name: pin.label, lat: pin.lat, lon: pin.lon, county, city: city ? `${fmtKm(city.km)} km from ${city.name}` : null,
               basisLabel: BASIS_LABEL[settings.basis], modeLabel: MODE_LABEL[settings.mode], link: `${window.location.origin}${window.location.pathname}${link}`,
-              caveats: CAVEATS, sources,
+              caveats, sources,
             }}
           />
         </>

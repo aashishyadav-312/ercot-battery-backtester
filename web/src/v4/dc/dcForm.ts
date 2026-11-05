@@ -92,7 +92,9 @@ export function dcYears(coverage: DcCoverage[], loc: string): DcCoverage[] {
 export const isPartial = (c: DcCoverage): boolean => c.first > `${c.year}-01-01` || c.last < `${c.year}-12-31`;
 
 /** "2026 YTD, annualized" for a partial year, the plain year otherwise. */
-export const yearLabel = (c: DcCoverage | undefined, year: number): string => (c && isPartial(c) ? `${year} YTD, annualized` : String(year));
+/** `upperBound`: the run added the full-stack ancillary part for a year whose ancillary part is a ceiling (config.ts AS_UPPER_BOUND_YEARS). */
+export const yearLabel = (c: DcCoverage | undefined, year: number, upperBound = false): string =>
+  (c && isPartial(c) ? `${year} YTD, annualized` : String(year)) + (upperBound ? ' (upper bound)' : '');
 
 /** Locations with at least one year Data Center mode can run, hubs first. */
 export function dcLocations(coverage: DcCoverage[]): string[] {

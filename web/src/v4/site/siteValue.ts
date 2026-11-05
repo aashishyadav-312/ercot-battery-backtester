@@ -2,8 +2,8 @@
 // $/kW-yr range, the year strip, the shareable URL, the CSV and the Studio link. No UI imports, so the tests can rebuild every figure.
 
 import type { HubRec, IndexRun, NodeRec, NodesFile } from '../../data/types';
-import { SITE_DEFAULT_DURATION_H, SITE_DEG } from '../config';
-import type { StackFile, StackMode } from '../stack';
+import { AS_UPPER_BOUND_NOTE, SITE_DEFAULT_DURATION_H, SITE_DEG } from '../config';
+import { isUpperBoundYear, type StackFile, type StackMode } from '../stack';
 import type { NodeFileKey, StackKey } from './stackIndex';
 
 export type Basis = 'energy' | 'stack';
@@ -95,7 +95,8 @@ export interface Point {
   hub: number | null;
 }
 
-export const yearLabel = (year: number, partial: boolean) => (partial ? `${year} YTD, annualized` : String(year));
+/** `upperBound`: a full-stack value for a year whose ancillary part is a ceiling (config.ts AS_UPPER_BOUND_YEARS). */
+export const yearLabel = (year: number, partial: boolean, upperBound = false) => (partial ? `${year} YTD, annualized` : String(year)) + (upperBound ? ' (upper bound)' : '');
 
 const byCode = new WeakMap<object, Map<string, NodeRec>>();
 function nodeMap(f: NodesFile): Map<string, NodeRec> {
@@ -110,7 +111,7 @@ export function pointFor(year: number, s: Pick<Settings, 'durationH' | 'mode' | 
     const f = d.stackFiles.get(year);
     if (!f) return { year, label: yearLabel(year, false), partial: false, range: null, hubCode, hub: null };
     const vals = near.flatMap((n) => (f.nodes[n.code] ? [{ code: n.code, km: n.km, value: f.nodes[n.code].total }] : []));
-    return { year, label: yearLabel(year, f.meta.partialYear), partial: f.meta.partialYear, range: rangeOf(vals, near.length), hubCode, hub: hubCode ? f.nodes[hubCode]?.total ?? null : null };
+    return { year, label: yearLabel(year, f.meta.partialYear, isUpperBoundYear(year)), partial: f.meta.partialYear, range: rangeOf(vals, near.length), hubCode, hub: hubCode ? f.nodes[hubCode]?.total ?? null : null };
   }
   const f = d.nodeFiles.get(year);
   const run = hubCode ? hubRuns(d.runs, s.durationH).find((r) => r.location === hubCode && r.year === year) : undefined;
@@ -124,6 +125,10 @@ export function pointFor(year: number, s: Pick<Settings, 'durationH' | 'mode' | 
   const hubValue = run ? (s.mode === 'foresight' ? run.revenue_per_kw_year : run.da_rt_revenue_per_kw_year ?? null) : null;
   return { year, label: yearLabel(year, !!run?.annualized), partial: !!run?.annualized, range: null, hubCode, hub: hubValue };
 }
+
+/** The upper-bound note for a Full stack strip, only when an upper-bound year (config.ts) has a value in it. Null otherwise. */
+export const upperBoundCaveat = (basis: Basis, strip: Pick<Point, 'year' | 'range' | 'hub'>[]): string | null =>
+  basis === 'stack' && strip.some((p) => isUpperBoundYear(p.year) && (p.range != null || p.hub != null)) ? AS_UPPER_BOUND_NOTE : null;
 
 /** The year strip: one point per year that has a result for the chosen basis, size and mode. */
 export function stripFor(s: Settings, near: NearIn[], hubCode: string | null, d: SiteData): Point[] {

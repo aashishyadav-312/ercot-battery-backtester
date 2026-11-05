@@ -11,7 +11,8 @@ import { money } from '../../data/studio';
 import { locName } from '../../data/site';
 import { loadFourCp, loadStack, loadStackIndex } from '../../data/loader';
 import { TERMS } from '../../copy/terms';
-import type { StackRow } from '../stack';
+import { isUpperBoundYear, type StackRow } from '../stack';
+import { AS_UPPER_BOUND_NOTE } from '../config';
 import { parseStackIndex, type StackKey } from '../site/stackIndex';
 import {
   DC_ASSUMPTIONS, DC_DEFAULTS, DC_STEP, breakdownRows, dcCsv, dcLocations, dcQuery, dcYears, defaultYear, durationOf, fitWindow,
@@ -47,7 +48,7 @@ const sb6Threshold = rules.sb6.provisions.find((p) => p.id === 'threshold');
 const hashQuery = () => window.location.hash.split('?')[1] ?? '';
 const writeHash = (f: DcForm) => history.replaceState(null, '', `#/studio?${dcQuery(f)}`);
 
-interface Shown { key: string; form: DcForm; result: DataCenterResult; ms: number; stackNote: string | null; year: string; profile: string | null }
+interface Shown { key: string; form: DcForm; result: DataCenterResult; ms: number; stackNote: string | null; year: string; upperBound: boolean; profile: string | null }
 type Run = { status: 'idle' } | { status: 'running' } | { status: 'error'; message: string };
 
 export default function DataCenterView({ coverage, deps = REAL_DC_DEPS, top }: { coverage: DcCoverage[]; deps?: DcDeps; top?: ReactNode }) {
@@ -110,7 +111,7 @@ export default function DataCenterView({ coverage, deps = REAL_DC_DEPS, top }: {
   const errors = useMemo(() => validateDcForm(form, coverage, profile?.values ?? null), [form, coverage, profile]);
   const cp = fourCp?.year === form.year ? fourCp.data : null;
   const cov = dcYears(coverage, form.loc).find((c) => c.year === form.year);
-  const label = yearLabel(cov, form.year);
+  const label = yearLabel(cov, form.year, !!row && isUpperBoundYear(form.year));
   const ready = !errors.length && !!cp && keys !== null && rowReady;
   const misses = cp ? windowMisses(cp.intervals, form.windowStartHour, form.windowEndHour) : [];
 
@@ -120,7 +121,7 @@ export default function DataCenterView({ coverage, deps = REAL_DC_DEPS, top }: {
   useEffect(() => {
     if (!inputs || !key || shown?.key === key) return;
     latest.current = key;
-    const snapshot = { form, stackNote, year: label, profile: profile?.name ?? null };
+    const snapshot = { form, stackNote, year: label, upperBound: !!row && isUpperBoundYear(form.year), profile: profile?.name ?? null };
     const timer = setTimeout(() => {
       setRun({ status: 'running' });
       deps.solve(inputs).then(
@@ -349,6 +350,7 @@ function Inputs({ form, set, coverage, profile, csvError, onFile, clearProfile, 
             <Pick label="Ancillary services" name="dc-as" value={form.asEnabled} onPick={(asEnabled) => set({ asEnabled })} options={[{ value: true, label: 'On' }, { value: false, label: 'Off' }]} />
             <p className={studio.hint} data-testid="dc-as-note">
               {choice === 'off' ? 'Energy only.' : stackNote ?? (choice === 'match' ? 'From the precomputed revenue stack for this year, duration and mode.' : 'Looking for a precomputed stack…')}
+              {choice === 'match' && !stackNote && isUpperBoundYear(form.year) && <> {AS_UPPER_BOUND_NOTE}</>}
             </p>
           </div>
         </div>
@@ -365,7 +367,7 @@ function Results({ shown, stale }: { shown: Shown; stale: boolean }) {
   const max = Math.max(r.perKwYr, r.standalone.perKwYr, 0) || 1;
   const diff = r.perKwYr - r.standalone.perKwYr;
   const s = r.dispatchSample;
-  const notes = [...(shown.stackNote ? [shown.stackNote] : []), ...r.notes];
+  const notes = [...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes];
   const csv = () => {
     const { headers, rows: out } = dcCsv(f, r, { yearLabel: shown.year, stackNote: shown.stackNote, profileName: shown.profile });
     downloadCsv(`chargeline-datacenter-${f.loc}-${f.year}.csv`, headers, out);
@@ -518,7 +520,7 @@ function DcPrint({ shown }: { shown: Shown }) {
         </tbody>
       </table>
       <p>Site load {num(f.siteLoadMw)} MW × {num(f.loadFactor, 2)}{shown.profile ? ` (hourly profile ${shown.profile})` : ''} · battery {num(f.batteryMw)} MW / {num(f.batteryMwh)} MWh · efficiency {num(f.rte, 2)} · 4CP rate {usd(f.fourCpRatePerKw, 2)}/kW · window {hourLabel(f.windowStartHour)} to {hourLabel(f.windowEndHour)} · curtailment {num(f.curtailmentHoursPerYear)} h · value of lost load {usd(f.valueOfLostLoad, 0)}/MWh</p>
-      <ul>{[...(shown.stackNote ? [shown.stackNote] : []), ...r.notes, rules.fourCp.review.text].map((n) => <li key={n}>{n}</li>)}</ul>
+      <ul>{[...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes, rules.fourCp.review.text].map((n) => <li key={n}>{n}</li>)}</ul>
       <p className={site.sheetLink}>{window.location.href}</p>
     </div>,
     document.body,

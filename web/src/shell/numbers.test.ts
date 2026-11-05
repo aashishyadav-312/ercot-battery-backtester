@@ -16,6 +16,8 @@ const REBUILT = [
   'components/live/MoveArrow.tsx',
   'v4/dc/DataCenter.tsx',
   'v4/dc/ModeSwitch.tsx',
+  'v4/method/V4Method.tsx',
+  'v4/learn/Screening.tsx',
 ];
 
 describe('no hardcoded decimal numbers in rebuilt screens', () => {
