@@ -185,6 +185,17 @@ describe('Site Value card', () => {
 
     const studio = screen.getByTestId('site-studio') as HTMLAnchorElement;
     expect(studio.getAttribute('href')).toMatch(/^#\/studio\?loc=(HB_NORTH|HB_HOUSTON|ANSON1_ALL)&dur=2&year=2025&strat=da$/);
+
+    // Data Center mode (Step 7): the same price location, the site and its nearest node, the card's duration and year.
+    const dc = new URLSearchParams((screen.getByTestId('site-dc') as HTMLAnchorElement).getAttribute('href')!.split('?')[1]);
+    const studioQ = new URLSearchParams(studio.getAttribute('href')!.split('?')[1]);
+    expect(dc.get('mode')).toBe('dc');
+    expect(dc.get('loc')).toBe(studioQ.get('loc'));
+    expect(dc.get('year')).toBe('2025');
+    expect(dc.get('mwh')).toBe('100');
+    expect(dc.get('site')).toContain('Jack');
+    expect(dc.get('lat')).toBeTruthy();
+    expect(screen.getByTestId('near-list').textContent).toContain(dc.get('node')!);
   });
 
   it('keeps working when the result files do not load', async () => {
