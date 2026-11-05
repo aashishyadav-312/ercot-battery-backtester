@@ -47,7 +47,7 @@ export const modesFor = (d: Pick<SiteData, 'stackKeys'>, basis: Basis, durationH
 
 export const hasFullStack = (d: Pick<SiteData, 'stackKeys'>): boolean => d.stackKeys.length > 0;
 
-/** Snap a wanted setting to one that has data: Energy if there is no stack, the usual size if it exists, else the latest year. */
+/** Snap a wanted setting to one that has data: Energy if there is no stack, the usual size if it exists, else the latest year with node-level results. */
 export function resolveSettings(want: Partial<Settings>, d: Pick<SiteData, 'manifest' | 'runs' | 'stackKeys'>): Settings {
   let basis: Basis = want.basis === 'stack' && hasFullStack(d) ? 'stack' : 'energy';
   let mode: StackMode = want.mode === 'foresight' ? 'foresight' : 'realistic';
@@ -56,7 +56,9 @@ export function resolveSettings(want: Partial<Settings>, d: Pick<SiteData, 'mani
   if (basis === 'stack' && !durs.length) { basis = 'energy'; durs = durationsFor(d, basis, mode); }
   const durationH = want.durationH != null && durs.includes(want.durationH) ? want.durationH : durs.includes(SITE_DEFAULT_DURATION_H) ? SITE_DEFAULT_DURATION_H : durs[0] ?? SITE_DEFAULT_DURATION_H;
   const years = yearsFor(d, basis, durationH, mode);
-  const year = want.year != null && years.includes(want.year) ? want.year : years[years.length - 1] ?? want.year ?? 0;
+  // The year to open on is the latest with a node-level result; a hub-only year (the study-site runs) is reachable from the strip.
+  const nodeYears = basis === 'energy' ? years.filter((y) => d.manifest.some((f) => f.year === y && f.durationH === durationH)) : years;
+  const year = want.year != null && years.includes(want.year) ? want.year : (nodeYears.length ? nodeYears : years).slice(-1)[0] ?? want.year ?? 0;
   return { year, durationH, mode, basis };
 }
 

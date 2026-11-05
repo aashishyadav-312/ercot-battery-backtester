@@ -90,8 +90,11 @@ describe('Full stack only when the index lists the file', () => {
     expect(p.hub).toBe(13);
     expect(p.label).toBe('2026 YTD, annualized');
   });
+  it('keeps a wanted hub-only year', () => {
+    expect(resolveSettings({ ...S, year: 2026 }, data()).year).toBe(2026);
+  });
   it('snaps a size or year with no data to one that has it', () => {
-    expect(resolveSettings({ year: 2019, durationH: 3, mode: 'realistic', basis: 'energy' }, data())).toMatchObject({ durationH: 2, year: 2026 });
+    expect(resolveSettings({ year: 2019, durationH: 3, mode: 'realistic', basis: 'energy' }, data())).toMatchObject({ durationH: 2, year: 2025 });
   });
 });
 

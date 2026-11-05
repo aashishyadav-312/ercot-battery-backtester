@@ -99,7 +99,7 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
           <p className={classes.eyebrow}>Site value</p>
           <h3 id="site-title" className={classes.title}>{pin.label}</h3>
           <p className={classes.sub} data-testid="site-where">
-            {[county ? `${county} County` : null, city ? `${fmtKm(city.km)} km from ${city.name}` : null, `${pin.lat.toFixed(3)}, ${pin.lon.toFixed(3)}`, pin.sub].filter(Boolean).join(' · ')}
+            {[county ? `${county} County` : null, city ? `${fmtKm(city.km)} km from ${city.name}` : null, pin.label.includes(pin.lat.toFixed(3)) ? null : `${pin.lat.toFixed(3)}, ${pin.lon.toFixed(3)}`, pin.sub].filter(Boolean).join(' · ')}
           </p>
         </div>
         <button type="button" className={classes.clear} onClick={onClear}>Clear site</button>
