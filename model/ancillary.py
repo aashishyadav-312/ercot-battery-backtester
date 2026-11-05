@@ -80,7 +80,7 @@ def optimize_stack(prices, as_prices, dt_hours, power_mw, energy_mwh,
                 lp += energy_mwh - soc[edge] >= down_energy
             if group in first:
                 for k in PRODUCTS:
-                    lp += reserves[k][t] == reserves[k][first[group]]
+                    lp += reserves[k][t] - reserves[k][first[group]] == 0  # pulp 4: var == var is a bool
             else:
                 first[group] = t
             if t in exclusive:
