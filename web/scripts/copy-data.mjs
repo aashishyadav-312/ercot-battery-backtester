@@ -56,6 +56,18 @@ function copyTree(from, to, rel = '') {
   }
 }
 if (existsSync(join(src, 'v4'))) copyTree(join(src, 'v4'), join(dst, 'v4'));
+// FIXTURE stack (web/fixtures/v4/stack: made-up numbers marked FIXTURE, for building the UI). Served at data/v4/stack/ only when
+// V4_FIXTURE=1 is set and results/v4/stack does not exist. Real results always win.
+const stackFixture = join(here, '..', 'fixtures', 'v4', 'stack');
+if (process.env.V4_FIXTURE === '1' && !existsSync(join(src, 'v4', 'stack'))) {
+  mkdirSync(join(dst, 'v4', 'stack'), { recursive: true });
+  for (const f of readdirSync(stackFixture).sort()) {
+    if (!f.endsWith('.json')) continue;
+    cpSync(join(stackFixture, f), join(dst, 'v4', 'stack', f));
+    hash.update(`v4/stack/${f}`).update(readFileSync(join(stackFixture, f)));
+    n++;
+  }
+}
 const version = hash.digest('hex').slice(0, 12);
 writeFileSync(join(here, '..', 'src', 'data', 'data-version.json'), JSON.stringify({ version }) + '\n');
 console.log(

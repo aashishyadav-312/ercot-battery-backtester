@@ -3,6 +3,7 @@ import { CumulativeCard, DailyRevenueCard, DurationCard, MonthlyRevenueCard, Top
 import { useSelectedRun } from '../hooks';
 import { useApp } from '../state';
 import { Ancillary } from '../components/Ancillary';
+import { StackByYear } from '../v4/StackByYear';
 import { ContextSection } from '../components/ContextSection';
 import { StartBanner } from '../components/StartBanner';
 import { KpiRow, PageHeader, RunStatus } from './RunHeader';
@@ -17,6 +18,7 @@ export default function Revenue() {
       <PageHeader title="Revenue" hero />
       <RunStatus />
       <KpiRow />
+      <StackByYear />
       <Ancillary />
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <MonthlyRevenueCard run={run} />

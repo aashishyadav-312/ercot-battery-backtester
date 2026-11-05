@@ -10,11 +10,15 @@ import {
   ratioBuckets, ratioOf, strayStory, topNodes, zoneShort, zonesOf, type Metric,
 } from '../data/atlas';
 import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
+import type { StackFile } from '../v4/stack';
 import { AtlasMap } from '../components/atlas/AtlasMap';
 import { V4 } from '../config/features';
 import { Info } from '../components/Info';
 import classes from './Atlas.module.css';
 import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
+import { useStackSet, type StackSet } from '../v4/useStack';
+import { FixtureBanner } from '../v4/Parts';
+import { PRODUCT_LABEL, asOf, withStackRevenue, yearTag } from '../v4/stack';
 
 // V4 map context and place search: a separate chunk, fetched only when the flag is on.
 const AtlasSite = lazy(() => import('../v4/map/AtlasSite'));
@@ -42,10 +46,16 @@ export default function Atlas() {
   const data = useAtlasData();
   if (data && 'error' in data) return <p className={classes.lede}>Could not load the node results for this page: {data.error}</p>;
   if (!data) return <div className={classes.loading} aria-busy="true">Loading every node…</div>;
-  return <AtlasView nodes={data.nodes} geo={data.geo} sel={sel} />;
+  return <AtlasWithStack nodes={data.nodes} geo={data.geo} sel={sel} />;
 }
 
-export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: TexasGeo; sel: Selection }) {
+/** Adds the v4 stack files (flag on only) for the all-node run's year and battery size. Flag off: the view alone, no extra fetch. */
+function AtlasWithStack({ nodes, geo, sel }: { nodes: NodesFile; geo: TexasGeo; sel: Selection }) {
+  const { set } = useStackSet(nodes.meta.duration_h, [nodes.meta.year], V4);
+  return <AtlasView nodes={nodes} geo={geo} sel={sel} stack={set} />;
+}
+
+export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: NodesFile; geo: TexasGeo; sel: Selection; stack?: StackSet | null }) {
   const { year, duration_h: durH } = file.meta;
   const all = file.nodes;
   const hubs = useMemo(() => hubRevenue(file), [file]);
@@ -61,9 +71,26 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
   const node = all.find((n) => n.code === code) ?? null;
   const mapRef = useRef<HTMLDivElement>(null);
 
-  const dots = useMemo(() => mapDots(all, metric), [all, metric]);
-  const top = useMemo(() => topNodes(all, metric, zone), [all, metric, zone]);
+  // v4: Energy | Full stack. Only the Revenue metric has a stack version. The stack file is the realistic mode, the one every node has.
+  const [basis, setBasis] = useState<'energy' | 'stack'>('energy');
+  const stackFile = V4 ? stack?.realistic.get(file.meta.year) ?? null : null;
+  const upperFile = V4 ? stack?.foresight.get(file.meta.year) ?? null : null;
+  const stackOn = !!stackFile && basis === 'stack' && metric === 'rev';
+  const shown = useMemo(() => (stackOn ? withStackRevenue(all, stackFile!) : { nodes: all, missing: 0 }), [stackOn, stackFile, all]);
+
+  const dots = useMemo(() => mapDots(shown.nodes, metric), [shown, metric]);
+  const top = useMemo(() => topNodes(shown.nodes, metric, zone), [shown, metric, zone]);
   const mInfo = METRICS.find((x) => x.id === metric)!;
+  const mLong = stackOn ? `Full stack revenue, realistic: energy plus ancillary services, ${TERMS.revenueUnit.label}` : mInfo.long;
+  const pickMetric = (m: Metric) => { setMetric(m); if (m !== 'rev') setBasis('energy'); };
+  // Switching to Full stack while the selected node has no stack result moves the card to the best node that has one.
+  const pickBasis = (b: 'energy' | 'stack') => {
+    setBasis(b);
+    if (b === 'stack' && stackFile && code && !stackFile.nodes[code]) {
+      const first = topNodes(withStackRevenue(all, stackFile).nodes, 'rev', zone)[0];
+      if (first) setCode(first.code);
+    }
+  };
 
   const choose = (c: string, reveal = false) => {
     setCode(c);
@@ -74,7 +101,7 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
 
   const mapProps = {
     outline, dots, metric, zoneOf, zone, selected: code, onSelect: (c: string) => choose(c),
-    label: `Map of Texas with ${where.nPlaced} of ${where.nNodes} resource nodes placed, sized and shaded by ${mInfo.label.toLowerCase()}${zone ? `, ${zoneShort(zone)} load zone highlighted` : ''}. The ranked list, the search box and the table below give the same nodes as text.`,
+    label: `Map of Texas with ${where.nPlaced} of ${where.nNodes} resource nodes placed, sized and shaded by ${stackOn ? 'full stack revenue' : mInfo.label.toLowerCase()}${zone ? `, ${zoneShort(zone)} load zone highlighted` : ''}. The ranked list, the search box and the table below give the same nodes as text.`,
   };
   const legend = (
     <>
@@ -86,8 +113,14 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
         </ul>
         <p className={classes.small}>{num(where.nUnplaced)} nodes are not on the map yet. Click a dot, pick from the list, or search.</p>
       </div>
+      {stackOn && (
+        <p className={classes.small} data-testid="atlas-stack-note">
+          Full stack, realistic mode, {yearTag(stackFile!.meta)}, {file.meta.duration_h}-hour battery. The colour scale is rebuilt from these values.
+          {shown.missing > 0 && <> {num(shown.missing)} nodes have no stack result yet and are not drawn.</>}
+        </p>
+      )}
       <p className={classes.small} data-testid="atlas-look">
-        What to look for: bigger, darker dots mean higher {mInfo.label.toLowerCase()}. Neighbouring dots can differ a lot{strayStory(file).tailCount > 0 ? `; ${num(strayStory(file).tailCount)} nodes earn ${TAIL_RATIO}× their hub or more` : ''}.
+        What to look for: bigger, darker dots mean higher {stackOn ? 'full stack revenue' : mInfo.label.toLowerCase()}. Neighbouring dots can differ a lot{strayStory(file).tailCount > 0 ? `; ${num(strayStory(file).tailCount)} nodes earn ${TAIL_RATIO}× their hub or more` : ''}.
       </p>
     </>
   );
@@ -109,16 +142,26 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
           <div className={classes.controls}>
             <div className={classes.pills} role="group" aria-label="Map metric">
               {METRICS.map((x) => (
-                <button key={x.id} type="button" className={classes.pill} aria-pressed={metric === x.id} title={x.long} onClick={() => setMetric(x.id)}>{x.label}</button>
+                <button key={x.id} type="button" className={classes.pill} aria-pressed={metric === x.id} title={x.long} onClick={() => pickMetric(x.id)}>{x.label}</button>
               ))}
             </div>
+            {stackFile && metric === 'rev' && (
+              <div className={classes.pills} role="group" aria-label="Revenue basis">
+                {(['energy', 'stack'] as const).map((b) => (
+                  <button key={b} type="button" className={classes.pill} aria-pressed={basis === b} onClick={() => pickBasis(b)} data-testid={`basis-${b}`}>
+                    {b === 'energy' ? 'Energy' : 'Full stack'}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={classes.zones} role="group" aria-label="Load zone">
               {[null, ...zones].map((z) => (
                 <button key={z ?? 'all'} type="button" className={classes.zone} aria-pressed={zone === z} onClick={() => setZone(z)}>{z ? zoneShort(z) : 'All'}</button>
               ))}
             </div>
           </div>
-          <p className={classes.meta}>{mInfo.long}, {year}{zone ? ` · ${zoneShort(zone)} load zone` : ''}</p>
+          <p className={classes.meta} data-testid="atlas-metric-long">{mLong}, {year}{zone ? ` · ${zoneShort(zone)} load zone` : ''}</p>
+          {stackOn && <FixtureBanner files={[stackFile]} />}
           {V4 ? (
             <Suspense fallback={<><AtlasMap {...mapProps} />{legend}</>}>
               <AtlasSite {...mapProps}>{legend}</AtlasSite>
@@ -132,8 +175,8 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
         </section>
 
         <div className={classes.side}>
-          {node && <NodeCard node={node} file={file} hubs={hubs} metric={metric} sel={sel} />}
-          <TopList nodes={top} metric={metric} zone={zone} hubs={hubs} selected={code} onSelect={(c) => choose(c)} />
+          {node && <NodeCard node={node} file={file} hubs={hubs} metric={metric} sel={sel} stackOn={stackOn} stackFile={stackFile} upperFile={upperFile} />}
+          <TopList nodes={top} metric={metric} zone={zone} hubs={hubs} selected={code} onSelect={(c) => choose(c)} stackFile={stackOn ? stackFile : null} />
         </div>
       </div>
 
@@ -146,7 +189,12 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
 
 // ------------------------------------------------------------ selected node
 
-function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: NodesFile; hubs: Map<string, number>; metric: Metric; sel: Selection }) {
+function NodeCard({ node, file, hubs, metric, sel, stackOn = false, stackFile = null, upperFile = null }: {
+  node: NodeRec; file: NodesFile; hubs: Map<string, number>; metric: Metric; sel: Selection;
+  stackOn?: boolean; stackFile?: StackFile | null; upperFile?: StackFile | null;
+}) {
+  const row = stackOn ? stackFile?.nodes[node.code] ?? null : null;
+  const upper = stackOn ? upperFile?.nodes[node.code] ?? null : null;
   const ratio = ratioOf(node, hubs);
   const max = Math.max(...node.monthly, 0);
   const stats: { id: string; label: string; value: string; term?: string }[] = [
@@ -162,8 +210,16 @@ function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: Node
       <p className={classes.meta}>Selected node · rank {node.rank} of {file.meta.n_nodes}</p>
       <h2 id="node-title" className={classes.nodeCode}>{node.code}</h2>
       <p className={classes.nodeSub}>{node.lz ?? 'No load zone'}{node.sub ? ` · substation ${node.sub}` : ''}{node.prec === 'county' && node.county ? ` · ${node.county} County` : ''}</p>
-      <p className={classes.bigValue} data-metric={metric} data-testid="node-value">{fmtMetric(metric, metricValue(node, metric))}</p>
-      <p className={classes.meta}>{UNIT[metric]}</p>
+      <p className={classes.bigValue} data-metric={metric} data-testid="node-value">{stackOn ? (row ? usd(row.total, 1) : '–') : fmtMetric(metric, metricValue(node, metric))}</p>
+      <p className={classes.meta}>{stackOn ? `${TERMS.revenueUnit.label}, full stack, realistic` : UNIT[metric]}</p>
+      {stackOn && (
+        <p className={classes.small} data-testid="node-stack">
+          {row
+            ? <>Energy {usd(row.energy, 1)} + ancillary {usd(asOf(row), 1)}. {upper ? <>Range: {usd(row.total, 1)} realistic to {usd(upper.total, 1)} perfect-foresight upper bound.</> : upperFile ? 'No upper bound computed for this node yet.' : null}</>
+            : 'No full stack result for this node yet.'}
+          {row && ` Products: ${(['regup', 'regdn', 'rrs', 'ecrs', 'nsrs'] as const).map((p) => `${PRODUCT_LABEL[p]} ${usd(row[p], 1)}`).join(', ')}.`}
+        </p>
+      )}
       <dl className={classes.stats}>
         {stats.map((s) => (
           <div key={s.id}>
@@ -195,8 +251,8 @@ function NodeCard({ node, file, hubs, metric, sel }: { node: NodeRec; file: Node
   );
 }
 
-function TopList({ nodes, metric, zone, hubs, selected, onSelect }: {
-  nodes: NodeRec[]; metric: Metric; zone: string | null; hubs: Map<string, number>; selected: string | null; onSelect: (code: string) => void;
+function TopList({ nodes, metric, zone, hubs, selected, onSelect, stackFile = null }: {
+  nodes: NodeRec[]; metric: Metric; zone: string | null; hubs: Map<string, number>; selected: string | null; onSelect: (code: string) => void; stackFile?: StackFile | null;
 }) {
   const mInfo = METRICS.find((x) => x.id === metric)!;
   return (
@@ -213,7 +269,7 @@ function TopList({ nodes, metric, zone, hubs, selected, onSelect }: {
               </span>
               <span className={classes.topVal}>
                 <span className={classes.mono}>{fmtMetric(metric, metricValue(n, metric))}</span>
-                <span className={classes.topSub}>{metric === 'rev' ? `${fmtRatio(ratioOf(n, hubs))} hub` : usd(n.rev, 1)}</span>
+                <span className={classes.topSub}>{stackFile ? `Energy ${usd(stackFile.nodes[n.code]?.energy, 1)}` : metric === 'rev' ? `${fmtRatio(ratioOf(n, hubs))} hub` : usd(n.rev, 1)}</span>
               </span>
             </button>
           </li>
