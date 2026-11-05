@@ -8,7 +8,7 @@ import {
 } from './stack';
 import type { NodeRec } from '../data/types';
 
-const files = readdirSync(FIXTURE_DIR).filter((f) => f.endsWith('.json'));
+const files = readdirSync(FIXTURE_DIR).filter((f) => /^\d{4}_\d+h_(foresight|realistic)\.json$/.test(f)); // index.json lists them and is not a stack file
 
 describe('fixture files follow the Stack results schema', () => {
   it.each(files)('%s', (f) => {
@@ -24,6 +24,9 @@ describe('fixture files follow the Stack results schema', () => {
       expect(Object.keys(row).sort()).toEqual([...PRODUCTS, 'total'].sort());
       expect(stackAdds(row as never)).toBe(true);
     }
+  });
+  it('index.json lists exactly the fixture files', () => {
+    expect(JSON.parse(readFileSync(resolve(FIXTURE_DIR, 'index.json'), 'utf8')).files).toEqual(files);
   });
   it('covers 3 hubs, 3 nodes and 2 years', () => {
     const f = fixtureFile(2025, 2, 'realistic');
