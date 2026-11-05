@@ -1,0 +1,93 @@
+/* V4 Atlas map context. Existing tokens only: --muted for city labels, --line-2 for county lines, --amber for the pin. */
+.wrap { display: flex; flex-direction: column; min-width: 0; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.mono { font-family: var(--mantine-font-family-monospace); }
+
+.tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 4px; }
+.search { position: relative; flex: 1 1 260px; min-width: 0; max-width: 420px; }
+.searchLabel { display: block; margin-bottom: 6px; font-size: 14px; color: var(--muted); }
+.searchBox { position: relative; }
+.searchInput {
+  width: 100%; min-height: var(--tap); padding: 0 40px 0 14px; box-sizing: border-box;
+  border: 1px solid var(--line-2); border-radius: var(--r-input); background: var(--bg); color: var(--text);
+  font: inherit; font-size: 16px; /* 16px keeps iOS from zooming the page on focus */
+}
+.searchInput::placeholder { color: var(--faint); }
+.slash {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  min-width: 20px; padding: 1px 6px; text-align: center; border: 1px solid var(--line-2); border-radius: 6px;
+  font-family: var(--mantine-font-family-monospace); font-size: 12px; color: var(--muted);
+}
+@media (hover: none) { .slash { display: none; } }
+.results {
+  position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px; list-style: none;
+  background: var(--panel-hi); border: 1px solid var(--line-2); border-radius: var(--r-input); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+.result { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; min-height: var(--tap); padding: 8px 10px; box-sizing: border-box; border-radius: 8px; cursor: pointer; }
+.result[aria-selected='true'] { background: var(--track); box-shadow: inset 0 0 0 1px var(--amber); }
+.result[aria-disabled='true'] { cursor: default; opacity: 0.7; }
+.resultName { color: var(--text); font-size: 15px; overflow-wrap: anywhere; }
+.resultSub { flex: none; color: var(--muted); font-size: 13px; }
+.searchNote { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+
+.pick {
+  min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line-2); border-radius: var(--r-pill); background: transparent;
+  color: var(--muted); font-family: var(--mantine-font-family-monospace); font-size: 13px; cursor: pointer;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), transform 160ms var(--ease);
+}
+.pick:hover { color: var(--text); }
+.pick:active { transform: scale(0.97); }
+.pick[aria-pressed='true'] { background: var(--text); border-color: var(--text); color: var(--bg); }
+.pickNote { min-height: 20px; margin: 6px 0 4px; font-size: 13px; color: var(--muted); }
+
+.stage { position: relative; max-width: 620px; width: 100%; margin: 0 auto; }
+.zoomBar { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.zoomBtn, .zoomReset {
+  min-width: var(--tap); min-height: var(--tap); padding: 0 10px; border: 1px solid var(--line-2); border-radius: var(--r-input);
+  background: var(--panel); color: var(--text); font-family: var(--mantine-font-family-monospace); font-size: 18px; cursor: pointer;
+  transition: background-color 200ms var(--ease), transform 160ms var(--ease);
+}
+.zoomReset { font-size: 13px; color: var(--muted); }
+.zoomBtn:hover, .zoomReset:hover { background: var(--panel-hi); }
+.zoomBtn:active, .zoomReset:active { transform: scale(0.97); }
+.zoomBtn:disabled, .zoomReset:disabled { opacity: 0.4; cursor: default; transform: none; }
+.mapNote { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+
+/* Layers drawn inside the map svg. */
+.countyLine { fill: none; stroke: var(--line-2); stroke-width: 0.8; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: opacity 240ms var(--ease); }
+.countyOn { fill: none; stroke: var(--amber); stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.cityMark { fill: var(--bg); stroke: var(--muted); }
+.cityLabel { fill: var(--muted); stroke: var(--bg); stroke-width: 3px; paint-order: stroke; stroke-linejoin: round; font-family: inherit; pointer-events: none; user-select: none; }
+.pin path { fill: var(--amber); stroke: var(--text); stroke-width: 1.4; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.pin circle { fill: var(--bg); }
+
+/* Pinned site */
+.panel { margin-top: 16px; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
+.panelHead { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.panelEyebrow { margin: 0; font-size: 13px; color: var(--muted); }
+.panelTitle { margin: 4px 0 0; font-size: 20px; font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.panelSub { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.clear {
+  min-height: var(--tap); padding: 0 16px; border: 1px solid var(--line-2); border-radius: var(--r-input); background: transparent;
+  color: var(--muted); font: inherit; font-size: 14px; cursor: pointer;
+}
+.clear:hover { color: var(--text); }
+.listTitle { margin: 16px 0 8px; font-size: 14px; font-weight: 500; color: var(--text); }
+.nearList { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.nearBtn {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-height: var(--tap); padding: 8px 12px; box-sizing: border-box;
+  border: 1px solid var(--line); border-radius: var(--r-input); background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer;
+  transition: background-color 200ms var(--ease), transform 160ms var(--ease);
+}
+.nearBtn:hover { background: var(--panel-hi); }
+.nearBtn:active { transform: scale(0.99); }
+.nearNum { flex: none; width: 20px; color: var(--muted); font-family: var(--mantine-font-family-monospace); font-size: 13px; }
+.nearName { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-family: var(--mantine-font-family-monospace); font-size: 14px; overflow-wrap: anywhere; }
+.nearSub { font-family: inherit; font-size: 12px; color: var(--muted); }
+.nearKm { flex: none; font-family: var(--mantine-font-family-monospace); font-size: 14px; color: var(--text); }
+.caveat { margin: 12px 0 0; max-width: 72ch; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pick, .zoomBtn, .zoomReset, .nearBtn, .countyLine { transition: none; }
+  .pick:active, .zoomBtn:active, .zoomReset:active, .nearBtn:active { transform: none; }
+}

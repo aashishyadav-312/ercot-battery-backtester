@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Select } from '@mantine/core';
 import { useApp } from '../state';
 import { buildHash } from '../shell/route';
@@ -11,9 +11,13 @@ import {
 } from '../data/atlas';
 import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
 import { AtlasMap } from '../components/atlas/AtlasMap';
+import { V4 } from '../config/features';
 import { Info } from '../components/Info';
 import classes from './Atlas.module.css';
 import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
+
+// V4 map context and place search: a separate chunk, fetched only when the flag is on.
+const AtlasSite = lazy(() => import('../v4/map/AtlasSite'));
 
 /** Value of a metric for display: dollars for revenue, a percentage for the two shares. */
 const fmtMetric = (m: Metric, v: number | null | undefined) => (m === 'rev' ? usd(v, 1) : pct(v));
@@ -68,6 +72,26 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
     if (reveal) mapRef.current?.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   };
 
+  const mapProps = {
+    outline, dots, metric, zoneOf, zone, selected: code, onSelect: (c: string) => choose(c),
+    label: `Map of Texas with ${where.nPlaced} of ${where.nNodes} resource nodes placed, sized and shaded by ${mInfo.label.toLowerCase()}${zone ? `, ${zoneShort(zone)} load zone highlighted` : ''}. The ranked list, the search box and the table below give the same nodes as text.`,
+  };
+  const legend = (
+    <>
+      <div className={classes.legendRow}>
+        <ul className={classes.legend} aria-label="Dot colour and size">
+          <li><span className={classes.swatch} data-tier="low" aria-hidden="true" />Lower {mInfo.label.toLowerCase()}</li>
+          <li><span className={classes.swatch} data-tier="top" data-metric={metric} aria-hidden="true" />Higher {mInfo.label.toLowerCase()}</li>
+          {where.nCounty > 0 && <li><span className={classes.ringSwatch} aria-hidden="true" />County-level placement ({where.nCounty})</li>}
+        </ul>
+        <p className={classes.small}>{num(where.nUnplaced)} nodes are not on the map yet. Click a dot, pick from the list, or search.</p>
+      </div>
+      <p className={classes.small} data-testid="atlas-look">
+        What to look for: bigger, darker dots mean higher {mInfo.label.toLowerCase()}. Neighbouring dots can differ a lot{strayStory(file).tailCount > 0 ? `; ${num(strayStory(file).tailCount)} nodes earn ${TAIL_RATIO}× their hub or more` : ''}.
+      </p>
+    </>
+  );
+
   return (
     <div className={classes.page}>
       <header className={classes.intro}>
@@ -95,21 +119,11 @@ export function AtlasView({ nodes: file, geo, sel }: { nodes: NodesFile; geo: Te
             </div>
           </div>
           <p className={classes.meta}>{mInfo.long}, {year}{zone ? ` · ${zoneShort(zone)} load zone` : ''}</p>
-          <AtlasMap
-            outline={outline} dots={dots} metric={metric} zoneOf={zoneOf} zone={zone} selected={code} onSelect={(c) => choose(c)}
-            label={`Map of Texas with ${where.nPlaced} of ${where.nNodes} resource nodes placed, sized and shaded by ${mInfo.label.toLowerCase()}${zone ? `, ${zoneShort(zone)} load zone highlighted` : ''}. The ranked list, the search box and the table below give the same nodes as text.`}
-          />
-          <div className={classes.legendRow}>
-            <ul className={classes.legend} aria-label="Dot colour and size">
-              <li><span className={classes.swatch} data-tier="low" aria-hidden="true" />Lower {mInfo.label.toLowerCase()}</li>
-              <li><span className={classes.swatch} data-tier="top" data-metric={metric} aria-hidden="true" />Higher {mInfo.label.toLowerCase()}</li>
-              {where.nCounty > 0 && <li><span className={classes.ringSwatch} aria-hidden="true" />County-level placement ({where.nCounty})</li>}
-            </ul>
-            <p className={classes.small}>{num(where.nUnplaced)} nodes are not on the map yet. Click a dot, pick from the list, or search.</p>
-          </div>
-          <p className={classes.small} data-testid="atlas-look">
-            What to look for: bigger, darker dots mean higher {mInfo.label.toLowerCase()}. Neighbouring dots can differ a lot{strayStory(file).tailCount > 0 ? `; ${num(strayStory(file).tailCount)} nodes earn ${TAIL_RATIO}× their hub or more` : ''}.
-          </p>
+          {V4 ? (
+            <Suspense fallback={<><AtlasMap {...mapProps} />{legend}</>}>
+              <AtlasSite {...mapProps}>{legend}</AtlasSite>
+            </Suspense>
+          ) : <><AtlasMap {...mapProps} />{legend}</>}
           <Select
             className={classes.search} label="Find any node" placeholder="Type a node, substation or zone" searchable clearable={false} limit={50}
             data={all.map((n) => ({ value: n.code, label: `${n.code}${n.sub ? ` · ${n.sub}` : ''} · ${zoneShort(n.lz)}${placed(n) ? '' : ' · not on map'}` }))}
