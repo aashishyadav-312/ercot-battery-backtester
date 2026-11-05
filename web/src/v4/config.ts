@@ -24,3 +24,13 @@ export const SITE_DEG = 10;
 
 /** Duration the card opens on when it has data for it. */
 export const SITE_DEFAULT_DURATION_H = 2;
+
+/** Years with a 4CP file (results/v4/fourcp/<year>.json, Step 2). A test pins this list to the files. */
+export const FOURCP_YEARS = [2023, 2024, 2025, 2026] as const;
+
+/**
+ * Battery the Step 1 stack files were computed for: round-trip efficiency and degradation cost ($/MWh discharged). Source: the
+ * first line of meta.assumptions in every results/v4/stack file. As of 2026-11-05. Data Center mode uses a stack row for ancillary
+ * services only when its battery matches these, and a test pins them to the files.
+ */
+export const STACK_BATTERY = { rte: 0.85, degCost: 10 } as const;

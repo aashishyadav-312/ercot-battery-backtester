@@ -81,3 +81,6 @@ export interface PriceIndex {
   files: { location: string; year: number; file: string; bytes: number; rt_first_day: string; rt_last_day: string; da_last_day: string }[];
 }
 export const loadPriceIndex = () => getJson<PriceIndex>('prices/index.json');
+
+/** 4CP intervals and daily peaks for one year (results/v4/fourcp/<year>.json, v4 Step 2). */
+export const loadFourCp = (year: number) => getJson<import('../custom/datacenter').FourCpYear>(`v4/fourcp/${year}.json`);
