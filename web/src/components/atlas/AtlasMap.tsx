@@ -23,25 +23,25 @@ export function AtlasMap({ outline, dots, metric, zoneOf, zone, selected, onSele
   label: string;
   /**
    * V4 only (map context, site search). Absent on the live site, where nothing below changes: `viewBox` zooms the drawing,
-   * `zoom` keeps dot sizes and line weights readable when zoomed, `under` and `over` are extra layers behind and in front
+   * `dotScale` (below 1 when zoomed) and `landStroke` keep dots and the outline readable when zoomed, `under` and `over` are extra layers behind and in front
    * of the nodes, `picking` pauses node clicks while a site is being picked, and `svgProps` and `svgRef` reach the svg.
    */
   v4?: {
-    viewBox?: string; zoom?: number; under?: ReactNode; over?: ReactNode; picking?: boolean;
+    viewBox?: string; zoom?: number; dotScale?: number; landStroke?: number; under?: ReactNode; over?: ReactNode; picking?: boolean;
     svgProps?: ComponentProps<'svg'>; svgRef?: Ref<SVGSVGElement>;
   };
 }) {
   const on = dots.find((d) => d.code === selected);
   const inZone = (code: string) => !zone || zoneOf.get(code) === zone;
   const zoom = v4?.zoom ?? 1;
-  const k = 1 / Math.sqrt(zoom); // dots shrink a little as the map zooms in, so they stay apart
+  const k = v4?.dotScale ?? 1; // dots shrink a little as the map zooms in, so they stay apart
   const picking = !!v4?.picking;
   return (
     <svg
       {...v4?.svgProps} ref={v4?.svgRef} className={classes.map} viewBox={v4?.viewBox ?? `0 0 ${VIEW_W} ${VIEW_H}`} role="img"
       aria-label={label} data-metric={metric} data-picking={picking || undefined} data-zoomed={zoom > 1 || undefined}
     >
-      <path d={outline} className={classes.land} style={zoom > 1 ? { strokeWidth: 1.2 / zoom } : undefined} />
+      <path d={outline} className={classes.land} style={v4?.landStroke ? { strokeWidth: v4.landStroke } : undefined} />
       {v4?.under}
       {/* Nodes outside the zone filter sit underneath, dimmed, so the zone keeps its geography. */}
       {[false, true].map((front) => (

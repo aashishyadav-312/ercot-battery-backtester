@@ -92,3 +92,8 @@ export function countyPaths(fc: FeatureCollection<Geometry, CountyProps>, minSte
   }
   return { all: [...byName.values()].join(''), byName };
 }
+
+/** Dot radius scale: dots shrink a little as the map zooms in, so they stay apart. 1 at the full view. */
+export const dotScale = (zoom: number) => 1 / Math.sqrt(zoom);
+/** Outline weight in viewBox units; the live site's 1.2 at the full view, thinner as the drawing grows. */
+export const landStroke = (zoom: number) => (zoom > 1 ? 1.2 / zoom : undefined);

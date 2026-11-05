@@ -9,7 +9,7 @@ import type { NodeIndex, Place } from '../geo/types';
 import { layoutCities } from './labels';
 import { SiteSearch } from './SiteSearch';
 import {
-  COUNTY_FROM, FULL_VIEW, clientToLonLat, countyOpacity, countyPaths, panBy, viewAround, viewBox, viewForBounds, zoomBy, zoomOf,
+  COUNTY_FROM, FULL_VIEW, clientToLonLat, countyOpacity, countyPaths, dotScale, landStroke, panBy, viewAround, viewBox, viewForBounds, zoomBy, zoomOf,
   type CountyPaths, type View,
 } from './view';
 import classes from './AtlasSite.module.css';
@@ -114,7 +114,7 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
 
   const selectedPath = pin?.county && paths ? paths.byName.get(pin.county) : undefined;
   const op = countyOpacity(zoom);
-  const k = 1 / Math.sqrt(zoom);
+  const k = dotScale(zoom);
   const under = (
     <g aria-hidden="true" className={classes.counties}>
       {paths && op > 0 && <path d={paths.all} className={classes.countyLine} style={{ opacity: op }} />}
@@ -123,8 +123,8 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
   );
   const over = (
     <g aria-hidden="true" className={classes.cities}>
+      {labels.map((l) => <text key={l.name} x={l.tx} y={l.ty} textAnchor={l.anchor} className={classes.cityLabel} style={{ fontSize: l.fontSize, strokeWidth: l.fontSize * 0.27 }}>{l.name}</text>)}
       {marks.map((m) => <rect key={m.name} x={m.x - m.size / 2} y={m.y - m.size / 2} width={m.size} height={m.size} className={classes.cityMark} style={{ strokeWidth: 1.2 / Math.sqrt(zoom) }} />)}
-      {labels.map((l) => <text key={l.name} x={l.tx} y={l.ty} textAnchor={l.anchor} className={classes.cityLabel} style={{ fontSize: l.fontSize }}>{l.name}</text>)}
       {pin && (() => {
         const [x, y] = project(pin.lon, pin.lat);
         return (
@@ -149,7 +149,7 @@ export default function AtlasSite({ source = REAL_SOURCE, children, ...map }: Om
       <div className={classes.stage}>
         <AtlasMap
           {...map}
-          v4={{ viewBox: viewBox(view), zoom, under, over, picking, svgProps, svgRef: svg }}
+          v4={{ viewBox: viewBox(view), zoom, dotScale: k, landStroke: landStroke(zoom), under, over, picking, svgProps, svgRef: svg }}
         />
         <div className={classes.zoomBar} role="group" aria-label="Map zoom">
           <button type="button" className={classes.zoomBtn} aria-label="Zoom in" disabled={atMax} onClick={() => setView((v) => zoomBy(v, 1.6))}>+</button>

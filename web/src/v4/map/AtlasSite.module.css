@@ -57,7 +57,7 @@
 .countyLine { fill: none; stroke: var(--line-2); stroke-width: 0.8; vector-effect: non-scaling-stroke; stroke-linejoin: round; transition: opacity 240ms var(--ease); }
 .countyOn { fill: none; stroke: var(--amber); stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .cityMark { fill: var(--bg); stroke: var(--muted); }
-.cityLabel { fill: var(--muted); stroke: var(--bg); stroke-width: 3px; paint-order: stroke; stroke-linejoin: round; font-family: inherit; pointer-events: none; user-select: none; }
+.cityLabel { fill: var(--muted); stroke: var(--bg); paint-order: stroke; stroke-linejoin: round; font-family: inherit; pointer-events: none; user-select: none; }
 .pin path { fill: var(--amber); stroke: var(--text); stroke-width: 1.4; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .pin circle { fill: var(--bg); }
 
