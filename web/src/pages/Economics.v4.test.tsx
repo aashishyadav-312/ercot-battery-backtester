@@ -12,7 +12,8 @@ import { usd } from '../data/format';
 import { setDcCase } from '../v4/dc/dcCase';
 
 vi.mock('../v4/flag', () => ({ V4: true }));
-vi.mock('../state', () => ({ useApp: () => ({ sel: { location: 'HB_HOUSTON', duration: 2, year: 2025, deg: 10 } }) }));
+let duration = 2; // the selection bar's duration
+vi.mock('../state', () => ({ useApp: () => ({ sel: { location: 'HB_HOUSTON', duration, year: 2025, deg: 10 } }) }));
 const ENERGY = 20; // $/kW-yr, low enough that NPV is negative at the default cost
 const ROW = { location: 'HB_HOUSTON', duration_h: 2, revenue_per_kw_year: ENERGY, da_rt_revenue_per_kw_year: 10, cycles_per_year: 300, annualized: false };
 vi.mock('../hooks', () => ({ useSelectedRun: () => ({ row: ROW, run: { metrics: { da_cycles_per_year: 250 } } }) }));
@@ -33,7 +34,7 @@ import Economics from './Economics';
 
 const HASH = '#/research/economics?loc=HB_HOUSTON&dur=2&year=2025&deg=10';
 const stackTotal = fixtureFile(2025, 2, 'foresight').nodes.HB_HOUSTON.total;
-const npvAt = (revenuePerKwYr: number) => compute(DEFAULTS, { durationH: 2, revenuePerKwYr, cyclesPerYear: 300 }).npv;
+const npvAt = (revenuePerKwYr: number, durationH = 2) => compute(DEFAULTS, { durationH, revenuePerKwYr, cyclesPerYear: 300 }).npv;
 const verdict = () => screen.getByTestId('econ-verdict').textContent ?? '';
 const wrap = () => render(<MantineProvider><Economics /></MantineProvider>);
 
@@ -41,7 +42,7 @@ beforeAll(() => {
   window.matchMedia ??= ((q: string) => ({ matches: false, media: q, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent: () => false })) as never;
   window.ResizeObserver ??= class { observe() {} unobserve() {} disconnect() {} } as never;
 });
-beforeEach(() => { stackAvailable = true; setDcCase(null); window.history.replaceState(null, '', HASH); });
+beforeEach(() => { duration = 2; stackAvailable = true; setDcCase(null); window.history.replaceState(null, '', HASH); });
 afterEach(cleanup);
 
 describe('Revenue pill', () => {
@@ -116,6 +117,30 @@ describe('Data Center site', () => {
     expect(window.location.hash).toContain('rev=dc');
     expect(window.location.hash).toContain('dc=88.5');
     expect(screen.getByLabelText('Revenue source', { selector: 'section' }).textContent).toContain('50 MW / 100 MWh at Houston hub, 2025');
+  });
+
+  it('carries the case duration in the URL and costs the battery at it, with a one-line note', async () => {
+    setDcCase({ perKwYr: 88.5, label: '50 MW / 200 MWh at Houston hub, 2025', durationH: 4 });
+    wrap();
+    fireEvent.click(await screen.findByLabelText('Data Center site'));
+    await waitFor(() => expect(verdict()).toContain(`NPV ${usd(npvAt(88.5, 4), 0)}/kW`));
+    expect(npvAt(88.5, 4)).not.toBeCloseTo(npvAt(88.5, 2), 0); // the duration changes the answer
+    expect(window.location.hash).toContain('dcd=4');
+    const line = screen.getByLabelText('Revenue source', { selector: 'section' }).textContent!;
+    expect(line).toContain('battery duration is the case');
+    expect(line).toContain('4h'); // the scenario text shows the duration in use
+  });
+
+  it('opens from a link with the duration, and goes back to Energy when the duration is changed', async () => {
+    window.history.replaceState(null, '', `${HASH}&rev=dc&dc=88.5&dcd=4`);
+    const { rerender } = wrap();
+    await waitFor(() => expect(verdict()).toContain(`NPV ${usd(npvAt(88.5, 4), 0)}/kW`));
+    duration = 1; // the user picks another duration in the selection bar
+    rerender(<MantineProvider><Economics /></MantineProvider>); // a new element, so React renders again
+    await waitFor(() => expect(verdict()).toContain(`NPV ${usd(npvAt(ENERGY), 0)}/kW`));
+    expect(window.location.hash).not.toContain('rev=dc');
+    expect(window.location.hash).not.toContain('dcd');
+    expect((screen.getByLabelText('Energy') as HTMLInputElement).checked).toBe(true);
   });
 
   it('opens from a link that carries the case', async () => {

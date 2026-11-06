@@ -374,11 +374,11 @@ function Results({ shown, stale }: { shown: Shown; stale: boolean }) {
   const notes = [...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes];
   // Project economics can use this case's total as its "Data Center site" revenue source.
   const label = `${num(f.batteryMw)} MW / ${num(f.batteryMwh)} MWh at ${locName(f.loc)}, ${shown.year}`;
-  useEffect(() => { setDcCase({ perKwYr: r.perKwYr, label }); }, [r.perKwYr, label]);
   const dur = durationOf(f);
+  useEffect(() => { setDcCase({ perKwYr: r.perKwYr, label, durationH: dur }); }, [r.perKwYr, label, dur]);
   const econHref = economicsLink(buildHash('economics', {
     location: f.loc, duration: DURATIONS.includes(dur) ? dur : 2, year: YEARS.includes(f.year) ? f.year : 2025, deg: 10,
-  }), r.perKwYr);
+  }), r.perKwYr, dur);
   const csv = () => {
     const { headers, rows: out } = dcCsv(f, r, { yearLabel: shown.year, stackNote: shown.stackNote, profileName: shown.profile });
     downloadCsv(`chargeline-datacenter-${f.loc}-${f.year}.csv`, headers, out);

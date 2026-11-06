@@ -16,7 +16,7 @@ import { V4 } from '../v4/flag';
 import { useEconStack } from '../v4/useEconStack';
 import { getDcCase } from '../v4/dc/dcCase';
 import {
-  REV_LABEL, effectiveSource, parseRevHash, revOptions, revenueOf, sourceDetail, withRevParams,
+  REV_LABEL, economicsDuration, effectiveSource, parseRevHash, revOptions, revenueOf, sourceDetail, withRevParams,
   type DcCase, type Offered, type PlanSource, type RevParams, type RevSource,
 } from '../v4/revenueSource';
 import { revealFocused } from '../shell/panelScroll';
@@ -154,17 +154,29 @@ export default function Economics() {
   const dcCase: DcCase | null = useMemo(() => {
     if (!V4) return null;
     const mem = getDcCase();
-    if (params.dc != null) return { perKwYr: params.dc, label: mem && Math.abs(mem.perKwYr - params.dc) < 0.01 ? mem.label : 'Data Center case from the link' };
+    if (params.dc != null) {
+      const same = !!mem && Math.abs(mem.perKwYr - params.dc) < 0.01;
+      return { perKwYr: params.dc, label: same ? mem!.label : 'Data Center case from the link', durationH: params.dcDur ?? (same ? mem!.durationH : undefined) };
+    }
     return mem;
-  }, [params.dc]);
+  }, [params.dc, params.dcDur]);
   const offered: Offered = { stack: stackRes.offered?.row ?? null, stackMeta: stackRes.offered?.meta ?? null, dc: dcCase };
   const options = revOptions(offered);
   const stackPending = V4 && params.rev === 'stack' && stackRes.status === 'loading';
   const rev: RevSource = effectiveSource(params.rev, offered);
   const detail = sourceDetail(rev, offered, use);
 
+  // While the Data Center site is the source, the battery is the case's, so its duration (MWh / MW) sets the installed cost.
+  // Changing the duration in the selection bar leaves the case behind: the page goes back to Energy.
+  const [seenDur, setSeenDur] = useState(sel.duration);
+  useEffect(() => {
+    if (seenDur === sel.duration) return;
+    setSeenDur(sel.duration);
+    if (params.rev === 'dc') setParams({ rev: 'energy' });
+  }, [sel.duration]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const resource: Resource | undefined = row && !stackPending ? {
-    durationH: row.duration_h,
+    durationH: economicsDuration(rev, dcCase, row.duration_h),
     revenuePerKwYr: revenueOf(rev, use === 'da' ? row.da_rt_revenue_per_kw_year! : row.revenue_per_kw_year, offered),
     cyclesPerYear: use === 'da' ? (run?.metrics.da_cycles_per_year ?? row.cycles_per_year) : row.cycles_per_year,
   } : undefined;
@@ -172,7 +184,7 @@ export default function Economics() {
   const out = useMemo(() => resource && compute(assumptions, resource), [assumptions, resource?.durationH, resource?.revenuePerKwYr, resource?.cyclesPerYear]); // eslint-disable-line react-hooks/exhaustive-deps
   const rows = useMemo(() => resource && tornado(assumptions, resource), [assumptions, resource?.durationH, resource?.revenuePerKwYr, resource?.cyclesPerYear]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const scenario = row ? `${locFull(sel.location)} · ${sel.duration}h · ${yearLabel(sel.year)}` : '';
+  const scenario = row ? `${locFull(sel.location)} · ${resource?.durationH ?? sel.duration}h · ${yearLabel(sel.year)}` : '';
   const yr1 = resource ? resource.revenuePerKwYr * (1 - form.haircutPct / 100) : undefined;
   const life = Math.max(1, Math.round(form.lifeYears));
   const ann = !!row?.annualized && rev === 'energy';
@@ -220,7 +232,7 @@ export default function Economics() {
           <Group gap="sm" justify="flex-end">
             {options.length > 1 && (
               <SegmentedControl
-                value={rev} onChange={(v) => setParams({ rev: v as RevSource, ...(v === 'dc' && dcCase ? { dc: dcCase.perKwYr } : {}) })}
+                value={rev} onChange={(v) => setParams({ rev: v as RevSource, ...(v === 'dc' && dcCase ? { dc: dcCase.perKwYr, dcDur: dcCase.durationH ?? null } : {}) })}
                 aria-label="Revenue" data-testid="rev-pill"
                 data={options.map((o) => ({ value: o, label: REV_LABEL[o] }))}
               />

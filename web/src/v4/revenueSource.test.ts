@@ -3,7 +3,7 @@ import { fixtureFile } from './fixture';
 import { parseStackIndex } from './site/stackIndex';
 import { AS_UPPER_BOUND_NOTE } from './config';
 import {
-  carryRevParams, economicsLink, effectiveSource, offeredStack, parseRevHash, parseRevParams, revOptions, revenueOf, sourceDetail, stackModeOf, withRevParams,
+  carryRevParams, economicsDuration, economicsLink, effectiveSource, offeredStack, parseRevHash, parseRevParams, revOptions, revenueOf, sourceDetail, stackModeOf, withRevParams,
   type Offered,
 } from './revenueSource';
 import { economicsVerdict } from '../data/notes';
@@ -76,11 +76,12 @@ describe('revenue and NPV per source', () => {
 
 describe('URL', () => {
   it('writes nothing for the defaults, so existing URLs do not change', () => {
-    expect(withRevParams(hash, { rev: 'energy', plan: 'pf', dc: null })).toBe(hash);
+    expect(withRevParams(hash, { rev: 'energy', plan: 'pf', dc: null, dcDur: null })).toBe(hash);
   });
   it('round-trips each source and the plan', () => {
     for (const p of [
-      { rev: 'stack', plan: 'pf', dc: null }, { rev: 'stack', plan: 'da', dc: null }, { rev: 'dc', plan: 'pf', dc: 61.25 }, { rev: 'energy', plan: 'da', dc: null },
+      { rev: 'stack', plan: 'pf', dc: null, dcDur: null }, { rev: 'stack', plan: 'da', dc: null, dcDur: null },
+      { rev: 'dc', plan: 'pf', dc: 61.25, dcDur: 2 }, { rev: 'dc', plan: 'pf', dc: 61.25, dcDur: 1.5 }, { rev: 'energy', plan: 'da', dc: null, dcDur: null },
     ] as const) {
       const h = withRevParams(hash, p);
       expect(parseRevHash(h)).toEqual(p);
@@ -88,19 +89,51 @@ describe('URL', () => {
     }
   });
   it('ignores unknown values', () => {
-    expect(parseRevParams('rev=banana&src=x&dc=abc')).toEqual({ rev: 'energy', plan: 'pf', dc: null });
-    expect(parseRevParams('')).toEqual({ rev: 'energy', plan: 'pf', dc: null });
+    expect(parseRevParams('rev=banana&src=x&dc=abc&dcd=0')).toEqual({ rev: 'energy', plan: 'pf', dc: null, dcDur: null });
+    expect(parseRevParams('')).toEqual({ rev: 'energy', plan: 'pf', dc: null, dcDur: null });
   });
   it('keeps the choice when the scenario changes', () => {
-    const from = withRevParams(hash, { rev: 'dc', plan: 'da', dc: 50 });
+    const from = withRevParams(hash, { rev: 'dc', plan: 'da', dc: 50, dcDur: 4 });
     const to = carryRevParams(from, '#/research/economics?loc=HB_WEST&dur=4&year=2025&deg=10');
     expect(to).toContain('loc=HB_WEST');
-    expect(parseRevHash(to)).toEqual({ rev: 'dc', plan: 'da', dc: 50 });
+    expect(parseRevHash(to)).toEqual({ rev: 'dc', plan: 'da', dc: 50, dcDur: 4 });
     expect(carryRevParams(hash, '#/x?a=1')).toBe('#/x?a=1');
   });
   it('builds the link from a Data Center result', () => {
-    const link = economicsLink(hash, 61.2549);
-    expect(parseRevHash(link)).toEqual({ rev: 'dc', plan: 'pf', dc: 61.25 });
+    const link = economicsLink(hash, 61.2549, 4);
+    expect(parseRevHash(link)).toEqual({ rev: 'dc', plan: 'pf', dc: 61.25, dcDur: 4 });
+  });
+  it('does not write the duration unless the Data Center site is the source', () => {
+    expect(withRevParams(hash, { rev: 'stack', plan: 'pf', dc: 50, dcDur: 4 })).not.toContain('dcd');
+  });
+});
+
+describe('Data Center duration', () => {
+  it('follows the case while Data Center site is the source, else the scenario', () => {
+    const c = { perKwYr: 50, label: 'case', durationH: 4 };
+    expect(economicsDuration('dc', c, 2)).toBe(4);
+    expect(economicsDuration('energy', c, 2)).toBe(2);
+    expect(economicsDuration('stack', c, 2)).toBe(2);
+    expect(economicsDuration('dc', { perKwYr: 50, label: 'case' }, 2)).toBe(2); // a case with no duration leaves the scenario's
+    expect(economicsDuration('dc', null, 2)).toBe(2);
+  });
+  it('says so in one line', () => {
+    expect(sourceDetail('dc', { ...offeredAll, dc: { perKwYr: 50, label: 'case', durationH: 4 } }, 'pf').extra).toContain('battery duration is the case');
+  });
+  it('costs the case at its own duration', () => {
+    const at = (h: number) => compute(DEFAULTS, { durationH: h, cyclesPerYear: 300, revenuePerKwYr: 77.5 }).netCapex;
+    expect(at(4)).toBeCloseTo(2 * at(2), 6);
+  });
+});
+
+describe('haircut', () => {
+  // Every source goes through the same compute(): year 1 revenue = revenue x (1 - haircut), less O&M.
+  it('applies the same way to Energy, Full stack and Data Center site', () => {
+    for (const src of ['energy', 'stack', 'dc'] as const) {
+      const revenue = revenueOf(src, 40, offeredAll);
+      const flows = compute({ ...DEFAULTS, haircut: 0.25, decline: 0 }, { durationH: 2, cyclesPerYear: 300, revenuePerKwYr: revenue }).cashFlows;
+      expect(flows[1] + DEFAULTS.omPerKwYr).toBeCloseTo(revenue * 0.75, 6);
+    }
   });
 });
 
