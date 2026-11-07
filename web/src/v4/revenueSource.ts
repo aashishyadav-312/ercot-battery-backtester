@@ -4,7 +4,7 @@
 //   #/research/economics?loc=..&dur=..&year=..&deg=..            energy, perfect foresight (the old URL)
 //   ...&src=da                                                    day-ahead plan
 //   ...&rev=stack                                                 full stack (energy plus ancillary services)
-//   ...&rev=dc&dc=<$/kW-yr>                                       the Data Center case total
+//   ...&rev=dc&dc=<$/kW-yr>&dcd=<hours>                           the Data Center case total and its battery duration (MWh / MW)
 
 import { AS_UPPER_BOUND_NOTE } from './config';
 import { isUpperBoundYear, yearTag, type StackFile, type StackMode, type StackRow } from './stack';
@@ -19,17 +19,21 @@ export const REV_LABEL: Record<RevSource, string> = { energy: 'Energy', stack: '
 /** Stack files carry two modes: the upper bound is the perfect-foresight run, the realistic one is the day-ahead plan. */
 export const stackModeOf = (plan: PlanSource): StackMode => (plan === 'da' ? 'realistic' : 'foresight');
 
-export interface RevParams { rev: RevSource; plan: PlanSource; dc: number | null }
+export interface RevParams { rev: RevSource; plan: PlanSource; dc: number | null; dcDur: number | null }
 
-const EXTRA_KEYS = ['rev', 'src', 'dc'] as const;
+const EXTRA_KEYS = ['rev', 'src', 'dc', 'dcd'] as const;
+
+const num = (v: string | null): number | null => (v != null && v.trim() !== '' && Number.isFinite(Number(v)) ? Number(v) : null);
 
 /** Read the choice from a query string. Anything unknown is the default. */
 export function parseRevParams(query: string): RevParams {
   const q = new URLSearchParams(query);
   const rev = q.get('rev');
-  const dcRaw = q.get('dc');
-  const dc = dcRaw != null && dcRaw.trim() !== '' && Number.isFinite(Number(dcRaw)) ? Number(dcRaw) : null;
-  return { rev: rev === 'stack' || rev === 'dc' ? rev : 'energy', plan: q.get('src') === 'da' ? 'da' : 'pf', dc };
+  const dcDur = num(q.get('dcd'));
+  return {
+    rev: rev === 'stack' || rev === 'dc' ? rev : 'energy', plan: q.get('src') === 'da' ? 'da' : 'pf',
+    dc: num(q.get('dc')), dcDur: dcDur != null && dcDur > 0 ? dcDur : null,
+  };
 }
 
 /** Read the choice from a full hash (`#/research/economics?...`). */
@@ -44,6 +48,7 @@ export function withRevParams(hash: string, p: RevParams): string {
   if (p.plan === 'da') q.set('src', 'da');
   if (p.rev !== 'energy') q.set('rev', p.rev);
   if (p.rev === 'dc' && p.dc != null) q.set('dc', String(p.dc));
+  if (p.rev === 'dc' && p.dc != null && p.dcDur != null) q.set('dcd', String(p.dcDur));
   const s = q.toString();
   return s ? `${base}?${s}` : base;
 }
@@ -62,7 +67,7 @@ export function carryRevParams(from: string, to: string): string {
 }
 
 /** The Data Center case total, as carried to Economics. */
-export interface DcCase { perKwYr: number; label: string }
+export interface DcCase { perKwYr: number; label: string; /** Battery MWh / MW of the case. */ durationH?: number }
 
 export interface Offered {
   stack: StackRow | null;
@@ -118,12 +123,19 @@ export function sourceDetail(src: RevSource, o: Offered, plan: PlanSource): Sour
     };
   }
   if (src === 'dc' && o.dc) {
-    return { label: 'Data Center site', split: null, yearNote: null, upperBoundNote: null, extra: `${o.dc.label}. Installed cost and cycles follow the scenario above.` };
+    const dur = o.dc.durationH != null
+      ? `The battery duration is the case's (${o.dc.durationH} h), so installed cost uses it. Change the duration above to return to Energy.`
+      : 'Installed cost follows the duration above.';
+    return { label: 'Data Center site', split: null, yearNote: null, upperBoundNote: null, extra: `${o.dc.label}. ${dur}` };
   }
   return { label: 'Energy only', split: null, yearNote: null, upperBoundNote: null, extra: null };
 }
 
 /** Link from a Data Center result to Project economics with that case as the revenue. `hash` is the economics hash for the case. */
-export function economicsLink(hash: string, dc: number): string {
-  return withRevParams(hash, { rev: 'dc', plan: 'pf', dc: Math.round(dc * 100) / 100 });
+export function economicsLink(hash: string, dc: number, durationH?: number): string {
+  return withRevParams(hash, { rev: 'dc', plan: 'pf', dc: Math.round(dc * 100) / 100, dcDur: durationH != null ? Math.round(durationH * 1000) / 1000 : null });
 }
+
+/** Duration the economics use: the Data Center case's while that source is in use, else the scenario's. */
+export const economicsDuration = (src: RevSource, dc: DcCase | null, scenarioH: number): number =>
+  src === 'dc' && dc?.durationH != null && dc.durationH > 0 ? dc.durationH : scenarioH;

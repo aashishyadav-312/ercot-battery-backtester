@@ -261,7 +261,9 @@ describe('strategies and limits', () => {
     expect(r.notes.join(' ')).toMatch(/energy only/);
   });
 
-  it('runs one node-year in under 2 s', () => {
+  // Speed guard, not a benchmark: the engine takes about 1 s on a fast machine and about 2.3 s on a slow laptop, and more when the
+  // whole suite runs in parallel. The budget catches a real slowdown (a 5x regression) without failing on a busy or slow machine.
+  it('runs one node-year in under 5 s', () => {
     const prices = parsePriceFileSync('HB_WEST_2025.ebp');
     const fourCp: FourCpYear = JSON.parse(readFileSync(join(RESULTS, 'v4', 'fourcp', '2025.json'), 'utf8'));
     return prices.then((p) => {
@@ -281,13 +283,13 @@ describe('strategies and limits', () => {
           fourCpStrategy,
         });
         const ms = performance.now() - t0;
-        expect(ms).toBeLessThan(2000);
+        expect(ms).toBeLessThan(5000);
         expect(r.daysSolved).toBeGreaterThan(360);
         expect(r.fourCpDetail).toHaveLength(4);
         expect(r.annualized).toBe(false);
       }
     });
-  }, 10_000);
+  }, 20_000);
 });
 
 describe('energy-only parity with the published results', () => {
