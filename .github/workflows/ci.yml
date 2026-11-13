@@ -58,6 +58,26 @@ jobs:
           npm ci
           npm test
 
+  # V5 is off until its release step. The same unit tests also run with it on (V5 needs V4 on), so a test that assumes the old
+  # shell fails here and should mock the flag.
+  web-v5:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install and test with V5 on
+        working-directory: web
+        env:
+          VITE_V4: "1"
+          VITE_V5: "1"
+        run: |
+          npm ci
+          npm test
+
   worker:
     runs-on: ubuntu-latest
     steps:

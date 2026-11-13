@@ -5,6 +5,7 @@
 // with the query kept as written, so shared links and bookmarks keep working.
 
 import type { Selection } from '../data/types';
+import { V5 } from '../config/features';
 
 export type Page = 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'siteguide' | 'limits' | 'glossary' | 'author' | 'map' | 'live' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
 /**
@@ -45,10 +46,19 @@ const VIEW_ALIAS: Partial<Record<Tab, Record<string, string>>> = {
 
 export type Tab = 'home' | 'atlas' | 'studio' | 'research' | 'learn';
 
-interface View { page: Page; slug: string; label: string }
+interface View {
+  page: Page;
+  slug: string;
+  label: string;
+  /** V5 only: this view is a section inside another view (the Research pages inside Learn). The view bar lists it on a second row. */
+  parent?: Page;
+  /** V5 only: the label on that second row, when it differs from `label`. */
+  subLabel?: string;
+}
+type TabDef = { tab: Tab; label: string; views: View[] };
 
 /** Tabs in navigation order. The first view of a tab is its default; `slug` is empty for a tab with one view. */
-export const TABS: { tab: Tab; label: string; views: View[] }[] = [
+export const TABS: TabDef[] = [
   { tab: 'home', label: 'Home', views: [{ page: 'home', slug: '', label: 'Overview' }, { page: 'live', slug: 'live', label: 'Live prices' }] },
   { tab: 'atlas', label: 'Atlas', views: [{ page: 'atlas', slug: '', label: 'All nodes' }, { page: 'map', slug: 'sites', label: 'Study sites' }] },
   {
@@ -80,26 +90,54 @@ export const TABS: { tab: Tab; label: string; views: View[] }[] = [
   },
 ];
 
+/**
+ * V5 shell: four tabs. Research is no longer a tab; its pages sit inside Learn, with the same slugs under `#/learn/`
+ * (`#/research` is `#/learn/research`, `#/research/revenue` is `#/learn/revenue`). Home, Atlas and Studio are the same as before.
+ */
+export const TABS_V5: TabDef[] = [
+  TABS[0],
+  TABS[1],
+  TABS[2],
+  {
+    tab: 'learn', label: 'Learn',
+    views: [
+      { page: 'learn', slug: '', label: 'Basics' },
+      { page: 'research', slug: 'research', label: 'Research', subLabel: 'Findings' },
+      { page: 'revenue', slug: 'revenue', label: 'Revenue', parent: 'research' },
+      { page: 'dispatch', slug: 'charging', label: 'Charging pattern', parent: 'research' },
+      { page: 'realism', slug: 'reality', label: 'Reality check', parent: 'research' },
+      { page: 'method', slug: 'method', label: 'Method', parent: 'research' },
+      { page: 'siteguide', slug: 'site-guide', label: 'Site guide' },
+      { page: 'limits', slug: 'limits', label: 'Limits' },
+      { page: 'glossary', slug: 'glossary', label: 'Glossary' },
+      { page: 'author', slug: 'about', label: 'About' },
+    ],
+  },
+];
+
+/** The tabs of the shell in use: five with V5 off (today's site), four with V5 on. */
+export const tabsFor = (v5: boolean = V5): TabDef[] => (v5 ? TABS_V5 : TABS);
+
 export const TAB_IDS: Tab[] = TABS.map((t) => t.tab);
 
-export function tabOf(page: Page): Tab {
-  return TABS.find((t) => t.views.some((v) => v.page === page))!.tab;
+export function tabOf(page: Page, v5: boolean = V5): Tab {
+  return tabsFor(v5).find((t) => t.views.some((v) => v.page === page))!.tab;
 }
 
-export function viewsOf(tab: Tab): View[] {
-  return TABS.find((t) => t.tab === tab)!.views;
+export function viewsOf(tab: Tab, v5: boolean = V5): View[] {
+  return (tabsFor(v5).find((t) => t.tab === tab) ?? TABS.find((t) => t.tab === tab)!).views;
 }
 
 /** Path (no leading `#/`, no query) of a page: "research/revenue", "atlas". */
-export function pathOf(page: Page): string {
-  const tab = tabOf(page);
-  const v = viewsOf(tab).find((x) => x.page === page)!;
+export function pathOf(page: Page, v5: boolean = V5): string {
+  const tab = tabOf(page, v5);
+  const v = viewsOf(tab, v5).find((x) => x.page === page)!;
   return v.slug ? `${tab}/${v.slug}` : tab;
 }
 
 /** Hash for a tab's default view, e.g. the header links. */
-export function tabPath(tab: Tab): string {
-  return pathOf(viewsOf(tab)[0].page);
+export function tabPath(tab: Tab, v5: boolean = V5): string {
+  return pathOf(viewsOf(tab, v5)[0].page, v5);
 }
 
 export interface ResolvedRoute {
@@ -114,7 +152,7 @@ export interface ResolvedRoute {
 }
 
 /** Resolve any hash, current or from before the redesign, to a route. */
-export function resolveHash(hash: string): ResolvedRoute {
+export function resolveHash(hash: string, v5: boolean = V5): ResolvedRoute {
   const raw = hash.replace(/^#\/?/, '');
   const qi = raw.indexOf('?');
   const path = qi < 0 ? raw : raw.slice(0, qi);
@@ -125,8 +163,14 @@ export function resolveHash(hash: string): ResolvedRoute {
   let page: Page;
   let redirected: boolean;
   const tabId = TAB_ALIAS[first] ?? first;
-  if ((TAB_IDS as string[]).includes(tabId)) {
-    const views = viewsOf(tabId as Tab);
+  if (v5 && tabId === 'research') {
+    // V5: Research lives inside Learn. `#/research` opens Findings, `#/research/<view>` opens that view, old view names included.
+    const renamed = VIEW_ALIAS.research?.[second];
+    const hit = second === '' ? undefined : viewsOf('learn', true).find((v) => v.slug === (renamed ?? second));
+    page = hit?.page ?? 'research';
+    redirected = true;
+  } else if ((TAB_IDS as string[]).includes(tabId)) {
+    const views = viewsOf(tabId as Tab, v5);
     const renamed = VIEW_ALIAS[tabId as Tab]?.[second];
     const hit = views.find((v) => v.slug === (renamed ?? second));
     // An unknown view, or a bare tab whose first view has its own slug (#/research), opens the tab's first view.
@@ -148,7 +192,7 @@ export function resolveHash(hash: string): ResolvedRoute {
     page = moved;
     redirected = true;
   }
-  return { tab: tabOf(page), page, query, canonical: `#/${pathOf(page)}${q ? `?${q}` : ''}`, redirected };
+  return { tab: tabOf(page, v5), page, query, canonical: `#/${pathOf(page, v5)}${q ? `?${q}` : ''}`, redirected };
 }
 
 /**
