@@ -2,6 +2,7 @@
 import type { ReactNode } from 'react';
 import { Anchor, List, Paper, Stack, Text, Title } from '@mantine/core';
 import { Info } from '../../components/Info';
+import { V5 } from '../../config/features';
 
 const Step = ({ n, title, children, link }: { n: number; title: string; children: ReactNode; link: ReactNode }) => (
   <Paper withBorder p={{ base: 'md', sm: 'lg' }} component="li" style={{ listStyle: 'none' }}>
@@ -13,7 +14,7 @@ const Step = ({ n, title, children, link }: { n: number; title: string; children
   </Paper>
 );
 
-export function Screening() {
+export function Screening({ v5 = V5 }: { v5?: boolean }) {
   return (
     <Stack gap="md">
       <List component="ol" spacing="md" listStyleType="none" m={0} p={0} data-testid="screening-steps">
@@ -31,6 +32,14 @@ export function Screening() {
           between energy, ancillary services, 4CP avoided <Info terms="fourcp" /> and cover during a curtailment under SB 6 <Info terms="sb6" />.
           Those rules are under review, so treat the rate and the curtailment hours as inputs you can change.
         </Step>
+        {v5 && (
+          <Step n={4} title="Read the site report" link={<Anchor href="#/home">Search on Home {'→'}</Anchor>}>
+            Search a place on Home, or use Open site report on an Atlas pin, and the site report opens. Read it from the top: Battery value is
+            the backtest range at the nearest priced nodes, with the year strip below it. Storage nearby counts the batteries operating and
+            planned around the point, from EIA data; more of them tends to mean thinner spreads. For a data center links to Data Center mode,
+            where 4CP and the proposed 12CP rule sit side by side. Limits lists what the numbers leave out. It is screening, not a forecast.
+          </Step>
+        )}
       </List>
     </Stack>
   );

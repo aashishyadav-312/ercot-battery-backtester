@@ -12,9 +12,10 @@ import {
   type AncillaryMeta,
 } from '../data/method';
 import { TERMS } from '../copy/terms';
-import { V4 } from '../config/features';
+import { V4, V5 } from '../config/features';
 
 const V4Method = lazy(() => import('../v4/method/V4Method'));
+const V5Method = lazy(() => import('../v5/method/V5Method'));
 
 function Sub({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -95,6 +96,7 @@ export default function Method() {
       </Section>
 
       {V4 && <Suspense fallback={<Text size="sm" c="dimmed">Loading the stack and Data Center method…</Text>}><V4Method /></Suspense>}
+      {V5 && <Suspense fallback={<Text size="sm" c="dimmed">Loading the 12CP and storage method…</Text>}><V5Method /></Suspense>}
 
       <Section title="What it leaves out">
         <List size="sm" spacing={4}>

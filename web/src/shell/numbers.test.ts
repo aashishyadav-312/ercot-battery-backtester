@@ -14,6 +14,8 @@ const REBUILT = [
   'v5/TcosBlock.tsx',
   'v5/site/SiteReport.tsx',
   'v5/site/report.ts',
+  'v5/method/V5Method.tsx',
+  'v5/glossary.ts',
   'components/home/HomeMap.tsx',
   'pages/Atlas.tsx',
   'components/atlas/AtlasMap.tsx',

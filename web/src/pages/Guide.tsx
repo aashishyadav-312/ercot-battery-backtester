@@ -11,7 +11,7 @@ import { locName } from '../data/site';
 import { START_DEFAULTS } from '../data/start';
 import { fmtDate } from '../data/format';
 import { markStartSeen } from '../components/StartBanner';
-import { V4 } from '../config/features';
+import { V4, V5 } from '../config/features';
 import { Screening } from '../v4/learn/Screening';
 
 /** Sections of the page, in order. `#/learn?s=<id>` opens it at one. The other old sections have their own pages now (shell/route.ts). */
@@ -138,7 +138,7 @@ export default function Guide() {
       </GuideSection>
 
       {V4 && (
-        <GuideSection id="screening" n={3} title="Site screening" lede="From a place on the map to what a battery is worth there. Three steps.">
+        <GuideSection id="screening" n={3} title="Site screening" lede={V5 ? 'From a place to what a battery is worth there. Four steps.' : 'From a place on the map to what a battery is worth there. Three steps.'}>
           <Screening />
         </GuideSection>
       )}

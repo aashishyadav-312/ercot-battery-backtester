@@ -8,6 +8,7 @@ import { Footer } from '../components/shell/Footer';
 import { Markdown } from '../components/Markdown';
 import { parseDoc } from '../data/markdown';
 import { GLOSSARY, glossaryEntries, SITE } from '../data/site';
+import { V5 } from '../config/features';
 import { TERMS } from '../copy/terms';
 import { retiredIn } from '../copy/retired';
 
@@ -77,7 +78,8 @@ describe('Glossary', () => {
   it('lists every term A to Z, with the short definition for the shared terms', () => {
     view(<Glossary />);
     const terms = [...document.querySelectorAll('dt')].map((t) => t.textContent!);
-    expect(terms).toHaveLength(Object.keys(GLOSSARY).filter((id) => !id.endsWith('_v4')).length);
+    // With V5 on (the web-v5 CI job) the page also lists the four V5 terms (src/v5/glossary.ts).
+    expect(terms).toHaveLength(Object.keys(GLOSSARY).filter((id) => !id.endsWith('_v4')).length + (V5 ? 4 : 0));
     expect(terms).toEqual([...terms].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })));
     const def = (label: string) => [...document.querySelectorAll('dt')].find((t) => t.textContent === label)!.nextElementSibling!.textContent;
     expect(def(TERMS.captureRate.label)).toBe(TERMS.captureRate.definition);
