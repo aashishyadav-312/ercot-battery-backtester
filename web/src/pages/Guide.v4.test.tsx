@@ -14,7 +14,7 @@ const RULES = JSON.parse(readFileSync(resolve(process.cwd(), 'src/custom/config/
 // The two original terms Studio's Ancillary card and the RTC+B cards use, as the glossary file holds them.
 const ORIG = (JSON.parse(readFileSync(resolve(process.cwd(), 'src/data/glossary.json'), 'utf8')) as { terms: Record<string, { definition: string }> }).terms;
 
-vi.mock('../config/features', () => ({ V4: true }));
+vi.mock('../config/features', () => ({ V4: true, V5: false }));
 vi.mock('../state', async () => {
   const route = await import('../shell/route');
   return { useApp: () => ({ go: () => {} }), buildHash: route.buildHash };

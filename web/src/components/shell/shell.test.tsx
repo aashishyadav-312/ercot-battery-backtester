@@ -10,6 +10,8 @@ import { tickerModel } from '../../shell/ticker';
 import { TABS } from '../../shell/route';
 import type { LiveState } from '../../live/live';
 
+vi.mock('../../config/features', async (orig) => ({ ...(await orig<typeof import('../../config/features')>()), V5: false })); // these tests describe the shell with V5 off
+
 afterEach(cleanup);
 
 const STATE: LiveState = {

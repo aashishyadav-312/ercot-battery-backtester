@@ -1,5 +1,5 @@
 import type { Selection } from '../../data/types';
-import { TABS, buildHash, viewsOf, type Tab } from '../../shell/route';
+import { buildHash, tabsFor, viewsOf, type Tab } from '../../shell/route';
 import type { Scheme } from '../../shell/scheme';
 import { IconMoon, IconSun } from '../Icons';
 import { SupportButton } from '../../support/Support';
@@ -22,7 +22,7 @@ interface Props {
   onToggleScheme: () => void;
 }
 
-/** Brand, the five tabs and the theme toggle. Tabs are real links; the current one carries aria-current. */
+/** Brand, the tabs (five, or four with V5) and the theme toggle. Tabs are real links; the current one carries aria-current. */
 export function Header({ active, sel, scheme, onToggleScheme }: Props) {
   const next = scheme === 'dark' ? 'light' : 'dark';
   return (
@@ -33,7 +33,7 @@ export function Header({ active, sel, scheme, onToggleScheme }: Props) {
           <span className={classes.name}>Chargeline</span>
         </a>
         <nav className={classes.nav} aria-label="Primary">
-          {TABS.map(({ tab, label, views }) => (
+          {tabsFor().map(({ tab, label, views }) => (
             <a key={tab} className={classes.tab} data-tour={`tab-${tab}`} href={buildHash(views[0].page, sel)} aria-current={active === tab ? 'page' : undefined}>
               {label}
             </a>

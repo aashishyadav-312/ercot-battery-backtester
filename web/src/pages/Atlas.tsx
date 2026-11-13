@@ -12,7 +12,8 @@ import {
 import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
 import type { StackFile } from '../v4/stack';
 import { AtlasMap } from '../components/atlas/AtlasMap';
-import { V4 } from '../config/features';
+import { V4, V5 } from '../config/features';
+import { readAdvanced, writeAdvanced } from '../v5/advanced';
 import { Info } from '../components/Info';
 import classes from './Atlas.module.css';
 import { PER_KW_PER_YEAR, TERMS } from '../copy/terms';
@@ -65,7 +66,16 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
   const outline = useMemo(() => outlinePath(geo), [geo]);
   const where = useMemo(() => placement(file), [file]);
 
-  const [metric, setMetric] = useState<Metric>('rev');
+  const [metricPick, setMetric] = useState<Metric>('rev');
+  // V5: the Advanced switch (address: adv=1). Off, the map shows Revenue only and the table leaves out its three technical columns.
+  const [adv, setAdv] = useState(() => V5 && typeof window !== 'undefined' && readAdvanced(window.location.hash));
+  const simple = V5 && !adv;
+  const metric: Metric = simple ? 'rev' : metricPick;
+  const toggleAdvanced = () => {
+    const next = !adv;
+    setAdv(next);
+    window.history.replaceState(null, '', writeAdvanced(window.location.hash, next));
+  };
   const [zone, setZone] = useState<string | null>(null);
   // An old #/map?loc=<node> link opens on that node; otherwise the rank-1 node.
   const [code, setCode] = useState(() => (all.some((n) => n.code === sel.location) ? sel.location : [...all].sort((a, b) => a.rank - b.rank)[0]?.code));
@@ -143,7 +153,7 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
           <h2 id="atlas-map-title" className={classes.srOnly}>Map of every placed node</h2>
           <div className={classes.controls}>
             <div className={classes.pills} role="group" aria-label="Map metric">
-              {METRICS.map((x) => (
+              {METRICS.filter((x) => !simple || x.id === 'rev').map((x) => (
                 <button key={x.id} type="button" className={classes.pill} aria-pressed={metric === x.id} title={x.long} onClick={() => pickMetric(x.id)}>{x.label}</button>
               ))}
             </div>
@@ -154,6 +164,14 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
                     {b === 'energy' ? 'Energy' : 'Full stack'}
                   </button>
                 ))}
+              </div>
+            )}
+            {V5 && (
+              <div className={classes.pills} role="group" aria-label="More measures">
+                <button type="button" className={classes.pill} aria-pressed={adv} onClick={toggleAdvanced} data-testid="advanced-toggle"
+                  title="Adds the capture rate and top-10-day share measures, and more table columns">
+                  Advanced
+                </button>
               </div>
             )}
             <div className={classes.zones} role="group" aria-label="Load zone">
@@ -184,7 +202,7 @@ export function AtlasView({ nodes: file, geo, sel, stack = null }: { nodes: Node
 
       <Stray file={file} />
       <Unplaced file={file} where={where} />
-      <NodeTable file={file} hubs={hubs} zone={zone} selected={code} onSelect={(c) => choose(c, true)} />
+      <NodeTable file={file} hubs={hubs} zone={zone} selected={code} onSelect={(c) => choose(c, true)} simple={simple} />
     </div>
   );
 }
@@ -371,10 +389,16 @@ const COLS: { key: Key; label: string; term?: string; num?: boolean }[] = [
 ];
 const PAGE = 25;
 
-function NodeTable({ file, hubs, zone, selected, onSelect }: {
-  file: NodesFile; hubs: Map<string, number>; zone: string | null; selected: string | null; onSelect: (code: string) => void;
+/** V5, Advanced off: these columns are left out of the table (the CSV still has every column). */
+const ADVANCED_COLS: Key[] = ['cycles', 'spread', 'corr_hub'];
+
+function NodeTable({ file, hubs, zone, selected, onSelect, simple = false }: {
+  file: NodesFile; hubs: Map<string, number>; zone: string | null; selected: string | null; onSelect: (code: string) => void; simple?: boolean;
 }) {
-  const [sort, setSort] = useState<{ key: Key; desc: boolean }>({ key: 'rev', desc: true });
+  const cols = useMemo(() => (simple ? COLS.filter((c) => !ADVANCED_COLS.includes(c.key)) : COLS), [simple]);
+  const [picked, setSort] = useState<{ key: Key; desc: boolean }>({ key: 'rev', desc: true });
+  // A hidden column cannot stay the sort key.
+  const sort = useMemo(() => (cols.some((c) => c.key === picked.key) ? picked : { key: 'rev' as Key, desc: true }), [cols, picked]);
   const [unplacedOnly, setUnplacedOnly] = useState(false);
   const [n, setN] = useState(PAGE);
   const rows = useMemo(() => {
@@ -419,7 +443,7 @@ function NodeTable({ file, hubs, zone, selected, onSelect }: {
         <table className={`${classes.table} ${classes.wide}`} data-testid="node-table">
           <thead>
             <tr>
-              {COLS.map((c) => (
+              {cols.map((c) => (
                 <th key={c.key} scope="col" className={c.num ? classes.num : undefined} aria-sort={sort.key === c.key ? (sort.desc ? 'descending' : 'ascending') : 'none'}>
                   <span className={classes.thInner}>
                     <button type="button" className={classes.sortBtn} onClick={() => click(c.key)}>
@@ -447,9 +471,9 @@ function NodeTable({ file, hubs, zone, selected, onSelect }: {
                 <td className={classes.num}>{usd(r.da_rev, 1)}</td>
                 <td className={classes.num}>{pct(r.capture)}</td>
                 <td className={classes.num}>{pct(r.top10)}</td>
-                <td className={classes.num}>{num(r.cycles)}</td>
-                <td className={classes.num}>{usd(r.spread, 0)}</td>
-                <td className={classes.num}>{r.corr_hub == null ? '–' : num(r.corr_hub, 2)}</td>
+                {!simple && <td className={classes.num}>{num(r.cycles)}</td>}
+                {!simple && <td className={classes.num}>{usd(r.spread, 0)}</td>}
+                {!simple && <td className={classes.num}>{r.corr_hub == null ? '–' : num(r.corr_hub, 2)}</td>}
               </tr>
             ))}
           </tbody>

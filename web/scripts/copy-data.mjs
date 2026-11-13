@@ -44,18 +44,21 @@ for (const f of readdirSync(prices).sort()) {
     n++;
   }
 }
-// V4 data (results/v4/**, for example results/v4/geo and results/v4/stack). Copied as-is, hashed with the rest.
-function copyTree(from, to, rel = '') {
+// V4 and V5 data (results/v4/**, results/v5/**, for example results/v4/geo and results/v4/stack). Copied as-is, hashed with the rest.
+function copyTree(from, to, root = 'v4/', rel = '') {
   for (const e of readdirSync(from, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
-    if (e.isDirectory()) { copyTree(join(from, e.name), join(to, e.name), `${rel}${e.name}/`); continue; }
+    if (e.isDirectory()) { copyTree(join(from, e.name), join(to, e.name), root, `${rel}${e.name}/`); continue; }
     if (!e.name.endsWith('.json')) continue;
     mkdirSync(to, { recursive: true });
     cpSync(join(from, e.name), join(to, e.name));
-    hash.update(`v4/${rel}${e.name}`).update(readFileSync(join(from, e.name)));
+    hash.update(`${root}${rel}${e.name}`).update(readFileSync(join(from, e.name)));
     n++;
   }
 }
 if (existsSync(join(src, 'v4'))) copyTree(join(src, 'v4'), join(dst, 'v4'));
+// V5 data (results/v5/**, for example results/v5/twelvecp and results/v5/batteries). Copied the same way. The folder may be empty or
+// missing: the build then carries no V5 data and still succeeds.
+if (existsSync(join(src, 'v5'))) copyTree(join(src, 'v5'), join(dst, 'v5'), 'v5/');
 // The FIXTURE stack (web/fixtures/v4/stack, made-up numbers for the unit tests) is never copied here. Tests read it from disk.
 // It used to be served with V4_FIXTURE=1 while Step 1 was unmerged; that path is gone so a build can never ship it.
 // scripts/check-no-fixture.mjs checks the finished build for it as well.

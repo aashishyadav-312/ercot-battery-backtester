@@ -22,5 +22,6 @@ export default defineConfig({
   plugins: [react()],
   build: { chunkSizeWarningLimit: 1200 },
   // Unit tests run with V4 off unless VITE_V4 is set in the shell (CI runs them both ways); a test that needs V4 mocks the flag.
-  test: { env: { VITE_V4: process.env.VITE_V4 ?? '0' } },
+  // The same goes for VITE_V5 (V5 also needs V4 on, so the web-v5 job sets both).
+  test: { env: { VITE_V4: process.env.VITE_V4 ?? '0', VITE_V5: process.env.VITE_V5 ?? '0' } },
 });

@@ -8,7 +8,7 @@ const OUTSIDE = 'Outside Texas';
  * Search over the map: a county, a city or "lat, long". `/` focuses the box from anywhere on the page (not while typing in a
  * field), arrows move through the results, Enter picks, Esc clears the box (and, when it is already empty, the pinned site).
  */
-export function SiteSearch({ index, onPick, onClear }: { index: SearchIndex | null; onPick: (hit: SearchHit) => void; onClear: () => void }) {
+export function SiteSearch({ index, onPick, onClear, label = 'Find a place' }: { index: SearchIndex | null; onPick: (hit: SearchHit) => void; onClear: () => void; label?: string }) {
   const id = useId();
   const input = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
@@ -56,7 +56,7 @@ export function SiteSearch({ index, onPick, onClear }: { index: SearchIndex | nu
 
   return (
     <div className={classes.search}>
-      <label className={classes.searchLabel} htmlFor={`${id}-in`}>Find a place</label>
+      <label className={classes.searchLabel} htmlFor={`${id}-in`}>{label}</label>
       <div className={classes.searchBox}>
         <input
           ref={input} id={`${id}-in`} className={classes.searchInput} type="text" role="combobox" autoComplete="off" spellCheck={false}
