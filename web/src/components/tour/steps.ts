@@ -1,5 +1,6 @@
 // First-visit tour: copy, "seen" memory and placement. Pure functions and one tiny event, so the rules are testable
 // without the DOM (the component in Tour.tsx only wires them up).
+import { V5_RESEARCH_IN_LEARN } from '../../shell/route';
 
 export interface TourStep {
   /** Matches a `data-tour` attribute on the element the step points at. */
@@ -25,6 +26,7 @@ const V5_HERO_BODY = 'Search a county, city, or lat, lon to screen a site. Charg
 export const tourSteps = (v4: boolean, v5 = false): TourStep[] => {
   const base = v4 ? TOUR_STEPS.map((s) => (s.anchor === 'tab-atlas' ? { ...s, body: ATLAS_SITE_BODY } : s)) : TOUR_STEPS;
   if (!v5) return base;
+  if (!V5_RESEARCH_IN_LEARN) return base.map((s) => (s.anchor === 'hero' ? { ...s, body: V5_HERO_BODY } : s));
   return base
     .filter((s) => s.anchor !== 'tab-research')
     .map((s) => (s.anchor === 'tab-learn' ? { ...s, body: V5_LEARN_BODY } : s.anchor === 'hero' ? { ...s, body: V5_HERO_BODY } : s));

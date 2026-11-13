@@ -7,6 +7,9 @@
 import type { Selection } from '../data/types';
 import { V5 } from '../config/features';
 
+/** V5 layout choice, parked: true puts the Research pages inside Learn (four tabs). False keeps Research as its own tab. */
+export const V5_RESEARCH_IN_LEARN = false;
+
 export type Page = 'site' | 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'siteguide' | 'limits' | 'glossary' | 'author' | 'map' | 'live' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
 /**
  * Pages that no longer exist on their own: Studio replaced Custom run and Compare, Learn (first called Guide) replaced Start here and About,
@@ -115,8 +118,8 @@ export const TABS_V5: TabDef[] = [
   },
 ];
 
-/** The tabs of the shell in use: five with V5 off (today's site), four with V5 on. */
-export const tabsFor = (v5: boolean = V5): TabDef[] => (v5 ? TABS_V5 : TABS);
+/** The tabs of the shell in use: five, unless V5 is on and the parked four-tab layout (Research inside Learn) is switched on. */
+export const tabsFor = (v5: boolean = V5, inLearn: boolean = V5_RESEARCH_IN_LEARN): TabDef[] => (v5 && inLearn ? TABS_V5 : TABS);
 
 export const TAB_IDS: Tab[] = TABS.map((t) => t.tab);
 
@@ -169,7 +172,7 @@ export function resolveHash(hash: string, v5: boolean = V5): ResolvedRoute {
     // V5: the site report, `#/site?lat=&lon=&dur=&year=`. Not a view of a tab; with V5 off the word is unknown and opens Home, as before.
     page = 'site';
     redirected = second !== '';
-  } else if (v5 && tabId === 'research') {
+  } else if (v5 && V5_RESEARCH_IN_LEARN && tabId === 'research') {
     // V5: Research lives inside Learn. `#/research` opens Findings, `#/research/<view>` opens that view, old view names included.
     const renamed = VIEW_ALIAS.research?.[second];
     const hit = second === '' ? undefined : viewsOf('learn', true).find((v) => v.slug === (renamed ?? second));

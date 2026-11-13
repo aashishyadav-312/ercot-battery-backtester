@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveHash, tabOf, tabPath, tabsFor, type OldRoute } from './route';
+import { V5_RESEARCH_IN_LEARN, OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveHash, tabOf, tabPath, tabsFor, type OldRoute } from './route';
 
 vi.mock('../config/features', async (orig) => ({ ...(await orig<typeof import('../config/features')>()), V5: false })); // these tests describe the shell with V5 off
 
@@ -181,17 +181,25 @@ describe('new routes', () => {
   });
 });
 
-// ------------------------------------------------------------ V5: four tabs, Research inside Learn
+// ------------------------------------------------------------ V5 shell. The four-tab layout (Research inside Learn) is parked
+// behind V5_RESEARCH_IN_LEARN; its tests run only when it is switched on.
 
 describe('V5 shell', () => {
   const r = (hash: string) => resolveHash(hash, true);
+  const inLearn = V5_RESEARCH_IN_LEARN;
 
-  it('has four tabs: Home, Atlas, Studio, Learn', () => {
+  it.runIf(!inLearn)('keeps five tabs with Research as its own tab', () => {
+    expect(tabsFor(true).map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
+    expect(r('#/research/revenue?loc=HB_WEST').canonical).toBe('#/research/revenue?loc=HB_WEST');
+    expect(tabOf('method', true)).toBe('research');
+  });
+
+  it.runIf(inLearn)('has four tabs: Home, Atlas, Studio, Learn', () => {
     expect(tabsFor(true).map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Learn']);
     expect(tabsFor(false).map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
   });
 
-  it('puts every Research page under Learn, with the same slugs', () => {
+  it.runIf(inLearn)('puts every Research page under Learn, with the same slugs', () => {
     expect(pathOf('research', true)).toBe('learn/research');
     expect(pathOf('revenue', true)).toBe('learn/revenue');
     expect(pathOf('dispatch', true)).toBe('learn/charging');
@@ -200,7 +208,7 @@ describe('V5 shell', () => {
     for (const p of ['research', 'revenue', 'dispatch', 'realism', 'method'] as const) expect(tabOf(p, true)).toBe('learn');
   });
 
-  it('sends #/research and its views to Learn, keeping the query', () => {
+  it.runIf(inLearn)('sends #/research and its views to Learn, keeping the query', () => {
     expect(r('#/research')).toMatchObject({ page: 'research', tab: 'learn', canonical: '#/learn/research', redirected: true });
     expect(r('#/research/')).toMatchObject({ page: 'research', canonical: '#/learn/research' });
     expect(r('#/research?f=4').canonical).toBe('#/learn/research?f=4');
@@ -210,14 +218,14 @@ describe('V5 shell', () => {
     expect(r('#/research/method').page).toBe('method');
   });
 
-  it('keeps the older Research names working', () => {
+  it.runIf(inLearn)('keeps the older Research names working', () => {
     expect(r('#/research/dispatch').canonical).toBe('#/learn/charging');
     expect(r('#/research/realism').canonical).toBe('#/learn/reality');
     expect(r('#/research/overview').canonical).toBe('#/learn/revenue');
     expect(r('#/research/nonsense').canonical).toBe('#/learn/research');
   });
 
-  it('every address from before V5 lands on a page that exists, in one of the four tabs', () => {
+  it('every address from before V5 lands on a page that exists, in one of the tabs', () => {
     const tabs = tabsFor(true).map((t) => t.tab);
     for (const p of OLD_PAGES) {
       const got = r(`#/${p}?loc=HB_WEST&year=2025`);
