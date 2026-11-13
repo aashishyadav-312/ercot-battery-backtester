@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MantineProvider } from '@mantine/core';
 import { AtlasView } from './Atlas';
 import { num, pct, usd } from '../data/format';
 import type { NodeRec, NodesFile, Selection, TexasGeo } from '../data/types';
 import { retiredIn } from '../copy/retired';
+
+vi.mock('../config/features', async (orig) => ({ ...(await orig<typeof import('../config/features')>()), V5: false })); // these tests describe the shell with V5 off
 
 afterEach(cleanup);
 beforeAll(() => {

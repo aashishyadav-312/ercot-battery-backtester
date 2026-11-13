@@ -1,5 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveHash, tabOf, tabPath, type OldRoute } from './route';
+import { describe, expect, it, vi } from 'vitest';
+import { OLD_PAGES, PAGES, TABS, TAB_IDS, buildHash, hashParam, pathOf, resolveHash, tabOf, tabPath, tabsFor, type OldRoute } from './route';
+
+vi.mock('../config/features', async (orig) => ({ ...(await orig<typeof import('../config/features')>()), V5: false })); // these tests describe the shell with V5 off
 
 /** Where every route from before the redesign now lives (docs/REDESIGN.md, "Old to new routes"). */
 const OLD_TO_NEW: Record<OldRoute, string> = {
@@ -176,5 +178,67 @@ describe('new routes', () => {
     const h = buildHash('revenue', { location: 'HB_WEST', duration: 4, year: 2025, deg: 10 });
     expect(h).toBe('#/research/revenue?loc=HB_WEST&dur=4&year=2025&deg=10');
     expect(resolveHash(h).page).toBe('revenue');
+  });
+});
+
+// ------------------------------------------------------------ V5: four tabs, Research inside Learn
+
+describe('V5 shell', () => {
+  const r = (hash: string) => resolveHash(hash, true);
+
+  it('has four tabs: Home, Atlas, Studio, Learn', () => {
+    expect(tabsFor(true).map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Learn']);
+    expect(tabsFor(false).map((t) => t.label)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
+  });
+
+  it('puts every Research page under Learn, with the same slugs', () => {
+    expect(pathOf('research', true)).toBe('learn/research');
+    expect(pathOf('revenue', true)).toBe('learn/revenue');
+    expect(pathOf('dispatch', true)).toBe('learn/charging');
+    expect(pathOf('realism', true)).toBe('learn/reality');
+    expect(pathOf('method', true)).toBe('learn/method');
+    for (const p of ['research', 'revenue', 'dispatch', 'realism', 'method'] as const) expect(tabOf(p, true)).toBe('learn');
+  });
+
+  it('sends #/research and its views to Learn, keeping the query', () => {
+    expect(r('#/research')).toMatchObject({ page: 'research', tab: 'learn', canonical: '#/learn/research', redirected: true });
+    expect(r('#/research/')).toMatchObject({ page: 'research', canonical: '#/learn/research' });
+    expect(r('#/research?f=4').canonical).toBe('#/learn/research?f=4');
+    expect(r('#/research/revenue?loc=HB_WEST&dur=4')).toMatchObject({ page: 'revenue', canonical: '#/learn/revenue?loc=HB_WEST&dur=4' });
+    expect(r('#/research/charging').page).toBe('dispatch');
+    expect(r('#/research/reality').page).toBe('realism');
+    expect(r('#/research/method').page).toBe('method');
+  });
+
+  it('keeps the older Research names working', () => {
+    expect(r('#/research/dispatch').canonical).toBe('#/learn/charging');
+    expect(r('#/research/realism').canonical).toBe('#/learn/reality');
+    expect(r('#/research/overview').canonical).toBe('#/learn/revenue');
+    expect(r('#/research/nonsense').canonical).toBe('#/learn/research');
+  });
+
+  it('every address from before V5 lands on a page that exists, in one of the four tabs', () => {
+    const tabs = tabsFor(true).map((t) => t.tab);
+    for (const p of OLD_PAGES) {
+      const got = r(`#/${p}?loc=HB_WEST&year=2025`);
+      expect(tabs).toContain(got.tab);
+      expect(got.canonical).toContain('loc=HB_WEST');
+      expect(r(got.canonical).page).toBe(got.page); // the new address resolves to the same page
+    }
+    for (const p of PAGES) expect(tabs).toContain(tabOf(p, true));
+  });
+
+  it('leaves Home, Atlas, Studio and the other Learn pages where they were', () => {
+    expect(r('#/atlas?lat=31&lon=-97').canonical).toBe('#/atlas?lat=31&lon=-97');
+    expect(r('#/studio/economics').page).toBe('economics');
+    expect(r('#/home/live').page).toBe('live');
+    expect(r('#/learn/glossary').page).toBe('glossary');
+    expect(r('#/learn/about').page).toBe('author');
+    expect(r('#/learn?s=glossary').page).toBe('glossary');
+    expect(r('#/about').page).toBe('author');
+  });
+
+  it('the path of every page resolves back to that page', () => {
+    for (const p of PAGES) expect(r(`#/${pathOf(p, true)}`).page).toBe(p);
   });
 });

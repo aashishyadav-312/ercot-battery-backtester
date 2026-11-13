@@ -7,6 +7,9 @@ import { describe, expect, it } from 'vitest';
 // Geometry and formula constants live in src/data/*.ts, next to the data they shape, where they are tested.
 const REBUILT = [
   'pages/Home.tsx',
+  'pages/HomeV5.tsx',
+  'v5/siteTarget.ts',
+  'v5/advanced.ts',
   'components/home/HomeMap.tsx',
   'pages/Atlas.tsx',
   'components/atlas/AtlasMap.tsx',

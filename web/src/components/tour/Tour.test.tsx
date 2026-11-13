@@ -4,6 +4,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { Tour } from './Tour';
 import { PHONE_MAX, DONE_KEY, SHOWN_KEY, TOUR_STEPS, placePopover, requestTour, resetTourSession, shouldAutoStart } from './steps';
 
+vi.mock('../../config/features', async (orig) => ({ ...(await orig<typeof import('../../config/features')>()), V5: false })); // these tests describe the shell with V5 off
+
 let page = 'home';
 const go = vi.fn((p: string) => { page = p; });
 vi.mock('../../state', () => ({ useApp: () => ({ page, go }) }));

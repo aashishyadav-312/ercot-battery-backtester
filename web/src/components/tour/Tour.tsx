@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useApp } from '../../state';
 import { PHONE_MAX, tourSteps, markTourSeen, onTourRequest, placePopover, shouldAutoStart, type Placement } from './steps';
-import { V4 } from '../../config/features';
+import { V4, V5 } from '../../config/features';
 import classes from './Tour.module.css';
 
-const STEPS = tourSteps(V4);
+const STEPS = tourSteps(V4, V5);
 
 const anchorOf = (id: string) => document.querySelector<HTMLElement>(`[data-tour="${id}"]`);
 

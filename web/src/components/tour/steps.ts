@@ -19,7 +19,16 @@ export const TOUR_STEPS: TourStep[] = [
 
 /** With V4 on, the Atlas stop also tells the visitor about site search. The step count and anchors stay the same. */
 const ATLAS_SITE_BODY = 'Every hub and node on one map. Click a dot to see what a battery there would have earned, or search a county or city to see what one is worth at a site.';
-export const tourSteps = (v4: boolean): TourStep[] => (v4 ? TOUR_STEPS.map((s) => (s.anchor === 'tab-atlas' ? { ...s, body: ATLAS_SITE_BODY } : s)) : TOUR_STEPS);
+/** With V5 on, Research is not a tab any more, so its stop goes and the Learn stop says where it went. The hero stop now points at the site search. */
+const V5_LEARN_BODY = 'New to ERCOT? Start here. Learn also holds the research findings, the glossary and who built this.';
+const V5_HERO_BODY = 'Search a county, city, or lat, lon to screen a site. Chargeline replays real ERCOT prices through a battery there. Prices in the top bar are live.';
+export const tourSteps = (v4: boolean, v5 = false): TourStep[] => {
+  const base = v4 ? TOUR_STEPS.map((s) => (s.anchor === 'tab-atlas' ? { ...s, body: ATLAS_SITE_BODY } : s)) : TOUR_STEPS;
+  if (!v5) return base;
+  return base
+    .filter((s) => s.anchor !== 'tab-research')
+    .map((s) => (s.anchor === 'tab-learn' ? { ...s, body: V5_LEARN_BODY } : s.anchor === 'hero' ? { ...s, body: V5_HERO_BODY } : s));
+};
 
 /** Finishing the tour (Done) is remembered for good. */
 export const DONE_KEY = 'chargeline-tour-done';

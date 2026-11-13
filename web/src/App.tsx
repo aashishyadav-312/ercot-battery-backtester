@@ -10,10 +10,12 @@ import { ViewBar } from './components/shell/ViewBar';
 import { Footer } from './components/shell/Footer';
 import { Tour } from './components/tour/Tour';
 import { useScheme } from './components/shell/SchemeProvider';
-import { TABS } from './shell/route';
+import { tabsFor } from './shell/route';
 import Guide from './pages/Guide';
 import { About, Glossary, Limits, SiteGuide } from './pages/Learn';
 import Home from './pages/Home';
+import HomeV5 from './pages/HomeV5';
+import { V5 } from './config/features';
 const Atlas = lazy(() => import('./pages/Atlas'));
 const MapPage = lazy(() => import('./pages/Map')); // pulls in echarts' geo component; other pages don't need it
 import Revenue from './pages/Revenue';
@@ -34,7 +36,7 @@ const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', 'sit
 const FLAT_HEADINGS: Page[] = ['revenue', 'dispatch', 'realism', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, siteguide: SiteGuide, limits: Limits, glossary: Glossary, author: About, map: MapPage, revenue: Revenue, dispatch: Dispatch,
+  home: V5 ? HomeV5 : Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, siteguide: SiteGuide, limits: Limits, glossary: Glossary, author: About, map: MapPage, revenue: Revenue, dispatch: Dispatch,
   realism: Realism, economics: Economics, live: Live, method: Method,
 };
 
@@ -44,7 +46,7 @@ export default function App() {
   const main = useRef<HTMLElement>(null);
   const first = useRef(true);
 
-  const tabLabel = TABS.find((t) => t.tab === tab)!;
+  const tabLabel = tabsFor().find((t) => t.tab === tab)!;
   const viewLabel = tabLabel.views.find((v) => v.page === page)!.label;
   const title = tabLabel.views.length > 1 && page !== 'home' ? `${viewLabel} · ${tabLabel.label}` : tabLabel.label;
 

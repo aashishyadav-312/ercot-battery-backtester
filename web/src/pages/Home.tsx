@@ -322,7 +322,7 @@ function DurationCard({ m }: { m: HomeModel }) {
   );
 }
 
-function HubTable({ m }: { m: HomeModel }) {
+export function HubTable({ m }: { m: HomeModel }) {
   const max = Math.max(...m.hubs.map((h) => h.pf));
   return (
     <article className={classes.card}>
@@ -356,7 +356,7 @@ function HubTable({ m }: { m: HomeModel }) {
   );
 }
 
-function Today({ live }: { live: { load: LiveLoad | null; now: number } }) {
+export function Today({ live }: { live: { load: LiveLoad | null; now: number } }) {
   const { load, now } = live;
   if (!load) return <p className={classes.sub}>Loading live prices…</p>;
   if (load.source === 'none') {
