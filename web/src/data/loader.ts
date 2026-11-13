@@ -90,6 +90,8 @@ export const loadPriceIndex = () => getJson<PriceIndex>('prices/index.json');
 
 /** 4CP intervals and daily peaks for one year (results/v4/fourcp/<year>.json, v4 Step 2). */
 export const loadFourCp = (year: number) => getJson<import('../custom/datacenter').FourCpYear>(`v4/fourcp/${year}.json`);
+/** 12CP: ERCOT's 12 monthly peaks for one calendar year (results/v5/twelvecp/<year>.json, v5 Step 2). */
+export const loadTwelveCp = (year: number) => getJson<import('../custom/twelvecp').TwelveCpYear>(`v5/twelvecp/${year}.json`);
 /** v4 Method page (scripts/build-v4-method.mjs): the AS rules config and the facts quoted from the stack files. Loaded only on Method. */
 export const loadAsRules = () => getJson<unknown>('v4/as_rules.json');
 export const loadMethodFacts = () => getJson<unknown>('v4/method_facts.json');

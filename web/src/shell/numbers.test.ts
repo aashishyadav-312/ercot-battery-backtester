@@ -10,6 +10,8 @@ const REBUILT = [
   'pages/HomeV5.tsx',
   'v5/siteTarget.ts',
   'v5/advanced.ts',
+  'v5/tcos.ts',
+  'v5/TcosBlock.tsx',
   'v5/site/SiteReport.tsx',
   'v5/site/report.ts',
   'components/home/HomeMap.tsx',

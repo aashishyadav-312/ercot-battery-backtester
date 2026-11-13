@@ -25,6 +25,9 @@ vi.mock('../../components/Chart', () => ({
   axisBase: () => ({}), legendBase: () => ({}), tooltipBase: () => ({}),
 }));
 
+// This file tests today's behaviour, so V5 is forced off even in the CI job that builds with it on (DataCenter.v5.test.tsx covers V5 on).
+vi.mock('../../config/features', async (orig) => ({ ...(await orig<typeof import('../../config/features')>()), V5: false }));
+
 import DataCenterView, { type DcDeps } from './DataCenter';
 import { ModeSwitch } from './ModeSwitch';
 
@@ -114,6 +117,17 @@ describe('Data Center mode', () => {
     fireEvent.click(screen.getByTestId('dc-as-false'));
     await waitFor(() => expect(screen.getByTestId('dc-as-note').textContent).toBe('Energy only.'));
     expect(window.location.hash).toContain('as=0');
+  }, 30000);
+
+  it('with V5 off has no transmission charge control and ignores tcos in the address', async () => {
+    const { d, runs } = deps();
+    open('mode=dc&loc=HB_WEST&year=2025&tcos=12cp', d);
+    await waitFor(() => expect(screen.getByTestId('dc-results')).toBeTruthy(), { timeout: 15000 });
+    expect(screen.queryByTestId('dc-tcos-control')).toBeNull();
+    expect(screen.queryByTestId('dc-tcos')).toBeNull();
+    expect(window.location.hash).not.toContain('tcos');
+    expect(screen.getByTestId('dc-row-fourCp').textContent).toContain('4CP avoided');
+    expect(screen.getByTestId('dc-perkw').textContent).toBe(usd(last(runs).result.perKwYr, 1));
   }, 30000);
 
   it('validates inputs before solving', async () => {

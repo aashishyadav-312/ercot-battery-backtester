@@ -1,0 +1,33 @@
+/* V5 Step 5: the 4CP and 12CP comparison in Data Center mode. Builds on Studio.module.css; tokens only, no new colours. */
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+.opt { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: var(--r-input); }
+.opt[data-selected] { border-color: var(--text); }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; margin: 0 0 8px; }
+.name { margin: 0; font-family: var(--mantine-font-family-headings); font-size: 16px; font-weight: 700; color: var(--text); }
+.pill {
+  padding: 0 8px; border: 1px solid var(--line-2); border-radius: var(--r-pill);
+  font-family: var(--mantine-font-family-monospace); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+.opt[data-selected] .pill { border-color: var(--text); color: var(--text); }
+.list { margin: 0; }
+.item { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--text); }
+.item:last-child { border-bottom: 0; }
+.item dt { color: var(--muted); }
+.item dd { margin: 0; text-align: right; font-family: var(--mantine-font-family-monospace); font-variant-numeric: tabular-nums; }
+.item dd small { display: block; font-size: 12px; color: var(--muted); }
+.net dt, .net dd { color: var(--text); font-weight: 600; }
+.partial { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.rules { margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.links { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 13px; }
+.links a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--text); overflow-wrap: anywhere; text-underline-offset: 2px; }
+.more { margin-top: 8px; }
+.more summary {
+  display: flex; align-items: center; min-height: var(--tap); cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text);
+}
+.more summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: var(--r-input); }
+.bullets { margin: 4px 0 0; padding-left: 18px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+.bullets li + li { margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .pair { grid-template-columns: minmax(0, 1fr); }
+}
