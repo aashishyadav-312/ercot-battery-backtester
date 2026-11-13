@@ -424,7 +424,8 @@ function Results({ shown, stale, tcos }: { shown: Shown; stale: boolean; tcos: T
   const max = Math.max(r.perKwYr, r.standalone.perKwYr, 0) || 1;
   const diff = r.perKwYr - r.standalone.perKwYr;
   const s = r.dispatchSample;
-  const notes = [...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes, ...(comparison && sel === '12cp' ? comparison.notes : [])];
+  // The 12CP run's own notes can repeat the comparison's, so each sentence is listed once.
+  const notes = [...new Set([...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes, ...(comparison && sel === '12cp' ? comparison.notes : [])])];
   // Project economics can use this case's total as its "Data Center site" revenue source.
   const label = `${num(f.batteryMw)} MW / ${num(f.batteryMwh)} MWh at ${locName(f.loc)}, ${shown.year}${comparison ? `, ${TCOS_LABEL[sel]}` : ''}`;
   const dur = durationOf(f);
@@ -603,7 +604,7 @@ function DcPrint({ shown, r, sel }: { shown: Shown; r: DataCenterResult; sel: Tc
         </table>
       )}
       <p>Site load {num(f.siteLoadMw)} MW × {num(f.loadFactor, 2)}{shown.profile ? ` (hourly profile ${shown.profile})` : ''} · battery {num(f.batteryMw)} MW / {num(f.batteryMwh)} MWh · efficiency {num(f.rte, 2)} · 4CP rate {usd(f.fourCpRatePerKw, 2)}/kW · window {hourLabel(f.windowStartHour)} to {hourLabel(f.windowEndHour)} · curtailment {num(f.curtailmentHoursPerYear)} h · value of lost load {usd(f.valueOfLostLoad, 0)}/MWh</p>
-      <ul>{[...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes, ...(comparison ? comparison.notes : []), rules.fourCp.review.text].map((n) => <li key={n}>{n}</li>)}</ul>
+      <ul>{[...new Set([...(shown.stackNote ? [shown.stackNote] : []), ...(shown.upperBound ? [AS_UPPER_BOUND_NOTE] : []), ...r.notes, ...(comparison ? comparison.notes : []), rules.fourCp.review.text])].map((n) => <li key={n}>{n}</li>)}</ul>
       <p className={site.sheetLink}>{window.location.href}</p>
     </div>,
     document.body,

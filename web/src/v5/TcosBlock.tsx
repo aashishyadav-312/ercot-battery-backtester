@@ -1,7 +1,7 @@
 // V5 Step 5: 4CP and 12CP side by side on the same battery, load and prices. The selected rule drives the main result, the
 // breakdown and the dispatch chart elsewhere on the page; this block always shows both. Every figure comes from runTwelveCpCase,
 // every sentence about the rule from twelvecp_rules.json.
-import { usd } from '../data/format';
+import { fmtDate, usd } from '../data/format';
 import { money } from '../data/studio';
 import type { TwelveCpComparison } from '../custom/twelvecp';
 import type { Tcos } from '../v4/dc/dcForm';
@@ -60,9 +60,8 @@ export default function TcosBlock({ comparison: c, tcos }: { comparison: TwelveC
 
       <div className={classes.rules} data-testid="dc-tcos-rules">
         <p className={studio.small} style={{ marginTop: 0 }}><b>{TCOS_LABEL['12cp']}: {rule.status.value}.</b> {rule.status.text}</p>
-        <p className={studio.small}>{rule.method.text} ({rule.method.citation}.)</p>
-        <p className={studio.small}>{rule.rate.text}</p>
-        <p className={studio.small}>{rule.billing.text}</p>
+        <p className={studio.small}>{rule.method.text}</p>
+        <ul className={classes.bullets} data-testid="dc-tcos-notes">{c.notes.filter((n) => !n.startsWith('12CP is ')).map((n) => <li key={n}>{n}</li>)}</ul>
         <ul className={classes.links}>
           {[...new Set([...rule.status.sources, rule.method.source])].map((u) => (
             <li key={u}><a href={u} target="_blank" rel="noreferrer">{u.replace(/^https:\/\/(www\.)?/, '')}</a></li>
@@ -71,11 +70,12 @@ export default function TcosBlock({ comparison: c, tcos }: { comparison: TwelveC
         <details className={classes.more}>
           <summary>What the 12CP model ignores</summary>
           <ul className={classes.bullets}>
-            <li>{rule.resolution.text}</li>
             {rule.notModelled.map((n) => <li key={n.id}>{n.text}</li>)}
+            <li>{rule.resolution.text}</li>
+            <li>{rule.rate.text}</li>
           </ul>
         </details>
-        <p className={studio.small}>Status of 12CP checked {rule.asOf}: {rule.status.value}. A proposal can change before any adoption.</p>
+        <p className={studio.small}>Status checked {fmtDate(rule.status.asOf)}: {rule.status.value}. A proposal can change before any adoption.</p>
       </div>
     </section>
   );

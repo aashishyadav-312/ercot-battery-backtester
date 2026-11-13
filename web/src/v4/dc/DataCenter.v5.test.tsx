@@ -14,7 +14,7 @@ import { parsePriceFile, type PriceFile } from '../../custom/prices';
 import { type FourCpYear } from '../../custom/datacenter';
 import { runTwelveCpCase, TWELVECP_RULES, type TwelveCpComparison, type TwelveCpYear } from '../../custom/twelvecp';
 import { runDataCenterCase } from '../../custom/datacenter';
-import { downloadCsv, usd } from '../../data/format';
+import { downloadCsv, fmtDate, usd } from '../../data/format';
 import { money } from '../../data/studio';
 import { parseStackIndex } from '../site/stackIndex';
 import { parseRevHash } from '../revenueSource';
@@ -105,6 +105,8 @@ describe('Data Center mode with V5 on', () => {
     expect(wf.xAxis.data).toContain('12CP avoided');
     expect(screen.getByTestId('dc-cmp-4cp').textContent).toContain(usd(cmp.fourCp.avoidedPerKwYr, 1)); // still shown
     expect(runs.length).toBe(before);
+    const noteTexts = within(screen.getByTestId('dc-notes')).getAllByRole('listitem').map((li) => li.textContent);
+    expect(new Set(noteTexts).size).toBe(noteTexts.length);
 
     // The hand-off to Project economics carries the selected rule and its total.
     const href = screen.getByTestId('dc-to-economics').getAttribute('href')!;
@@ -137,7 +139,8 @@ describe('Data Center mode with V5 on', () => {
     expect(screen.getByTestId('dc-tcos-12cp').getAttribute('aria-pressed')).toBe('true');
     const note = screen.getByTestId('dc-tcos-rules');
     expect(note.textContent).toContain(TWELVECP_RULES.status.text);
-    expect(note.textContent).toContain(TWELVECP_RULES.status.asOf);
+    expect(note.textContent).toContain(fmtDate(TWELVECP_RULES.status.asOf));
+    expect(within(screen.getByTestId('dc-tcos-notes')).getAllByRole('listitem').length).toBeGreaterThan(0);
     const links = within(note).getAllByRole('link').map((a) => a.getAttribute('href'));
     expect(links).toEqual(expect.arrayContaining(TWELVECP_RULES.status.sources));
     expect(within(note).getByText('What the 12CP model ignores')).toBeTruthy();
