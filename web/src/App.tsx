@@ -25,18 +25,19 @@ import Economics from './pages/Economics';
 const Studio = lazy(() => import('./pages/Studio')); // the solver and worker load only when someone opens this page
 const Live = lazy(() => import('./pages/Live')); // likewise the solver, and the live fetch runs only on this page
 import Method from './pages/Method';
+const SiteReport = lazy(() => import('./v5/site/SiteReport')); // V5 site report: its geo and result loaders come with the chunk
 const Research = lazy(() => import('./pages/Research')); // the findings text and the hub run files load only when someone opens this page
 import type { Page } from './state';
 import classes from './App.module.css';
 
 /** Pages without the scenario selectors (they have none, or their own inputs). */
-const OWN_INPUTS: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', 'siteguide', 'limits', 'glossary', 'author', 'method', 'live'];
+const OWN_INPUTS: Page[] = ['site', 'home', 'atlas', 'studio', 'research', 'learn', 'siteguide', 'limits', 'glossary', 'author', 'method', 'live'];
 
 /** Run pages whose cards sit directly under the h1. */
 const FLAT_HEADINGS: Page[] = ['revenue', 'dispatch', 'realism', 'live'];
 
 const VIEWS: Record<Page, React.ComponentType> = {
-  home: V5 ? HomeV5 : Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, siteguide: SiteGuide, limits: Limits, glossary: Glossary, author: About, map: MapPage, revenue: Revenue, dispatch: Dispatch,
+  site: SiteReport, home: V5 ? HomeV5 : Home, atlas: Atlas, studio: Studio, research: Research, learn: Guide, siteguide: SiteGuide, limits: Limits, glossary: Glossary, author: About, map: MapPage, revenue: Revenue, dispatch: Dispatch,
   realism: Realism, economics: Economics, live: Live, method: Method,
 };
 
@@ -47,8 +48,8 @@ export default function App() {
   const first = useRef(true);
 
   const tabLabel = tabsFor().find((t) => t.tab === tab)!;
-  const viewLabel = tabLabel.views.find((v) => v.page === page)!.label;
-  const title = tabLabel.views.length > 1 && page !== 'home' ? `${viewLabel} · ${tabLabel.label}` : tabLabel.label;
+  const viewLabel = page === 'site' ? 'Site report' : tabLabel.views.find((v) => v.page === page)!.label;
+  const title = page === 'site' ? viewLabel : tabLabel.views.length > 1 && page !== 'home' ? `${viewLabel} · ${tabLabel.label}` : tabLabel.label;
 
   useEffect(() => {
     document.title = `${title} · Chargeline`;
@@ -71,7 +72,7 @@ export default function App() {
       <Header active={tab} sel={sel} scheme={scheme} onToggleScheme={toggle} />
       <main id="main" ref={main} tabIndex={-1} className={classes.main}>
         {/* Home is the landing page: no sub-navigation above the hero. Its "Live prices" view links back to it. */}
-        {page !== 'home' && (
+        {page !== 'home' && page !== 'site' && (
           <ViewBar tab={tab} page={page} sel={sel}>
             {selectors && <Group visibleFrom="md"><Selectors /></Group>}
           </ViewBar>

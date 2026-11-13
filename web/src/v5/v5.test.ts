@@ -4,7 +4,7 @@ import { siteHash } from './siteTarget';
 
 describe('siteHash', () => {
   it('opens the Atlas on the site, with four decimals', () => {
-    expect(siteHash(31.5, -97.123456)).toBe('#/atlas?lat=31.5000&lon=-97.1235');
+    expect(siteHash(31.5, -97.123456)).toBe('#/site?lat=31.5000&lon=-97.1235');
   });
 });
 

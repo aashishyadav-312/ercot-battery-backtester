@@ -8,6 +8,8 @@ import { countyAt, nearestPlace } from '../geo/place';
 import { buildSearchIndex, inTexas, type CountyInput, type SearchHit } from '../geo/search';
 import type { NodeIndex, Place } from '../geo/types';
 import { SITE_NEAR_K } from '../config';
+import { V5 } from '../../config/features';
+import { siteReportHash } from '../../v5/site/report';
 import { SiteCard } from '../site/SiteCard';
 import { readSiteFromHash, writeSiteToHash, type Settings } from '../site/siteValue';
 import { REAL_SITE_SOURCE, type SiteSource } from '../site/useSiteData';
@@ -188,6 +190,7 @@ export default function AtlasSite({ source = REAL_SOURCE, siteSource = REAL_SITE
         <SiteCard
           pin={pin} near={near} counts={counts} county={county} city={city} source={siteSource} initial={shared ?? undefined}
           onSettings={setSettings} onSelect={map.onSelect} onClear={clear}
+          reportHref={V5 && settings ? siteReportHash(pin, settings, window.location.hash) : undefined}
         />
       )}
     </div>
