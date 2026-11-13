@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "asOf": "2026-11-13",
+  "nearbyBatteries": {
+    "defaultRadiusKm": 40,
+    "assumption": true,
+    "note": "A screening radius chosen to cover a metro area or a transmission corner, not a market rule. The user can change it."
+  }
+}
