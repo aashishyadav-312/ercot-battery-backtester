@@ -1,0 +1,2016 @@
+{
+ "year": 2023,
+ "status": "computed",
+ "complete": true,
+ "source": "https://www.ercot.com/gridinfo/load/load_hist",
+ "asOf": "2026-11-12",
+ "months_finished": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12
+ ],
+ "mean_monthly_peak_mw": 69115.8,
+ "intervals": [
+  {
+   "month": 1,
+   "label": "peak hour ending 01/31/2023 19:00 (computed from hourly load)",
+   "interval_ending_local": "2023-01-31T19:00",
+   "start_utc": "2023-02-01T00:00:00Z",
+   "end_utc": "2023-02-01T01:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 65632.0,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 2,
+   "label": "peak hour ending 02/01/2023 19:00 (computed from hourly load)",
+   "interval_ending_local": "2023-02-01T19:00",
+   "start_utc": "2023-02-02T00:00:00Z",
+   "end_utc": "2023-02-02T01:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 63505.5,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 3,
+   "label": "peak hour ending 03/31/2023 18:00 (computed from hourly load)",
+   "interval_ending_local": "2023-03-31T18:00",
+   "start_utc": "2023-03-31T22:00:00Z",
+   "end_utc": "2023-03-31T23:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 53005.6,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 4,
+   "label": "peak hour ending 04/03/2023 18:00 (computed from hourly load)",
+   "interval_ending_local": "2023-04-03T18:00",
+   "start_utc": "2023-04-03T22:00:00Z",
+   "end_utc": "2023-04-03T23:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 60921.6,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 5,
+   "label": "peak hour ending 05/05/2023 18:00 (computed from hourly load)",
+   "interval_ending_local": "2023-05-05T18:00",
+   "start_utc": "2023-05-05T22:00:00Z",
+   "end_utc": "2023-05-05T23:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 68121.3,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 6,
+   "label": "peak hour ending 06/27/2023 18:00 (computed from hourly load)",
+   "interval_ending_local": "2023-06-27T18:00",
+   "start_utc": "2023-06-27T22:00:00Z",
+   "end_utc": "2023-06-27T23:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 80786.5,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 7,
+   "label": "peak hour ending 07/31/2023 17:00 (computed from hourly load)",
+   "interval_ending_local": "2023-07-31T17:00",
+   "start_utc": "2023-07-31T21:00:00Z",
+   "end_utc": "2023-07-31T22:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 82939.1,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 8,
+   "label": "peak hour ending 08/10/2023 18:00 (computed from hourly load)",
+   "interval_ending_local": "2023-08-10T18:00",
+   "start_utc": "2023-08-10T22:00:00Z",
+   "end_utc": "2023-08-10T23:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 85464.1,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 9,
+   "label": "peak hour ending 09/08/2023 17:00 (computed from hourly load)",
+   "interval_ending_local": "2023-09-08T17:00",
+   "start_utc": "2023-09-08T21:00:00Z",
+   "end_utc": "2023-09-08T22:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 84342.7,
+   "twelvecp_year": 2023
+  },
+  {
+   "month": 10,
+   "label": "peak hour ending 10/04/2023 17:00 (computed from hourly load)",
+   "interval_ending_local": "2023-10-04T17:00",
+   "start_utc": "2023-10-04T21:00:00Z",
+   "end_utc": "2023-10-04T22:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 71180.7,
+   "twelvecp_year": 2024
+  },
+  {
+   "month": 11,
+   "label": "peak hour ending 11/08/2023 16:00 (computed from hourly load)",
+   "interval_ending_local": "2023-11-08T16:00",
+   "start_utc": "2023-11-08T21:00:00Z",
+   "end_utc": "2023-11-08T22:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 56515.2,
+   "twelvecp_year": 2024
+  },
+  {
+   "month": 12,
+   "label": "peak hour ending 12/11/2023 08:00 (computed from hourly load)",
+   "interval_ending_local": "2023-12-11T08:00",
+   "start_utc": "2023-12-11T13:00:00Z",
+   "end_utc": "2023-12-11T14:00:00Z",
+   "resolution_minutes": 60,
+   "ercot_peak_mw": 56975.9,
+   "twelvecp_year": 2024
+  }
+ ],
+ "daily_peaks": [
+  {
+   "date": "2023-01-01",
+   "peak_mw": 41595.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-02",
+   "peak_mw": 46265.6,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-03",
+   "peak_mw": 44268.5,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-04",
+   "peak_mw": 44085.5,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-01-05",
+   "peak_mw": 47379.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-06",
+   "peak_mw": 46320.8,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-07",
+   "peak_mw": 42900.6,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-08",
+   "peak_mw": 42227.9,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-01-09",
+   "peak_mw": 47029.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-10",
+   "peak_mw": 44780.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-11",
+   "peak_mw": 47082.7,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-12",
+   "peak_mw": 45320.1,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-01-13",
+   "peak_mw": 51224.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-14",
+   "peak_mw": 49179.0,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-01-15",
+   "peak_mw": 42267.8,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-16",
+   "peak_mw": 45291.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-17",
+   "peak_mw": 45574.2,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-18",
+   "peak_mw": 44609.9,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-19",
+   "peak_mw": 45015.0,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-20",
+   "peak_mw": 46110.9,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-01-21",
+   "peak_mw": 44671.5,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-01-22",
+   "peak_mw": 45471.3,
+   "hour_ending": 22
+  },
+  {
+   "date": "2023-01-23",
+   "peak_mw": 54688.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-24",
+   "peak_mw": 51498.1,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-01-25",
+   "peak_mw": 54490.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-26",
+   "peak_mw": 57821.1,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-27",
+   "peak_mw": 56092.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-01-28",
+   "peak_mw": 44942.3,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-01-29",
+   "peak_mw": 50556.1,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-01-30",
+   "peak_mw": 63018.2,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-01-31",
+   "peak_mw": 65632.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-02-01",
+   "peak_mw": 63505.5,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-02-02",
+   "peak_mw": 59718.8,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-02-03",
+   "peak_mw": 60512.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-04",
+   "peak_mw": 53519.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-05",
+   "peak_mw": 44620.3,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-06",
+   "peak_mw": 44028.7,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-07",
+   "peak_mw": 46567.6,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-02-08",
+   "peak_mw": 48140.2,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-09",
+   "peak_mw": 53238.0,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-10",
+   "peak_mw": 50338.8,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-02-11",
+   "peak_mw": 53381.3,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-02-12",
+   "peak_mw": 50749.4,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-13",
+   "peak_mw": 49090.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-14",
+   "peak_mw": 44677.5,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-15",
+   "peak_mw": 46275.5,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-16",
+   "peak_mw": 51599.8,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-02-17",
+   "peak_mw": 58325.1,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-18",
+   "peak_mw": 53835.2,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-02-19",
+   "peak_mw": 44678.4,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-02-20",
+   "peak_mw": 46789.1,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-21",
+   "peak_mw": 49867.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-02-22",
+   "peak_mw": 49970.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-02-23",
+   "peak_mw": 48306.4,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-24",
+   "peak_mw": 48463.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-02-25",
+   "peak_mw": 46617.2,
+   "hour_ending": 12
+  },
+  {
+   "date": "2023-02-26",
+   "peak_mw": 45914.8,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-02-27",
+   "peak_mw": 48447.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-02-28",
+   "peak_mw": 50366.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-01",
+   "peak_mw": 50066.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-02",
+   "peak_mw": 49099.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-03",
+   "peak_mw": 42577.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-04",
+   "peak_mw": 43028.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-05",
+   "peak_mw": 45536.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-06",
+   "peak_mw": 50822.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-07",
+   "peak_mw": 49990.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-08",
+   "peak_mw": 49931.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-09",
+   "peak_mw": 50210.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-10",
+   "peak_mw": 48062.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-11",
+   "peak_mw": 51929.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-12",
+   "peak_mw": 46127.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-13",
+   "peak_mw": 43835.5,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-14",
+   "peak_mw": 43763.0,
+   "hour_ending": 10
+  },
+  {
+   "date": "2023-03-15",
+   "peak_mw": 44053.2,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-16",
+   "peak_mw": 46510.0,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-17",
+   "peak_mw": 47526.8,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-03-18",
+   "peak_mw": 46460.8,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-03-19",
+   "peak_mw": 47645.1,
+   "hour_ending": 10
+  },
+  {
+   "date": "2023-03-20",
+   "peak_mw": 51751.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-03-21",
+   "peak_mw": 45491.7,
+   "hour_ending": 10
+  },
+  {
+   "date": "2023-03-22",
+   "peak_mw": 50216.3,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-23",
+   "peak_mw": 52766.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-24",
+   "peak_mw": 51115.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-25",
+   "peak_mw": 47601.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-26",
+   "peak_mw": 47650.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-03-27",
+   "peak_mw": 47269.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-03-28",
+   "peak_mw": 43987.1,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-29",
+   "peak_mw": 44164.8,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-30",
+   "peak_mw": 47904.9,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-03-31",
+   "peak_mw": 53005.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-01",
+   "peak_mw": 48445.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-04-02",
+   "peak_mw": 50775.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-03",
+   "peak_mw": 60921.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-04",
+   "peak_mw": 55251.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-05",
+   "peak_mw": 45956.0,
+   "hour_ending": 12
+  },
+  {
+   "date": "2023-04-06",
+   "peak_mw": 44100.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-07",
+   "peak_mw": 43548.2,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-04-08",
+   "peak_mw": 41792.4,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-04-09",
+   "peak_mw": 42659.9,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-04-10",
+   "peak_mw": 45206.0,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-04-11",
+   "peak_mw": 47837.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-12",
+   "peak_mw": 48658.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-13",
+   "peak_mw": 50854.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-14",
+   "peak_mw": 50446.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-15",
+   "peak_mw": 55600.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-16",
+   "peak_mw": 44960.9,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-04-17",
+   "peak_mw": 48085.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-18",
+   "peak_mw": 49014.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-19",
+   "peak_mw": 54935.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-20",
+   "peak_mw": 52967.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-04-21",
+   "peak_mw": 50725.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-22",
+   "peak_mw": 46623.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-04-23",
+   "peak_mw": 41407.1,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-04-24",
+   "peak_mw": 44111.5,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-04-25",
+   "peak_mw": 47372.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-26",
+   "peak_mw": 51600.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-27",
+   "peak_mw": 48771.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-04-28",
+   "peak_mw": 51636.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-04-29",
+   "peak_mw": 41755.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-04-30",
+   "peak_mw": 51616.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-05-01",
+   "peak_mw": 53353.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-02",
+   "peak_mw": 52815.8,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-03",
+   "peak_mw": 56400.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-04",
+   "peak_mw": 55777.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-05",
+   "peak_mw": 68121.3,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-06",
+   "peak_mw": 61983.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-07",
+   "peak_mw": 54689.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-08",
+   "peak_mw": 62887.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-09",
+   "peak_mw": 54452.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-10",
+   "peak_mw": 52791.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-11",
+   "peak_mw": 64150.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-12",
+   "peak_mw": 64290.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-13",
+   "peak_mw": 51573.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-14",
+   "peak_mw": 51758.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-05-15",
+   "peak_mw": 57875.5,
+   "hour_ending": 15
+  },
+  {
+   "date": "2023-05-16",
+   "peak_mw": 55661.3,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-05-17",
+   "peak_mw": 61071.8,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-18",
+   "peak_mw": 64936.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-19",
+   "peak_mw": 65975.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-20",
+   "peak_mw": 54558.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-21",
+   "peak_mw": 49070.9,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-05-22",
+   "peak_mw": 60867.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-23",
+   "peak_mw": 63745.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-24",
+   "peak_mw": 62198.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-25",
+   "peak_mw": 60893.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-05-26",
+   "peak_mw": 62139.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-27",
+   "peak_mw": 58698.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-28",
+   "peak_mw": 57161.3,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-05-29",
+   "peak_mw": 60620.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-05-30",
+   "peak_mw": 63688.4,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-05-31",
+   "peak_mw": 66664.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-01",
+   "peak_mw": 66220.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-02",
+   "peak_mw": 67245.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-03",
+   "peak_mw": 65477.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-04",
+   "peak_mw": 58536.3,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-05",
+   "peak_mw": 59476.2,
+   "hour_ending": 15
+  },
+  {
+   "date": "2023-06-06",
+   "peak_mw": 62145.1,
+   "hour_ending": 15
+  },
+  {
+   "date": "2023-06-07",
+   "peak_mw": 67129.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-08",
+   "peak_mw": 67418.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-09",
+   "peak_mw": 72483.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-10",
+   "peak_mw": 70533.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-11",
+   "peak_mw": 73558.8,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-12",
+   "peak_mw": 71238.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-13",
+   "peak_mw": 67055.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-14",
+   "peak_mw": 72574.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-15",
+   "peak_mw": 76269.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-16",
+   "peak_mw": 75365.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-17",
+   "peak_mw": 74178.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-18",
+   "peak_mw": 73893.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-19",
+   "peak_mw": 79129.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-20",
+   "peak_mw": 79200.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-21",
+   "peak_mw": 77440.0,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-06-22",
+   "peak_mw": 73614.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-23",
+   "peak_mw": 75552.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-24",
+   "peak_mw": 76954.4,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-25",
+   "peak_mw": 78630.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-26",
+   "peak_mw": 79975.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-27",
+   "peak_mw": 80786.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-06-28",
+   "peak_mw": 80089.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-29",
+   "peak_mw": 80135.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-06-30",
+   "peak_mw": 78220.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-01",
+   "peak_mw": 69889.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-02",
+   "peak_mw": 69354.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-03",
+   "peak_mw": 75331.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-04",
+   "peak_mw": 71991.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-05",
+   "peak_mw": 75727.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-06",
+   "peak_mw": 68004.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-07",
+   "peak_mw": 72107.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-08",
+   "peak_mw": 74920.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-09",
+   "peak_mw": 74589.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-10",
+   "peak_mw": 79633.8,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-11",
+   "peak_mw": 78586.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-12",
+   "peak_mw": 81378.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-13",
+   "peak_mw": 81225.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-14",
+   "peak_mw": 80666.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-15",
+   "peak_mw": 78199.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-16",
+   "peak_mw": 73992.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-17",
+   "peak_mw": 81794.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-18",
+   "peak_mw": 82499.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-19",
+   "peak_mw": 82320.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-20",
+   "peak_mw": 81931.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-21",
+   "peak_mw": 81124.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-22",
+   "peak_mw": 77569.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-23",
+   "peak_mw": 75448.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-24",
+   "peak_mw": 81093.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-25",
+   "peak_mw": 81631.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-26",
+   "peak_mw": 81375.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-27",
+   "peak_mw": 80643.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-28",
+   "peak_mw": 79871.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-07-29",
+   "peak_mw": 78565.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-30",
+   "peak_mw": 80689.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-07-31",
+   "peak_mw": 82939.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-01",
+   "peak_mw": 83497.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-02",
+   "peak_mw": 83303.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-03",
+   "peak_mw": 83617.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-04",
+   "peak_mw": 83509.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-05",
+   "peak_mw": 83321.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-06",
+   "peak_mw": 82561.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-07",
+   "peak_mw": 83752.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-08",
+   "peak_mw": 82923.3,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-09",
+   "peak_mw": 83736.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-10",
+   "peak_mw": 85464.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-11",
+   "peak_mw": 85037.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-12",
+   "peak_mw": 84479.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-13",
+   "peak_mw": 84468.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-14",
+   "peak_mw": 84516.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-15",
+   "peak_mw": 79770.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-16",
+   "peak_mw": 80051.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-17",
+   "peak_mw": 84839.9,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-08-18",
+   "peak_mw": 84878.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-19",
+   "peak_mw": 84654.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-20",
+   "peak_mw": 84951.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-21",
+   "peak_mw": 84486.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-22",
+   "peak_mw": 78470.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-23",
+   "peak_mw": 84049.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-24",
+   "peak_mw": 84347.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-25",
+   "peak_mw": 84347.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-26",
+   "peak_mw": 81736.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-27",
+   "peak_mw": 80269.2,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-08-28",
+   "peak_mw": 77771.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-29",
+   "peak_mw": 76479.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-30",
+   "peak_mw": 77188.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-08-31",
+   "peak_mw": 77921.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-01",
+   "peak_mw": 76594.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-02",
+   "peak_mw": 75093.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-03",
+   "peak_mw": 75111.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-04",
+   "peak_mw": 78213.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-09-05",
+   "peak_mw": 81851.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-06",
+   "peak_mw": 82607.2,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-09-07",
+   "peak_mw": 84143.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-08",
+   "peak_mw": 84342.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-09",
+   "peak_mw": 77362.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-09-10",
+   "peak_mw": 73010.6,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-09-11",
+   "peak_mw": 71288.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-12",
+   "peak_mw": 68750.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-13",
+   "peak_mw": 65494.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-14",
+   "peak_mw": 62337.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-15",
+   "peak_mw": 63201.1,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-09-16",
+   "peak_mw": 60311.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-17",
+   "peak_mw": 67078.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-09-18",
+   "peak_mw": 71105.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-19",
+   "peak_mw": 72119.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-20",
+   "peak_mw": 74056.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-21",
+   "peak_mw": 75189.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-22",
+   "peak_mw": 77631.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-23",
+   "peak_mw": 77490.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-24",
+   "peak_mw": 77135.1,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-25",
+   "peak_mw": 73689.5,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-26",
+   "peak_mw": 72936.3,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-27",
+   "peak_mw": 72989.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-28",
+   "peak_mw": 74628.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-29",
+   "peak_mw": 74172.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-09-30",
+   "peak_mw": 71535.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-01",
+   "peak_mw": 67317.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-02",
+   "peak_mw": 68592.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-03",
+   "peak_mw": 65964.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-04",
+   "peak_mw": 71180.7,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-05",
+   "peak_mw": 55282.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-06",
+   "peak_mw": 59384.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-07",
+   "peak_mw": 46495.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-08",
+   "peak_mw": 47804.3,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-09",
+   "peak_mw": 56555.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-10",
+   "peak_mw": 53710.3,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-10-11",
+   "peak_mw": 49892.7,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-10-12",
+   "peak_mw": 56669.7,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-13",
+   "peak_mw": 60796.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-14",
+   "peak_mw": 45541.0,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-15",
+   "peak_mw": 44934.3,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-10-16",
+   "peak_mw": 45456.8,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-10-17",
+   "peak_mw": 46993.1,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-18",
+   "peak_mw": 51172.5,
+   "hour_ending": 18
+  },
+  {
+   "date": "2023-10-19",
+   "peak_mw": 56412.4,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-20",
+   "peak_mw": 61034.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-21",
+   "peak_mw": 57850.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-22",
+   "peak_mw": 56944.9,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-23",
+   "peak_mw": 56924.3,
+   "hour_ending": 15
+  },
+  {
+   "date": "2023-10-24",
+   "peak_mw": 55658.8,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-25",
+   "peak_mw": 57525.2,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-26",
+   "peak_mw": 57537.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-27",
+   "peak_mw": 61085.9,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-10-28",
+   "peak_mw": 53941.0,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-10-29",
+   "peak_mw": 52141.0,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-10-30",
+   "peak_mw": 50627.9,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-10-31",
+   "peak_mw": 51271.3,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-11-01",
+   "peak_mw": 52621.4,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-02",
+   "peak_mw": 52098.0,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-03",
+   "peak_mw": 46707.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-04",
+   "peak_mw": 45915.6,
+   "hour_ending": 17
+  },
+  {
+   "date": "2023-11-05",
+   "peak_mw": 48180.3,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-11-06",
+   "peak_mw": 52390.7,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-11-07",
+   "peak_mw": 56392.9,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-11-08",
+   "peak_mw": 56515.2,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-11-09",
+   "peak_mw": 49246.4,
+   "hour_ending": 13
+  },
+  {
+   "date": "2023-11-10",
+   "peak_mw": 45305.1,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-11",
+   "peak_mw": 43467.1,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-12",
+   "peak_mw": 44708.2,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-11-13",
+   "peak_mw": 45565.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-14",
+   "peak_mw": 45996.5,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-15",
+   "peak_mw": 45838.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-16",
+   "peak_mw": 46249.9,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-17",
+   "peak_mw": 47230.5,
+   "hour_ending": 16
+  },
+  {
+   "date": "2023-11-18",
+   "peak_mw": 44813.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-19",
+   "peak_mw": 45548.4,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-20",
+   "peak_mw": 49238.0,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-21",
+   "peak_mw": 47456.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-22",
+   "peak_mw": 49516.7,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-23",
+   "peak_mw": 47043.1,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-11-24",
+   "peak_mw": 44111.1,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-11-25",
+   "peak_mw": 44320.2,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-11-26",
+   "peak_mw": 48810.8,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-11-27",
+   "peak_mw": 54440.2,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-28",
+   "peak_mw": 50662.8,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-29",
+   "peak_mw": 50880.2,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-11-30",
+   "peak_mw": 46930.4,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-01",
+   "peak_mw": 45702.3,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-02",
+   "peak_mw": 45331.8,
+   "hour_ending": 11
+  },
+  {
+   "date": "2023-12-03",
+   "peak_mw": 45370.3,
+   "hour_ending": 20
+  },
+  {
+   "date": "2023-12-04",
+   "peak_mw": 47832.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-05",
+   "peak_mw": 49650.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-06",
+   "peak_mw": 48698.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-07",
+   "peak_mw": 48499.1,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-08",
+   "peak_mw": 47956.5,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-09",
+   "peak_mw": 46982.2,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-10",
+   "peak_mw": 50206.5,
+   "hour_ending": 21
+  },
+  {
+   "date": "2023-12-11",
+   "peak_mw": 56975.9,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-12",
+   "peak_mw": 52298.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-13",
+   "peak_mw": 49848.6,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-14",
+   "peak_mw": 49091.0,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-15",
+   "peak_mw": 48048.4,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-16",
+   "peak_mw": 46652.5,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-12-17",
+   "peak_mw": 49149.3,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-12-18",
+   "peak_mw": 50756.8,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-19",
+   "peak_mw": 52754.0,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-20",
+   "peak_mw": 48233.6,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-21",
+   "peak_mw": 47800.1,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-22",
+   "peak_mw": 46190.2,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-23",
+   "peak_mw": 45474.1,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-24",
+   "peak_mw": 44656.6,
+   "hour_ending": 19
+  },
+  {
+   "date": "2023-12-25",
+   "peak_mw": 46348.9,
+   "hour_ending": 22
+  },
+  {
+   "date": "2023-12-26",
+   "peak_mw": 52083.2,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-12-27",
+   "peak_mw": 51556.3,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-28",
+   "peak_mw": 52732.7,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-29",
+   "peak_mw": 55781.5,
+   "hour_ending": 8
+  },
+  {
+   "date": "2023-12-30",
+   "peak_mw": 52889.4,
+   "hour_ending": 9
+  },
+  {
+   "date": "2023-12-31",
+   "peak_mw": 47497.0,
+   "hour_ending": 9
+  }
+ ],
+ "checks": {
+  "hourly_peak_vs_official_4cp": [
+   {
+    "month": 6,
+    "official_4cp_interval_ending_local": "2023-06-27T17:00",
+    "hourly_peak_interval_ending_local": "2023-06-27T18:00",
+    "same_day": true,
+    "official_interval_in_peak_hour": false
+   },
+   {
+    "month": 7,
+    "official_4cp_interval_ending_local": "2023-07-31T17:00",
+    "hourly_peak_interval_ending_local": "2023-07-31T17:00",
+    "same_day": true,
+    "official_interval_in_peak_hour": true
+   },
+   {
+    "month": 8,
+    "official_4cp_interval_ending_local": "2023-08-10T17:00",
+    "hourly_peak_interval_ending_local": "2023-08-10T18:00",
+    "same_day": true,
+    "official_interval_in_peak_hour": false
+   },
+   {
+    "month": 9,
+    "official_4cp_interval_ending_local": "2023-09-08T16:45",
+    "hourly_peak_interval_ending_local": "2023-09-08T17:00",
+    "same_day": true,
+    "official_interval_in_peak_hour": true
+   }
+  ]
+ },
+ "sources": {
+  "intervals": "https://www.ercot.com/gridinfo/load/load_hist",
+  "daily_peaks": "https://www.ercot.com/gridinfo/load/load_hist",
+  "proposal": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf"
+ },
+ "notes": [
+  "Each interval is the month's peak hour of hourly ERCOT system load (US/Central, interval ending). The proposal measures each monthly peak on a 30-minute interval; hourly data cannot locate it more closely than the hour, so resolution_minutes is 60.",
+  "Calendar-year file. The proposal's 12CP year runs October 1 to September 30; twelvecp_year names the 12CP year each month falls in.",
+  "ercot_peak_mw is total ERCOT hourly load. The proposal's ERCOT 12CP load excludes export flows and wholesale storage load, so its peak interval can differ.",
+  "daily_peaks are hourly ERCOT system load (MW) for every day of the finished months, used by the realistic 12CP strategy.",
+  "Screening data computed from hourly load, not an ERCOT 12CP report (none exists; 12CP is proposed)."
+ ],
+ "generated": "2026-11-13T05:22:34Z"
+}
