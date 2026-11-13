@@ -241,4 +241,26 @@ describe('V5 shell', () => {
   it('the path of every page resolves back to that page', () => {
     for (const p of PAGES) expect(r(`#/${pathOf(p, true)}`).page).toBe(p);
   });
+
+  it('#/site is the site report, under the Atlas tab, with its query kept as written', () => {
+    const got = r('#/site?lat=31.5&lon=-97.1&dur=2&year=2025&basis=stack');
+    expect(got.page).toBe('site');
+    expect(got.tab).toBe('atlas');
+    expect(got.redirected).toBe(false);
+    expect(got.canonical).toBe('#/site?lat=31.5&lon=-97.1&dur=2&year=2025&basis=stack');
+    expect(pathOf('site', true)).toBe('site');
+    expect(r('#/site').page).toBe('site');
+  });
+
+  it('the Atlas address with a site still opens the Atlas', () => {
+    expect(r('#/atlas?lat=31&lon=-97&dur=2&year=2025').page).toBe('atlas');
+  });
+});
+
+describe('#/site with V5 off', () => {
+  it('is an unknown address and opens Home, exactly as before', () => {
+    const got = resolveHash('#/site?lat=31&lon=-97', false);
+    expect(got.page).toBe('home');
+    expect(got.redirected).toBe(true);
+  });
 });

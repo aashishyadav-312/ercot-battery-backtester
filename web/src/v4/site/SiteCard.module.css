@@ -75,6 +75,7 @@
   .sheet p, .sheet ul { margin: 4pt 0; }
   .sheetKicker { font-size: 9pt; color: #444; }
   .sheetTitle { margin: 2pt 0; font-size: 20pt; font-weight: 600; }
+  .sheetH2 { margin: 10pt 0 2pt; font-size: 13pt; font-weight: 600; }
   .sheetBig { font-size: 22pt; font-weight: 600; }
   .sheetTable { width: 100%; margin: 8pt 0; border-collapse: collapse; font-size: 10pt; }
   .sheetTable th, .sheetTable td { padding: 3pt 6pt; border-bottom: 0.5pt solid #888; text-align: left; }

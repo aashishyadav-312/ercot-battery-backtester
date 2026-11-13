@@ -7,14 +7,14 @@
 import type { Selection } from '../data/types';
 import { V5 } from '../config/features';
 
-export type Page = 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'siteguide' | 'limits' | 'glossary' | 'author' | 'map' | 'live' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
+export type Page = 'site' | 'home' | 'atlas' | 'studio' | 'research' | 'learn' | 'siteguide' | 'limits' | 'glossary' | 'author' | 'map' | 'live' | 'revenue' | 'dispatch' | 'realism' | 'economics' | 'method';
 /**
  * Pages that no longer exist on their own: Studio replaced Custom run and Compare, Learn (first called Guide) replaced Start here and About,
  * and Revenue absorbed Run overview (polish step 4).
  */
 type Retired = 'custom' | 'compare' | 'start' | 'about' | 'guide' | 'overview';
 type LearnPage = 'siteguide' | 'limits' | 'glossary' | 'author';
-export type OldRoute = Exclude<Page, 'home' | 'atlas' | 'studio' | 'research' | 'learn' | LearnPage> | Retired;
+export type OldRoute = Exclude<Page, 'site' | 'home' | 'atlas' | 'studio' | 'research' | 'learn' | LearnPage> | Retired;
 /** The pages from before the redesign. Their bare hash (`#/live`) is an old route that redirects to its new home. */
 export const OLD_PAGES: OldRoute[] = ['start', 'guide', 'map', 'live', 'overview', 'revenue', 'dispatch', 'compare', 'realism', 'economics', 'custom', 'method', 'about'];
 export const PAGES: Page[] = ['home', 'atlas', 'studio', 'research', 'learn', 'siteguide', 'limits', 'glossary', 'author', ...OLD_PAGES.filter((p): p is Exclude<OldRoute, Retired> => !['custom', 'compare', 'start', 'about', 'guide', 'overview'].includes(p))];
@@ -121,6 +121,7 @@ export const tabsFor = (v5: boolean = V5): TabDef[] => (v5 ? TABS_V5 : TABS);
 export const TAB_IDS: Tab[] = TABS.map((t) => t.tab);
 
 export function tabOf(page: Page, v5: boolean = V5): Tab {
+  if (page === 'site') return 'atlas'; // V5 site report: not a view of any tab, but the Atlas tab is the one that stays marked
   return tabsFor(v5).find((t) => t.views.some((v) => v.page === page))!.tab;
 }
 
@@ -130,6 +131,7 @@ export function viewsOf(tab: Tab, v5: boolean = V5): View[] {
 
 /** Path (no leading `#/`, no query) of a page: "research/revenue", "atlas". */
 export function pathOf(page: Page, v5: boolean = V5): string {
+  if (page === 'site') return 'site';
   const tab = tabOf(page, v5);
   const v = viewsOf(tab, v5).find((x) => x.page === page)!;
   return v.slug ? `${tab}/${v.slug}` : tab;
@@ -163,7 +165,11 @@ export function resolveHash(hash: string, v5: boolean = V5): ResolvedRoute {
   let page: Page;
   let redirected: boolean;
   const tabId = TAB_ALIAS[first] ?? first;
-  if (v5 && tabId === 'research') {
+  if (v5 && first === 'site') {
+    // V5: the site report, `#/site?lat=&lon=&dur=&year=`. Not a view of a tab; with V5 off the word is unknown and opens Home, as before.
+    page = 'site';
+    redirected = second !== '';
+  } else if (v5 && tabId === 'research') {
     // V5: Research lives inside Learn. `#/research` opens Findings, `#/research/<view>` opens that view, old view names included.
     const renamed = VIEW_ALIAS.research?.[second];
     const hit = second === '' ? undefined : viewsOf('learn', true).find((v) => v.slug === (renamed ?? second));
