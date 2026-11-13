@@ -52,6 +52,8 @@ SOURCES = {
 }
 # Hours a month may miss (gaps, DST) and still count as finished.
 MAX_MISSING_HOURS = 2
+# ONE_HOUR warns under pandas 3 with recent NumPy; seconds with a unit does not.
+ONE_HOUR = pd.Timedelta(3600, unit="s")
 
 
 # --- hourly load -------------------------------------------------------------------------------
@@ -115,7 +117,7 @@ def fetch_hourly_load(year: int, refresh: bool = False) -> tuple[pd.DataFrame, s
 def hours_in_month(year: int, month: int) -> int:
     start = pd.Timestamp(year=year, month=month, day=1).tz_localize(TZ)
     end = (start + pd.offsets.MonthBegin(1)).tz_localize(None).tz_localize(TZ)
-    return int(round((end - start) / pd.Timedelta(hours=1)))
+    return int(round((end - start) / ONE_HOUR))
 
 
 def finished_months(load: pd.DataFrame, year: int, now: pd.Timestamp | None = None) -> list[int]:
@@ -146,7 +148,7 @@ def monthly_peaks(load: pd.DataFrame, year: int, months: list[int]) -> list[dict
         f = load[(starts.dt.year == year) & (starts.dt.month == m)]
         i = f["load_mw"].idxmax()
         start = pd.Timestamp(f.at[i, "interval_start"])
-        end = start + pd.Timedelta(hours=1)
+        end = start + ONE_HOUR
         end_local = end.tz_convert(TZ)
         out.append(
             {

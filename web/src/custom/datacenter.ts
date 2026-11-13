@@ -18,6 +18,8 @@
 //              executed schedule actually held at each official interval.
 // Without export, discharge never exceeds the site load in any interval. A 4CP cut never counts
 // more than the site load.
+// The optional holdWindows and peakLabel inputs (off by default) let twelvecp.ts run the same engine
+// on 12 monthly peaks with seasonal hold windows.
 import type { Highs } from 'highs';
 import rules from './config/datacenter_rules.json';
 import { TOL, optimizeDay } from './dispatch';
@@ -97,6 +99,13 @@ export interface DataCenterInputs {
   alertThresholdPct?: number;
   windowStartHour?: number;
   windowEndHour?: number;
+  /**
+   * Optional realistic hold windows by month, local [startHour, endHour) blocks. When given, they
+   * replace windowStartHour/windowEndHour (used by the 12CP case, twelvecp.ts). Default: off.
+   */
+  holdWindows?: HoldWindow[] | null;
+  /** Name of the coincident peak method in notes. Default '4CP'. */
+  peakLabel?: string;
   curtailmentHoursPerYear?: number;
   curtailmentEvents?: number;
   /** $/MWh. */
@@ -109,6 +118,11 @@ export interface DataCenterInputs {
   endDate?: string;
   /** Optional hook that sees each solved day's 15-min schedule (used by tests and charts). */
   onDay?: (date: string, schedule: Schedule, loadMw: number[]) => void;
+}
+
+export interface HoldWindow {
+  months: number[];
+  hours: [number, number][];
 }
 
 export interface FourCpDetail {
@@ -135,6 +149,8 @@ export interface DispatchSample {
   fourCp: [number, number] | null;
   /** Indices of the realistic 4CP window [start, end), or null. */
   window: [number, number] | null;
+  /** With holdWindows: each window block's indices [start, end). */
+  windows?: [number, number][];
   alertDay: boolean;
 }
 
@@ -219,6 +235,14 @@ export function validateDataCenterInputs(x: Partial<DataCenterInputs>): string[]
     const s = x.windowStartHour ?? 0;
     const e = x.windowEndHour ?? 0;
     if (!(Number.isInteger(s) && Number.isInteger(e) && s >= 0 && e <= 24 && s < e)) errors.push('The 4CP window must be whole hours with start before end.');
+  }
+  if (x.holdWindows) {
+    const ok = x.holdWindows.every(
+      (w) =>
+        w.months.every((m) => Number.isInteger(m) && m >= 1 && m <= 12) &&
+        w.hours.every(([s, e]) => Number.isInteger(s) && Number.isInteger(e) && s >= 0 && e <= 24 && s < e),
+    );
+    if (!ok) errors.push('Hold windows must be months 1 to 12 and whole hours with start before end.');
   }
   if (x.loadProfileMw) {
     const n = x.loadProfileMw.length;
@@ -534,6 +558,13 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
   const wEnd = inputs.windowEndHour ?? Number(rules.fourCp.realisticStrategy.windowEndLocal.slice(0, 2));
   const load = makeLoad(inputs);
   const notes: string[] = [];
+  const label = inputs.peakLabel ?? '4CP';
+  const holdWindows = inputs.holdWindows ?? null;
+  const inWindow = (month: number, hour: number) => {
+    if (!holdWindows) return hour >= wStart && hour < wEnd;
+    const w = holdWindows.find((x) => x.months.includes(month));
+    return !!w && w.hours.some(([s, e]) => hour >= s && hour < e);
+  };
 
   const alerts = realistic ? alertDays(fourCp.daily_peaks, threshold) : new Set<string>();
   // 4CP intervals by local date, with the RT index span filled in per day.
@@ -560,7 +591,16 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
   let solved = 0;
   let lastDay = '';
 
-  const makeSample = (date: string, ms: number[], rt: Float64Array, loadMw: number[], sch: Schedule, cp: [number, number] | null, win: [number, number] | null, alert: boolean): DispatchSample => ({
+  const blocks = (idx: number[]): [number, number][] => {
+    const out: [number, number][] = [];
+    for (const t of idx) {
+      const last = out[out.length - 1];
+      if (last && last[1] === t) last[1] = t + 1;
+      else out.push([t, t + 1]);
+    }
+    return out;
+  };
+  const makeSample = (date: string, ms: number[], rt: Float64Array, loadMw: number[], sch: Schedule, cp: [number, number] | null, win: [number, number] | null, alert: boolean, winIdx: number[] = []): DispatchSample => ({
     date,
     times: ms.map(hhmm),
     loadMw: loadMw.map((v) => round(v, 3)),
@@ -570,6 +610,7 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
     priceUsdMwh: Array.from(rt, (v) => round(v, 2)),
     fourCp: cp,
     window: win,
+    ...(holdWindows ? { windows: blocks(winIdx) } : {}),
     alertDay: alert,
   });
 
@@ -598,10 +639,8 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
     }
     const cpRMax = cpIdx.length ? Math.min(P, ...cpIdx.map((t) => loadMw[t])) : 0;
     const alert = realistic && rate > 0 && alerts.has(date); // no 4CP rate, nothing to hold for
-    const winIdx = alert ? ms.flatMap((m, t) => {
-      const h = centralHour(m).hour;
-      return h >= wStart && h < wEnd ? [t] : [];
-    }) : [];
+    const month = Number(date.slice(5, 7));
+    const winIdx = alert ? ms.flatMap((m, t) => (inWindow(month, centralHour(m).hour) ? [t] : [])) : [];
     const win: [number, number] | null = winIdx.length ? [winIdx[0], winIdx[winIdx.length - 1] + 1] : null;
 
     let sch: Schedule;
@@ -666,9 +705,9 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
         alertDay: realistic ? alert : true,
         valueUsd: covered ? cut * 1000 * rate : 0,
       });
-      samples.set(date, makeSample(date, ms, rt, loadMw, sch, cpRange, win, realistic ? alert : true));
+      samples.set(date, makeSample(date, ms, rt, loadMw, sch, cpRange, win, realistic ? alert : true, winIdx));
     } else if (alert && !samples.has('firstAlert')) {
-      samples.set('firstAlert', makeSample(date, ms, rt, loadMw, sch, null, win, true));
+      samples.set('firstAlert', makeSample(date, ms, rt, loadMw, sch, null, win, true, winIdx));
     }
   }
   if (!solved) throw new Error('no complete days in the selected range');
@@ -692,8 +731,13 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
       },
   );
   const fourCpUsd = fourCpDetail.reduce((a, d) => a + d.valueUsd, 0);
-  if (!fourCp.complete) notes.push('The 4CP file does not have all four months; only the months present are valued.');
-  if (fourCp.status === 'computed') notes.push(`${fourCp.year} 4CP intervals are computed from hourly load (ERCOT has not published them yet).`);
+  if (label === '4CP') {
+    if (!fourCp.complete) notes.push('The 4CP file does not have all four months; only the months present are valued.');
+    if (fourCp.status === 'computed') notes.push(`${fourCp.year} 4CP intervals are computed from hourly load (ERCOT has not published them yet).`);
+  } else {
+    if (!fourCp.complete) notes.push(`The ${label} file has ${fourCp.intervals.length} finished months; only those monthly peaks are valued.`);
+    if (fourCp.status === 'computed') notes.push(`${fourCp.year} ${label} intervals are the monthly peak hours of hourly ERCOT load.`);
+  }
 
   // Ancillary services from the Step 1 stack.
   let asUsd = 0;
@@ -713,7 +757,7 @@ export function runDataCenterCase(inputs: DataCenterInputs): DataCenterResult {
       const constraintCost = (unconstrained - constrained) * scale;
       energyUsd = st.energy * kw - constraintCost;
       notes.push(
-        `Ancillary services from the precomputed stack, reduced by the ${round(reservedShare * 100, 2)}% of hours held for 4CP` +
+        `Ancillary services from the precomputed stack, reduced by the ${round(reservedShare * 100, 2)}% of hours held for ${label}` +
           (inputs.exportAllowed ? '.' : ` and scaled by ${round(exportScale, 3)} for no export.`),
       );
     }
