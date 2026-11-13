@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "asOf": "2026-11-13",
+  "notes": "Rules and defaults for runTwelveCpCase (web/src/custom/twelvecp.ts). 12CP is a proposal, not an adopted rule. Each item has a source URL and an as-of date. Items marked assumption: true are not rules; they are labelled defaults or modelling choices.",
+  "status": {
+    "value": "proposed, not adopted",
+    "text": "The PUCT approved a proposal for publication in Project No. 58000 on July 9, 2026; comments were due August 11, 2026. The Project 58000 filings list shows no adopted rule or order for adoption (last filing October 1, 2026, checked November 13, 2026). SB 6 Section 6 requires the rules by December 31, 2026.",
+    "sources": [
+      "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "https://interchange.puc.texas.gov/search/filings/?ControlNumber=58000&UtilityType=E&DocumentType=ALL",
+      "https://capitol.texas.gov/tlodocs/89R/billtext/html/SB00006F.htm"
+    ],
+    "asOf": "2026-11-13"
+  },
+  "method": {
+    "text": "A TSP's network transmission service rate would be its approved transmission cost of service divided by the ERCOT 12CP load. Each DSP would pay the monthly rate times its previous year's DSP 12CP load: the average of its 12 demand values coincident with the ERCOT 12CP intervals, excluding export flows and wholesale storage load.",
+    "citation": "Proposed 16 TAC §25.192(b)(2), (b)(3), (d)(1) and (d)(2), Project No. 58000 proposal for publication (July 9, 2026)",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "interval": {
+    "minutes": 30,
+    "text": "ERCOT 12CP intervals: the set of 12 30-minute intervals made of the ERCOT system monthly peak demand interval for each of the 12 calendar months from October 1 of one year through September 30 of the next.",
+    "citation": "Proposed 16 TAC §25.192(b)(4)",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "dataResolution": {
+    "minutes": 60,
+    "assumption": true,
+    "text": "The 12CP data is hourly ERCOT system load, so each monthly peak is the month's peak hour and the engine counts a cut only if it is held for that whole hour, the margin the 4CP case uses for an hourly interval. The 30-minute peak may fall partly outside the peak hour: in 2023 to 2025, ERCOT's official 15-minute 4CP interval fell inside the hourly peak hour in about half of the summer months. The perfect strategy may overstate what a battery would catch; the realistic strategy holds a wider window.",
+    "source": "https://www.ercot.com/gridinfo/load/load_hist",
+    "asOf": "2026-11-13"
+  },
+  "chargeTiming": {
+    "text": "By December 1 each year ERCOT would file each DSP's 12CP load from the 12CP intervals ending the previous September. A cut at this year's monthly peaks lowers a later year's transmission charge. The engine values the cuts in one calendar year at the annual rate, a steady-state view of that lag.",
+    "citation": "Proposed 16 TAC §25.192(d)(2) and (f)(1)",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "defaultRatePerKwPerPeak": {
+    "derivedFrom": "datacenter_rules.json fourCp.postageStampRate",
+    "divisor": 12,
+    "roundToCents": true,
+    "unit": "$/kW per monthly peak",
+    "assumption": true,
+    "text": "Default 12CP rate: the same 2025 ERCOT postage stamp rate the 4CP case uses, divided by 12 and rounded to the cent. The charge would be the rate times the average of 12 monthly loads, so 1 kW less at one monthly peak saves a twelfth of the annual rate. When a 4CP rate is entered, the 12CP rate defaults to the same annual amount (the 4CP rate x 4 / 12).",
+    "source": "https://interchange.puc.texas.gov/Documents/57491_58_1505349.PDF",
+    "asOf": "2026-11-13"
+  },
+  "realisticStrategy": {
+    "thresholdPctFrom": "datacenter_rules.json fourCp.realisticStrategy.thresholdPct",
+    "derivedFromYears": [
+      2023,
+      2024,
+      2025
+    ],
+    "windows": [
+      {
+        "season": "winter",
+        "months": [
+          12,
+          1,
+          2
+        ],
+        "hours": [
+          [
+            6,
+            8
+          ],
+          [
+            17,
+            19
+          ]
+        ]
+      },
+      {
+        "season": "spring",
+        "months": [
+          3,
+          4,
+          5
+        ],
+        "hours": [
+          [
+            15,
+            18
+          ]
+        ]
+      },
+      {
+        "season": "summer",
+        "months": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "hours": [
+          [
+            15,
+            18
+          ]
+        ]
+      },
+      {
+        "season": "fall",
+        "months": [
+          10,
+          11
+        ],
+        "hours": [
+          [
+            12,
+            17
+          ]
+        ]
+      }
+    ],
+    "assumption": true,
+    "text": "Realistic 12CP strategy: the 4CP alert rule in every month. Discharge on a day when that day's ERCOT peak load is at least the 4CP threshold share of the highest daily peak so far that month (the first day of a month always counts). The battery holds an even cut through its season's hold window, local time. Each window starts one hour before the earliest 2023 to 2025 monthly peak hour in that season and ends with the latest, as the 4CP window does; winter has a morning and an evening block. The windows cover every 2023 to 2025 monthly peak hour. They were fitted to those years, so they can miss a later peak: January 2026 peaked in the hour ending 09:00, after the winter morning block.",
+    "source": "https://www.ercot.com/gridinfo/load/load_hist",
+    "asOf": "2026-11-13"
+  },
+  "minimumBillingDemand": {
+    "optional": true,
+    "text": "Optional. A REP serving a large load customer would be charged on a minimum billing demand: the greater of the customer's contracted peak demand, its highest non-coincident peak demand in the past year, or its 12CP demand. When this input is on, the engine bills the 12CP case on that greater figure, so a cut lowers the bill only where the 12CP demand is above the other two. A site's own non-coincident peak is never below its 12CP demand, so with no lower figure entered the floor removes the whole 12CP saving.",
+    "citation": "Proposed 16 TAC §25.193(d)(1) and (d)(2); ERCOT adjustment in proposed §25.192(f)(1)(B)",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "minimumBillingDemandNcp": {
+    "assumption": true,
+    "text": "When no highest non-coincident peak is entered, the engine uses the site's highest load without the battery (the flat load, or the peak of the uploaded profile). It assumes the battery neither raises that peak by charging nor shaves it. The highest net load the battery's schedule reaches is reported, not billed.",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "notModelled": [
+    {
+      "id": "minimumBillingDemandOptions",
+      "text": "The proposal asks whether the minimum billing demand should differ by size, be ratcheted, or be a weighted average of contracted or non-coincident peak demand and 12CP demand. None of these is modelled.",
+      "citation": "Project No. 58000 proposal for publication, questions for comment 1 to 3",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "batteryNcp",
+      "text": "The battery's effect on the site's non-coincident peak. The dispatch does not try to lower the site's annual peak, and it may charge while the site is at its peak, which would raise the metered peak and so the minimum billing demand. The engine reports that net peak but bills the site's peak without the battery.",
+      "citation": "Proposed 16 TAC §25.193(d)(2)(B)",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "rateRebasing",
+      "text": "Under 12CP the rate would be the cost of service divided by the ERCOT 12CP load, an average of 12 monthly peaks that is lower than the summer 4CP average, so the per-kW rate would be higher for the same cost of service. The default keeps the 4CP annual rate. Each result file's mean_monthly_peak_mw shows the size of that gap.",
+      "citation": "Proposed 16 TAC §25.192(d)(1)",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "storageAndExports",
+      "text": "ERCOT 12CP load excludes export flows and wholesale storage load. The monthly peaks here come from total ERCOT hourly load, so a peak interval can differ from the one ERCOT would find.",
+      "citation": "Proposed 16 TAC §25.192(b)(3)",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "retailPassThrough",
+      "text": "Retail pass-through. An investor-owned DSP's TCRF would allocate cost by class demands coincident with the 12CP intervals, with large load minimum billing demands. The engine values the ERCOT-wide wholesale rate, not a utility's TCRF.",
+      "citation": "Proposed 16 TAC §25.193(c)",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "transition",
+      "text": "Start date. The first 12CP billing demands would take effect with the order in the next docket that sets ERCOT transmission charges using ERCOT's 12CP data. The engine applies 12CP to the backtest year as if it were in force.",
+      "citation": "Proposed 16 TAC §25.192(j)(1)",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    }
+  ]
+}
