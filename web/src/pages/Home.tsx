@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useApp } from '../state';
 import { loadLocations, loadNodes, loadTexas } from '../data/loader';
 import { num, pct, usd } from '../data/format';
@@ -88,16 +88,18 @@ function useHomeData() {
   return data;
 }
 
-export default function Home() {
+/** `search` (V5): the site search box, shown in the hero under the two buttons. Without it Home is exactly as before. */
+export default function Home({ search }: { search?: ReactNode } = {}) {
   const { index } = useApp();
   const data = useHomeData();
   const feed = useLiveFeed();
   if (data && 'error' in data) return <p className={classes.lede}>Could not load the results for this page: {data.error}</p>;
   if (!index || !data) return <div className={classes.loading} aria-busy="true">Loading results…</div>;
-  return <HomeView index={index} nodes={data.nodes} locs={data.locs} geo={data.geo} live={feed} />;
+  return <HomeView index={index} nodes={data.nodes} locs={data.locs} geo={data.geo} live={feed} search={search} />;
 }
 
-export function HomeView({ index, nodes, locs, geo, live }: {
+export function HomeView({ index, nodes, locs, geo, live, search }: {
+  search?: ReactNode;
   index: Parameters<typeof buildHome>[0];
   nodes: NodesFile;
   locs: LocationsFile;
@@ -140,6 +142,7 @@ export function HomeView({ index, nodes, locs, geo, live }: {
             <a className={classes.primary} href="#/atlas">Explore the Atlas</a>
             <a className={classes.secondary} href="#/studio/custom">Run your own battery</a>
           </div>
+          {search && <div className={classes.heroSearch} data-testid="hero-search">{search}</div>}
           <LiveChip chip={chip} targetId="today-title" />
         </div>
 

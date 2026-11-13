@@ -5,6 +5,7 @@ import { MantineProvider } from '@mantine/core';
 import { Header } from './Header';
 import { ViewBar } from './ViewBar';
 import { tourSteps } from '../tour/steps';
+import { V5_RESEARCH_IN_LEARN as inLearn } from '../../shell/route';
 import type { Selection } from '../../data/types';
 
 vi.mock('../../config/features', async (orig) => ({ ...(await orig<typeof import('../../config/features')>()), V5: true }));
@@ -16,7 +17,13 @@ beforeAll(() => {
 const SEL: Selection = { location: 'HB_HOUSTON', duration: 2, year: 2025, deg: 10 };
 
 describe('V5 header and view bar', () => {
-  it('shows four tabs as links, in order, with the current one marked', () => {
+  it.runIf(!inLearn)('keeps five tabs, with Research as its own tab', () => {
+    render(<MantineProvider><Header active="research" sel={SEL} scheme="dark" onToggleScheme={() => {}} /></MantineProvider>);
+    const links = within(screen.getByRole('navigation', { name: 'Primary' })).getAllByRole('link');
+    expect(links.map((a) => a.textContent)).toEqual(['Home', 'Atlas', 'Studio', 'Research', 'Learn']);
+  });
+
+  it.runIf(inLearn)('shows four tabs as links, in order, with the current one marked', () => {
     render(<MantineProvider><Header active="learn" sel={SEL} scheme="dark" onToggleScheme={() => {}} /></MantineProvider>);
     const links = within(screen.getByRole('navigation', { name: 'Primary' })).getAllByRole('link');
     expect(links.map((a) => a.textContent)).toEqual(['Home', 'Atlas', 'Studio', 'Learn']);
@@ -24,7 +31,7 @@ describe('V5 header and view bar', () => {
     expect(links[3].getAttribute('href')).toContain('#/learn');
   });
 
-  it('Learn lists Research as one item, and the Research pages on a second row', () => {
+  it.runIf(inLearn)('Learn lists Research as one item, and the Research pages on a second row', () => {
     render(<ViewBar tab="learn" page="revenue" sel={SEL} />);
     const top = within(screen.getByRole('navigation', { name: 'Learn pages' })).getAllByRole('link');
     expect(top.map((a) => a.textContent)).toEqual(['Basics', 'Research', 'Site guide', 'Limits', 'Glossary', 'About']);
@@ -35,7 +42,7 @@ describe('V5 header and view bar', () => {
     expect(sub[1].getAttribute('href')).toMatch(/^#\/learn\/revenue\?/);
   });
 
-  it('the second row appears on Findings too, and not on the other Learn pages', () => {
+  it.runIf(inLearn)('the second row appears on Findings too, and not on the other Learn pages', () => {
     const { unmount } = render(<ViewBar tab="learn" page="research" sel={SEL} />);
     expect(screen.getByRole('navigation', { name: 'Research pages' })).toBeTruthy();
     unmount();
@@ -45,10 +52,15 @@ describe('V5 header and view bar', () => {
 });
 
 describe('V5 tour', () => {
-  it('has no stop for the Research tab, and the Learn stop says where Research went', () => {
+  it.runIf(inLearn)('has no stop for the Research tab, and the Learn stop says where Research went', () => {
     const steps = tourSteps(true, true);
     expect(steps.map((s) => s.anchor)).toEqual(['hero', 'tab-atlas', 'tab-studio', 'tab-learn', 'support']);
     expect(steps.find((s) => s.anchor === 'tab-learn')!.body).toContain('research');
+  });
+  it.runIf(!inLearn)('keeps the Research stop, and the hero stop points at the site search', () => {
+    const steps = tourSteps(true, true);
+    expect(steps.map((s) => s.anchor)).toContain('tab-research');
+    expect(steps.find((s) => s.anchor === 'hero')!.body).toContain('screen a site');
   });
   it('is unchanged with V5 off', () => {
     expect(tourSteps(true).map((s) => s.anchor)).toContain('tab-research');
