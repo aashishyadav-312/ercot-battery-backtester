@@ -1,7 +1,8 @@
 # V5 Step 2: 12CP engine and data
 
-**Assumes:** the site is billed on its 12CP demand, at the 4CP postage stamp rate / 12 per monthly peak; a cut counts only if held for the whole peak hour of hourly ERCOT load (no 30-minute data), and the realistic rule is the 4CP alert rule in every month with season windows fitted to 2023 to 2025.
-**Ignores:** the proposal's large load minimum billing demand (which can make a cut worth nothing), rate rebasing on the lower 12CP load, storage and export exclusions, retail TCRF pass-through and the start date.
+**Assumes:** by default the site is billed on its 12CP demand, at the 4CP postage stamp rate / 12 per monthly peak; a cut counts only if held for the whole peak hour of hourly ERCOT load (no 30-minute data), and the realistic rule is the 4CP alert rule in every month with season windows fitted to 2023 to 2025.
+**Optional:** large load minimum billing demand (`opts.minimumBillingDemand`). It bills 12CP on the greatest of contracted peak, NCP (default: the site's highest load) and 12CP demand, which removes the saving unless a lower NCP is entered.
+**Ignores:** ratcheted or weighted minimum billing demand, an NCP set by the battery's own charging (reported, not billed), rate rebasing on the lower 12CP load, storage and export exclusions, retail TCRF pass-through and the start date.
 
 **What changed**
 - `data/fetch_twelvecp.py` writes `results/v5/twelvecp/2023-2026.json` from the hourly load archive that `fetch_fourcp.py` uses (API fallback kept). 2026 has January to October, `complete: false`. Extra fields beyond the contract: `label`, `twelvecp_year`, `daily_peaks`, `months_finished`, `mean_monthly_peak_mw`, `checks`, `sources`, `notes`.

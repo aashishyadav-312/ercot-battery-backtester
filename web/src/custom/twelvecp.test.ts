@@ -122,8 +122,10 @@ describe('12CP rules config', () => {
     expect(TWELVECP_RULES.status.value).toBe('proposed, not adopted');
     expect(TWELVECP_RULES.interval.minutes).toBe(30);
     const ids = TWELVECP_RULES.notModelled.map((n) => n.id);
-    expect(ids).toContain('minimumBillingDemand');
+    expect(ids).toContain('minimumBillingDemandOptions');
+    expect(ids).toContain('batteryNcp');
     expect(ids).toContain('rateRebasing');
+    expect(TWELVECP_RULES.minimumBillingDemand.citation).toMatch(/25\.193\(d\)/);
   });
 
   it('derives the default rate from the 4CP postage stamp rate, not a typed number', () => {
@@ -301,6 +303,82 @@ describe('12CP engine', () => {
     expect(c.twelveCp.detail.find((d) => d.month === 10)!.covered).toBe(true);
     expect(c.notes.join(' ')).toMatch(new RegExp(`${peaks.intervals.length} of 12 months`));
     expect(c.status).toBe('proposed, not adopted');
+  });
+
+  describe('minimum billing demand (optional)', () => {
+    // Fixture: flat 50 MW site, one monthly peak (n = 1 of 12), foresight holds the full 10 MW cut.
+    // Annual 12CP rate 12 x 5.71 = 68.52 $/kW-yr; one peak of 12 counts 1/12 of it, 5.71 $/kW.
+    it('off by default: the saving is the per-peak cut, as before', () => {
+      const off = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp());
+      expect(off.twelveCp.minimumBillingDemand).toBeUndefined();
+      expect(off.notes.join(' ')).toMatch(/assumes the site is billed on its 12CP demand/);
+    });
+
+    it('a zero floor gives the same saving as no floor', () => {
+      const off = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp());
+      const zero = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { contractedPeakMw: 0, ncpMw: 0 } });
+      expect(zero.twelveCp.avoidedUsd).toBeCloseTo(off.twelveCp.avoidedUsd, 6);
+      expect(zero.twelveCp.minimumBillingDemand!.floorEffect).toBe('none');
+      expect(zero.twelveCp.minimumBillingDemand!.avoidedBeforeFloorUsd).toBeCloseTo(57_100, 3);
+    });
+
+    it("defaults the NCP to the site's highest load, which removes the whole saving", () => {
+      const c = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: {} });
+      const f = c.twelveCp.minimumBillingDemand!;
+      expect(f.ncpSource).toBe('site load');
+      expect(f.ncpMw).toBe(50);
+      expect(f.floorMw).toBe(50);
+      expect(f.twelveCpDemandWithoutMw).toBeCloseTo(50, 9);
+      expect(f.twelveCpDemandWithMw).toBeCloseTo(40, 6);
+      expect(f.billingDemandWithoutMw).toBe(50);
+      expect(f.billingDemandWithMw).toBe(50);
+      expect(f.floorEffect).toBe('full');
+      expect(c.twelveCp.avoidedUsd).toBe(0);
+      expect(c.twelveCp.netUsd).toBeCloseTo(-c.twelveCp.energyGivenUpUsd, 9);
+      expect(c.notes.join(' ')).toMatch(/12CP saving is \$0/);
+      // 4CP is untouched by the 12CP floor.
+      expect(c.fourCp.minimumBillingDemand).toBeUndefined();
+    });
+
+    it('hand-checked partial floor: an NCP of 45 MW keeps 5 of the 10 MW cut', () => {
+      const c = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { ncpMw: 45 } });
+      const f = c.twelveCp.minimumBillingDemand!;
+      expect(f.floorEffect).toBe('partial');
+      expect(f.billingDemandWithoutMw).toBeCloseTo(50, 9);
+      expect(f.billingDemandWithMw).toBe(45);
+      // (50 - 45) MW x 1000 x 68.52 $/kW-yr x 1/12 = 5,000 kW x 5.71 = $28,550.
+      expect(c.twelveCp.avoidedUsd).toBeCloseTo(28_550, 3);
+      expect(c.twelveCp.avoidedPerKwYr).toBeCloseTo(2.855, 9);
+    });
+
+    it('the contracted peak sets the floor when it is higher', () => {
+      const c = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { contractedPeakMw: 60, ncpMw: 30 } });
+      const f = c.twelveCp.minimumBillingDemand!;
+      expect(f.floorMw).toBe(60);
+      expect(f.contractedPeakMw).toBe(60);
+      expect(c.twelveCp.avoidedUsd).toBe(0);
+    });
+
+    it("reports, but does not bill, a net peak the battery's charging sets", () => {
+      const c = runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { ncpMw: 45 } });
+      const f = c.twelveCp.minimumBillingDemand!;
+      // The battery charges at up to 10 MW on top of the 50 MW site load.
+      expect(f.ncpWithBatteryMw).toBeGreaterThan(50);
+      expect(f.ncpWithBatteryMw).toBeLessThanOrEqual(60 + 1e-6);
+      expect(c.notes.join(' ')).toMatch(/does not bill that/);
+    });
+
+    it('rejects negative or non-numeric MW', () => {
+      expect(() => runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { contractedPeakMw: -1 } })).toThrow(/Contracted peak/);
+      expect(() => runTwelveCpCase(base(), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: { ncpMw: Number.NaN } })).toThrow(/non-coincident/);
+    });
+
+    it('uses the peak of an uploaded profile as the default NCP', () => {
+      const profile = Array.from({ length: 8760 }, (_, h) => (h === 5000 ? 80 : 50));
+      const c = runTwelveCpCase(base({ loadProfileMw: profile }), TWELVECP_RULES, fixtureTwelveCp(), { minimumBillingDemand: {} });
+      expect(c.twelveCp.minimumBillingDemand!.ncpMw).toBe(80);
+      expect(c.twelveCp.avoidedUsd).toBe(0);
+    });
   });
 
   it('rejects a 12CP file for another year', () => {

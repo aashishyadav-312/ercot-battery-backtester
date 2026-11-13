@@ -14,11 +14,17 @@
 //              an even cut through the season's hold window. Only the cut the executed schedule held
 //              through the whole peak hour counts.
 //   rate:      the 4CP postage stamp rate / 12 per peak, or the entered 4CP rate x 4 / 12.
-// Ignored (see notModelled in the config): large load minimum billing demand, rate rebasing on the
-// lower 12CP load, storage and export exclusions, retail TCRF pass-through, the start date.
+//   minimum billing demand (optional, opts.minimumBillingDemand): the site is billed on the greater of
+//              its contracted peak, its highest non-coincident peak (NCP) and its 12CP demand. The
+//              saving is the annual rate x the drop in that billing demand. Off: billed on 12CP demand.
+// Ignored (see notModelled in the config): ratcheted or weighted minimum billing demand, rate
+// rebasing on the lower 12CP load, storage and export exclusions, retail TCRF pass-through, the start
+// date, and any NCP the battery's own charging would set.
 import dcRules from './config/datacenter_rules.json';
 import rules from './config/twelvecp_rules.json';
 import {
+  countedSpan,
+  makeLoad,
   runDataCenterCase,
   type DataCenterInputs,
   type DataCenterResult,
@@ -101,6 +107,34 @@ export function toPeakFile(peaks: TwelveCpYear): FourCpYear {
 
 // --- engine ------------------------------------------------------------------------------------
 
+/** Large load minimum billing demand inputs (proposed §25.193(d)). MW. */
+export interface MinimumBillingDemandInput {
+  /** Contracted peak demand. Omit or null for none. */
+  contractedPeakMw?: number | null;
+  /** Highest non-coincident peak demand in the past year. Default: the site's highest load. */
+  ncpMw?: number | null;
+}
+
+export interface MinimumBillingDemandResult {
+  contractedPeakMw: number | null;
+  ncpMw: number;
+  ncpSource: 'input' | 'site load';
+  /** The floor: the greater of contracted peak and NCP. */
+  floorMw: number;
+  /** Average site load at the monthly peaks, without and with the battery's cuts. */
+  twelveCpDemandWithoutMw: number;
+  twelveCpDemandWithMw: number;
+  /** Billing demand: the greater of the floor and the 12CP demand. */
+  billingDemandWithoutMw: number;
+  billingDemandWithMw: number;
+  /** 'none': the floor is below the 12CP demand with the battery; 'partial': it cuts the saving; 'full': no saving. */
+  floorEffect: 'none' | 'partial' | 'full';
+  /** The 12CP saving if the site were billed on its 12CP demand (USD/yr). */
+  avoidedBeforeFloorUsd: number;
+  /** Highest site net load with the battery (load + charge - discharge) in the run, MW. Reported, not billed. */
+  ncpWithBatteryMw: number | null;
+}
+
 export interface CpOutcome {
   method: '4CP' | '12CP';
   /** $/kW per coincident peak interval. */
@@ -124,7 +158,11 @@ export interface CpOutcome {
   /** Avoided charge less the energy and ancillary revenue given up, USD/yr and $/kW-yr. */
   netUsd: number;
   netPerKwYr: number;
+  /** Per-peak values before any minimum billing demand floor. */
   detail: FourCpDetail[];
+  /** 12CP only, when opts.minimumBillingDemand is given. */
+  minimumBillingDemand?: MinimumBillingDemandResult;
+  /** The raw engine run (its breakdown.fourCp is before any minimum billing demand floor). */
   result: DataCenterResult;
 }
 
@@ -142,6 +180,83 @@ export interface TwelveCpComparison {
 export interface TwelveCpOptions {
   /** $/kW per monthly peak. Default: defaultTwelveCpRate(input.fourCpRatePerKw). */
   twelveCpRatePerKw?: number;
+  /** Bill the 12CP case on the proposal's large load minimum billing demand. Default: off. */
+  minimumBillingDemand?: MinimumBillingDemandInput | null;
+}
+
+/** Problems with minimum billing demand inputs, in plain words; empty when they can run. */
+export function validateMinimumBillingDemand(m: MinimumBillingDemandInput): string[] {
+  const errors: string[] = [];
+  const check = (v: number | null | undefined, label: string) => {
+    if (v === undefined || v === null) return;
+    if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) errors.push(`${label} must be a number of MW at or above 0.`);
+  };
+  check(m.contractedPeakMw, 'Contracted peak demand');
+  check(m.ncpMw, 'Highest non-coincident peak');
+  return errors;
+}
+
+/** The site's highest load without the battery, MW. */
+function siteMaxMw(input: DataCenterInputs): number {
+  const p = input.loadProfileMw;
+  if (p && p.length) {
+    let m = -Infinity;
+    for (let i = 0; i < p.length; i++) m = Math.max(m, Number(p[i]));
+    return m;
+  }
+  return input.siteLoadMw * (input.loadFactor ?? 1);
+}
+
+/**
+ * Apply the minimum billing demand floor to a 12CP outcome. Billing demand is max(floor, 12CP demand),
+ * with 12CP demand the average site load at the year's monthly peaks. A year with n of 12 peaks
+ * counts n/12 of the annual rate, so with no floor this equals the per-peak sum.
+ */
+function applyFloor(o: CpOutcome, input: DataCenterInputs, peaks: FourCpYear, m: MinimumBillingDemandInput, ncpWithBatteryMw: number | null): CpOutcome {
+  const load = makeLoad(input);
+  const n = peaks.intervals.length;
+  const loads = peaks.intervals.map((iv) => {
+    const [s, e] = countedSpan(iv);
+    let sum = 0;
+    let k = 0;
+    for (let t = s; t < e; t += 900_000, k++) sum += load(t);
+    return k ? sum / k : load(s);
+  });
+  const cuts = o.detail.map((d) => d.cutMw);
+  const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+  const without = mean(loads);
+  const withB = mean(loads.map((l, i) => l - cuts[i]));
+  const contracted = m.contractedPeakMw ?? null;
+  const ncpInput = m.ncpMw ?? null;
+  const ncp = ncpInput ?? siteMaxMw(input);
+  const floor = Math.max(contracted ?? 0, ncp);
+  const bWithout = Math.max(floor, without);
+  const bWith = Math.max(floor, withB);
+  const annual = o.ratePerKw * 12;
+  const avoidedUsd = n ? annual * (n / 12) * (bWithout - bWith) * 1000 : 0;
+  const kw = input.batteryMw * 1000;
+  const netUsd = avoidedUsd - o.energyGivenUpUsd - o.asGivenUpUsd;
+  const floorEffect = floor <= withB + 1e-9 ? 'none' : floor >= without - 1e-9 ? 'full' : 'partial';
+  return {
+    ...o,
+    avoidedUsd,
+    avoidedPerKwYr: avoidedUsd / kw,
+    netUsd,
+    netPerKwYr: netUsd / kw,
+    minimumBillingDemand: {
+      contractedPeakMw: contracted,
+      ncpMw: ncp,
+      ncpSource: ncpInput === null ? 'site load' : 'input',
+      floorMw: floor,
+      twelveCpDemandWithoutMw: without,
+      twelveCpDemandWithMw: withB,
+      billingDemandWithoutMw: bWithout,
+      billingDemandWithMw: bWith,
+      floorEffect,
+      avoidedBeforeFloorUsd: o.avoidedUsd,
+      ncpWithBatteryMw,
+    },
+  };
 }
 
 function outcome(method: CpOutcome['method'], r: DataCenterResult, base: DataCenterResult, rate: number, peaksInYear: number, kw: number): CpOutcome {
@@ -185,21 +300,50 @@ export function runTwelveCpCase(
   if (!(Number.isFinite(rate12) && rate12 >= 0)) throw new Error('12CP rate must be a number at or above 0.');
   const rate4 = input.fourCpRatePerKw ?? dcRules.fourCp.defaultRatePerKwPer4cp.value;
   const kw = input.batteryMw * 1000;
+  const mbd = opts.minimumBillingDemand ?? null;
+  if (mbd) {
+    const errors = validateMinimumBillingDemand(mbd);
+    if (errors.length) throw new Error(errors.join(' '));
+  }
+  let ncpWithBattery = -Infinity;
+  const watchNcp = (_date: string, sch: { charge: ArrayLike<number>; discharge: ArrayLike<number> }, loadMw: number[]) => {
+    for (let t = 0; t < loadMw.length; t++) ncpWithBattery = Math.max(ncpWithBattery, loadMw[t] + sch.charge[t] - sch.discharge[t]);
+  };
 
   const four = runDataCenterCase(input);
   const quiet = { ...input, onDay: undefined };
   const base = runDataCenterCase({ ...quiet, fourCp: { ...input.fourCp, intervals: [], daily_peaks: [] } });
+  const peakFile = toPeakFile(peaks);
   const twelve = runDataCenterCase({
     ...quiet,
-    fourCp: toPeakFile(peaks),
+    ...(mbd ? { onDay: watchNcp } : {}),
+    fourCp: peakFile,
     fourCpRatePerKw: rate12,
     holdWindows: holdWindows(r),
     peakLabel: '12CP',
   });
 
+  let twelveOut = outcome('12CP', twelve, base, rate12, 12, kw);
+  const floorNotes: string[] = [];
+  if (mbd) {
+    twelveOut = applyFloor(twelveOut, input, peakFile, mbd, Number.isFinite(ncpWithBattery) ? ncpWithBattery : null);
+    const f = twelveOut.minimumBillingDemand!;
+    const mw = (x: number) => `${Math.round(x * 10) / 10} MW`;
+    if (f.floorEffect === 'full')
+      floorNotes.push(`Minimum billing demand binds: the site is billed on ${mw(f.floorMw)} whatever the battery does at the monthly peaks, so the 12CP saving is $0. A site in this position would not hold the cuts.`);
+    else if (f.floorEffect === 'partial')
+      floorNotes.push(`Minimum billing demand (${mw(f.floorMw)}) is above the 12CP demand with the battery (${mw(f.twelveCpDemandWithMw)}), so only part of the cut lowers the bill.`);
+    else floorNotes.push(`Minimum billing demand (${mw(f.floorMw)}) is below the 12CP demand with the battery, so it does not change the saving.`);
+    if (f.ncpSource === 'site load') floorNotes.push(`The highest non-coincident peak defaults to the site's highest load (${mw(f.ncpMw)}), which is never below its 12CP demand. Enter a lower figure only if the meter would record one.`);
+    if (f.ncpWithBatteryMw !== null && f.ncpWithBatteryMw > f.floorMw + 1e-6)
+      floorNotes.push(`The battery's charging takes the site's net load to ${mw(f.ncpWithBatteryMw)}, above the floor. The engine does not bill that; it assumes charging is kept under the site's peak.`);
+  }
+
   const notes = [
     `12CP is ${r.status.value}: PUCT Project No. 58000.`,
-    'The 12CP value assumes the site is billed on its 12CP demand. Under the proposal a large load is billed on at least its contracted or highest non-coincident peak demand, which can leave a battery cut worth nothing.',
+    ...(mbd
+      ? floorNotes
+      : ['The 12CP value assumes the site is billed on its 12CP demand. Under the proposal a large load is billed on at least its contracted or highest non-coincident peak demand, which can leave a battery cut worth nothing.']),
     `Monthly peaks are hourly; the proposal measures 30-minute intervals.`,
     ...twelve.notes.filter((n) => !four.notes.includes(n)),
   ];
@@ -211,7 +355,7 @@ export function runTwelveCpCase(
     status: r.status.value,
     baseline: { energyUsd: base.breakdown.energy, asUsd: base.breakdown.as, energyPerKwYr: base.breakdown.energy / kw },
     fourCp: outcome('4CP', four, base, rate4, 4, kw),
-    twelveCp: outcome('12CP', twelve, base, rate12, 12, kw),
+    twelveCp: twelveOut,
     notes,
   };
 }

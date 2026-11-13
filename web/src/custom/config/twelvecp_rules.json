@@ -50,30 +50,103 @@
   },
   "realisticStrategy": {
     "thresholdPctFrom": "datacenter_rules.json fourCp.realisticStrategy.thresholdPct",
-    "derivedFromYears": [2023, 2024, 2025],
+    "derivedFromYears": [
+      2023,
+      2024,
+      2025
+    ],
     "windows": [
-      { "season": "winter", "months": [12, 1, 2], "hours": [[6, 8], [17, 19]] },
-      { "season": "spring", "months": [3, 4, 5], "hours": [[15, 18]] },
-      { "season": "summer", "months": [6, 7, 8, 9], "hours": [[15, 18]] },
-      { "season": "fall", "months": [10, 11], "hours": [[12, 17]] }
+      {
+        "season": "winter",
+        "months": [
+          12,
+          1,
+          2
+        ],
+        "hours": [
+          [
+            6,
+            8
+          ],
+          [
+            17,
+            19
+          ]
+        ]
+      },
+      {
+        "season": "spring",
+        "months": [
+          3,
+          4,
+          5
+        ],
+        "hours": [
+          [
+            15,
+            18
+          ]
+        ]
+      },
+      {
+        "season": "summer",
+        "months": [
+          6,
+          7,
+          8,
+          9
+        ],
+        "hours": [
+          [
+            15,
+            18
+          ]
+        ]
+      },
+      {
+        "season": "fall",
+        "months": [
+          10,
+          11
+        ],
+        "hours": [
+          [
+            12,
+            17
+          ]
+        ]
+      }
     ],
     "assumption": true,
     "text": "Realistic 12CP strategy: the 4CP alert rule in every month. Discharge on a day when that day's ERCOT peak load is at least the 4CP threshold share of the highest daily peak so far that month (the first day of a month always counts). The battery holds an even cut through its season's hold window, local time. Each window starts one hour before the earliest 2023 to 2025 monthly peak hour in that season and ends with the latest, as the 4CP window does; winter has a morning and an evening block. The windows cover every 2023 to 2025 monthly peak hour. They were fitted to those years, so they can miss a later peak: January 2026 peaked in the hour ending 09:00, after the winter morning block.",
     "source": "https://www.ercot.com/gridinfo/load/load_hist",
     "asOf": "2026-11-13"
   },
+  "minimumBillingDemand": {
+    "optional": true,
+    "text": "Optional. A REP serving a large load customer would be charged on a minimum billing demand: the greater of the customer's contracted peak demand, its highest non-coincident peak demand in the past year, or its 12CP demand. When this input is on, the engine bills the 12CP case on that greater figure, so a cut lowers the bill only where the 12CP demand is above the other two. A site's own non-coincident peak is never below its 12CP demand, so with no lower figure entered the floor removes the whole 12CP saving.",
+    "citation": "Proposed 16 TAC §25.193(d)(1) and (d)(2); ERCOT adjustment in proposed §25.192(f)(1)(B)",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
+  "minimumBillingDemandNcp": {
+    "assumption": true,
+    "text": "When no highest non-coincident peak is entered, the engine uses the site's highest load without the battery (the flat load, or the peak of the uploaded profile). It assumes the battery neither raises that peak by charging nor shaves it. The highest net load the battery's schedule reaches is reported, not billed.",
+    "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+    "asOf": "2026-11-13"
+  },
   "notModelled": [
-    {
-      "id": "minimumBillingDemand",
-      "text": "Large load minimum billing demand. A large load customer would be billed on the greater of its contracted peak demand, its highest non-coincident peak demand in the past year, or its 12CP demand, and ERCOT would raise each DSP's 12CP load by the difference. If a site's contracted or non-coincident peak is above its 12CP demand, a battery cut at the monthly peaks may lower its transmission charge by nothing. The engine assumes the site is billed on its 12CP demand.",
-      "citation": "Proposed 16 TAC §25.193(d) and §25.192(f)(1)(B)",
-      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
-      "asOf": "2026-11-13"
-    },
     {
       "id": "minimumBillingDemandOptions",
       "text": "The proposal asks whether the minimum billing demand should differ by size, be ratcheted, or be a weighted average of contracted or non-coincident peak demand and 12CP demand. None of these is modelled.",
       "citation": "Project No. 58000 proposal for publication, questions for comment 1 to 3",
+      "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
+      "asOf": "2026-11-13"
+    },
+    {
+      "id": "batteryNcp",
+      "text": "The battery's effect on the site's non-coincident peak. The dispatch does not try to lower the site's annual peak, and it may charge while the site is at its peak, which would raise the metered peak and so the minimum billing demand. The engine reports that net peak but bills the site's peak without the battery.",
+      "citation": "Proposed 16 TAC §25.193(d)(2)(B)",
       "source": "https://www.ercot.com/files/docs/2026/07/23/PUCT-Project-58000-pfp_adopted-9-July-2026.pdf",
       "asOf": "2026-11-13"
     },
