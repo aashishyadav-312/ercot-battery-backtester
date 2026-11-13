@@ -1,16 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { downloadCsv, usd } from '../../data/format';
-import { TERMS } from '../../copy/terms';
 import type { nearestNodes } from '../geo/nearest';
 import { StackNotes, FixtureBanner } from '../Parts';
 import { SitePrint } from './SitePrint';
 import { dcLinkFromSite } from '../dc/dcForm';
 import {
-  resolveSettings, siteCsv, stripFor, studioHash, studioLocation, durationsFor, hasFullStack, modesFor, writeSiteToHash,
-  upperBoundCaveat, type Basis, type Point, type Settings, type SiteData,
+  resolveSettings, siteCsv, stripFor, studioHash, studioLocation, writeSiteToHash, upperBoundCaveat, type Point, type Settings, type SiteData,
 } from './siteValue';
 import { useSiteBase, useSiteFiles, type SiteSource } from './useSiteData';
-import type { StackMode } from '../stack';
+import { BASIS_LABEL, MODE_LABEL, SITE_CAVEATS as CAVEATS, SiteControls, SiteRange, YearStrip, useStripScale } from './SiteParts';
 import atlas from '../map/AtlasSite.module.css'; // the nearest-node rows keep their Step 4 look
 import classes from './SiteCard.module.css';
 
@@ -18,16 +16,6 @@ export interface SitePin { lat: number; lon: number; label: string; sub: string 
 export type Near = ReturnType<typeof nearestNodes>;
 
 const fmtKm = (km: number) => (km < 10 ? km.toFixed(1) : String(Math.round(km)));
-const MODE_LABEL: Record<StackMode, string> = { realistic: TERMS.dayAheadPlan.label, foresight: TERMS.perfectForesight.label };
-const BASIS_LABEL: Record<Basis, string> = { energy: 'Energy', stack: 'Full stack' };
-
-/** Plain caveats (plan Step 5). The numbers they refer to are on the card, not in these sentences. */
-const CAVEATS = [
-  'A backtest of past prices, not a forecast.',
-  'Distance to a node is a straight line. It is not an interconnection point, and a real site needs its own study.',
-  'Ancillary-service prices are thin markets. A large fleet would push them down, so Full stack values are not what the next battery would earn.',
-];
-
 export interface SiteCardProps {
   pin: SitePin;
   near: Near | null;
@@ -41,9 +29,11 @@ export interface SiteCardProps {
   onSettings: (s: Settings) => void;
   onSelect: (code: string) => void;
   onClear: () => void;
+  /** V5: where the full site report for this pin lives. Shows an "Open site report" link when given. */
+  reportHref?: string;
 }
 
-export function SiteCard({ pin, near, counts, county, city, source, initial, onSettings, onSelect, onClear }: SiteCardProps) {
+export function SiteCard({ pin, near, counts, county, city, source, initial, onSettings, onSelect, onClear, reportHref }: SiteCardProps) {
   const { base, ready } = useSiteBase(source, true);
   const [want, setWant] = useState<Partial<Settings>>(initial ?? {});
   const settings = useMemo(() => resolveSettings(want, base), [want, base]);
@@ -60,20 +50,10 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
 
   useEffect(() => { if (ready) onSettings(settings); }, [ready, settings, onSettings]);
 
-  const durs = durationsFor(base, settings.basis, settings.mode);
-  const modes = modesFor(base, settings.basis, settings.durationH);
   const studioLoc = studioLocation(nearList, hubCode, base.priceLocations);
   const stackFile = settings.basis === 'stack' ? files.stackFiles.get(settings.year) ?? null : null;
 
-  // One scale for every row of the strip, so bars compare across years.
-  const scale = useMemo(() => {
-    const v = strip.flatMap((p) => (p.range ? [p.range.min, p.range.max] : p.hub != null ? [p.hub] : []));
-    const lo = Math.min(0, ...v);
-    const hi = Math.max(...v, 0);
-    return { lo, span: hi - lo || 1 };
-  }, [strip]);
-  const at = (v: number) => `${(((v - scale.lo) / scale.span) * 100).toFixed(2)}%`;
-  const wide = (a: number, b: number) => `${Math.max(((b - a) / scale.span) * 100, 1.2).toFixed(2)}%`;
+  const scale = useStripScale(strip);
 
   const [status, setStatus] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -110,76 +90,12 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
 
       {!near ? <p className={classes.sub}>Finding nearby nodes…</p> : (
         <>
-          <div className={classes.controls}>
-            {hasFullStack(base) && (
-              <div className={classes.group} role="group" aria-label="Revenue basis">
-                {(['energy', 'stack'] as const).map((b) => (
-                  <button key={b} type="button" className={classes.pill} aria-pressed={settings.basis === b} onClick={() => set({ basis: b })} data-testid={`site-basis-${b}`}>{BASIS_LABEL[b]}</button>
-                ))}
-              </div>
-            )}
-            <div className={classes.group} role="group" aria-label="Mode">
-              {modes.map((m) => (
-                <button key={m} type="button" className={classes.pill} aria-pressed={settings.mode === m} onClick={() => set({ mode: m })} data-testid={`site-mode-${m}`}>{MODE_LABEL[m]}</button>
-              ))}
-            </div>
-            <div className={classes.group} role="group" aria-label="Battery duration">
-              {durs.length > 1
-                ? durs.map((d) => <button key={d} type="button" className={classes.pill} aria-pressed={settings.durationH === d} onClick={() => set({ durationH: d })} data-testid={`site-dur-${d}`}>{d} h</button>)
-                : <span className={classes.fixed}>{settings.durationH}-hour battery</span>}
-            </div>
-          </div>
+          <SiteControls base={base} settings={settings} set={set} />
           {stackFile && <FixtureBanner files={[stackFile]} />}
 
-          <div className={classes.main} aria-live="polite">
-            {loading || !ready ? <p className={classes.unit}>Loading results…</p> : range ? (
-              <>
-                <p className={classes.big} data-testid="site-range">{usd(range.min, 1)} to {usd(range.max, 1)}</p>
-                <p className={classes.unit} data-testid="site-range-note">
-                  {TERMS.revenueUnit.label} · {BASIS_LABEL[settings.basis]}, {MODE_LABEL[settings.mode].toLowerCase()} · {cur?.label} · {settings.durationH}-hour battery · median {usd(range.median, 1)}, {range.n} of {range.of} nearest nodes
-                </p>
-                <div className={classes.bar} aria-hidden="true">
-                  <span className={classes.barFill} style={{ left: at(range.min), width: wide(range.min, range.max) }} />
-                  <span className={classes.barMed} style={{ left: at(range.median) }} />
-                </div>
-              </>
-            ) : cur?.hub != null ? (
-              <>
-                <p className={classes.big} data-testid="site-range">{usd(cur.hub, 1)}</p>
-                <p className={classes.unit} data-testid="site-range-note">
-                  {TERMS.revenueUnit.label} · nearest hub {cur.hubCode} · {cur.label} · {settings.durationH}-hour battery. No all-node result for these settings, so this is the hub, not a node range.
-                </p>
-              </>
-            ) : (
-              <p className={classes.unit} data-testid="site-range-note">No result for these settings at the nearest nodes.</p>
-            )}
-          </div>
+          <SiteRange cur={cur} settings={settings} scale={scale} loading={loading || !ready} />
 
-          {strip.length > 0 && (
-            <>
-              <h4 className={classes.h4}>By year</h4>
-              <ol className={classes.strip} data-testid="site-strip" aria-label="Range by year. Pick a year to show it above.">
-                {strip.map((p) => (
-                  <li key={p.year}>
-                    <button type="button" className={classes.stripBtn} aria-pressed={p.year === settings.year} onClick={() => set({ year: p.year })} data-testid={`site-year-${p.year}`}>
-                      <span>{p.label}</span>
-                      <span className={classes.stripTrack} aria-hidden="true">
-                        {p.range ? (
-                          <>
-                            <span className={classes.stripRange} style={{ left: at(p.range.min), width: wide(p.range.min, p.range.max) }} />
-                            <span className={classes.stripMed} style={{ left: at(p.range.median) }} />
-                          </>
-                        ) : p.hub != null ? <span className={classes.stripDot} style={{ left: at(p.hub) }} /> : null}
-                      </span>
-                      <span className={classes.stripVal}>
-                        {p.range ? `${usd(p.range.min, 0)} to ${usd(p.range.max, 0)}` : p.hub != null ? `hub ${usd(p.hub, 0)}` : 'no result'}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </>
-          )}
+          <YearStrip strip={strip} settings={settings} scale={scale} set={set} />
 
           <h4 className={classes.h4}>Nearest nodes</h4>
           <ol className={atlas.nearList} data-testid="near-list">
@@ -227,6 +143,7 @@ export function SiteCard({ pin, near, counts, county, city, source, initial, onS
                 Data Center mode
               </a>
             )}
+            {reportHref && <a className={classes.action} href={reportHref} data-testid="site-report-link">Open site report</a>}
             <button type="button" className={classes.action} onClick={copy}>Copy link</button>
             <button type="button" className={classes.action} onClick={csv} disabled={!strip.length}>Download CSV</button>
             <button type="button" className={classes.action} onClick={() => window.print()}>Print</button>

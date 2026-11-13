@@ -1,0 +1,36 @@
+/* Site report. Existing tokens only; the title, eyebrow and lede come from the Atlas page's module. */
+.page { display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px; }
+.head { padding: 24px 0 4px; background: var(--hero-glow); background-repeat: no-repeat; }
+.title { margin: 0; font-family: var(--mantine-font-family-headings); font-size: clamp(30px, 3.6vw, 48px); font-weight: 800; line-height: 1.06; letter-spacing: -0.025em; color: var(--text); overflow-wrap: anywhere; }
+.where { margin: 14px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.6; color: var(--muted); }
+.panel { padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); min-width: 0; }
+.h2 { margin: 0; font-size: 20px; font-weight: 500; color: var(--text); letter-spacing: -0.014em; }
+.small { margin: 10px 0 0; max-width: 72ch; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+.body { margin: 10px 0 0; max-width: 68ch; font-size: 15px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+.link { color: var(--text); text-underline-offset: 3px; }
+
+.nodes { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--r-input); font-size: 14px; }
+.rowName { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; color: var(--text); }
+.rowSub { font-size: 12px; color: var(--muted); }
+.num { font-family: var(--mantine-font-family-monospace); font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
+.km { font-family: var(--mantine-font-family-monospace); font-size: 13px; color: var(--muted); min-width: 56px; text-align: right; white-space: nowrap; }
+
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.stat { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-input); }
+.statBig { margin: 0; font-size: 1.5rem; font-weight: 620; line-height: 1.2; color: var(--text); font-variant-numeric: tabular-nums; }
+.statSub { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+
+.cta { display: inline-flex; align-items: center; justify-content: center; min-height: var(--tap); margin-top: 14px; padding: 0 18px; border: 1px solid var(--text); border-radius: var(--r-input); background: var(--text); color: var(--bg); font: inherit; font-size: 14px; font-weight: 600; text-decoration: none; transition: transform 160ms var(--ease); }
+.cta:active { transform: scale(0.97); }
+.cta:focus-visible { outline: 2px solid var(--chart-blue); outline-offset: 2px; }
+
+.state { padding: 24px; }
+.stateLinks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+@media (max-width: 640px) {
+  .panel { padding: 16px; }
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row .km { grid-column: 2; text-align: right; }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+}

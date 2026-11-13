@@ -1,6 +1,6 @@
-// Where a visitor goes after choosing a place on Home. One function, so the step that adds the site report page changes one line.
+// Where a visitor goes after choosing a place on Home. One function, so the target page is changed in one line.
 
-/** Hash for a chosen site. Today it opens the Atlas on that site; the site report (`#/site`) replaces it later. */
+/** Hash for a chosen site: the site report (`#/site`), which picks the battery size and year itself. */
 export function siteHash(lat: number, lon: number): string {
-  return `#/atlas?${new URLSearchParams({ lat: lat.toFixed(4), lon: lon.toFixed(4) })}`;
+  return `#/site?${new URLSearchParams({ lat: lat.toFixed(4), lon: lon.toFixed(4) })}`;
 }

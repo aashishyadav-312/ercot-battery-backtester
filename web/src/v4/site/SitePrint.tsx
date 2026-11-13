@@ -4,7 +4,15 @@ import { TERMS } from '../../copy/terms';
 import type { Point, Settings } from './siteValue';
 import classes from './SiteCard.module.css';
 
-export interface SheetSite { name: string; lat: number; lon: number; county: string | null; city: string | null; basisLabel: string; modeLabel: string; link: string; caveats: string[]; sources: string[] }
+/** V5 site report: the Storage nearby block for the printed sheet. Absent on the V4 card. */
+export interface SheetStorage {
+  heading: string;
+  lines: string[];
+  rows: { name: string; status: string; mw: string; distance: string; online: string }[];
+  source: string;
+}
+
+export interface SheetSite { name: string; lat: number; lon: number; county: string | null; city: string | null; basisLabel: string; modeLabel: string; link: string; caveats: string[]; sources: string[]; storage?: SheetStorage }
 
 /** A clean one-page result for the browser's print dialog. Hidden on screen; when printing, the rest of the page is hidden and this shows. */
 export function SitePrint({ site, s, strip, today }: { site: SheetSite; s: Settings; strip: Point[]; today: string }) {
@@ -38,6 +46,19 @@ export function SitePrint({ site, s, strip, today }: { site: SheetSite; s: Setti
           ))}
         </tbody>
       </table>
+      {site.storage && (
+        <>
+          <h2 className={classes.sheetH2}>{site.storage.heading}</h2>
+          {site.storage.lines.map((l) => <p key={l}>{l}</p>)}
+          {site.storage.rows.length > 0 && (
+            <table className={classes.sheetTable}>
+              <thead><tr><th>Unit</th><th>Status</th><th>MW</th><th>Distance (km)</th><th>Online</th></tr></thead>
+              <tbody>{site.storage.rows.map((r) => <tr key={`${r.name}-${r.status}`}><td>{r.name}</td><td>{r.status}</td><td>{r.mw}</td><td>{r.distance}</td><td>{r.online}</td></tr>)}</tbody>
+            </table>
+          )}
+          <p>{site.storage.source}</p>
+        </>
+      )}
       <ul>{site.caveats.map((c) => <li key={c}>{c}</li>)}</ul>
       {site.sources.length > 0 && <p>Sources: {site.sources.join('; ')}</p>}
       <p className={classes.sheetLink}>{site.link}</p>
