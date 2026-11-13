@@ -26,7 +26,7 @@ export const V4: boolean = v4Enabled(
 // ?v5=1 or ?v5=0 in the address wins over VITE_V5, which wins over the default. V5 builds on V4, so with V4 off V5 is off too.
 
 /** The release switch. A later step flips this in its own final commit, so that commit can be reverted alone. */
-export const V5_DEFAULT_ON = true;
+export const V5_DEFAULT_ON = false;
 
 /** Pure so it can be tested. Same order as V4: address, then build variable, then `defaultOn`. `v4On` false always wins. */
 export function v5Enabled(envValue: string | undefined, search: string, hash: string, defaultOn = false, v4On = true): boolean {
