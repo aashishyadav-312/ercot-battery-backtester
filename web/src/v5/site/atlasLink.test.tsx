@@ -70,7 +70,11 @@ describe('Atlas card, Open site report', () => {
     const href = screen.getByTestId('site-report-link').getAttribute('href')!;
     expect(href).toMatch(/^#\/site\?/);
     const q = new URLSearchParams(href.split('?')[1]);
-    expect(Number(q.get('lat'))).toBeCloseTo(Number(new URLSearchParams(window.location.hash.split('?')[1]).get('lat')), 3);
+    // The card writes the pin into the address once its settings are known; the link must name the same place.
+    await waitFor(() => expect(new URLSearchParams(window.location.hash.split('?')[1]).get('lat')).not.toBeNull());
+    const here = new URLSearchParams(window.location.hash.split('?')[1]);
+    expect(q.get('lat')).toBe(here.get('lat'));
+    expect(q.get('lon')).toBe(here.get('lon'));
     expect(q.get('dur')).toBe('2');
     expect(q.get('year')).toBe('2025');
     expect(screen.getByTestId('site-dc')).toBeTruthy(); // the existing actions are still there
