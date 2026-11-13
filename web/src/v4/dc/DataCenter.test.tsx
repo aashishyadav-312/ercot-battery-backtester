@@ -25,6 +25,9 @@ vi.mock('../../components/Chart', () => ({
   axisBase: () => ({}), legendBase: () => ({}), tooltipBase: () => ({}),
 }));
 
+// This file tests today's behaviour, so V5 is forced off even in the CI job that builds with it on (DataCenter.v5.test.tsx covers V5 on).
+vi.mock('../../config/features', async (orig) => ({ ...(await orig<typeof import('../../config/features')>()), V5: false }));
+
 import DataCenterView, { type DcDeps } from './DataCenter';
 import { ModeSwitch } from './ModeSwitch';
 
