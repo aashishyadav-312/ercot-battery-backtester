@@ -4,6 +4,10 @@ import type { IndexRun } from './types';
 import { TERMS } from '../copy/terms';
 import dcRules from '../custom/config/datacenter_rules.json';
 import { v4ConfigTerms } from '../v4/glossary';
+import twelveRules from '../custom/config/twelvecp_rules.json';
+import v5Config from '../v5/config.json';
+import { v5Terms } from '../v5/glossary';
+import { V5 } from '../config/features';
 
 // ------------------------------------------------------------ site facts (About + footer)
 export const SITE = {
@@ -54,9 +58,11 @@ for (const [id, key] of SHARED) GLOSSARY[id] = { ...GLOSSARY[id], term: TERMS[ke
  * The Glossary page: every term A to Z, with the short definition from copy/terms.ts where the term is shared. Entries ending in
  * _v4 are the V4 wording for tooltips on V4 views; the page lists the original term instead.
  */
-export function glossaryEntries(): (GlossaryTerm & { id: string })[] {
+export function glossaryEntries(v5: boolean = V5): (GlossaryTerm & { id: string })[] {
   const short = new Map<string, string>(SHARED.map(([id, key]) => [id, TERMS[key].definition]));
-  return Object.entries(GLOSSARY)
+  // V5 adds its terms to the page only; with V5 off the Glossary is the same as before.
+  const extra: Record<string, GlossaryTerm> = v5 ? v5Terms(twelveRules, dcRules, v5Config) : {};
+  return Object.entries({ ...GLOSSARY, ...extra })
     .filter(([id]) => !id.endsWith('_v4'))
     .map(([id, g]) => ({ ...g, id, definition: short.get(id) ?? g.definition }))
     .sort((x, y) => x.term.localeCompare(y.term, 'en', { sensitivity: 'base' }));
