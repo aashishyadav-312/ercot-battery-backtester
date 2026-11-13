@@ -2,8 +2,9 @@
 // rows that go into the CSV and the print sheet, and the rule text. Every figure comes from runTwelveCpCase or twelvecp_rules.json.
 import { TWELVECP_RULES, type CpOutcome, type TwelveCpComparison } from '../custom/twelvecp';
 import type { Tcos } from '../v4/dc/dcForm';
+import { TCOS_LABEL } from '../v4/revenueSource';
 
-export const TCOS_LABEL: Record<Tcos, string> = { '4cp': '4CP (current rule)', '12cp': '12CP (proposed)' };
+export { TCOS_LABEL } from '../v4/revenueSource';
 export const TCOS_SHORT: Record<Tcos, string> = { '4cp': '4CP', '12cp': '12CP' };
 export const TCOS_ORDER: Tcos[] = ['4cp', '12cp'];
 

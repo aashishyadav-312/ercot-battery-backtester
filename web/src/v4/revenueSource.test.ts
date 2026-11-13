@@ -152,3 +152,19 @@ describe('verdict', () => {
     expect(economicsVerdict(bad)).toContain('energy arbitrage alone does not pay back'); // unchanged without a context
   });
 });
+
+describe('V5 transmission charge rule in the economics link', () => {
+  it('writes tcos=12cp only for a Data Center case run under 12CP, and reads it back', () => {
+    const h12 = economicsLink(hash, 77.5, 2, '12cp');
+    expect(h12).toContain('rev=dc');
+    expect(h12).toContain('tcos=12cp');
+    expect(parseRevHash(h12)).toMatchObject({ rev: 'dc', dc: 77.5, dcDur: 2, tcos: '12cp' });
+    // 4CP, or no rule given, leaves the link as it was before V5.
+    expect(economicsLink(hash, 77.5, 2, '4cp')).toBe(economicsLink(hash, 77.5, 2));
+    expect(economicsLink(hash, 77.5, 2)).not.toContain('tcos');
+    expect(parseRevHash(economicsLink(hash, 77.5, 2)).tcos).toBeUndefined();
+    // tcos does not stick to other sources, and the selection bar keeps it.
+    expect(withRevParams(h12, { rev: 'energy', plan: 'pf', dc: null, dcDur: null, tcos: '12cp' })).not.toContain('tcos');
+    expect(carryRevParams(h12, '#/research/economics?loc=HB_WEST')).toContain('tcos=12cp');
+  });
+});

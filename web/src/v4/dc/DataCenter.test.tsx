@@ -116,6 +116,17 @@ describe('Data Center mode', () => {
     expect(window.location.hash).toContain('as=0');
   }, 30000);
 
+  it('with V5 off has no transmission charge control and ignores tcos in the address', async () => {
+    const { d, runs } = deps();
+    open('mode=dc&loc=HB_WEST&year=2025&tcos=12cp', d);
+    await waitFor(() => expect(screen.getByTestId('dc-results')).toBeTruthy(), { timeout: 15000 });
+    expect(screen.queryByTestId('dc-tcos-control')).toBeNull();
+    expect(screen.queryByTestId('dc-tcos')).toBeNull();
+    expect(window.location.hash).not.toContain('tcos');
+    expect(screen.getByTestId('dc-row-fourCp').textContent).toContain('4CP avoided');
+    expect(screen.getByTestId('dc-perkw').textContent).toBe(usd(last(runs).result.perKwYr, 1));
+  }, 30000);
+
   it('validates inputs before solving', async () => {
     const { d, runs } = deps();
     open('mode=dc&loc=HB_HOUSTON&year=2025&load=0&ws=18&we=15', d);

@@ -13,10 +13,11 @@ import { locFull } from '../data/site';
 import { economicsVerdict } from '../data/notes';
 import { TERMS } from '../copy/terms';
 import { V4 } from '../v4/flag';
+import { V5 } from '../config/features';
 import { useEconStack } from '../v4/useEconStack';
 import { getDcCase } from '../v4/dc/dcCase';
 import {
-  REV_LABEL, economicsDuration, effectiveSource, parseRevHash, revOptions, revenueOf, sourceDetail, withRevParams,
+  REV_LABEL, TCOS_LABEL, economicsDuration, effectiveSource, parseRevHash, revOptions, revenueOf, sourceDetail, withRevParams,
   type DcCase, type Offered, type PlanSource, type RevParams, type RevSource,
 } from '../v4/revenueSource';
 import { revealFocused } from '../shell/panelScroll';
@@ -156,10 +157,15 @@ export default function Economics() {
     const mem = getDcCase();
     if (params.dc != null) {
       const same = !!mem && Math.abs(mem.perKwYr - params.dc) < 0.01;
-      return { perKwYr: params.dc, label: same ? mem!.label : 'Data Center case from the link', durationH: params.dcDur ?? (same ? mem!.durationH : undefined) };
+      // V5: the link says which transmission charge rule the case was run under (tcos=12cp); missing means 4CP.
+      const tcos = V5 && params.tcos === '12cp' ? ('12cp' as const) : undefined;
+      return {
+        perKwYr: params.dc, label: same ? mem!.label : `Data Center case from the link${tcos ? `, ${TCOS_LABEL[tcos]}` : ''}`,
+        durationH: params.dcDur ?? (same ? mem!.durationH : undefined), ...(tcos ? { tcos } : {}),
+      };
     }
     return mem;
-  }, [params.dc, params.dcDur]);
+  }, [params.dc, params.dcDur, params.tcos]);
   const offered: Offered = { stack: stackRes.offered?.row ?? null, stackMeta: stackRes.offered?.meta ?? null, dc: dcCase };
   const options = revOptions(offered);
   const stackPending = V4 && params.rev === 'stack' && stackRes.status === 'loading';
@@ -202,7 +208,7 @@ export default function Economics() {
         merchant-risk premium, and {rev === 'stack'
           ? 'the revenue is energy plus ancillary services from the backtest, with no allowance for prices falling as more batteries bid.'
           : rev === 'dc'
-            ? 'the revenue is the Data Center case you ran, including the 4CP and reliability values you set.'
+            ? `the revenue is the Data Center case you ran, including the ${dcCase?.tcos === '12cp' ? '12CP (proposed)' : '4CP'} and reliability values you set.`
             : 'the revenue is energy arbitrage only.'} Change every input to your own view.
       </Alert>
       <RunStatus />

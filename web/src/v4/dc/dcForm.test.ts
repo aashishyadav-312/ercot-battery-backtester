@@ -81,6 +81,16 @@ describe('link', () => {
     expect(isDcHash(hash)).toBe(true);
     expect(parseDcQuery(hash.split('?')[1], COVERAGE)).toEqual(f);
   });
+  it('carries the transmission charge rule, leaving 4CP out so old links stay the same', () => {
+    expect(DC_DEFAULTS.tcos).toBe('4cp');
+    expect(base().tcos).toBe('4cp');
+    expect(dcQuery(base())).not.toContain('tcos');
+    expect(dcQuery({ ...base(), tcos: '12cp' })).toContain('tcos=12cp');
+    expect(parseDcQuery('mode=dc&tcos=12cp', COVERAGE).tcos).toBe('12cp');
+    expect(parseDcQuery('mode=dc&tcos=nonsense', COVERAGE).tcos).toBe('4cp');
+    expect(breakdownRows({ breakdown: { energy: 1, as: 2, fourCp: 3, reliability: 4 }, breakdownPerKwYr: { energy: 1, as: 2, fourCp: 3, reliability: 4 } }, '12CP')[2].label).toBe('12CP avoided');
+    expect(breakdownRows({ breakdown: { energy: 1, as: 2, fourCp: 3, reliability: 4 }, breakdownPerKwYr: { energy: 1, as: 2, fourCp: 3, reliability: 4 } })[2].label).toBe('4CP avoided');
+  });
   it('leaves defaults out and keeps old Studio links in battery mode', () => {
     expect(dcQuery(base())).toBe('mode=dc&loc=HB_HOUSTON&year=2025');
     expect(isDcHash('#/studio?loc=HB_WEST&dur=2')).toBe(false);

@@ -5,6 +5,7 @@
 //   ...&src=da                                                    day-ahead plan
 //   ...&rev=stack                                                 full stack (energy plus ancillary services)
 //   ...&rev=dc&dc=<$/kW-yr>&dcd=<hours>                           the Data Center case total and its battery duration (MWh / MW)
+//   ...&rev=dc&dc=..&tcos=12cp                                    (V5) the Data Center case was run under the proposed 12CP rule; missing means 4CP
 
 import { AS_UPPER_BOUND_NOTE } from './config';
 import { isUpperBoundYear, yearTag, type StackFile, type StackMode, type StackRow } from './stack';
@@ -19,9 +20,13 @@ export const REV_LABEL: Record<RevSource, string> = { energy: 'Energy', stack: '
 /** Stack files carry two modes: the upper bound is the perfect-foresight run, the realistic one is the day-ahead plan. */
 export const stackModeOf = (plan: PlanSource): StackMode => (plan === 'da' ? 'realistic' : 'foresight');
 
-export interface RevParams { rev: RevSource; plan: PlanSource; dc: number | null; dcDur: number | null }
+/** V5: the transmission charge rule the Data Center case was run under. */
+export type TcosParam = '4cp' | '12cp';
+export const TCOS_LABEL: Record<TcosParam, string> = { '4cp': '4CP (current rule)', '12cp': '12CP (proposed)' };
 
-const EXTRA_KEYS = ['rev', 'src', 'dc', 'dcd'] as const;
+export interface RevParams { rev: RevSource; plan: PlanSource; dc: number | null; dcDur: number | null; /** V5. Present only for 12CP; missing means 4CP. */ tcos?: TcosParam }
+
+const EXTRA_KEYS = ['rev', 'src', 'dc', 'dcd', 'tcos'] as const;
 
 const num = (v: string | null): number | null => (v != null && v.trim() !== '' && Number.isFinite(Number(v)) ? Number(v) : null);
 
@@ -33,6 +38,7 @@ export function parseRevParams(query: string): RevParams {
   return {
     rev: rev === 'stack' || rev === 'dc' ? rev : 'energy', plan: q.get('src') === 'da' ? 'da' : 'pf',
     dc: num(q.get('dc')), dcDur: dcDur != null && dcDur > 0 ? dcDur : null,
+    ...(q.get('tcos') === '12cp' ? { tcos: '12cp' as const } : {}),
   };
 }
 
@@ -49,6 +55,7 @@ export function withRevParams(hash: string, p: RevParams): string {
   if (p.rev !== 'energy') q.set('rev', p.rev);
   if (p.rev === 'dc' && p.dc != null) q.set('dc', String(p.dc));
   if (p.rev === 'dc' && p.dc != null && p.dcDur != null) q.set('dcd', String(p.dcDur));
+  if (p.rev === 'dc' && p.tcos === '12cp') q.set('tcos', '12cp');
   const s = q.toString();
   return s ? `${base}?${s}` : base;
 }
@@ -67,7 +74,7 @@ export function carryRevParams(from: string, to: string): string {
 }
 
 /** The Data Center case total, as carried to Economics. */
-export interface DcCase { perKwYr: number; label: string; /** Battery MWh / MW of the case. */ durationH?: number }
+export interface DcCase { perKwYr: number; label: string; /** Battery MWh / MW of the case. */ durationH?: number; /** V5: the rule the case ran under. Missing means 4CP. */ tcos?: TcosParam }
 
 export interface Offered {
   stack: StackRow | null;
@@ -132,8 +139,8 @@ export function sourceDetail(src: RevSource, o: Offered, plan: PlanSource): Sour
 }
 
 /** Link from a Data Center result to Project economics with that case as the revenue. `hash` is the economics hash for the case. */
-export function economicsLink(hash: string, dc: number, durationH?: number): string {
-  return withRevParams(hash, { rev: 'dc', plan: 'pf', dc: Math.round(dc * 100) / 100, dcDur: durationH != null ? Math.round(durationH * 1000) / 1000 : null });
+export function economicsLink(hash: string, dc: number, durationH?: number, tcos: TcosParam = '4cp'): string {
+  return withRevParams(hash, { rev: 'dc', plan: 'pf', dc: Math.round(dc * 100) / 100, dcDur: durationH != null ? Math.round(durationH * 1000) / 1000 : null, tcos });
 }
 
 /** Duration the economics use: the Data Center case's while that source is in use, else the scenario's. */
