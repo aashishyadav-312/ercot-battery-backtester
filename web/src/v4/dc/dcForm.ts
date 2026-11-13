@@ -7,10 +7,14 @@ import {
 } from '../../custom/datacenter';
 import { centralHour } from '../../custom/prices';
 import type { StackRow, StackMode } from '../stack';
+import type { TwelveCpComparison } from '../../custom/twelvecp';
+import { TCOS_LABEL, TCOS_SHORT, tcosCsvRows } from '../../v5/tcos';
 import type { StackKey } from '../site/stackIndex';
 import { FOURCP_YEARS, STACK_BATTERY } from '../config';
 
 export type DcStrategy = 'foresight' | 'realistic';
+/** V5: which transmission charge rule drives the result. `4cp` is today's rule; `12cp` is the PUCT proposal (Project No. 58000). */
+export type Tcos = '4cp' | '12cp';
 
 /** Where the site is, when Data Center mode was opened from the Site Value card. */
 export interface DcSite {
@@ -39,6 +43,8 @@ export interface DcForm {
   curtailmentHoursPerYear: number;
   valueOfLostLoad: number;
   asEnabled: boolean;
+  /** V5 only. Ignored (and left out of the link) unless the page runs with V5 on. */
+  tcos: Tcos;
   site: DcSite | null;
 }
 
@@ -67,6 +73,7 @@ export const DC_DEFAULTS = {
   curtailmentHoursPerYear: rules.defaults.curtailmentHoursPerYear.value,
   valueOfLostLoad: rules.defaults.valueOfLostLoad.value,
   asEnabled: true,
+  tcos: '4cp' as Tcos,
 };
 
 /** Degradation cost the engine runs with ($/MWh discharged): the same as the stack files and the Studio default. */
@@ -158,6 +165,7 @@ export function parseDcQuery(query: string, coverage: DcCoverage[]): DcForm {
     curtailmentHoursPerYear: numParam(q, 'ch', DC_DEFAULTS.curtailmentHoursPerYear),
     valueOfLostLoad: numParam(q, 'voll', DC_DEFAULTS.valueOfLostLoad),
     asEnabled: boolParam(q, 'as', DC_DEFAULTS.asEnabled),
+    tcos: q.get('tcos') === '12cp' ? '12cp' : DC_DEFAULTS.tcos,
     site,
   };
 }
@@ -181,6 +189,7 @@ export function dcQuery(f: DcForm): string {
   put('ch', f.curtailmentHoursPerYear, DC_DEFAULTS.curtailmentHoursPerYear);
   put('voll', f.valueOfLostLoad, DC_DEFAULTS.valueOfLostLoad);
   put('as', f.asEnabled, DC_DEFAULTS.asEnabled);
+  put('tcos', f.tcos, DC_DEFAULTS.tcos);
   if (f.site) {
     q.set('site', f.site.label);
     q.set('lat', f.site.lat.toFixed(4));
@@ -332,20 +341,22 @@ export const hourLabel = (h: number) => `${String(h).padStart(2, '0')}:00`;
 export const BREAKDOWN_KEYS = ['energy', 'as', 'fourCp', 'reliability'] as const;
 export type BreakdownKey = (typeof BREAKDOWN_KEYS)[number];
 export const BREAKDOWN_LABEL: Record<BreakdownKey, string> = { energy: 'Energy', as: 'Ancillary', fourCp: '4CP avoided', reliability: 'Reliability' };
+/** The label of the transmission part. `peak` is '4CP' (today) or '12CP' (V5, when the 12CP rule is selected). */
+export const avoidedLabel = (peak: string): string => `${peak} avoided`;
 
 export interface BreakdownRow { key: BreakdownKey; label: string; usd: number; perKw: number }
 
 /** The engine's breakdown as display rows, in the order of the chart. Their sums are the engine's totals. */
-export function breakdownRows(r: Pick<DataCenterResult, 'breakdown' | 'breakdownPerKwYr'>): BreakdownRow[] {
-  return BREAKDOWN_KEYS.map((key) => ({ key, label: BREAKDOWN_LABEL[key], usd: r.breakdown[key], perKw: r.breakdownPerKwYr[key] }));
+export function breakdownRows(r: Pick<DataCenterResult, 'breakdown' | 'breakdownPerKwYr'>, peak = '4CP'): BreakdownRow[] {
+  return BREAKDOWN_KEYS.map((key) => ({ key, label: key === 'fourCp' ? avoidedLabel(peak) : BREAKDOWN_LABEL[key], usd: r.breakdown[key], perKw: r.breakdownPerKwYr[key] }));
 }
 
 /** Waterfall steps: each part starts where the last one ended; the total is a full bar from zero. */
-export function waterfall(b: Breakdown): { label: string; base: number; value: number; end: number }[] {
+export function waterfall(b: Breakdown, peak = '4CP'): { label: string; base: number; value: number; end: number }[] {
   let at = 0;
   const steps = BREAKDOWN_KEYS.map((k) => {
     const v = b[k];
-    const s = { label: BREAKDOWN_LABEL[k], base: Math.min(at, at + v), value: Math.abs(v), end: at + v };
+    const s = { label: k === 'fourCp' ? avoidedLabel(peak) : BREAKDOWN_LABEL[k], base: Math.min(at, at + v), value: Math.abs(v), end: at + v };
     at += v;
     return s;
   });
@@ -355,7 +366,10 @@ export function waterfall(b: Breakdown): { label: string; base: number; value: n
 const round = (x: number, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
 
 /** CSV: every input, then every output, one per row. */
-export function dcCsv(f: DcForm, r: DataCenterResult, x: { yearLabel: string; stackNote: string | null; profileName: string | null }): { headers: string[]; rows: (string | number | null)[][] } {
+export function dcCsv(
+  f: DcForm, r: DataCenterResult,
+  x: { yearLabel: string; stackNote: string | null; profileName: string | null; /** V5: both transmission rules on the same inputs; the selected one is `f.tcos`. */ comparison?: TwelveCpComparison | null },
+): { headers: string[]; rows: (string | number | null)[][] } {
   const rows: (string | number | null)[][] = [];
   const add = (section: string, item: string, value: string | number | null, unit = '') => rows.push([section, item, value, unit]);
   if (f.site) {
@@ -381,7 +395,9 @@ export function dcCsv(f: DcForm, r: DataCenterResult, x: { yearLabel: string; st
   add('Input', 'Curtailment hours', f.curtailmentHoursPerYear, 'h/yr');
   add('Input', 'Value of lost load', f.valueOfLostLoad, '$/MWh');
   add('Input', 'Ancillary services', f.asEnabled ? (x.stackNote ? 'on, no stack' : 'on') : 'off');
-  for (const row of breakdownRows(r)) {
+  const peak = x.comparison ? TCOS_SHORT[f.tcos] : '4CP';
+  if (x.comparison) add('Input', 'Transmission charge rule', TCOS_LABEL[f.tcos]);
+  for (const row of breakdownRows(r, peak)) {
     add('Output', `${row.label}`, round(row.usd, 0), '$/yr');
     add('Output', `${row.label}`, round(row.perKw, 2), '$/kW-yr');
   }
@@ -389,7 +405,8 @@ export function dcCsv(f: DcForm, r: DataCenterResult, x: { yearLabel: string; st
   add('Output', 'Total', round(r.perKwYr, 2), '$/kW-yr');
   add('Output', `Standalone at ${f.loc}`, round(r.standalone.totalUsd, 0), '$/yr');
   add('Output', `Standalone at ${f.loc}`, round(r.standalone.perKwYr, 2), '$/kW-yr');
-  for (const d of r.fourCpDetail) add('4CP', d.intervalEndingLocal, round(d.valueUsd, 0), d.covered ? `$ (cut ${round(d.cutMw, 2)} MW)` : '$ (not covered)');
+  if (x.comparison) rows.push(...tcosCsvRows(x.comparison));
+  for (const d of r.fourCpDetail) add(peak, d.intervalEndingLocal, round(d.valueUsd, 0), d.covered ? `$ (cut ${round(d.cutMw, 2)} MW)` : '$ (not covered)');
   for (const n of [...(x.stackNote ? [x.stackNote] : []), ...r.notes]) add('Note', '', n);
   return { headers: ['Section', 'Item', 'Value', 'Unit'], rows };
 }

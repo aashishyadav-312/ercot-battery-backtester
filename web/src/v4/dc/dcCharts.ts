@@ -9,8 +9,8 @@ import { BREAKDOWN_KEYS, waterfall, type BreakdownKey } from './dcForm';
 export const BREAKDOWN_TOKEN: Record<BreakdownKey, 'blue' | 'green' | 'violet' | 'orange'> = { energy: 'blue', as: 'green', fourCp: 'violet', reliability: 'orange' };
 
 /** Waterfall in $/kW-yr: Energy, Ancillary, 4CP avoided, Reliability, then the total from zero. */
-export function buildWaterfallOption(t: ChartTheme, perKw: Breakdown) {
-  const steps = waterfall(perKw);
+export function buildWaterfallOption(t: ChartTheme, perKw: Breakdown, peak = '4CP') {
+  const steps = waterfall(perKw, peak);
   const colors = [...BREAKDOWN_KEYS.map((k) => t[BREAKDOWN_TOKEN[k]]), t.grey[0]];
   return {
     tooltip: {
@@ -46,11 +46,12 @@ export function dispatchSeries(s: DispatchSample) {
   };
 }
 
-export function buildDispatchOption(t: ChartTheme, s: DispatchSample) {
+export function buildDispatchOption(t: ChartTheme, s: DispatchSample, peak = '4CP') {
   const d = dispatchSeries(s);
   const areas: object[] = [];
-  if (s.window) areas.push([{ xAxis: s.times[s.window[0]], itemStyle: { color: alpha(t.blue, 0.08) } }, { xAxis: s.times[s.window[1] - 1] }]);
-  if (s.fourCp) areas.push([{ xAxis: s.times[s.fourCp[0]], itemStyle: { color: alpha(t.violet, 0.28) }, name: '4CP' }, { xAxis: s.times[s.fourCp[1] - 1] }]);
+  if (s.windows) for (const w of s.windows) areas.push([{ xAxis: s.times[w[0]], itemStyle: { color: alpha(t.blue, 0.08) } }, { xAxis: s.times[w[1] - 1] }]);
+  else if (s.window) areas.push([{ xAxis: s.times[s.window[0]], itemStyle: { color: alpha(t.blue, 0.08) } }, { xAxis: s.times[s.window[1] - 1] }]);
+  if (s.fourCp) areas.push([{ xAxis: s.times[s.fourCp[0]], itemStyle: { color: alpha(t.violet, 0.28) }, name: peak }, { xAxis: s.times[s.fourCp[1] - 1] }]);
   return {
     tooltip: { ...tooltipBase(t), trigger: 'axis', valueFormatter: (v: number) => `${v.toFixed(1)} MW` },
     legend: { ...legendBase(t), data: ['Site load', 'Grid draw', 'Discharge', 'Charge'] },
